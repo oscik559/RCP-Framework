@@ -14,6 +14,9 @@ import fitz  # PyMuPDF
 from PIL import Image, ImageDraw, ImageFont
 import json
 import sqlite3
+import requests
+import base64
+from io import BytesIO
 
 
 class TableDetector:
@@ -21,10 +24,12 @@ class TableDetector:
         """Initialize the TableDetector."""
         self.output_dir = Path("data/output")
         self.pages_dir = Path("data/pages")
+        self.tables_dir = Path("data/tables")
         self.db_path = Path("data/products.db")
         
-        # Create output directory
+        # Create directories
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.tables_dir.mkdir(parents=True, exist_ok=True)
     
     def get_exclusion_regions(self, pdf_name, page_number):
         """
@@ -134,21 +139,44 @@ class TableDetector:
                     print(f"Excluded table {i+1} (in header/footer region): {bbox}")
                     continue
                 
-                # Extract table content
-                table_data = table.extract()
+                # Extract table content using VLM instead of PyMuPDF extraction
+                table_content = self.extract_table_with_vlm(page, bbox, page_number)
                 
-                # Count rows and columns
-                rows = len(table_data) if table_data else 0
-                cols = len(table_data[0]) if table_data and len(table_data) > 0 else 0
+                # Count rows and columns from VLM extraction
+                rows = len(table_content) if table_content else 0
+                cols = len(table_content[0]) if table_content and len(table_content) > 0 else 0
+                
+                table_id = len(tables) + 1
                 
                 table_info = {
-                    "table_id": len(tables) + 1,
+                    "table_id": table_id,
                     "bbox": list(bbox),
                     "rows": rows,
                     "columns": cols,
                     "area": (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]),
-                    "content_preview": table_data[:3] if table_data else []  # First 3 rows
+                    "content": table_content if table_content else []  # Full VLM-extracted content
                 }
+                
+                # Save individual table data to tables folder with proper numbering
+                if table_content:
+                    table_filename = f"page_{page_number:03d}_table_{table_id}_{rows}x{cols}.json"
+                    table_path = self.tables_dir / table_filename
+                    
+                    individual_table_info = {
+                        "page": page_number,
+                        "table_id": table_id,
+                        "table_bbox": list(bbox),
+                        "rows": rows,
+                        "columns": cols,
+                        "content": table_content,
+                        "extraction_method": "VLM",
+                        "model": "qwen3-vl:235b-cloud"
+                    }
+                    
+                    with open(table_path, 'w', encoding='utf-8') as f:
+                        json.dump(individual_table_info, f, indent=2, ensure_ascii=False)
+                    
+                    print(f"Saved table data: {table_path}")
                 
                 tables.append(table_info)
                 
@@ -255,7 +283,155 @@ class TableDetector:
         
         return [x0, y0, x1, y1]
     
-    def draw_table_boxes(self, png_path, tables, pdf_page_size, output_path, exclusion_regions=None):
+    def extract_table_with_vlm(self, page, table_bbox, page_number):
+        """
+        Extract table content using VLM by cropping the table area and sending to qwen model.
+        
+        Args:
+            page: PyMuPDF page object
+            table_bbox: Table bounding box (x0, y0, x1, y1)
+            page_number: Page number for context
+            
+        Returns:
+            List of lists containing table data, or None if extraction failed
+        """
+        try:
+            # Render the table area to an image
+            zoom = 300 / 72.0  # 300 DPI
+            mat = fitz.Matrix(zoom, zoom)
+            
+            # Create a rect for the table area with some padding
+            padding = 10  # Add small padding around table
+            table_rect = fitz.Rect(
+                max(0, table_bbox[0] - padding),
+                max(0, table_bbox[1] - padding), 
+                min(page.rect.width, table_bbox[2] + padding),
+                min(page.rect.height, table_bbox[3] + padding)
+            )
+            
+            # Render just the table area
+            pix = page.get_pixmap(matrix=mat, clip=table_rect)
+            
+            # Convert to PIL Image
+            img_data = pix.tobytes("png")
+            table_image = Image.open(BytesIO(img_data))
+            
+            # Convert image to base64 for API
+            buffer = BytesIO()
+            table_image.save(buffer, format='PNG')
+            img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            
+            # Try chat API first, then fallback to generate API
+            api_endpoints = [
+                "http://localhost:11434/api/chat",
+                "http://localhost:11434/api/generate"
+            ]
+            
+            prompt_content = """Look at this table image and extract ALL the text content exactly as it appears. 
+
+I need you to read every single cell in the table and return the data as a JSON array. Each row should be an array containing the exact text from each column.
+
+Important instructions:
+- Read the ACTUAL text in each cell, don't make up placeholder names
+- Include ALL columns you can see (there should be 6-7 columns typically)
+- Include the header row with column names like "Artikelnr", "ID mm", etc.
+- Include all data rows with product numbers, measurements, etc.
+- If a cell contains multiple lines of text, keep them together
+- If you see numbers, include them exactly as shown
+- Preserve Swedish text exactly as it appears
+
+Example format:
+[
+  ["Artikelnr", "ID mm", "ID tum", "YD mm", "Arb.tr. MPa", "Böjradie mm", "Vikt kg/m"],
+  ["1101-14-04", "6,5", "1/4\"", "13,4", "22,5", "100", "0,21"],
+  ...
+]
+
+Return ONLY the JSON array with the actual table content."""
+
+            success = False
+            content = None
+            
+            for api_url in api_endpoints:
+                try:
+                    if "chat" in api_url:
+                        # Chat API format
+                        payload = {
+                            "model": "qwen3-vl:235b-cloud",
+                            "messages": [
+                                {
+                                    "role": "user",
+                                    "content": prompt_content,
+                                    "images": [img_base64]
+                                }
+                            ],
+                            "stream": False,
+                            "options": {
+                                "temperature": 0.1,
+                                "num_predict": 2000
+                            }
+                        }
+                    else:
+                        # Generate API format
+                        payload = {
+                            "model": "qwen3-vl:235b-cloud",
+                            "prompt": prompt_content,
+                            "images": [img_base64],
+                            "stream": False,
+                            "options": {
+                                "temperature": 0.1,
+                                "num_predict": 2000
+                            }
+                        }
+                    
+                    print(f"Trying {api_url}...")
+                    response = requests.post(api_url, json=payload, timeout=120)
+                    
+                    if response.status_code == 200:
+                        result = response.json()
+                        if "chat" in api_url:
+                            content = result.get('message', {}).get('content', '').strip()
+                        else:
+                            content = result.get('response', '').strip()
+                        
+                        if content:
+                            success = True
+                            print(f"Successfully got response from {api_url}")
+                            break
+                    else:
+                        print(f"API {api_url} failed with status {response.status_code}")
+                        
+                except Exception as e:
+                    print(f"Error with {api_url}: {e}")
+                    continue
+            
+            if not success or not content:
+                print("All VLM API endpoints failed")
+                return None
+            
+            # Try to parse JSON response
+            try:
+                # Remove any markdown formatting if present
+                if content.startswith('```json'):
+                    content = content[7:]
+                if content.endswith('```'):
+                    content = content[:-3]
+                content = content.strip()
+                
+                table_data = json.loads(content)
+                print(f"VLM extracted table with {len(table_data)} rows, {len(table_data[0]) if table_data else 0} columns")
+                
+                return table_data
+                
+            except json.JSONDecodeError as e:
+                print(f"Failed to parse VLM response as JSON: {e}")
+                print(f"Raw response: {content[:200]}...")
+                return None
+                
+        except Exception as e:
+            print(f"Error in VLM table extraction: {e}")
+            return None
+    def draw_table_boxes(self, png_path, tables, pdf_page_size, output_path, exclusion_regions=None, page_number=None):
         """
         Draw bounding boxes around detected tables on PNG image.
         
@@ -339,6 +515,14 @@ class TableDetector:
         
         # Save annotated image
         image.save(output_path)
+        
+        # Also save to tables folder if page_number is provided
+        if page_number is not None:
+            tables_png_filename = f"page_{page_number:03d}_tables_visualization.png"
+            tables_png_path = self.tables_dir / tables_png_filename
+            image.save(tables_png_path)
+            print(f"Table visualization saved to: {tables_png_path}")
+        
         print(f"Table detection visualization saved: {output_path}")
     
     def process_pdf_page(self, pdf_path, page_number, png_path=None):
@@ -391,17 +575,18 @@ class TableDetector:
         output_path = self.output_dir / output_filename
         
         # Draw table bounding boxes with exclusion regions
-        self.draw_table_boxes(png_path, tables, pdf_page_size, output_path, exclusion_regions)
+        self.draw_table_boxes(png_path, tables, pdf_page_size, output_path, exclusion_regions, page_number)
         
-        # Save table detection results as JSON
-        json_filename = f"{pdf_name}_page_{page_number:03d}_tables.json"
-        json_path = self.output_dir / json_filename
-        
+        # Create summary results (individual tables are already saved in tables folder)
         results = {
             "page": page_number,
             "pdf_page_size": pdf_page_size,
             "png_size": Image.open(png_path).size,
-            "tables": tables,
+            "tables_detected": len(tables),
+            "individual_table_files": [
+                f"page_{page_number:03d}_table_{t['table_id']}_{t['rows']}x{t['columns']}.json" 
+                for t in tables if t.get('content')
+            ],
             "visualization": str(output_path),
             "detection_summary": {
                 "total_tables": len(tables),
@@ -410,10 +595,8 @@ class TableDetector:
             }
         }
         
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(results, f, indent=2, ensure_ascii=False)
-        
-        print(f"Detection results saved: {json_path}")
+        print(f"Individual table files saved in data/tables/")
+        print(f"Table visualization saved: {output_path}")
         
         return results
 
@@ -512,14 +695,13 @@ def main():
             )
             
             # Print single page summary
-            tables = results["tables"]
-            if tables:
+            tables_count = results["tables_detected"]
+            if tables_count > 0:
                 print(f"\n=== Table Detection Summary ===")
                 print(f"Page: {results['page']}")
-                print(f"Tables detected: {len(tables)}")
-                for table in tables:
-                    print(f"  Table {table['table_id']}: {table['rows']}x{table.get('columns', '?')} "
-                          f"at {table['bbox']} (area: {table['area']:.0f})")
+                print(f"Tables detected: {tables_count}")
+                print(f"Individual table files: {results['individual_table_files']}")
+                print(f"Visualization saved: {results['visualization']}")
             else:
                 print(f"\nNo tables detected on page {args.page}")
             

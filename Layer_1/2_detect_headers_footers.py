@@ -351,7 +351,12 @@ def main():
             manager.process_page(pdf_path, args.page)
         
         else:
-            parser.print_help()
+            # Default behavior: process all pages
+            pdf_path = Path(args.pdf_path)
+            if not pdf_path.exists():
+                print(f"Error: PDF file not found: {pdf_path}")
+                sys.exit(1)
+            manager.process_all_pages(pdf_path)
             
     except Exception as e:
         print(f"Error: {e}")
