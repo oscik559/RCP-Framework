@@ -1,0 +1,92 @@
+{
+  "page": 32,
+  "pdf_page_size": [
+    595.3200073242188,
+    841.9200439453125
+  ],
+  "png_size": [
+    2481,
+    3508
+  ],
+  "tables": [
+    {
+      "table_id": 1,
+      "bbox": [
+        173.28000030517578,
+        255.1199951171875,
+        535.3739868164063,
+        308.2799987792969
+      ],
+      "rows": 3,
+      "columns": 7,
+      "area": 19248.917648964794,
+      "content_preview": [
+        [
+          "Artikel\nnummer",
+          "ID\nmm",
+          "ID\ntum",
+          "YD\nmm",
+          "Arb.tr.\nMPa",
+          "Böjradie\nmm",
+          "Vikt\nkg/m"
+        ],
+        [
+          "1058-01-04",
+          "6,5",
+          "1/4\"",
+          "14,0",
+          "70,0",
+          "35",
+          "0,15"
+        ],
+        [
+          "1058-01-06",
+          "10,0",
+          "3/8\"",
+          "18,0",
+          "70,0",
+          "90",
+          "0,21"
+        ]
+      ]
+    },
+    {
+      "table_id": 2,
+      "bbox": [
+        173.28000030517578,
+        631.199951171875,
+        535.3739868164063,
+        668.0399780273438
+      ],
+      "rows": 2,
+      "columns": 7,
+      "area": 13339.55218727747,
+      "content_preview": [
+        [
+          "Artikel\nnummer",
+          "ID\nmm",
+          "ID\ntum",
+          "YD\nmm",
+          "Arb.tr.\nMPa",
+          "Böjradie\nmm",
+          "Vikt\nkg/m"
+        ],
+        [
+          "1058-50-06",
+          "10,0",
+          "3/8\"",
+          "18,0",
+          "55,0",
+          "70",
+          "0,21"
+        ]
+      ]
+    }
+  ],
+  "visualization": "data/output/Produktbok_page_032_tables.png",
+  "detection_summary": {
+    "total_tables": 2,
+    "largest_table": 1,
+    "total_area": 32588.469836242264
+  }
+}

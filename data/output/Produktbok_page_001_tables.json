@@ -1,0 +1,47 @@
+{
+  "page": 1,
+  "pdf_page_size": [
+    595.3200073242188,
+    841.9200439453125
+  ],
+  "png_size": [
+    2481,
+    3508
+  ],
+  "tables": [
+    {
+      "table_id": 1,
+      "bbox": [
+        1.4399999380111694,
+        1.9199999570846558,
+        593.8800048828125,
+        64.44000244140625
+      ],
+      "rows": 2,
+      "columns": 5,
+      "area": 37039.350580960476,
+      "content_preview": [
+        [
+          "",
+          "",
+          "",
+          "",
+          "1:1"
+        ],
+        [
+          null,
+          "",
+          "",
+          null,
+          ""
+        ]
+      ]
+    }
+  ],
+  "visualization": "data/output/Produktbok_page_001_tables.png",
+  "detection_summary": {
+    "total_tables": 1,
+    "largest_table": 1,
+    "total_area": 37039.350580960476
+  }
+}
