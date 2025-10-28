@@ -4,50 +4,8 @@
   "pages": {
     "1": {
       "page": 1,
-      "pdf_page_size": [
-        595.3200073242188,
-        841.9200439453125
-      ],
-      "png_size": [
-        2481,
-        3508
-      ],
-      "tables": [
-        {
-          "table_id": 1,
-          "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            64.44000244140625
-          ],
-          "rows": 2,
-          "columns": 5,
-          "area": 37039.350580960476,
-          "content_preview": [
-            [
-              "",
-              "",
-              "",
-              "",
-              "1:1"
-            ],
-            [
-              null,
-              "",
-              "",
-              null,
-              ""
-            ]
-          ]
-        }
-      ],
-      "visualization": "data/output/Produktbok_page_001_tables.png",
-      "detection_summary": {
-        "total_tables": 1,
-        "largest_table": 1,
-        "total_area": 37039.350580960476
-      }
+      "tables": [],
+      "png_path": null
     },
     "2": {
       "page": 2,
@@ -67,28 +25,6 @@
       "tables": [
         {
           "table_id": 1,
-          "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
           "bbox": [
             306.1199951171875,
             264.4800109863281,
@@ -119,9 +55,9 @@
       ],
       "visualization": "data/output/Produktbok_page_003_tables.png",
       "detection_summary": {
-        "total_tables": 2,
+        "total_tables": 1,
         "largest_table": 1,
-        "total_area": 35284.56699316521
+        "total_area": 11041.921875
       }
     },
     "4": {
@@ -176,28 +112,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.48470800063188,
             257.4000244140625,
             537.47998046875,
@@ -239,9 +153,9 @@
       ],
       "visualization": "data/output/Produktbok_page_005_tables.png",
       "detection_summary": {
-        "total_tables": 2,
-        "largest_table": 2,
-        "total_area": 67223.21311182293
+        "total_tables": 1,
+        "largest_table": 1,
+        "total_area": 42980.56799365772
       }
     },
     "6": {
@@ -350,28 +264,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.96000035603842,
             269.94000074598523,
             537.8899688720703,
@@ -411,7 +303,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.96000035603842,
             439.91998291015625,
@@ -445,9 +337,9 @@
       ],
       "visualization": "data/output/Produktbok_page_007_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 89378.83549843315
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 65136.19038026795
       }
     },
     "8": {
@@ -565,28 +457,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.88545712557706,
             264.4800109863281,
             537.0436345880681,
@@ -626,7 +496,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.88545712557706,
             439.44000244140625,
@@ -660,9 +530,9 @@
       ],
       "visualization": "data/output/Produktbok_page_009_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 84991.73967513436
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 60749.094556969154
       }
     },
     "10": {
@@ -780,28 +650,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.93142918178015,
             272.6399841308594,
             537.1885637555804,
@@ -841,7 +689,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.93142918178015,
             610.3200073242188,
@@ -875,9 +723,9 @@
       ],
       "visualization": "data/output/Produktbok_page_011_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 66961.67527546173
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 42719.030157296525
       }
     },
     "12": {
@@ -983,28 +831,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.96307725172775,
             251.16000366210938,
             518.8472683993252,
@@ -1041,7 +867,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.96307725172775,
             610.3200073242188,
@@ -1081,9 +907,9 @@
       ],
       "visualization": "data/output/Produktbok_page_013_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 97496.04521290885
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 73253.40009474364
       }
     },
     "14": {
@@ -1189,28 +1015,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.8857153029669,
             252.1199951171875,
             537.0,
@@ -1250,7 +1054,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.8857153029669,
             610.9199829101562,
@@ -1293,9 +1097,9 @@
       ],
       "visualization": "data/output/Produktbok_page_015_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 88470.29639709006
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 64227.65127892485
       }
     },
     "16": {
@@ -1413,28 +1217,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.9520004272461,
             292.67999267578125,
             536.932502746582,
@@ -1474,7 +1256,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.9520004272461,
             637.199951171875,
@@ -1517,9 +1299,9 @@
       ],
       "visualization": "data/output/Produktbok_page_017_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 84090.87211294305
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 59848.22699477784
       }
     },
     "18": {
@@ -1628,28 +1410,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.52000427246094,
             266.2799987792969,
             530.637777822989,
@@ -1689,7 +1449,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.52000427246094,
             669.47998046875,
@@ -1732,9 +1492,9 @@
       ],
       "visualization": "data/output/Produktbok_page_019_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 3,
-        "total_area": 70439.4008859079
+        "total_tables": 2,
+        "largest_table": 2,
+        "total_area": 46196.755767742696
       }
     },
     "20": {
@@ -1852,28 +1612,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             174.26400299072264,
             252.72000122070312,
             537.4799860174006,
@@ -1904,7 +1642,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             174.26400299072264,
             630.9600219726562,
@@ -1947,9 +1685,9 @@
       ],
       "visualization": "data/output/Produktbok_page_021_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 1,
-        "total_area": 58370.41577969967
+        "total_tables": 2,
+        "largest_table": 2,
+        "total_area": 34127.770661534465
       }
     },
     "22": {
@@ -2073,28 +1811,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.52000427246094,
             244.0800018310547,
             536.52001953125,
@@ -2140,7 +1856,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.52000427246094,
             611.760009765625,
@@ -2189,9 +1905,9 @@
       ],
       "visualization": "data/output/Produktbok_page_023_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 3,
-        "total_area": 75512.76926733521
+        "total_tables": 2,
+        "largest_table": 2,
+        "total_area": 51270.124149170006
       }
     },
     "24": {
@@ -2306,28 +2022,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.7888018798828,
             245.04000854492188,
             537.0599975585938,
@@ -2370,7 +2064,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.7888018798828,
             623.4000244140625,
@@ -2416,9 +2110,9 @@
       ],
       "visualization": "data/output/Produktbok_page_025_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 109945.56830828162
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 85702.92319011642
       }
     },
     "26": {
@@ -2536,28 +2230,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             174.87271950461647,
             240.83999633789062,
             538.5490833629261,
@@ -2597,7 +2269,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             174.87271950461647,
             614.52001953125,
@@ -2631,9 +2303,9 @@
       ],
       "visualization": "data/output/Produktbok_page_027_tables.png",
       "detection_summary": {
-        "total_tables": 3,
+        "total_tables": 2,
         "largest_table": 1,
-        "total_area": 59679.281998922495
+        "total_area": 35436.63688075729
       }
     },
     "28": {
@@ -2751,28 +2423,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.38560180664064,
             276.7200012207031,
             536.4623876953125,
@@ -2812,7 +2462,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.38560180664064,
             624.9600219726562,
@@ -2855,9 +2505,9 @@
       ],
       "visualization": "data/output/Produktbok_page_029_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 100227.33817474202
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 75984.69305657681
       }
     },
     "30": {
@@ -2975,28 +2625,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             172.76571437290735,
             263.0400085449219,
             536.4171534946987,
@@ -3036,7 +2664,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             172.76571437290735,
             642.7200317382812,
@@ -3070,9 +2698,9 @@
       ],
       "visualization": "data/output/Produktbok_page_031_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 70891.84018703694
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 46649.19506887173
       }
     },
     "32": {
@@ -3181,28 +2809,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             174.1320022583008,
             249.24000549316406,
             537.8880065917969,
@@ -3242,7 +2848,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             174.1320022583008,
             617.6400146484375,
@@ -3276,9 +2882,9 @@
       ],
       "visualization": "data/output/Produktbok_page_033_tables.png",
       "detection_summary": {
-        "total_tables": 3,
+        "total_tables": 2,
         "largest_table": 1,
-        "total_area": 55365.59130943453
+        "total_area": 31122.946191269322
       }
     },
     "34": {
@@ -3396,28 +3002,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.9520004272461,
             228.59999084472656,
             537.8040100097656,
@@ -3454,7 +3038,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.9520004272461,
             600.7200317382812,
@@ -3494,9 +3078,9 @@
       ],
       "visualization": "data/output/Produktbok_page_035_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 84278.22114733986
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 60035.576029174656
       }
     },
     "36": {
@@ -3614,28 +3198,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.78999819074357,
             239.51998901367188,
             530.1220310756138,
@@ -3675,7 +3237,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.78999819074357,
             632.760009765625,
@@ -3715,9 +3277,9 @@
       ],
       "visualization": "data/output/Produktbok_page_037_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 116817.71106769121
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 92575.065949526
       }
     },
     "38": {
@@ -3832,28 +3394,6 @@
         {
           "table_id": 1,
           "bbox": [
-            1.4399999380111694,
-            1.9199999570846558,
-            593.8800048828125,
-            42.84000015258789
-          ],
-          "rows": 2,
-          "columns": 2,
-          "area": 24242.64511816521,
-          "content_preview": [
-            [
-              "KAPITEL 1:1 HÖGTRYCKSSLANG",
-              "1:1"
-            ],
-            [
-              "",
-              ""
-            ]
-          ]
-        },
-        {
-          "table_id": 2,
-          "bbox": [
             173.52000427246094,
             262.67999267578125,
             537.7999945746528,
@@ -3893,7 +3433,7 @@
           ]
         },
         {
-          "table_id": 3,
+          "table_id": 2,
           "bbox": [
             173.52000427246094,
             616.3200073242188,
@@ -3936,9 +3476,9 @@
       ],
       "visualization": "data/output/Produktbok_page_039_tables.png",
       "detection_summary": {
-        "total_tables": 3,
-        "largest_table": 2,
-        "total_area": 101615.72395190521
+        "total_tables": 2,
+        "largest_table": 1,
+        "total_area": 77373.07883374
       }
     },
     "40": {
@@ -4033,8 +3573,8 @@
     }
   },
   "summary": {
-    "pages_with_tables": 39,
-    "total_tables": 93,
+    "pages_with_tables": 38,
+    "total_tables": 73,
     "pages_processed": 40
   }
 }

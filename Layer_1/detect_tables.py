@@ -13,6 +13,7 @@ from pathlib import Path
 import fitz  # PyMuPDF
 from PIL import Image, ImageDraw, ImageFont
 import json
+import sqlite3
 
 
 class TableDetector:
@@ -20,13 +21,73 @@ class TableDetector:
         """Initialize the TableDetector."""
         self.output_dir = Path("data/output")
         self.pages_dir = Path("data/pages")
+        self.db_path = Path("data/products.db")
         
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
+    def get_exclusion_regions(self, pdf_name, page_number):
+        """
+        Get header/footer regions from database to exclude from table detection.
+        
+        Args:
+            pdf_name: PDF filename (without extension)
+            page_number: Page number
+            
+        Returns:
+            Dictionary with header and footer regions, or None if not found
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT page_width, page_height, header_x0, header_y0, header_x1, header_y1,
+                   footer_x0, footer_y0, footer_x1, footer_y1
+            FROM page_regions 
+            WHERE pdf_name = ? AND page_number = ?
+        ''', (pdf_name, page_number))
+        
+        result = cursor.fetchone()
+        conn.close()
+        
+        if not result:
+            return None
+        
+        return {
+            "page_size": [result[0], result[1]],
+            "header_region": fitz.Rect(result[2], result[3], result[4], result[5]),
+            "footer_region": fitz.Rect(result[6], result[7], result[8], result[9])
+        }
+    
+    def is_table_in_exclusion_zone(self, table_bbox, exclusion_regions):
+        """
+        Check if a table intersects with header or footer exclusion regions.
+        
+        Args:
+            table_bbox: Table bounding box as fitz.Rect or [x0, y0, x1, y1]
+            exclusion_regions: Dictionary with header_region and footer_region
+            
+        Returns:
+            True if table should be excluded, False otherwise
+        """
+        if not exclusion_regions:
+            return False
+        
+        # Convert to fitz.Rect if needed
+        if isinstance(table_bbox, list):
+            table_rect = fitz.Rect(table_bbox)
+        else:
+            table_rect = table_bbox
+        
+        # Check if table intersects with header or footer regions
+        header_intersects = table_rect.intersects(exclusion_regions["header_region"])
+        footer_intersects = table_rect.intersects(exclusion_regions["footer_region"])
+        
+        return header_intersects or footer_intersects
+    
     def detect_tables_in_pdf_page(self, pdf_path, page_number):
         """
-        Detect tables in a PDF page using PyMuPDF.
+        Detect tables in a PDF page using PyMuPDF, excluding header/footer regions.
         
         Args:
             pdf_path: Path to PDF file
@@ -42,8 +103,18 @@ class TableDetector:
         
         page = doc.load_page(page_number - 1)  # Convert to 0-based
         
+        # Get exclusion regions from database
+        pdf_name = Path(pdf_path).stem
+        exclusion_regions = self.get_exclusion_regions(pdf_name, page_number)
+        
+        if exclusion_regions:
+            print(f"Using exclusion regions - Header: {exclusion_regions['header_region']}, Footer: {exclusion_regions['footer_region']}")
+        else:
+            print("No exclusion regions found in database")
+        
         # Find tables using PyMuPDF's table detection
         tables = []
+        excluded_tables = []
         
         try:
             # Get all tables on the page
@@ -53,6 +124,16 @@ class TableDetector:
                 # Get table bounding box
                 bbox = table.bbox  # Returns (x0, y0, x1, y1)
                 
+                # Check if table is in exclusion zone
+                if self.is_table_in_exclusion_zone(list(bbox), exclusion_regions):
+                    excluded_tables.append({
+                        "table_id": f"excluded_{i + 1}",
+                        "bbox": list(bbox),
+                        "reason": "In header/footer region"
+                    })
+                    print(f"Excluded table {i+1} (in header/footer region): {bbox}")
+                    continue
+                
                 # Extract table content
                 table_data = table.extract()
                 
@@ -61,7 +142,7 @@ class TableDetector:
                 cols = len(table_data[0]) if table_data and len(table_data) > 0 else 0
                 
                 table_info = {
-                    "table_id": i + 1,
+                    "table_id": len(tables) + 1,
                     "bbox": list(bbox),
                     "rows": rows,
                     "columns": cols,
@@ -71,24 +152,27 @@ class TableDetector:
                 
                 tables.append(table_info)
                 
-                print(f"Table {i+1}: {rows}x{cols} at {bbox}")
+                print(f"Table {table_info['table_id']}: {rows}x{cols} at {bbox}")
         
         except Exception as e:
             print(f"Error detecting tables: {e}")
         
         # Alternative method: Look for text patterns that suggest tables
         if not tables:
-            tables = self._detect_table_patterns(page)
+            tables = self._detect_table_patterns(page, exclusion_regions)
         
         doc.close()
+        
+        print(f"Found {len(tables)} valid tables, excluded {len(excluded_tables)} tables in header/footer regions")
         return tables
     
-    def _detect_table_patterns(self, page):
+    def _detect_table_patterns(self, page, exclusion_regions=None):
         """
         Fallback method to detect table-like structures using text analysis.
         
         Args:
             page: PyMuPDF page object
+            exclusion_regions: Dictionary with header/footer regions to exclude
             
         Returns:
             List of detected table regions
@@ -103,6 +187,12 @@ class TableDetector:
         
         for block in blocks:
             if "lines" in block:
+                bbox = block["bbox"]
+                
+                # Check if block is in exclusion zone
+                if self.is_table_in_exclusion_zone(list(bbox), exclusion_regions):
+                    continue
+                
                 # Analyze text patterns in this block
                 lines = block["lines"]
                 
@@ -120,7 +210,6 @@ class TableDetector:
                 
                 # If many lines have numeric/tabular patterns, consider it a table
                 if numeric_lines >= 3 and len(lines) >= 4:
-                    bbox = block["bbox"]
                     table_info = {
                         "table_id": len(table_candidates) + 1,
                         "bbox": bbox,
@@ -166,7 +255,7 @@ class TableDetector:
         
         return [x0, y0, x1, y1]
     
-    def draw_table_boxes(self, png_path, tables, pdf_page_size, output_path):
+    def draw_table_boxes(self, png_path, tables, pdf_page_size, output_path, exclusion_regions=None):
         """
         Draw bounding boxes around detected tables on PNG image.
         
@@ -175,6 +264,7 @@ class TableDetector:
             tables: List of table dictionaries with bbox info
             pdf_page_size: (width, height) of original PDF page
             output_path: Path to save annotated image
+            exclusion_regions: Optional header/footer regions to show
         """
         # Open PNG image
         image = Image.open(png_path)
@@ -183,10 +273,38 @@ class TableDetector:
         # Try to load a font for labels
         try:
             font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 16)
+            font_small = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 12)
         except:
             font = ImageFont.load_default()
+            font_small = font
         
+        # Draw exclusion regions first (as background)
+        if exclusion_regions:
+            # Draw header region
+            header_bbox = [
+                exclusion_regions["header_region"].x0,
+                exclusion_regions["header_region"].y0,
+                exclusion_regions["header_region"].x1,
+                exclusion_regions["header_region"].y1
+            ]
+            header_png = self.scale_bbox_to_png(header_bbox, pdf_page_size, image.size)
+            draw.rectangle(header_png, outline="red", width=2)
+            draw.text((header_png[0] + 5, header_png[1] + 5), "HEADER (EXCLUDED)", 
+                     fill="red", font=font_small)
+            
+            # Draw footer region
+            footer_bbox = [
+                exclusion_regions["footer_region"].x0,
+                exclusion_regions["footer_region"].y0,
+                exclusion_regions["footer_region"].x1,
+                exclusion_regions["footer_region"].y1
+            ]
+            footer_png = self.scale_bbox_to_png(footer_bbox, pdf_page_size, image.size)
+            draw.rectangle(footer_png, outline="red", width=2)
+            draw.text((footer_png[0] + 5, footer_png[1] + 5), "FOOTER (EXCLUDED)", 
+                     fill="red", font=font_small)
         
+        # Draw detected tables
         for i, table in enumerate(tables):
             # Scale PDF bounding box to PNG coordinates
             pdf_bbox = table["bbox"]
@@ -197,7 +315,7 @@ class TableDetector:
             )
             
             # Choose color
-            color = "red" 
+            color = "blue" 
             
             # Draw bounding box
             draw.rectangle(png_bbox, outline=color, width=3)
@@ -243,7 +361,11 @@ class TableDetector:
         pdf_page_size = (page.rect.width, page.rect.height)
         doc.close()
         
-        # Detect tables
+        # Get exclusion regions for visualization
+        pdf_name = Path(pdf_path).stem
+        exclusion_regions = self.get_exclusion_regions(pdf_name, page_number)
+        
+        # Detect tables (exclusion is handled inside this method)
         tables = self.detect_tables_in_pdf_page(pdf_path, page_number)
         
         if not tables:
@@ -268,8 +390,8 @@ class TableDetector:
         output_filename = f"{pdf_name}_page_{page_number:03d}_tables.png"
         output_path = self.output_dir / output_filename
         
-        # Draw table bounding boxes
-        self.draw_table_boxes(png_path, tables, pdf_page_size, output_path)
+        # Draw table bounding boxes with exclusion regions
+        self.draw_table_boxes(png_path, tables, pdf_page_size, output_path, exclusion_regions)
         
         # Save table detection results as JSON
         json_filename = f"{pdf_name}_page_{page_number:03d}_tables.json"
