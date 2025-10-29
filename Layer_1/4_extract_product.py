@@ -3,7 +3,12 @@
 Product Data Extractor using Ollama VLM
 
 Extracts product information from PDF pages using a Vision Language Model
-and stores the results in a SQLite database.
+and stores the results in a hierarchical SQLite database structure:
+- Categories (top level: product groups)
+- Product Families (middle level: product lines with shared construction)
+- Products (bottom level: individual SKUs with specifications)
+
+Can leverage pre-extracted table data from the detect_tables stage for accuracy.
 """
 
 import os
@@ -32,46 +37,38 @@ class ProductExtractor:
         self.model_name = model_name
         self.db_path = Path("data/products.db")
         self.output_dir = Path("output")
+        self.tables_dir = Path("data/tables")
         
         # Create directories
         self.db_path.parent.mkdir(exist_ok=True)
         self.output_dir.mkdir(exist_ok=True)
         
-        # Initialize database
-        self._init_database()
+        # Verify database is initialized
+        if not self._init_database():
+            raise RuntimeError("Database not properly initialized")
     
     def _init_database(self):
-        """Initialize SQLite database with product tables."""
+        """Initialize SQLite database - uses external schema.sql file."""
+        # Database should be initialized with schema.sql before running this script
+        # This method just verifies the tables exist
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        # Create products table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS products (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                product_code TEXT UNIQUE,
-                name TEXT,
-                category TEXT,
-                page_number INTEGER,
-                raw_text TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
+        # Verify required tables exist
+        cursor.execute("""
+            SELECT name FROM sqlite_master 
+            WHERE type='table' AND name IN ('categories', 'product_families', 'products')
+        """)
+        tables = cursor.fetchall()
         
-        # Create specifications table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS specs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                product_id INTEGER,
-                spec_key TEXT,
-                spec_value TEXT,
-                unit TEXT,
-                FOREIGN KEY (product_id) REFERENCES products (id)
-            )
-        ''')
+        if len(tables) < 3:
+            print("⚠️  Warning: Database schema not initialized!")
+            print("Please run: sqlite3 data/products.db < Layer_1/schema.sql")
+            conn.close()
+            return False
         
-        conn.commit()
         conn.close()
+        return True
     
     def render_pdf_page(self, pdf_path, page_number):
         """
@@ -147,121 +144,138 @@ class ProductExtractor:
             print(f"Error calling Ollama API: {e}")
             return None
     
-    def extract_products_from_image(self, image, strict_table=False):
+    def extract_products_from_image(self, image, page_number, table_data=None):
         """
         Extract product information from an image using VLM.
+        
+        Uses hierarchical structure: category -> families -> individual products
+        A page can contain multiple product families.
 
         Args:
             image: PIL Image object
-            strict_table: if True, use a stricter prompt that forces one product per table row
+            page_number: Page number being processed
+            table_data: Pre-extracted table data from detect_tables stage (optional)
 
         Returns:
-            List of extracted products with their information
+            Tuple of (category_name, families_list)
+            where families_list is a list of family dicts, each containing their products
         """
-        if strict_table:
-            # Stronger prompt to force extraction of every table row as an individual product
-            prompt = f'''
-            You are given an image of a product-specification page (dimensions: {image.size[0]}x{image.size[1]} pixels) that contains a table listing multiple product rows.
+        
+        # Build context from pre-extracted table data if available
+        table_context = ""
+        if table_data:
+            table_context = "\n\n📊 PRE-EXTRACTED TABLE DATA:\n"
+            for i, table in enumerate(table_data, 1):
+                table_context += f"\nTable {i} ({table.get('rows')}x{table.get('columns')}):\n"
+                table_context += json.dumps(table.get('content', []), indent=2, ensure_ascii=False) + "\n"
+        
+        prompt = f'''You are analyzing a Swedish industrial hose/hydraulic product catalog page. Your task is to understand and extract the hierarchical product information naturally presented on the page.
 
-            Your task: Extract every table row as a separate product object. For each table row include the exact product code as printed (e.g., "1059-01-04"), the exact measurements from the row (ID mm, ID tum, YD mm, Arb.tr MPa, Böjradie mm, Vikt kg/m), and attach the page-level metadata (product name/category and construction text) to each product.
+Image dimensions: {image.size[0]}x{image.size[1]} pixels
+{table_context}
 
-            CRITICAL - Bounding Box Requirements:
-            - The image is {image.size[0]} pixels wide and {image.size[1]} pixels tall
-            - For each product, provide a bounding_box that encompasses the ENTIRE product section including:
-              * The product image (hose illustration on the left)
-              * The construction details (Konstruktion section)
-              * The specifications table row
-              * Any usage/application text (Användning och egenskaper)
-            - Bounding box format: [x1, y1, x2, y2] where:
-              * x1, y1 = top-left corner coordinates
-              * x2, y2 = bottom-right corner coordinates
-              * All coordinates must be within 0-{image.size[0]} (width) and 0-{image.size[1]} (height)
-            - Make bounding boxes generous - better to include too much than too little
+📋 TASK: Extract product data in a 3-level hierarchy
 
-            Requirements:
-            - Return a JSON array where each element is an object with keys: product_code, name, category, specifications (with keys id_mm, id_tum, yd_mm, working_pressure_mpa, bend_radius_mm, weight_kg_per_m), construction (string), bounding_box (array of 4 numbers).
-            - Do NOT include summary or explanatory text—only return valid JSON.
-            - Ensure that table header rows are not returned as products; only return actual product rows with full codes (including trailing segments like "-04").
-            - If a value is missing, set it to null.
+🔍 WHAT TO LOOK FOR:
 
-            Example output:
-            [
-              {{"product_code":"1059-01-04", "name":"...", "category":"...", "specifications":{{"id_mm":6.5,...}}, "construction":"...", "bounding_box":[50, 100, 1200, 400]}},
-              ...
+**Level 1 - CATEGORY** (broad product group):
+Find the main category this page belongs to. Look for large headings or chapter references.
+Common categories: HÖGTRYCKSSLANG, OLJESLANG, KEMIKALIESLANGAR, etc.
+
+**Level 2 - PRODUCT FAMILIES** (product lines with shared characteristics):
+⚠️ IMPORTANT: A page may contain MULTIPLE product families (1, 2, or more).
+Each family typically has:
+- A prominent product name/model (often bold or large text)
+- A base article/product code that products share (the prefix before size variants)
+- Its own "Konstruktion" section describing materials, temperature range, standards
+- Its own "Användning och egenskaper" (usage/application) text
+- Its own product hose image
+
+The family code is the common prefix in article numbers (e.g., if you see "1059-01-04", "1059-01-06", the family is "1059-01").
+
+**Level 3 - INDIVIDUAL PRODUCTS** (specific SKUs):
+Each family has multiple products from its specifications table. Each table row = one product with:
+- Complete article number (including size suffix like "-04", "-06", "-12")
+- Technical specifications (inner diameter, outer diameter, pressure, bend radius, weight)
+- Physical location on page (bounding box)
+
+Some products may have special configurations (like "PÅ BOBIN" for reel products).
+
+🎯 EXTRACTION STRATEGY:
+1. Scan the entire page to identify ALL product families (look for distinct product names and base codes)
+2. For each family, extract its name, base code, construction details, and applications
+3. Match each table to its corresponding family based on article number prefixes
+4. Extract each table row as an individual product with full article number
+5. Use pre-extracted table data when available for accuracy
+
+📤 OUTPUT: Return ONLY valid JSON (no markdown, no explanations):
+
+{{
+    "category": "category name or null",
+    "chapter": "chapter reference or null",
+    "families": [
+        {{
+            "family_code": "base code without size suffix",
+            "name": "product line name",
+            "subtitle": "subtitle if present or null",
+            "description": "additional description or null",
+            "construction_details": {{
+                // Extract whatever construction info is present, common fields:
+                // "inner_tube", "outer_cover", "reinforcement", "safety_factor",
+                // "temperature": {{"min": num, "max": num, "unit": "°C"}},
+                // "standards": [], "marking", "hylsa", "produktgrupp", etc.
+                // Include whatever fields exist, omit what doesn't
+            }},
+            "applications": "usage/application text or null",
+            "products": [
+                {{
+                    "product_code": "complete article number",
+                    "configuration_type": "STANDARD|REEL|SPECIAL|etc",
+                    "configuration_name": "descriptive name or null",
+                    "specifications": {{
+                        // "id_mm", "id_tum", "yd_mm", 
+                        // "working_pressure_mpa", "bend_radius_mm", "weight_kg_per_m"
+                    }},
+                    "bounding_box": [x1, y1, x2, y2]
+                }}
             ]
-            '''
-        else:
-            prompt = f'''
-            Analyze this product specification page (dimensions: {image.size[0]}x{image.size[1]} pixels) and extract all product information.
+        }}
+    ]
+}}
 
-            For each product, identify and extract:
-            1. Product code (like 1105-43-04, 1105-43-06, etc.)
-            2. Technical specifications from tables (ID mm, ID tum, YD mm, Arb.tr MPa, Böjradie mm, Vikt kg/m)
-            3. Product name/category (like "KAPPAFLEX 2K PO")
-            4. Construction details (Konstruktion section with materials, temperature, etc.)
-
-            CRITICAL - Bounding Box Requirements:
-            - The image is {image.size[0]} pixels wide and {image.size[1]} pixels tall
-            - For each product, provide a bounding_box that encompasses the ENTIRE product section
-            - Bounding box format: [x1, y1, x2, y2] where all coordinates are within image bounds
-            - Make bounding boxes generous to include all related content
-
-            Return the data as a JSON array where each product is an object with:
-            {{
-                "product_code": "string",
-                "name": "string", 
-                "category": "string",
-                "specifications": {{
-                    "id_mm": "number",
-                    "id_tum": "string", 
-                    "yd_mm": "number",
-                    "working_pressure_mpa": "number",
-                    "bend_radius_mm": "number",
-                    "weight_kg_per_m": "number"
-                }},
-                "construction": "string (full construction text)",
-                "bounding_box": [x1, y1, x2, y2] (coordinates within 0-{image.size[0]}, 0-{image.size[1]})
-            }}
-
-            Only return valid JSON, no other text.
-            '''
+💡 Be intelligent: Count how many distinct product sections exist on the page. Each section with its own name, code, konstruktion, and table is a separate family.'''
         
         response = self.call_ollama_vlm(image, prompt)
         
         if not response or 'message' not in response:
             print("No response from VLM")
-            return []
+            return None, []
         
         try:
             # Extract JSON from the response
             content = response['message']['content']
             
-            # Try to find JSON in the response
-            start_idx = content.find('[')
-            end_idx = content.rfind(']') + 1
+            # Try to find JSON object
+            start_idx = content.find('{')
+            end_idx = content.rfind('}') + 1
             
-            if start_idx == -1 or end_idx == 0:
-                # Try for single object
-                start_idx = content.find('{')
-                end_idx = content.rfind('}') + 1
-                
             if start_idx != -1 and end_idx > start_idx:
                 json_str = content[start_idx:end_idx]
-                products = json.loads(json_str)
+                data = json.loads(json_str)
                 
-                # Ensure it's a list
-                if isinstance(products, dict):
-                    products = [products]
+                # Extract hierarchical structure
+                category = data.get('category', 'Unknown')
+                families = data.get('families', [])
                 
-                return products
+                return category, families
             else:
                 print("No JSON found in VLM response")
-                return []
+                return None, []
                 
         except json.JSONDecodeError as e:
             print(f"Error parsing JSON from VLM response: {e}")
             print(f"Response content: {content}")
-            return []
+            return None, []
     
     def draw_bounding_boxes(self, image, products, output_path):
         """
@@ -290,52 +304,125 @@ class ProductExtractor:
         img_copy.save(output_path)
         print(f"Bounding box visualization saved: {output_path}")
     
-    def save_to_database(self, products, page_number):
+    def load_table_data(self, page_number):
         """
-        Save extracted products to SQLite database.
+        Load previously extracted table data for a page.
         
         Args:
-            products: List of product dictionaries
+            page_number: PDF page number
+            
+        Returns:
+            List of table data dictionaries, or None if not found
+        """
+        # Look for table JSON files for this page
+        pattern = f"page_{page_number:03d}_table_*.json"
+        table_files = list(self.tables_dir.glob(pattern))
+        
+        if not table_files:
+            print(f"ℹ️  No pre-extracted table data found for page {page_number}")
+            return None
+        
+        tables_data = []
+        for table_file in sorted(table_files):
+            try:
+                with open(table_file, 'r', encoding='utf-8') as f:
+                    table_data = json.load(f)
+                    tables_data.append(table_data)
+                    print(f"✓ Loaded table data: {table_file.name}")
+            except Exception as e:
+                print(f"⚠️  Error loading {table_file.name}: {e}")
+        
+        return tables_data if tables_data else None
+
+    def save_to_database(self, category_name, family_data, products_list, page_number):
+        """
+        Save extracted products to hierarchical SQLite database.
+        
+        Args:
+            category_name: Category name (e.g., "HÖGTRYCKSSLANG")
+            family_data: Dictionary with family-level information
+            products_list: List of product dictionaries with specifications
             page_number: PDF page number
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
-        for product in products:
-            try:
-                # Insert product
+        try:
+            # 1. Insert or get category
+            cursor.execute('''
+                INSERT OR IGNORE INTO categories (name, page_number)
+                VALUES (?, ?)
+            ''', (category_name, page_number))
+            
+            cursor.execute('SELECT id FROM categories WHERE name = ?', (category_name,))
+            category_id = cursor.fetchone()[0]
+            
+            # 2. Insert or update product family
+            family_code = family_data.get('family_code')
+            family_name = family_data.get('name')
+            
+            cursor.execute('''
+                INSERT OR REPLACE INTO product_families 
+                (category_id, family_code, name, subtitle, description, 
+                 construction_details, applications, page_number)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                category_id,
+                family_code,
+                family_name,
+                family_data.get('subtitle'),
+                family_data.get('description'),
+                json.dumps(family_data.get('construction_details', {}), ensure_ascii=False),
+                family_data.get('applications'),
+                page_number
+            ))
+            
+            cursor.execute('''
+                SELECT id FROM product_families 
+                WHERE family_code = ? AND name = ?
+            ''', (family_code, family_name))
+            family_id = cursor.fetchone()[0]
+            
+            print(f"✓ Saved family: {family_code} - {family_name}")
+            
+            # 3. Insert individual products
+            for product in products_list:
+                product_code = product.get('product_code')
+                
+                # Extract variant suffix (e.g., "-04" from "1059-01-04")
+                if family_code and product_code and product_code.startswith(family_code):
+                    variant_suffix = product_code[len(family_code):]
+                else:
+                    variant_suffix = None
+                
                 cursor.execute('''
-                    INSERT OR REPLACE INTO products 
-                    (product_code, name, category, page_number, raw_text)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO products
+                    (family_id, product_code, variant_suffix, configuration_type,
+                     configuration_name, specifications, bounding_box, page_number)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    product.get('product_code'),
-                    product.get('name'),
-                    product.get('category'),
-                    page_number,
-                    product.get('construction', '')
+                    family_id,
+                    product_code,
+                    variant_suffix,
+                    product.get('configuration_type', 'STANDARD'),
+                    product.get('configuration_name'),
+                    json.dumps(product.get('specifications', {}), ensure_ascii=False),
+                    json.dumps(product.get('bounding_box', [])) if product.get('bounding_box') else None,
+                    page_number
                 ))
                 
-                product_id = cursor.lastrowid
-                
-                # Insert specifications
-                specs = product.get('specifications', {})
-                for key, value in specs.items():
-                    if value is not None:
-                        cursor.execute('''
-                            INSERT INTO specs (product_id, spec_key, spec_value, unit)
-                            VALUES (?, ?, ?, ?)
-                        ''', (product_id, key, str(value), ''))
-                
-                print(f"Saved product: {product.get('product_code', 'Unknown')}")
-                
-            except sqlite3.Error as e:
-                print(f"Database error for product {product.get('product_code', 'Unknown')}: {e}")
-        
-        conn.commit()
-        conn.close()
+                print(f"  ✓ Saved product: {product_code}")
+            
+            conn.commit()
+            print(f"✅ Saved {len(products_list)} products to database")
+            
+        except sqlite3.Error as e:
+            print(f"❌ Database error: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
     
-    def extract_from_pdf_page(self, pdf_path, page_number, strict_table=False):
+    def extract_from_pdf_page(self, pdf_path, page_number):
         """
         Main method to extract products from a PDF page.
         
@@ -344,31 +431,79 @@ class ProductExtractor:
             page_number: Page number to process
             
         Returns:
-            List of extracted products
+            Tuple of (category, families_list)
         """
+        print(f"\n{'='*60}")
         print(f"Processing PDF: {pdf_path}, Page: {page_number}")
+        print(f"{'='*60}")
+        
+        # Try to load pre-extracted table data
+        table_data = self.load_table_data(page_number)
         
         # Render PDF page to image
         image = self.render_pdf_page(pdf_path, page_number)
-        print(f"Rendered page {page_number} to image ({image.size[0]}x{image.size[1]})")
-        # Extract products using VLM
-        products = self.extract_products_from_image(image, strict_table=strict_table)
-        print(f"Extracted {len(products)} products")
+        print(f"✓ Rendered page {page_number} to image ({image.size[0]}x{image.size[1]})")
+        
+        # Extract products using VLM with hierarchical structure
+        category, families_list = self.extract_products_from_image(
+            image, page_number, table_data
+        )
+        
+        if not category or not families_list:
+            print("❌ No products extracted")
+            return None, []
+        
+        print(f"\n✓ Extracted hierarchical data:")
+        print(f"  Category: {category}")
+        print(f"  Families found: {len(families_list)}")
+        
+        for i, family in enumerate(families_list, 1):
+            print(f"    {i}. {family.get('family_code')} - {family.get('name')}")
+            print(f"       Products: {len(family.get('products', []))} items")
 
-        if products:
-            # Save visualization with bounding boxes
-            pdf_name = Path(pdf_path).stem
-            viz_path = self.output_dir / f"{pdf_name}_page_{page_number:03d}_boxes.png"
-            self.draw_bounding_boxes(image, products, viz_path)
+        # Collect all products for visualization
+        all_products = []
+        for family in families_list:
+            all_products.extend(family.get('products', []))
+        
+        # Save visualization with bounding boxes
+        pdf_name = Path(pdf_path).stem
+        viz_path = self.output_dir / f"{pdf_name}_page_{page_number:03d}_products.png"
+        self.draw_bounding_boxes(image, all_products, viz_path)
 
-            # Save to database
-            self.save_to_database(products, page_number)
+        # Save each family to database
+        for family in families_list:
+            family_data = {
+                'family_code': family.get('family_code'),
+                'name': family.get('name'),
+                'subtitle': family.get('subtitle'),
+                'description': family.get('description'),
+                'construction_details': family.get('construction_details', {}),
+                'applications': family.get('applications')
+            }
+            products_list = family.get('products', [])
+            self.save_to_database(category, family_data, products_list, page_number)
 
-            # Print extracted data
-            print("\nExtracted Products:")
-            print(json.dumps(products, indent=2, ensure_ascii=False))
+        # Print extracted data summary
+        print("\n" + "="*60)
+        print("EXTRACTION SUMMARY")
+        print("="*60)
+        print(f"Category: {category}")
+        print(f"\nProduct Families: {len(families_list)}")
+        
+        total_products = 0
+        for i, family in enumerate(families_list, 1):
+            print(f"\n{i}. Family Code: {family.get('family_code')}")
+            print(f"   Family Name: {family.get('name')}")
+            products = family.get('products', [])
+            print(f"   Products: {len(products)}")
+            for j, p in enumerate(products, 1):
+                print(f"     {j}. {p.get('product_code')} - {p.get('configuration_type', 'STANDARD')}")
+            total_products += len(products)
+        
+        print(f"\nTotal products extracted: {total_products}")
 
-        return products
+        return category, families_list
 
 
 def main():
@@ -378,7 +513,6 @@ def main():
     parser.add_argument("--ollama-url", default="http://localhost:11434", 
                        help="Ollama API URL")
     parser.add_argument("--model", default="qwen3-vl:235b-cloud", help="VLM model name")
-    parser.add_argument("--strict-table", action="store_true", help="Use strict table-row extraction prompt to force one product per table row")
     
     args = parser.parse_args()
     
@@ -389,23 +523,32 @@ def main():
         sys.exit(1)
     
     # Initialize extractor
-    extractor = ProductExtractor(
-        ollama_url=args.ollama_url,
-        model_name=args.model
-    )
+    try:
+        extractor = ProductExtractor(
+            ollama_url=args.ollama_url,
+            model_name=args.model
+        )
+    except RuntimeError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
     
     try:
-        # Extract products (pass strict_table flag)
-        products = extractor.extract_from_pdf_page(pdf_path, args.page, strict_table=args.strict_table)
+        # Extract products with hierarchical structure
+        category, families = extractor.extract_from_pdf_page(
+            pdf_path, args.page
+        )
 
-        if products:
-            print(f"\nSuccessfully extracted {len(products)} products from page {args.page}")
-            print(f"Data saved to: {extractor.db_path}")
+        if families:
+            total_products = sum(len(f.get('products', [])) for f in families)
+            print(f"\n✅ Successfully extracted {len(families)} families with {total_products} total products from page {args.page}")
+            print(f"📊 Data saved to: {extractor.db_path}")
         else:
-            print(f"No products extracted from page {args.page}")
+            print(f"⚠️  No products extracted from page {args.page}")
 
     except Exception as e:
-        print(f"Error during extraction: {e}")
+        print(f"❌ Error during extraction: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
