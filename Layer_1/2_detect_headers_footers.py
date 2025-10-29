@@ -12,12 +12,13 @@ from pathlib import Path
 import fitz  # PyMuPDF
 import sqlite3
 from PIL import Image, ImageDraw, ImageFont
+from db_utils import DatabaseManager
 
 
 class RegionManager:
     def __init__(self):
         """Initialize the RegionManager."""
-        self.db_path = Path("data/products.db")
+        self.db_manager = DatabaseManager()
         self.output_dir = Path("data/output")
         self.pages_dir = Path("data/pages")
         
@@ -28,37 +29,10 @@ class RegionManager:
         self.header_threshold = 0.05  # Top 5% of page for headers
         self.footer_threshold = 0.95  # Bottom 5% of page (from 95% down)
         
-        # Initialize database
-        self._init_database()
+        # Initialize database with full schema
+        self.db_manager.init_database()
     
-    def _init_database(self):
-        """Initialize SQLite database with page regions table."""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        # Create page_regions table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS page_regions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                page_number INTEGER,
-                pdf_name TEXT,
-                page_width REAL,
-                page_height REAL,
-                header_x0 REAL,
-                header_y0 REAL,
-                header_x1 REAL,
-                header_y1 REAL,
-                footer_x0 REAL,
-                footer_y0 REAL,
-                footer_x1 REAL,
-                footer_y1 REAL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(page_number, pdf_name)
-            )
-        ''')
-        
-        conn.commit()
-        conn.close()
+
     
     def save_regions_to_database(self, pdf_path, page_number, results):
         """
@@ -74,7 +48,7 @@ class RegionManager:
         header_region = results["header_region"]
         footer_region = results["footer_region"]
         
-        conn = sqlite3.connect(self.db_path)
+        conn = self.db_manager.get_connection()
         cursor = conn.cursor()
         
         try:
@@ -111,7 +85,7 @@ class RegionManager:
         Returns:
             List of region records
         """
-        conn = sqlite3.connect(self.db_path)
+        conn = self.db_manager.get_connection()
         cursor = conn.cursor()
         
         if pdf_name and page_number:

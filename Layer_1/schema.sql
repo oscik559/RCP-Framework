@@ -6,6 +6,34 @@
 -- ============================================================================
 
 -- ============================================================================
+-- LEVEL 0: Page Regions (Header/Footer exclusion zones)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS page_regions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    page_number INTEGER NOT NULL,
+    pdf_name TEXT NOT NULL,
+    page_width REAL NOT NULL,
+    page_height REAL NOT NULL,
+    header_x0 REAL NOT NULL,
+    header_y0 REAL NOT NULL,
+    header_x1 REAL NOT NULL,
+    header_y1 REAL NOT NULL,
+    footer_x0 REAL NOT NULL,
+    footer_y0 REAL NOT NULL,
+    footer_x1 REAL NOT NULL,
+    footer_y1 REAL NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(pdf_name, page_number)
+);
+
+-- ============================================================================
+-- INDEXES for Page Regions
+-- ============================================================================
+CREATE INDEX IF NOT EXISTS idx_page_regions_pdf ON page_regions(pdf_name);
+CREATE INDEX IF NOT EXISTS idx_page_regions_page ON page_regions(page_number);
+
+-- ============================================================================
 -- LEVEL 1: Categories (Top-level product groupings)
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS categories (

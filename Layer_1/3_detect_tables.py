@@ -17,19 +17,21 @@ import sqlite3
 import requests
 import base64
 from io import BytesIO
+from db_utils import DatabaseManager
 
 
 class TableDetector:
     def __init__(self):
         """Initialize the TableDetector."""
-        self.output_dir = Path("data/output")
         self.pages_dir = Path("data/pages")
         self.tables_dir = Path("data/tables")
-        self.db_path = Path("data/products.db")
+        self.db_manager = DatabaseManager()
         
         # Create directories
-        self.output_dir.mkdir(parents=True, exist_ok=True)
         self.tables_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Initialize database with full schema
+        self.db_manager.init_database()
     
     def get_exclusion_regions(self, pdf_name, page_number):
         """
@@ -42,7 +44,7 @@ class TableDetector:
         Returns:
             Dictionary with header and footer regions, or None if not found
         """
-        conn = sqlite3.connect(self.db_path)
+        conn = self.db_manager.get_connection()
         cursor = conn.cursor()
         
         cursor.execute('''
@@ -431,16 +433,16 @@ Return ONLY the JSON array with the actual table content."""
         except Exception as e:
             print(f"Error in VLM table extraction: {e}")
             return None
-    def draw_table_boxes(self, png_path, tables, pdf_page_size, output_path, exclusion_regions=None, page_number=None):
+    def draw_table_boxes(self, png_path, tables, pdf_page_size, exclusion_regions=None, page_number=None):
         """
-        Draw bounding boxes around detected tables on PNG image.
+        Draw bounding boxes around detected tables on PNG image and save to tables folder.
         
         Args:
             png_path: Path to PNG image
             tables: List of table dictionaries with bbox info
             pdf_page_size: (width, height) of original PDF page
-            output_path: Path to save annotated image
             exclusion_regions: Optional header/footer regions to show
+            page_number: Page number for filename
         """
         # Open PNG image
         image = Image.open(png_path)
@@ -513,17 +515,12 @@ Return ONLY the JSON array with the actual table content."""
             # Draw label text
             draw.text((label_x, label_y), label, fill=color, font=font)
         
-        # Save annotated image
-        image.save(output_path)
-        
-        # Also save to tables folder if page_number is provided
+        # Save to tables folder if page_number is provided
         if page_number is not None:
             tables_png_filename = f"page_{page_number:03d}_tables_visualization.png"
             tables_png_path = self.tables_dir / tables_png_filename
             image.save(tables_png_path)
             print(f"Table visualization saved to: {tables_png_path}")
-        
-        print(f"Table detection visualization saved: {output_path}")
     
     def process_pdf_page(self, pdf_path, page_number, png_path=None):
         """
@@ -569,25 +566,22 @@ Return ONLY the JSON array with the actual table content."""
             print("You may need to run pdf_to_png.py first to generate PNG files.")
             return {"page": page_number, "tables": tables, "png_path": None}
         
-        # Create output visualization
-        pdf_name = Path(pdf_path).stem
-        output_filename = f"{pdf_name}_page_{page_number:03d}_tables.png"
-        output_path = self.output_dir / output_filename
-        
         # Draw table bounding boxes with exclusion regions
-        self.draw_table_boxes(png_path, tables, pdf_page_size, output_path, exclusion_regions, page_number)
+        self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number)
         
         # Create summary results (individual tables are already saved in tables folder)
+        visualization_file = f"page_{page_number:03d}_tables_visualization.png"
         results = {
             "page": page_number,
             "pdf_page_size": pdf_page_size,
             "png_size": Image.open(png_path).size,
+            "tables": tables,  # Keep the actual tables list for process_all_pages
             "tables_detected": len(tables),
             "individual_table_files": [
                 f"page_{page_number:03d}_table_{t['table_id']}_{t['rows']}x{t['columns']}.json" 
                 for t in tables if t.get('content')
             ],
-            "visualization": str(output_path),
+            "visualization": visualization_file,
             "detection_summary": {
                 "total_tables": len(tables),
                 "largest_table": max(tables, key=lambda t: t["area"])["table_id"] if tables else None,
@@ -596,7 +590,7 @@ Return ONLY the JSON array with the actual table content."""
         }
         
         print(f"Individual table files saved in data/tables/")
-        print(f"Table visualization saved: {output_path}")
+        print(f"Table visualization saved in data/tables/")
         
         return results
 
@@ -647,18 +641,11 @@ Return ONLY the JSON array with the actual table content."""
                     "tables": []
                 }
         
-        # Save overall summary
-        pdf_name = Path(pdf_path).stem
-        summary_path = self.output_dir / f"{pdf_name}_all_tables_summary.json"
-        
-        with open(summary_path, 'w', encoding='utf-8') as f:
-            json.dump(all_results, f, indent=2, ensure_ascii=False)
-        
         print(f"\n=== FINAL SUMMARY ===")
         print(f"Total pages processed: {all_results['summary']['pages_processed']}")
         print(f"Pages with tables: {all_results['summary']['pages_with_tables']}")
         print(f"Total tables detected: {all_results['summary']['total_tables']}")
-        print(f"Summary saved: {summary_path}")
+        print(f"All individual table files and visualizations saved in data/tables/")
         
         return all_results
 
@@ -702,6 +689,7 @@ def main():
                 print(f"Tables detected: {tables_count}")
                 print(f"Individual table files: {results['individual_table_files']}")
                 print(f"Visualization saved: {results['visualization']}")
+                print(f"All files saved in data/tables/")
             else:
                 print(f"\nNo tables detected on page {args.page}")
             
