@@ -1,0 +1,9 @@
+
+VLM-Based Data Extraction
+Uses Ollama VLM API (specifically qwen3-vl:235b-cloud model) to analyze product images
+Extracts structured product information including:
+Product codes (e.g., "1059-01-04", "1105-43-06")
+Technical specifications from tables (ID mm, ID tum, YD mm, working pressure, bend radius, weight)
+Product names/categories (e.g., "KAPPAFLEX 2K PO")
+Construction details (materials, temperature ratings, etc.)
+Bounding boxes for visual verification
