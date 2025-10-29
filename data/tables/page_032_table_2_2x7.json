@@ -1,0 +1,34 @@
+{
+  "page": 32,
+  "table_id": 2,
+  "table_bbox": [
+    173.28000030517578,
+    631.199951171875,
+    535.3739868164063,
+    668.0399780273438
+  ],
+  "rows": 2,
+  "columns": 7,
+  "content": [
+    [
+      "Artikelnummer",
+      "ID mm",
+      "ID tum",
+      "YD mm",
+      "Arb.tr. MPa",
+      "Böjradie mm",
+      "Vikt kg/m"
+    ],
+    [
+      "1058-50-06",
+      "10,0",
+      "3/8\"",
+      "18,0",
+      "55,0",
+      "70",
+      "0,21"
+    ]
+  ],
+  "extraction_method": "VLM",
+  "model": "qwen3-vl:235b-cloud"
+}

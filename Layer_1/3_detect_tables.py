@@ -551,7 +551,14 @@ Return ONLY the JSON array with the actual table content."""
         
         if not tables:
             print(f"No tables detected on page {page_number}")
-            return {"page": page_number, "tables": [], "png_path": png_path}
+            return {
+                "page": page_number, 
+                "tables": [], 
+                "tables_detected": 0,
+                "png_path": png_path,
+                "individual_table_files": [],
+                "visualization": None
+            }
         
         print(f"Detected {len(tables)} table(s) on page {page_number}")
         
@@ -564,7 +571,17 @@ Return ONLY the JSON array with the actual table content."""
         if not png_path.exists():
             print(f"Warning: PNG file not found: {png_path}")
             print("You may need to run pdf_to_png.py first to generate PNG files.")
-            return {"page": page_number, "tables": tables, "png_path": None}
+            return {
+                "page": page_number, 
+                "tables": tables, 
+                "tables_detected": len(tables),
+                "png_path": None,
+                "individual_table_files": [
+                    f"page_{page_number:03d}_table_{t['table_id']}_{t['rows']}x{t['columns']}.json" 
+                    for t in tables if t.get('content')
+                ],
+                "visualization": None
+            }
         
         # Draw table bounding boxes with exclusion regions
         self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number)

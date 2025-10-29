@@ -22,6 +22,7 @@ from io import BytesIO
 import requests
 import fitz  # PyMuPDF
 from PIL import Image, ImageDraw
+from db_utils import DatabaseManager
 
 
 class ProductExtractor:
@@ -35,40 +36,18 @@ class ProductExtractor:
         """
         self.ollama_url = ollama_url
         self.model_name = model_name
-        self.db_path = Path("data/products.db")
+        self.db_manager = DatabaseManager()
         self.output_dir = Path("output")
         self.tables_dir = Path("data/tables")
         
         # Create directories
-        self.db_path.parent.mkdir(exist_ok=True)
         self.output_dir.mkdir(exist_ok=True)
         
-        # Verify database is initialized
-        if not self._init_database():
+        # Initialize database with full schema
+        if not self.db_manager.init_database():
             raise RuntimeError("Database not properly initialized")
     
-    def _init_database(self):
-        """Initialize SQLite database - uses external schema.sql file."""
-        # Database should be initialized with schema.sql before running this script
-        # This method just verifies the tables exist
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        # Verify required tables exist
-        cursor.execute("""
-            SELECT name FROM sqlite_master 
-            WHERE type='table' AND name IN ('categories', 'product_families', 'products')
-        """)
-        tables = cursor.fetchall()
-        
-        if len(tables) < 3:
-            print("⚠️  Warning: Database schema not initialized!")
-            print("Please run: sqlite3 data/products.db < Layer_1/schema.sql")
-            conn.close()
-            return False
-        
-        conn.close()
-        return True
+
     
     def render_pdf_page(self, pdf_path, page_number):
         """
@@ -344,7 +323,7 @@ Some products may have special configurations (like "PÅ BOBIN" for reel product
             products_list: List of product dictionaries with specifications
             page_number: PDF page number
         """
-        conn = sqlite3.connect(self.db_path)
+        conn = self.db_manager.get_connection()
         cursor = conn.cursor()
         
         try:

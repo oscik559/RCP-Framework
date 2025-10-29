@@ -117,29 +117,32 @@ class DatabaseManager:
             conn = self.get_connection()
             cursor = conn.cursor()
             
-            # Get table counts
-            cursor.execute("""
-                SELECT name, 
-                       (SELECT COUNT(*) FROM sqlite_master sm2 
-                        WHERE sm2.name = sm.name AND sm2.type = 'table') as exists
-                FROM (
-                    VALUES ('page_regions'), ('categories'), 
-                           ('product_families'), ('products')
-                ) as tables(name)
-                LEFT JOIN sqlite_master sm ON sm.name = tables.name AND sm.type = 'table'
-            """)
+            # Get table information
+            required_tables = ['page_regions', 'categories', 'product_families', 'products']
+            table_info = []
             
-            results = cursor.fetchall()
-            
-            print(f"\n📊 Database Status: {self.db_path}")
-            print("=" * 50)
-            
-            for table_name, exists in results:
-                status = "✅ EXISTS" if exists else "❌ MISSING"
+            for table_name in required_tables:
+                cursor.execute("""
+                    SELECT name FROM sqlite_master 
+                    WHERE type='table' AND name = ?
+                """, (table_name,))
+                exists = cursor.fetchone() is not None
                 
                 if exists:
                     cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
                     count = cursor.fetchone()[0]
+                else:
+                    count = 0
+                
+                table_info.append((table_name, exists, count))
+            
+            print(f"\n📊 Database Status: {self.db_path}")
+            print("=" * 50)
+            
+            for table_name, exists, count in table_info:
+                status = "✅ EXISTS" if exists else "❌ MISSING"
+                
+                if exists:
                     print(f"{table_name:15} {status:10} ({count:,} rows)")
                 else:
                     print(f"{table_name:15} {status}")
