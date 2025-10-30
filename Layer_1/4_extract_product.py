@@ -82,7 +82,7 @@ class ProductExtractor:
     6. SQLite database storage
     """
     
-    def __init__(self, ollama_url="http://localhost:11434", model_name="llama3.2-vision"):
+    def __init__(self, ollama_url="http://localhost:11434", model_name="qwen3-vl:235b-instruct-cloud"):
         """
         Initialize the ProductExtractor with VLM configuration.
         
@@ -1293,12 +1293,14 @@ Some products may have special configurations (like "PÅ BOBIN" for reel product
 
         return category, chapter, families_list
 
-    def process_all_pages(self, pdf_path_or_dir):
+    def process_all_pages(self, pdf_path_or_dir, start_page=1, end_page=None):
         """
-        Process all pages in a PDF file or all individual PDF pages in a directory.
+        Process pages in a PDF file or individual PDF pages in a directory.
         
         Args:
             pdf_path_or_dir: Path to PDF file or directory containing individual PDF pages
+            start_page: Starting page number (1-based, default: 1)
+            end_page: Ending page number (1-based, default: None for all pages)
             
         Returns:
             Dictionary with processing results
@@ -1311,8 +1313,11 @@ Some products may have special configurations (like "PÅ BOBIN" for reel product
             total_pages = len(doc)
             doc.close()
             
-            print(f"📄 Processing all {total_pages} pages from PDF: {path.name}")
-            pages_to_process = [(path, i) for i in range(1, total_pages + 1)]
+            print(f"📄 Processing pages {start_page}-{end_page or total_pages} from PDF: {path.name}")
+            all_pages = [(path, i) for i in range(1, total_pages + 1)]
+            # Filter by start_page and end_page
+            pages_to_process = [(pdf_path, page_num) for pdf_path, page_num in all_pages 
+                              if page_num >= start_page and (end_page is None or page_num <= end_page)]
             
         elif path.is_dir():
             # Process all individual PDF page files in directory
@@ -1321,19 +1326,26 @@ Some products may have special configurations (like "PÅ BOBIN" for reel product
                 print(f"❌ No PDF files found in directory: {path}")
                 return {}
             
-            print(f"📁 Processing {len(pdf_files)} individual PDF pages from directory: {path.name}")
+            print(f"📁 Processing individual PDF pages from directory: {path.name}")
             # Extract page numbers from filenames like "Produktbok_page_031.pdf"
-            pages_to_process = []
+            all_pages = []
             for pdf_file in pdf_files:
                 # Try to extract page number from filename
                 import re
                 match = re.search(r'page_(\d+)', pdf_file.stem)
                 if match:
                     page_num = int(match.group(1))
-                    pages_to_process.append((pdf_file, page_num))
+                    all_pages.append((pdf_file, page_num))
                 else:
                     # If no page number found, use 1 as default
-                    pages_to_process.append((pdf_file, 1))
+                    all_pages.append((pdf_file, 1))
+            
+            # Filter by start_page and end_page
+            pages_to_process = [(pdf_path, page_num) for pdf_path, page_num in all_pages 
+                              if page_num >= start_page and (end_page is None or page_num <= end_page)]
+            
+            print(f"📊 Found {len(all_pages)} total pages, processing {len(pages_to_process)} pages (from {start_page} to {end_page or 'end'})")
+            
         else:
             print(f"❌ Path not found: {path}")
             return {}
@@ -1435,6 +1447,7 @@ def main():
 EXAMPLES:
   Single page:  python 4_extract_product.py data/pdf_pages/Produktbok_page_031.pdf --page 31
   Batch mode:   python 4_extract_product.py data/pdf_pages/ --all-pages
+  Page range:   python 4_extract_product.py data/pdf_pages/ --all-pages --start-page 28 --end-page 40
   Full PDF:     python 4_extract_product.py Produktbok.pdf --all-pages
 
 PROCESSING MODES:
@@ -1452,6 +1465,10 @@ PROCESSING MODES:
                        help="Page number to process (ignored when --all-pages is used)")
     parser.add_argument("--all-pages", action="store_true", 
                        help="Process all pages in directory or entire PDF file")
+    parser.add_argument("--start-page", type=int, default=1,
+                       help="Starting page number for batch processing (default: 1)")
+    parser.add_argument("--end-page", type=int, default=None,
+                       help="Ending page number for batch processing (default: process all)")
     parser.add_argument("--ollama-url", default="http://localhost:11434", 
                        help="Ollama API server URL (default: http://localhost:11434)")
     parser.add_argument("--model", default="qwen3-vl:235b-instruct-cloud", 
@@ -1496,7 +1513,8 @@ PROCESSING MODES:
         if args.all_pages:
             # BATCH PROCESSING MODE: Process entire directories or multi-page PDFs
             print(f"\n📂 Starting batch processing mode...")
-            results = extractor.process_all_pages(path)
+            print(f"   Range: Page {args.start_page} to {args.end_page or 'end'}")
+            results = extractor.process_all_pages(path, args.start_page, args.end_page)
             
             # BATCH RESULTS SUMMARY
             if results['successful_pages'] > 0:
