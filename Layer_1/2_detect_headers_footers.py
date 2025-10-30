@@ -20,7 +20,7 @@ class RegionManager:
         """Initialize the RegionManager."""
         self.db_manager = DatabaseManager()
         self.output_dir = Path("data/output")
-        self.pages_dir = Path("data/pages")
+        self.pages_dir = Path("data/png_pages")
         
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)

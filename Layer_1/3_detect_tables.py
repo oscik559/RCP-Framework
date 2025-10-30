@@ -23,7 +23,7 @@ from db_utils import DatabaseManager
 class TableDetector:
     def __init__(self):
         """Initialize the TableDetector."""
-        self.pages_dir = Path("data/pages")
+        self.pages_dir = Path("data/png_pages")
         self.tables_dir = Path("data/tables")
         self.db_manager = DatabaseManager()
         
@@ -529,7 +529,7 @@ Return ONLY the JSON array with the actual table content."""
         Args:
             pdf_path: Path to PDF file
             page_number: Page number to process
-            png_path: Optional path to existing PNG, otherwise will look in data/pages
+            png_path: Optional path to existing PNG, otherwise will look in data/png_pages
             
         Returns:
             Dictionary with detection results
