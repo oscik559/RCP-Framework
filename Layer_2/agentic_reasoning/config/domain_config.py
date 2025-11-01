@@ -1,13 +1,10 @@
 """
 Domain Configuration - Hydroscand Hoses
 
-This is the configuration for the Hydroscand product catalog project.
-Ready to use with the product database from Layer_1 extraction.
+Active domain configuration for the Hydroscand product catalog project.
+Uses the product database from Layer_1 extraction.
 
-To use this configuration:
-    cp domain_config_HYDROSCAND.py domain_config.py
-
-Database: ../../data/products.db (from Layer_1 extraction)
+Database: ../data/database/harvested.db (335 products, 69 families)
 """
 
 # =============================================================================

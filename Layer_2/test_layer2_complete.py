@@ -52,14 +52,15 @@ def test_2_domain_config():
     print("="*70)
     
     try:
-        from agentic_reasoning.config.domain_config_HYDROSCAND import (
+        # Test Hydroscand domain configuration
+        from agentic_reasoning.config.domain_config import (
             DOMAIN_NAME,
             DOMAIN_DESCRIPTION,
             DATABASE_PATH,
             DOMAIN_TABLES,
             DOMAIN_FUNCTIONS,
             DOMAIN_STRATEGIES,
-            get_table_name
+            get_table_name,
         )
         
         print(f"✅ Domain: {DOMAIN_NAME}")
@@ -142,7 +143,7 @@ def test_4_database_connection():
     print("="*70)
     
     try:
-        from agentic_reasoning.config.domain_config_HYDROSCAND import DATABASE_PATH
+        from agentic_reasoning.config.domain_config import DATABASE_PATH
         import sqlite3
         import os
         

@@ -16,7 +16,7 @@ class DatabaseManager:
     def __init__(self, db_path="data/database/harvested.db"):
         """Initialize database manager."""
         self.db_path = Path(db_path)
-        self.schema_path = Path("Layer_1/schema.sql")
+        self.schema_path = Path("Layer_1/harvested_schema.sql")
         
         # Ensure data directory exists
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -75,7 +75,7 @@ class DatabaseManager:
             return False
     
     def _load_schema(self):
-        """Load schema from schema.sql file."""
+        """Load schema from harvested_schema.sql file."""
         if not self.schema_path.exists():
             raise FileNotFoundError(f"Schema file not found: {self.schema_path}")
         

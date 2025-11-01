@@ -611,7 +611,7 @@ pipeline_trackers = {}
 def get_pipeline_status():
     """Get status of all pipelines and data inventory"""
     try:
-        from agentic_reasoning.config.domain_config_HYDROSCAND import DOMAIN_TABLES, get_table_name
+        from agentic_reasoning.config.domain_config import DOMAIN_TABLES, get_table_name
         
         # Get domain-specific table names
         SUMMARY_TABLE = get_table_name("summarized_doc")
