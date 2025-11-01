@@ -47,6 +47,13 @@ STRATEGY_TEST_CONFIG = {
     "ENHANCED LOOKUP": True,  # Multi-step comprehensive analysis
     "VISUAL LAYOUT": False,  # Image processing (experimental)
     "PARALLEL ENHANCED LOOKUP": True,  # Concurrent processing optimization
+    "PRODUCT COMPARISON": True,  # Compare multiple products side-by-side
+    "TECHNICAL CALCULATION": True,  # Perform technical calculations (flow rate, pressure, etc.)
+    "STANDARD COMPLIANCE": True,  # Check standards and certifications compliance
+    "SMART RECOMMENDATION": True,  # Provide product recommendations based on requirements
+    "HIERARCHICAL NAVIGATION": True,  # Navigate product hierarchy and categories
+    "SPECIFICATION ANALYSIS": True,  # Analyze and extract detailed specifications
+    "PRODUCT LOCATION": True,  # Locate products in catalogue (page numbers, chapters)
 }
 
 # Testing execution modes

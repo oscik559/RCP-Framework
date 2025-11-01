@@ -26,7 +26,7 @@ from agentic_reasoning.db.connection import (
     get_agentic_connection,
     get_output_connection,
 )
-from agentic_reasoning.app.progress_workflow import create_progress_workflow
+from agentic_reasoning.app.progress_flow import create_progress_workflow
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key-change-this-in-production"

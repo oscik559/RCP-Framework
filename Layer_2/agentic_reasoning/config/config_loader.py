@@ -48,6 +48,53 @@ import yaml
 
 # ── Configuration loading ────────────────────────────────
 
+_LAYER_ROOT = Path(__file__).resolve().parents[2]  # Layer_2
+
+
+def _resolve_path(value: str) -> str:
+    """Resolve config paths relative to Layer_2 directory for cwd flexibility."""
+    if not isinstance(value, str) or not value.strip():
+        return value
+
+    # Expand user home references
+    expanded = os.path.expanduser(value.strip())
+    candidate = Path(expanded)
+
+    if candidate.is_absolute():
+        return str(candidate)
+
+    # Resolve against Layer_2 root to keep compatibility with existing layout
+    return str((_LAYER_ROOT / candidate).resolve())
+
+
+def _normalize_paths(config: dict) -> dict:
+    """Normalize well-known path entries to absolute paths."""
+    path_keys = {
+        "log_dir",
+        "model_path",
+        "agentic_db",
+        "harvested_db",
+        "temp_db",
+        "data_dir",
+        "pdf_dir",
+        "extracted_image_dir",
+        "exports_dir",
+        "config_file",
+    }
+
+    for key in path_keys:
+        if key in config:
+            config[key] = _resolve_path(config[key])
+
+    # Support optional nested dictionaries users may add later
+    for section_key in ("databases", "paths"):
+        section = config.get(section_key)
+        if isinstance(section, dict):
+            for key, value in section.items():
+                section[key] = _resolve_path(value)
+
+    return config
+
 
 def load_config(path="agentic_reasoning/config/config.yaml"):
     """
@@ -75,7 +122,9 @@ def load_config(path="agentic_reasoning/config/config.yaml"):
     for config_path in potential_paths:
         try:
             with open(config_path, "r", encoding="utf-8") as f:
-                return yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                # Normalize critical path settings before returning
+                return _normalize_paths(loaded or {})
         except FileNotFoundError:
             continue
 

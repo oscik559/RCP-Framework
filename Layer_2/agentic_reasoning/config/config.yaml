@@ -38,7 +38,7 @@ config_file: agentic_reasoning/config/config.yaml
 
 # ─── Log Paths ──────────────────────────────────────────────────────────
 # Application logging configuration for debug output and error tracking
-log_dir: agentic_reasoning/config/        # Directory for log files
+log_dir: agentic_reasoning/config/logs/   # Directory for log files (inside Layer_2)
 log_file: app.log                         # Main application log file
 log_level: info                           # Logging verbosity (debug/info/warning/error)
 
