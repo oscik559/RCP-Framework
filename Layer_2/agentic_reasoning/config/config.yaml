@@ -1,0 +1,82 @@
+# ═════════════════════════════════# ─── Model Paths ───────────────────────────────────────────────────────
+# Local model storage directory (reserved for future local model caching)
+model_path: agentic_reasoning/models/
+
+
+# Database Configuration
+# ────────────────────────────────────────────────────────────────────────────
+agentic_db: ../data/database/agentic.db      # Workflow state, execution tracking, templates
+harvested_db: ../data/database/harvested.db  # Hydroscand product database (335 products, 69 families)
+temp_db: ../data/database/temp.db            # Temporary data assembly and query processing══════════════════════════════
+# AGENTIC REASONING SYSTEM CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════
+# 
+# Main configuration file for the multi-agent LLM document processing system.
+# Controls LLM models, database paths, logging, and system parameters.
+#
+# Configuration Categories:
+# - LLM Models: Ollama model configuration by capability tier
+# - Databases: SQLite database paths for different data types  
+# - Logging: Debug output and file logging configuration
+# - Directories: Data storage and processing directories
+# - System: Performance limits and timeout configurations
+# 
+# Usage:
+# - Loaded automatically by config_loader.py at startup
+# - Accessed via CONFIG dictionary throughout the application
+# - Environment-specific overrides supported via env variables
+# ═══════════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+# ─── Configuration Paths ────────────────────────────────────────────────
+# System configuration file location for dynamic reloading and validation
+config_file: agentic_reasoning/config/config.yaml
+
+# ─── Log Paths ──────────────────────────────────────────────────────────
+# Application logging configuration for debug output and error tracking
+log_dir: agentic_reasoning/config/        # Directory for log files
+log_file: app.log                         # Main application log file
+log_level: info                           # Logging verbosity (debug/info/warning/error)
+
+# ─── Model Paths ───────────────────────────────────────────────────────
+model_path: agentic_reasoning/models/
+
+
+# ─── Databases ────────────────────────────────────
+agentic_db: ../data/database/agentic.db
+harvested_db: ../data/database/harvested.db
+temp_db: ../data/database/temp.db
+
+# ─── Data Directories ──────────────────────────────────────────────────
+# File system paths for document processing and storage
+data_dir: ../data/                           # Root data directory containing all processed files
+pdf_dir: ../data/pdfs/                       # Source PDF documents for table extraction
+extracted_image_dir: ../data/images/         # Extracted images, tables, and diagrams
+exports_dir: ../data/exports/                # Exported data (CSV, XLSX)
+
+
+# ─── LLM Levels ──────────────────────────────────────────────────
+# Ollama model configuration organized by capability tiers
+# Three-tier architecture for optimal performance vs. quality trade-offs
+llms:
+  # Basic tier: Fast responses for simple tasks (keyword generation, validation)
+  # Used for: Quick classifications, simple extractions, boolean validations
+  basic:
+    model: gpt-oss:20b-cloud                # Cloud-based GPT model for reliability
+    temperature: 0.0                        # Deterministic output for consistency
+
+  # Reasoning tier: Complex analysis and strategy selection
+  # Used for: Strategy planning, goal validation, complex decision making
+  reasoning:
+    model: gpt-oss:20b-cloud                # Cloud-based GPT model for complex reasoning
+    temperature: 0.0                        # Deterministic for strategy selection
+
+  # Multimodal tier: Image and table processing capabilities  
+  # Used for: PDF image analysis, table extraction, visual data processing
+  multimodal:
+    model: llava:latest                     # Vision-capable model for image analysis
+    temperature: 0.0                        # Consistent output for visual processing

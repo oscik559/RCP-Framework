@@ -1,0 +1,19 @@
+0,1,2,3,4,5,6
+Product code,Fig,"Number of
+conductors
+x mm²","ø Jacket
+mm","ø Braid
+mm
+nom","DC-resistance
+braid
+Ω/km
+max",Remark
+TFR4631016/050,10,5 x 1.25,7.9 ± 0.3,5.5,8.70,5 x AWG 16
+TFR4631020/050,10,5 x 0.6,6.5 ± 0.3,4.4,12.10,"See Para 4 Note: 1
+5 x AWG 20"
+TFR4631020/100,11,10 x 0.6,8.6 ± 0.4,6.2,9.00,10 x AWG 20
+TFR4631024/100,11,10 x 0.25,6.9 ± 0.3,4.7,10.80,"See Para 4 Note: 1
+10 x AWG 24"
+TFR4631020/190,12,19 x 0.6,10.2 ± 0.5,7.6,6.50,19 x AWG 20
+TFR4631024/190,12,19 x 0.25,8.1 ± 0.4,5.7,-,"See Para 4 Note: 1
+19 x AWG 24"

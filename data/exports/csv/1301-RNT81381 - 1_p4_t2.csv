@@ -1,0 +1,11 @@
+0,1,2,3,4
+"Service
+Rating","Test voltage
+(V RMS)","Test voltage
+(V RMS)","Test voltage
+(V RMS)","Test voltage
+(V RMS)"
+"Service
+Rating",Sea level,"15,2 km","21,3 km","30,5 km"
+I,1800,600,400,200
+II,2300,800,500,200

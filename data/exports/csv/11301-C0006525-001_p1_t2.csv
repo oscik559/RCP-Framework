@@ -1,0 +1,31 @@
+0,1,2,3,4,5,6,7,8,9
+Intended Use,Intended Use,Intended Use,Intended Use,Intended Use,Internal wiring of equipment or external / interconnecti,Internal wiring of equipment or external / interconnecti,Internal wiring of equipment or external / interconnecti,ng wires,ng wires
+Technical Data,Intended Use,Intended Use,Intended Use,Intended Use,Values at +20° C (nominal data),Internal wiring of equipment or external / interconnecti,Internal wiring of equipment or external / interconnecti,Unit,ng wires
+Conductor Resistance,Intended Use,Intended Use,Intended Use,Intended Use,,24 AWG,Internal wiring of equipment or external / interconnecti,": max 86,6 Ω/km
+mm2: 41,7",ng wires
+Conductor Resistance,Intended Use,Intended Use,Intended Use,Intended Use,,"0,5",Internal wiring of equipment or external / interconnecti,": max 86,6 Ω/km
+mm2: 41,7",ng wires
+Insulation Resistance,Intended Use,Intended Use,Intended Use,Intended Use,,"0,5",Internal wiring of equipment or external / interconnecti,>1500 MΩ x km,ng wires
+Test Voltage,Intended Use,Intended Use,Intended Use,,,,Internal wiring of equipment or external / interconnecti,3 kV DC,
+Voltage Rating,Intended Use,Intended Use,Intended Use,,"0,5",,Internal wiring of equipment or external / interconnecti,mm2: 600 V AC,
+Impedance,Intended Use,Intended Use,Intended Use,,@ 1 MH,,Internal wiring of equipment or external / interconnecti,z: 120±15 Ω,
+Weight,Intended Use,Intended Use,Intended Use,,,,Internal wiring of equipment or external / interconnecti,60 g / m,
+Temperature Rating,Intended Use,Intended Use,Intended Use,,,,Internal wiring of equipment or external / interconnecti,-40+90 °C,
+"Reference standards/specifications
+All dimensions in mm, unless otherwise stated.",Intended Use,Intended Use,Intended Use,,,,Internal wiring of equipment or external / interconnecti,-40+90 °C,
+Pos,Intended Use,Description,Intended Use,,,,Dimension Ove,rall Diameter Remarks,
+1.,Intended Use,,Tin plated copper conductor,,,,24 AWG,"0,60 19x0,13
+2,1",
+1.,Intended Use,,Insulation of XLPE,,,,24 AWG,"0,60 19x0,13
+2,1",
+2.,Intended Use,"Tin plated copper conductor
+Insulation of HFI 140",Insulation of XLPE,,,,"0,5 mm2","0,88 16x0,20
+1,28",
+3.,,,Filler,,,,,,
+4.,,Binder,Filler,,,,,"4,3",
+5.,,,Braided screen of tin plated copper wire,,,,"Wire Ø: 0,13","4,9 min 85% coverage.",
+6.,,"Jacket of HFS 107 XL, black",Braided screen of tin plated copper wire,,,,"Thickness 0,8","6,5",
+"Jacket marking in contrasting colour, intervals of 250 mm:
+Habia Cable - 5012106 - YYYY-Www - batchcode
+YYYY-Www to be replaced with year and week of manufacture.
+Batchcode to be replaced with manufacturers traceability code",,"Jacket of HFS 107 XL, black",Braided screen of tin plated copper wire,,,,"Thickness 0,8","6,5",

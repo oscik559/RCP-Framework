@@ -1,0 +1,35 @@
+0,1,2,3
+Issue,Date,Changed By,Change Description
+A,2010-04-19,Jonas Ekholtz,First revision.
+B,2012-09-26,Magnus Elverlind,"Wrong design for 25-61, J61, paragraph 4.9. New picture
+is added and the old is deleted."
+C,2013-05-23,Magnus Elverlind,"Added layout for shell size 13-26 during para 4.3. Updated
+para 5 with strip length."
+D,2018-03-15,Magnus Elverlind,"Added layout for shell size 25-8 during para 4.9. NXC has
+been added in the head."
+E,2018-06-15,Joakim Skarpsvärd,"Added connector 9305933-204. Reformatted document to
+latest template."
+F,2018-09-06,Joakim Skarpsvärd,Added connector series RNTM2240002 and layout 17-99.
+G,2019-04-23,Elliot Gutestam,Added RPT2346311/990 and layout 11-99.
+H,2021-03-15,Elliot Gutestam,Removed a digit from installation & removal tools
+I,2021-09-06,Axel A Egerlid,"Error, no changes made (see revision J)"
+J,2021-09-06,Axel A Egerlid,"Added layout for new contact, shell size 23-54."
+K,2021-10-08,Axel A Egerlid,Corrected layout text from previous update
+L,2021-11-01,Axel A Egerlid,Corrected revision number
+M,2022-06-10,Patrik Olsson,Updated layout 17-26
+N,2022-08-16,Frida Delin,Connector series RPTM2340004 added
+O,2022-10-18,Frida Delin,Connector RPT2346113/352 added
+P,2023-01-05,"Kristoffer Y.
+Mikkelsen",Connector family C0000690 added.
+Q,2023-01-05,"Kristoffer Y.
+Mikkelsen",Connector family C0000691 and C0005821 added.
+R,2023-06-12,Marcus Danielsson,Added layout 11-13
+S,2023-06-20,Marcus Danielsson,Added #8 in chapter 2.1
+T,2023-10-05,Eduard Jelica,Connector family C0005943 added.
+U,2024-01-12,Albert Andersson,Document was deleted on Rev U. Added file again.
+V,2024-02-29,Marcus Danielsson,Removing locator from #8 in chapter 2.1
+W,2024-03-19,Albert Andersson,Added family RNTM2240004.
+X,2024-03-19,Albert Andersson,Added family RPTM2340002
+Y,2024-03-26,"Albert Andersson/
+Linda Hamlet","Added AWG 23 in 2.1 and 3. Added Layout 13-32 and 13-
+63. Added family C0000658."

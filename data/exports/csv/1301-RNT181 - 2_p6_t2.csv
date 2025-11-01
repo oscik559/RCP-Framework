@@ -1,0 +1,6 @@
+0,1,2,3
+Parameter,Conditions,Value,Unit
+Number of matings,,500,
+Engaging force,Per contact element.,max 2.9,N
+Separating force,Per contact element.,min 0.2,N
+Retention force,From insulator (sleeve),min 10,N

@@ -7,3 +7,23 @@ Technical specifications from tables (ID mm, ID tum, YD mm, working pressure, be
 Product names/categories (e.g., "KAPPAFLEX 2K PO")
 Construction details (materials, temperature ratings, etc.)
 Bounding boxes for visual verification
+
+
+
+function_library.py requires refactoring - This ~2000 line file contains SAAB-specific functions and is the main blocker for Hydroscand integration.
+
+Recommended approach:
+
+Rename current file to function_library_saab_example.py (keep as reference)
+Create function_library_hydroscand.py with product catalog functions
+Implement 8-10 essential functions:
+find_product_by_code()
+search_products_by_category()
+get_product_family_details()
+compare_products()
+etc.
+
+
+
+⚠️ Need testing: workflow_nodes.py, llm_helpers.py
+🚨 Need refactoring: function_library.py (SAAB-specific), vector_helpers.py (domain prompts)

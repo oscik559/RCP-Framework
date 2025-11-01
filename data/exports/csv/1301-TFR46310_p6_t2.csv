@@ -1,0 +1,19 @@
+0,1,2,3,4,5,6
+Product code,Fig,"Number of
+conductors
+x mm²","ø Jacket
+mm","ø Braid
+mm
+nom","DC-
+resistance
+braid
+Ω/km max",Remark
+TFR4631015/040,2,4 x 1.5,7.9 ± 0.4,5.5,8.70,"Black conductors shall
+be numbered 1, 2 and 3"
+TFR4631025/040,2,4 x 2.5,9.1 ± 0.5,6.7,7.70,"Black conductors shall
+be numbered 1, 2 and 3"
+TFR4631060/040,2,4 x 6.0,16.2 ± 0.8,13.4,2.40,"Black conductors shall
+be numbered 1, 2 and 3"
+TFR4631060/04B,2b,4 x 6.0,"12,8 ± 0.8",10,-,
+TFR4631010/040,2b,4 x 10,"15,2","12,4",-,
+TFR4631016/040,3,4 x 1.25,7.9 ± 0.4,5.5,-,

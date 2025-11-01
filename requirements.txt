@@ -1,3 +1,66 @@
-requests
-Pillow
-PyMuPDF
+# ============================================================================
+# Project Hydroscand-Hoses - Complete Requirements
+# ============================================================================
+#
+# Python Version: 3.12.12 (REQUIRED for ChromaDB)
+# Install: pip install -r requirements.txt
+#
+# Note: Python 3.14 does NOT work due to chromadb dependency conflicts
+# Use Python 3.12: python3.12 -m venv .venv
+# ============================================================================
+
+# ============================================================================
+# LAYER 1 - PDF Processing
+# ============================================================================
+requests>=2.32.0,<3.0.0          # HTTP requests
+Pillow>=12.0.0,<13.0.0           # Image processing
+PyMuPDF>=1.26.0,<2.0.0           # PDF parsing (fitz)
+
+# ============================================================================
+# LAYER 2 - Agentic Reasoning System
+# ============================================================================
+
+# Core Framework - LangGraph & LangChain
+langgraph>=1.0.0,<2.0.0
+langchain>=1.0.0,<2.0.0
+langchain-core>=1.0.0,<2.0.0
+langchain-classic>=1.0.0,<2.0.0
+langchain-community>=0.4.0,<1.0.0
+langchain-text-splitters>=1.0.0,<2.0.0
+
+# LLM Providers
+langchain-openai>=1.0.0,<2.0.0
+langchain-anthropic>=1.0.0,<2.0.0
+langchain-ollama>=1.0.0,<2.0.0
+openai>=2.0.0,<3.0.0
+anthropic>=0.70.0,<1.0.0
+ollama>=0.6.0,<1.0.0
+
+# Vector Store (ChromaDB - Requires Python 3.12)
+langchain-chroma>=1.0.0,<2.0.0
+chromadb>=1.0.0,<2.0.0
+
+# Database
+SQLAlchemy>=2.0.0,<3.0.0
+
+# Data Processing
+numpy>=2.0.0,<3.0.0
+pydantic>=2.7.0,<3.0.0
+pydantic-settings>=2.10.0,<3.0.0
+PyYAML>=6.0.0,<7.0.0
+
+# Utilities
+python-dotenv>=1.0.0,<2.0.0
+httpx>=0.28.0,<1.0.0
+aiohttp>=3.8.0,<4.0.0
+tenacity>=9.0.0,<10.0.0
+tiktoken>=0.12.0,<1.0.0
+tqdm>=4.60.0,<5.0.0
+
+# Type Checking & Validation
+typing-extensions>=4.5.0,<5.0.0
+typing-inspection>=0.4.0,<1.0.0
+dataclasses-json>=0.6.0,<1.0.0
+
+# Monitoring
+langsmith>=0.4.0,<1.0.0

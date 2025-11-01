@@ -1,0 +1,39 @@
+0,1,2,3
+"Pin/Male (P)
+Socket /Female
+(S)",Series according to D38999,Series according to D38999,Type of connector
+"Pin/Male (P)
+Socket /Female
+(S)",Serie I,Serie III,Type of connector
+S,RNT2251,"RNT2240
+RNTM2240002
+RNT81381","Receptacle square
+flange"
+S,RNT2254,RNT2244,Receptacle jam nut
+S,RNT2257,"RNT2246
+RNT81382
+9305933-204
+C0005943
+RNTM2240004
+C0000658",Plug
+S,X/RNT225,"RNT2246
+RNT81382
+9305933-204
+C0005943
+RNTM2240004
+C0000658",Socket contacts
+P,"RPR2351
+RPT2356
+C0000742","RPT2340
+RPT81381
+C0000691
+RPTM2340002","Receptacle square
+flange"
+P,RPT2354,RPT2344,Receptacle jam nut
+P,RPT2357,"RPT2346
+RPT812
+RPTM2340004
+C0000690
+C0005821",Plug
+P,PB5051/620A/0,,
+P,X/RPT235,,Pin contacts

@@ -1,0 +1,10 @@
+0,1,2,3
+Parameter,Condition,Value,Unit
+Conductor loop resistance,max,29Ω/100m,
+"Conductor resistance
+balanced",max,2%,
+"Capacitance unbalance to
+earth",max,1600,pF/km
+Skew,@100MHz,40nsec/100m,
+"Mean characteristic
+impedance",,100 ± 5,Ω

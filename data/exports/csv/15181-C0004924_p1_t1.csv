@@ -1,0 +1,12 @@
+0,1,2,3
+Issue,Date,Changed By,Change Description
+A,2022-03-21,U034501,First issue.
+B,2022-09-14,U034501,Added crimp tool and locator
+C,2022-09-30,U062636,Added insertion tool
+D,2023-01-10,U062636,Clarifications
+E,2023-01-25,U062636,Added layout info
+F,2023-10-18,U090247,Added connector C0004924-100309
+G,2023-11-13,U090247,"Added connector C0004924-10031 and
+changed insertion and extraction tool."
+G,2024-02-05,U091982,Removed fourth column on 5.
+H,2024-03-25,U083225,Removed tools in section 3

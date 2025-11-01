@@ -1,0 +1,16 @@
+0,1,2
+,Value,Unit
+Temperature range,- 30...+105,°C
+Operating temperature,- 30...+85,°C
+Tensile strength,min. 11,N/mm²
+Elongation,min. 220,%
+"Cold bend, - 30°C","Bend the cable around a mandrel with a
+diameter 5 times the cable diameter
+Number of bendings shall be 5 times
+The examination shall show no cracks",
+Flammability,"A burnlight in 45° angle toward the cable
+Max afterburn, non",
+"Flammability-60 1)
+(only valid for selected cables)","A burnlight in 60° angle toward the cable
+Flame exposure time 30 s.
+Max afterburn 30 s.",

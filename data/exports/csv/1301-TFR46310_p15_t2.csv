@@ -1,0 +1,25 @@
+0,1,2,3,4,5,6,7
+"This document and the information contained herein is the property of Saab AB and must not be used, disclosed or altered without Saab AB prior written consent.",,,,,,,
+"This document and the information contained herein is the property of Saab AB and must not be used, disclosed or altered without Saab AB prior written consent.",Product code,Fig,"Number of
+conductors
+x mm²","ø Jacket
+mm","ø Braid
+mm
+nom","DC-resistance
+braid
+Ω/km
+max",Remark
+,Product code,Fig,"Number of
+conductors
+x mm²","ø Jacket
+mm","ø Braid
+mm
+nom","DC-resistance
+braid
+Ω/km
+max",Remark
+,TFR4631020/102,19,5 x 2 x 0.6,10.1 ± 0.5,7.5,7.10,5 x 2 twist pair AWG 20
+,TFR4631024/102,19,5 x 2 x 0.25,8.0 ± 0.5,5.6,8.80,5 x 2 twist pair AWG 24
+,TFR4631016/202,20,10 x 2 x 1.25,15.3 ± 0.8,12.5,2.70,10 x 2 twist pair AWG 16
+,TFR4631020/202,20,10 x 2 x 0.6,12.2 ± 0.6,9.6,4.10,10 x 2 twist pair AWG 20
+,TFR4631024/202,20,10 x 2 x 0.25,9.7 ± 0.5,7.1,7.40,10 x 2 twist pair AWG 24

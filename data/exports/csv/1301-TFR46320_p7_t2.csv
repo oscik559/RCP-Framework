@@ -1,0 +1,17 @@
+0,1,2,3,4,5,6
+Product code,Fig,"Number of
+conductors
+x mm2","ø Jacket
+mm","ø Braid
+mm
+nom","DC-
+resistance
+Ω/km
+nom.",Remark
+TFR 463 2012/043,7,4 x 3.0,"13.6 ±
+0.7",10.8,3.6,"2x2 pair twisted
+AWG 12"
+TFR 463 2016/070,6b,7 x 1.25,8.4 max,6.2,15.1,"AWG 16, numbered"
+TFR 463 2020/070,6a,7 x 0.6,7.0 ± 0.4,4.8,10.9,"See Para 5 Note: 2
+AWG 20"
+TFR 463 2024/070,6a,7 x 0.2,5.7 ± 0.3,3.7,15.0,AWG 24

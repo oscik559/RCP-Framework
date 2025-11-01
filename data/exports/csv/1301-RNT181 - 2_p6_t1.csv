@@ -1,0 +1,19 @@
+0,1,2,3
+Parameter,Symbol,Value,Unit
+"Current rating,
+max/contacts","I
+R",2,A
+"Current rating, max
+all contacts",,1.75,A
+Voltage rating,"U
+R",120,"V DC,
+AC RMS"
+Test voltage,"U
+test",360,"V DC,
+AC RMS"
+Contact resistance,"R
+C",max 20,mΩ
+Insulation resistance,,min.103,MΩ
+Temperature range,"T
+amb","-
+55...+125",°C

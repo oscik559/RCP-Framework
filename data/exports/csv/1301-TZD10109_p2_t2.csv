@@ -1,0 +1,6 @@
+0,1,2,3
+Parameter,Conditions,Value,Unit
+Test voltage,,3,kV DC
+Capacitance,,465,nF/km
+Impedance,at 1 MHz,100,
+Insulation resistance,min.,1500,Mkm

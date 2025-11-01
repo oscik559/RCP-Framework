@@ -1,0 +1,30 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	GoalDefine(GoalDefine)
+	StrategyPlan(StrategyPlan)
+	FunctionExecute(FunctionExecute)
+	FunctionValidate(FunctionValidate)
+	StrategyValidate(StrategyValidate)
+	GoalValidate(GoalValidate)
+	done(done)
+	__end__([<p>__end__</p>]):::last
+	FunctionExecute --> FunctionValidate;
+	FunctionValidate --> StrategyValidate;
+	GoalDefine --> StrategyPlan;
+	GoalValidate -. &nbsp;False&nbsp; .-> StrategyPlan;
+	GoalValidate -. &nbsp;True&nbsp; .-> done;
+	StrategyPlan -.-> FunctionExecute;
+	StrategyPlan -.-> done;
+	StrategyValidate -.-> FunctionExecute;
+	StrategyValidate -.-> GoalValidate;
+	StrategyValidate -.-> StrategyPlan;
+	__start__ --> GoalDefine;
+	done --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

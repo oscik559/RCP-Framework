@@ -13,7 +13,7 @@ import sys
 class DatabaseManager:
     """Manages database initialization and connection."""
     
-    def __init__(self, db_path="data/products.db"):
+    def __init__(self, db_path="data/database/harvested.db"):
         """Initialize database manager."""
         self.db_path = Path(db_path)
         self.schema_path = Path("Layer_1/schema.sql")
@@ -156,7 +156,7 @@ class DatabaseManager:
 
 
 # Convenience function for quick initialization
-def init_database(db_path="data/products.db"):
+def init_database(db_path="data/database/harvested.db"):
     """
     Quick database initialization function.
     
@@ -171,7 +171,7 @@ def init_database(db_path="data/products.db"):
 
 
 # Convenience function for getting connection
-def get_db_connection(db_path="data/products.db"):
+def get_db_connection(db_path="data/database/harvested.db"):
     """
     Get database connection with auto-initialization.
     
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Database management utilities")
     parser.add_argument("--init", action="store_true", help="Initialize database")
     parser.add_argument("--verify", action="store_true", help="Verify database status")
-    parser.add_argument("--db-path", default="data/products.db", help="Database path")
+    parser.add_argument("--db-path", default="data/database/harvested.db", help="Database path")
     
     args = parser.parse_args()
     
