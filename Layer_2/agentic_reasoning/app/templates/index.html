@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Saab - AI Technical Assistant</title>
+    <title>AI Technical Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Grandview:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -782,9 +782,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔧 Project_Saab</h1>
+            <h1>🤖 AI Technical Assistant</h1>
             <p>AI-Powered Technical Documentation Assistant</p>
-            <div class="tech-badge">Multi-Agent LLM System • 450+ Product Families</div>
+            <div class="tech-badge">Multi-Agent LLM System • Domain Knowledge Expert</div>
         </div>
 
         <form class="query-form" id="queryForm">
@@ -792,7 +792,7 @@
                 <textarea
                     class="query-input"
                     id="queryInput"
-                    placeholder="Ask me about any technical detail...&#10;&#10;Example: 'What is the shell size for RPT2354309/350?'"
+                    placeholder="Ask me about any technical detail...&#10;&#10;Example: 'What are the specifications for [product]?'"
                     required
                 ></textarea>
             </div>
@@ -894,20 +894,20 @@
 
         <div class="examples">
             <h4>💡 Example Queries</h4>
-            <div class="example-query" onclick="setQuery('What is the shell size for RPT2354309/350?')">
-                What is the shell size for RPT2354309/350?
+            <div class="example-query" onclick="setQuery('What are the specifications for [product ID]?')">
+                What are the specifications for [product ID]?
             </div>
-            <div class="example-query" onclick="setQuery('Differentiate product: C0001686-61701 from product: RPT 235 4313/350.')">
-                Differentiate product: C0001686-61701 from product: RPT 235 4313/350.
+            <div class="example-query" onclick="setQuery('Compare [product A] with [product B]')">
+                Compare [product A] with [product B]
             </div>
-            <div class="example-query" onclick="setQuery('Find the contact count for RNT2240 series')">
-                Find the contact count for RNT2240 series
+            <div class="example-query" onclick="setQuery('Find products in the [category] family')">
+                Find products in the [category] family
             </div>
-            <div class="example-query" onclick="setQuery('What is the jacket size of cable TFR4631025/040?')">
-                What is the jacket size of cable TFR4631025/040?
+            <div class="example-query" onclick="setQuery('What is the [attribute] for [product]?')">
+                What is the [attribute] for [product]?
             </div>
-            <div class="example-query" onclick="setQuery('What locator and crimptool is used for RPT 235 4313/350?')">
-                What locator and crimptool is used for RPT 235 4313/350?
+            <div class="example-query" onclick="setQuery('List all [type] products')">
+                List all [type] products
             </div>
 
 
