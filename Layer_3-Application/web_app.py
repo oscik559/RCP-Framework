@@ -16,17 +16,20 @@ import threading
 import time
 import json
 
+# Add Layer_2-Agentic to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
+
 # Import the existing agentic reasoning system
-from agentic_reasoning.logic.state_graph import get_graph
-from agentic_reasoning.logic.types import SessionState
-from agentic_reasoning.config.debug_config import debug
-from agentic_reasoning.config.session_config import generate_session_id
-from agentic_reasoning.config.config_loader import CONFIG
-from agentic_reasoning.db.connection import (
+from logic.state_graph import get_graph
+from logic.types import SessionState
+from config.debug_config import debug
+from config.session_config import generate_session_id
+from config.config_loader import CONFIG
+from db.connection import (
     get_agentic_connection,
     get_output_connection,
 )
-from agentic_reasoning.app.progress_flow import create_progress_workflow
+from progress_flow import create_progress_workflow
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key-change-this-in-production"
@@ -296,7 +299,7 @@ def execute_workflow_with_progress(init_state, tracker):
                 print("❌ No session ID provided to monitor_real_progress")
                 return
 
-            from agentic_reasoning.db.connection import get_agentic_connection
+            from db.connection import get_agentic_connection
 
             # Set goal information immediately
             tracker.set_goal(
@@ -611,7 +614,7 @@ pipeline_trackers = {}
 def get_pipeline_status():
     """Get status of all pipelines and data inventory"""
     try:
-        from agentic_reasoning.config.domain_config import DOMAIN_TABLES, get_table_name
+        from config.domain_config import DOMAIN_TABLES, get_table_name
         
         # Get domain-specific table names
         SUMMARY_TABLE = get_table_name("summarized_doc")

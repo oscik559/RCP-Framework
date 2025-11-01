@@ -6,16 +6,16 @@ This guide will help you quickly integrate the generic agentic reasoning system 
 
 ### Step 1: Configure Domain Settings
 
-Edit `Layer_2/agentic_reasoning/config/domain_config.py` with your domain specifics:
+Edit `Layer_2-Agentic/config/domain_config.py` with your domain specifics:
 
 ```python
 DOMAIN_NAME = "MyApplication"
-DATABASE_PATH = "../path/to/your/database.db"
+DATABASE_PATH = "data/database/your_database.db"  # Relative to project root
 ```
 
 ### Step 2: Define Your Functions
 
-In `agentic_reasoning/logic/function_library.py`, add your functions:
+In `Layer_2-Agentic/logic/function_library.py`, add your functions:
 
 ```python
 def find_my_entity(entity_id: str) -> dict:
@@ -36,7 +36,7 @@ def find_my_entity(entity_id: str) -> dict:
 
 ### Step 3: Create Strategy Templates
 
-In `agentic_reasoning/logic/templates.py`, add to strategy library:
+In `Layer_2-Agentic/logic/templates.py`, add to strategy library:
 
 ```python
 STRATEGY_LIBRARY.append({
@@ -58,9 +58,12 @@ STRATEGY_LIBRARY.append({
 ### Step 4: Test Your Integration
 
 ```python
-from agentic_reasoning.config.session_config import get_default_session_state
-from agentic_reasoning.logic.state_graph import get_graph
-from agentic_reasoning.logic.templates import populate_template_libraries
+import sys
+sys.path.insert(0, 'Layer_2-Agentic')
+
+from config.session_config import get_default_session_state
+from logic.state_graph import get_graph
+from logic.templates import populate_template_libraries
 
 # Initialize
 query = "Find entity ABC123"
@@ -80,11 +83,11 @@ print(result['answer'])
 
 Let's integrate with a product catalog:
 
-#### 1. Domain Configuration (`domain_config.py`)
+#### 1. Domain Configuration (`Layer_2-Agentic/config/domain_config.py`)
 
 ```python
 DOMAIN_NAME = "Product Catalog"
-DATABASE_PATH = "../../data/products.db"
+DATABASE_PATH = "data/products.db"
 
 DOMAIN_FUNCTIONS = [
     {
@@ -117,7 +120,7 @@ EXAMPLE_QUERIES = [
 #### 2. Function Implementation
 
 ```python
-# In function_library.py
+# In Layer_2-Agentic/logic/function_library.py
 
 import sqlite3
 import json
@@ -297,7 +300,7 @@ def compare_products(product_code_1: str, product_code_2: str) -> dict:
 #### 3. Strategy Templates
 
 ```python
-# In templates.py
+# In Layer_2-Agentic/logic/templates.py
 
 PRODUCT_STRATEGIES = [
     {
@@ -367,7 +370,7 @@ def populate_template_libraries():
 #### 4. Run It
 
 ```python
-# In main.py
+# In main.py (at project root)
 
 user_query = "What are the specifications of product 1059-01-04?"
 
@@ -415,11 +418,11 @@ Query → Goal → Strategy: "SearchAndFilter" →
 ## Troubleshooting
 
 **Q: Functions not being found**
-- Ensure functions are properly imported in `function_library.py`
+- Ensure functions are properly imported in `Layer_2-Agentic/logic/function_library.py`
 - Check function names match exactly in strategy templates
 
 **Q: Database connection errors**
-- Verify `DATABASE_PATH` in domain_config.py
+- Verify `DATABASE_PATH` in `Layer_2-Agentic/config/domain_config.py`
 - Check database file permissions
 - Ensure database schema exists
 
@@ -438,4 +441,4 @@ Query → Goal → Strategy: "SearchAndFilter" →
 For more detailed documentation, see:
 - `README.md` - Full system documentation
 - `docs/graph.md` - Workflow architecture
-- `agentic_reasoning/config/domain_config_template.py` - Configuration options
+- `Layer_2-Agentic/config/domain_config_template.py` - Configuration options

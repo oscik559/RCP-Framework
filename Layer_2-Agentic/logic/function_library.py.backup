@@ -252,16 +252,76 @@ def func_table_search(params: dict) -> tuple[bool, dict | str]:
 
 
 def _generate_format_variations(keyword: str) -> list[str]:
-    """
-    Generate different formatting variations of a product number/keyword (GENERIC).
-    
-    Handles common spacing and separator variations without domain-specific patterns.
-    """
+    """Generate different formatting variations of a product number/keyword."""
     variations = []
 
     # Skip if not a potential product number (too short or no alphanumeric pattern)
-    if len(keyword) < 3 or not re.search(r"[A-Za-z].*\d|\d.*[A-Za-z]", keyword):
+    if len(keyword) < 5 or not re.search(r"[A-Za-z].*\d|\d.*[A-Za-z]", keyword):
         return variations
+
+    # Clean the keyword first
+    clean_kw = re.sub(r"\s+", "", keyword)  # Remove all spaces
+
+    # Common product number patterns to handle:
+    # RPT 235 4309/350 vs RPT2354309/350
+    # C0001686-61701 vs C0001686 61701
+    # RNT 181/001 vs RNT181/001
+    # TFR 46310/001 vs TFR46310/001
+
+    # Pattern 1: RPT series (RPT + numbers)
+    rpt_match = re.match(r"(RPT)(\d{3})(\d{4})/(\d{3})", clean_kw, re.IGNORECASE)
+    if rpt_match:
+        prefix, part1, part2, suffix = rpt_match.groups()
+        variations.extend(
+            [
+                f"{prefix} {part1} {part2}/{suffix}",  # RPT 235 4309/350
+                f"{prefix}{part1} {part2}/{suffix}",  # RPT235 4309/350
+                f"{prefix} {part1}{part2}/{suffix}",  # RPT 2354309/350
+                f"{prefix}{part1}{part2}/{suffix}",  # RPT2354309/350 (original)
+                f"{prefix} {part1[:2]} {part1[2:]}{part2}/{suffix}",  # RPT 23 54309/350
+            ]
+        )
+
+    # Pattern 2: C-series with dash (C0001686-61701)
+    c_match = re.match(r"(C\d+)-?(\d+)", clean_kw, re.IGNORECASE)
+    if c_match:
+        prefix, suffix = c_match.groups()
+        variations.extend(
+            [
+                f"{prefix}-{suffix}",  # C0001686-61701
+                f"{prefix} {suffix}",  # C0001686 61701
+                f"{prefix} - {suffix}",  # C0001686 - 61701
+                f"{prefix}{suffix}",  # C000168661701
+            ]
+        )
+
+    # Pattern 3: RNT series (RNT + numbers)
+    rnt_match = re.match(r"(RNT)(\d+)/(\d+)", clean_kw, re.IGNORECASE)
+    if rnt_match:
+        prefix, part, suffix = rnt_match.groups()
+        variations.extend(
+            [
+                f"{prefix} {part}/{suffix}",  # RNT 181/001
+                f"{prefix}{part}/{suffix}",  # RNT181/001
+                f"{prefix} {part} {suffix}",  # RNT 181 001
+                f"{prefix}{part} {suffix}",  # RNT181 001
+                f"{prefix}-{part}/{suffix}",  # RNT-181/001
+            ]
+        )
+
+    # Pattern 4: TFR series (TFR + numbers)
+    tfr_match = re.match(r"(TFR)(\d+)/(\d+)", clean_kw, re.IGNORECASE)
+    if tfr_match:
+        prefix, part, suffix = tfr_match.groups()
+        variations.extend(
+            [
+                f"{prefix} {part}/{suffix}",  # TFR 46310/001
+                f"{prefix}{part}/{suffix}",  # TFR46310/001
+                f"{prefix} {part[:4]} {part[4:]}/{suffix}",  # TFR 4631 0/001
+                f"{prefix} {part[:3]} {part[3:]}/{suffix}",  # TFR 463 10/001
+                f"{prefix}-{part}/{suffix}",  # TFR-46310/001
+            ]
+        )
 
     # General patterns: Add/remove spaces around common separators
     if "/" in keyword:
@@ -288,7 +348,6 @@ def _generate_format_variations(keyword: str) -> list[str]:
                     f"{left.strip()}-{right.strip()}",
                     f"{left.strip()} - {right.strip()}",
                     f"{left.strip()} {right.strip()}",
-                    f"{left.strip()}{right.strip()}",  # Compressed
                 ]
             )
 
@@ -856,11 +915,7 @@ def func_filter_table(params: dict) -> tuple[bool, dict | str]:
         if not content:
             continue
 
-        if keep_header:
-            header, *rows = content
-        else:
-            header = []
-            rows = content[1:] if len(content) > 1 else []
+        header, *rows = content if keep_header else ([], content)
 
         filtered_rows = [row for row in rows if row_matches(row)]
 
@@ -1918,32 +1973,43 @@ def func_extract_product_number(params: dict) -> tuple[bool, dict]:
 
 
 def _normalize_product_format(product_code: str) -> str:
-    """
-    Normalize product code to a standard searchable format (GENERIC).
-    
-    Applies basic normalization without domain-specific patterns.
-    Just cleans up whitespace and standardizes separators.
-    """
+    """Normalize product code to a standard searchable format."""
     if not product_code:
         return product_code
 
-    # Clean up the code: normalize whitespace
-    code = " ".join(product_code.strip().split())
-    
-    # Standardize separators: replace multiple spaces/dashes with single
-    code = re.sub(r'\s+-\s+', '-', code)  # " - " → "-"
-    code = re.sub(r'\s+/\s+', '/', code)   # " / " → "/"
-    
+    # Clean up the code
+    code = product_code.strip()
+
+    # Handle common RPT patterns: RPT2354309/350 → RPT 235 4309/350
+    rpt_match = re.match(r"(RPT)(\d{3})(\d{4})/(\d{3})", code, re.IGNORECASE)
+    if rpt_match:
+        prefix, part1, part2, suffix = rpt_match.groups()
+        return f"{prefix} {part1} {part2}/{suffix}"
+
+    # Handle C-series: ensure dash format C0001686-61701
+    c_match = re.match(r"(C\d+)[\s-]*(\d+)", code, re.IGNORECASE)
+    if c_match:
+        prefix, suffix = c_match.groups()
+        return f"{prefix}-{suffix}"
+
+    # Handle RNT series: ensure space format RNT 181/001
+    rnt_match = re.match(r"(RNT)(\d+)/(\d+)", code, re.IGNORECASE)
+    if rnt_match:
+        prefix, part, suffix = rnt_match.groups()
+        return f"{prefix} {part}/{suffix}"
+
+    # Handle TFR series: ensure space format TFR 46310/001
+    tfr_match = re.match(r"(TFR)(\d+)/(\d+)", code, re.IGNORECASE)
+    if tfr_match:
+        prefix, part, suffix = tfr_match.groups()
+        return f"{prefix} {part}/{suffix}"
+
+    # Return original if no pattern matches
     return code
 
 
 def func_normalize_product_number(params: dict) -> tuple[bool, dict | str]:
-    """
-    Normalize product code by removing extra spaces and standardizing format (GENERIC).
-    
-    No longer truncates to specific length - that was SAAB-specific.
-    Just cleans and standardizes the format.
-    """
+    """Normalize product code by removing spaces/suffixes and truncating to 7 chars."""
     import re
 
     raw = params.get("Keyword Output", "")
@@ -1957,17 +2023,16 @@ def func_normalize_product_number(params: dict) -> tuple[bool, dict | str]:
             f"[func_normalize_product_number] Multiple keywords found, using first: {raw}"
         )
 
-    # Basic normalization: remove extra whitespace, standardize format
-    code = " ".join(raw.split())  # Normalize whitespace
-    code = re.sub(r'\s+-\s+', '-', code)  # " - " → "-"
-    code = re.sub(r'\s+/\s+', '/', code)  # " / " → "/"
+    code = re.sub(r"\s+", "", raw)
+    code = re.sub(r"/.*$", "", code)
+    family_code = code[:7]
 
     debug.print_function(
-        f"[func_normalize_product_number] Normalized: {repr(raw)} → {repr(code)}"
+        f"[func_normalize_product_number] RESET: {repr(raw)} → {repr(family_code)}"
     )
 
     # Return ONLY the normalized code (this resets the keyword context)
-    return (True, {"Keyword Output": code})
+    return (True, {"Keyword Output": family_code})
 
 
 def func_suggest_keywords(params: dict) -> tuple[bool, dict]:
@@ -2013,23 +2078,23 @@ def func_suggest_keywords(params: dict) -> tuple[bool, dict]:
             "[func_suggest_keywords] LLM returned no keywords, using fallback extraction"
         )
 
-        # Common technical terms for Hydroscand domain (hoses, couplings, fittings)
+        # Common technical terms that might appear in questions
         fallback_terms = [
-            "pressure",
-            "temperature",
-            "diameter",
-            "length",
-            "hose",
-            "coupling",
-            "fitting",
-            "connector",
-            "adapter",
+            "torque",
+            "tool",
+            "crimp",
+            "locator",
+            "shell",
             "size",
-            "flow",
-            "material",
-            "thread",
-            "rating",
-            "standard",
+            "voltage",
+            "current",
+            "diameter",
+            "contact",
+            "installing",
+            "installation",
+            "connector",
+            "cable",
+            "jacket",
         ]
 
         question_lower = question.lower()
@@ -2037,12 +2102,15 @@ def func_suggest_keywords(params: dict) -> tuple[bool, dict]:
 
         for term in fallback_terms:
             if term in question_lower:
-                # Handle compound terms like "working pressure" or "max temperature"
-                if term == "pressure" and any(x in question_lower for x in ["working", "max", "burst", "operating"]):
-                    found_terms.append(f"{next(x for x in ['working', 'max', 'burst', 'operating'] if x in question_lower)} pressure")
-                elif term == "temperature" and any(x in question_lower for x in ["min", "max", "operating"]):
-                    found_terms.append(f"{next(x for x in ['min', 'max', 'operating'] if x in question_lower)} temperature")
-                elif term not in found_terms:  # Avoid duplicates
+                # Handle compound terms like "installing tool"
+                if term == "installing" and "tool" in question_lower:
+                    found_terms.append("installing tool")
+                elif term == "shell" and "size" in question_lower:
+                    found_terms.append("shell size")
+                elif term not in [
+                    "installing",
+                    "shell",
+                ]:  # Don't add these individually if compound found
                     found_terms.append(term)
 
         keywords = list(set(found_terms))  # Remove duplicates
@@ -2060,1376 +2128,710 @@ def func_suggest_keywords(params: dict) -> tuple[bool, dict]:
 
 def func_generate_visual_layout(params: dict) -> tuple[bool, dict]:
     """
-    Generate visual layout (SIMPLIFIED - SAAB-specific features removed).
-    
-    Simplified version that returns a basic layout description.
-    For full visual layout generation with image search, use the image search functions.
-    
+    Generate visual layout by finding images from the same documents where the product was found.
+
+    This function:
+    1. Takes filtered table data to identify which documents contain the product
+    2. Searches for images from those specific documents in saved_images table
+    3. Provides visual content directly related to the product's documentation
+    4. Combines images with technical specifications from the filtered data
+
     Args:
-        params: Dict containing product information and query
-        
+        params: Dict containing filtered table data and product information
+
     Returns:
-        Tuple of (success, output_dict) with basic layout information
+        Tuple of (success, output_dict) with layout information and relevant images
     """
+    debug.print_function(
+        f"[func_generate_visual_layout] Starting document-based visual layout generation"
+    )
+
+    # Get input parameters
     product_code = params.get("Product Number Output", "").strip()
     filtered_data = params.get("Filtered Data", "").strip()
     user_query = params.get("Input", "").strip()
-    
+
     debug.print_function(f"[func_generate_visual_layout] Product: {product_code}")
-    
-    if not filtered_data and not product_code:
-        return (False, "No product information available for layout generation")
-    
+    debug.print_function(f"[func_generate_visual_layout] Query: {user_query}")
+
+    if not filtered_data:
+        return (False, "No filtered table data available for visual layout generation")
+
     try:
-        # Basic layout info
+        # Parse the filtered data to find source documents
+        tables = json.loads(filtered_data) if filtered_data else []
+        source_documents = set()
+
+        # Extract document names from the filtered data
+        for table in tables:
+            if isinstance(table, dict) and "filename" in table:
+                doc_name = table["filename"]
+                if doc_name:
+                    source_documents.add(doc_name)
+
+        debug.print_function(
+            f"[func_generate_visual_layout] Found {len(source_documents)} source documents: {list(source_documents)}"
+        )
+
+        # Determine visual type from query
+        visual_type = _determine_visual_type(user_query, "")
+
+        # Search for images from the identified documents
+        relevant_images = _search_images_by_documents(
+            list(source_documents), product_code, visual_type
+        )
+
         layout_info = {
             "product_code": product_code,
-            "query": user_query,
-            "status": "Layout generation - simplified version",
-            "message": "Use Display Images function for full visual content"
+            "visual_type": visual_type,
+            "source_documents": list(source_documents),
+            "images_found": len(relevant_images) > 0,
+            "image_count": len(relevant_images),
+            "images": relevant_images,
+            "technical_data": _extract_technical_specs_from_filtered_data(tables),
+            "layout_description": "",
         }
-        
-        # Extract source documents if available
-        source_documents = []
-        if filtered_data:
-            try:
-                tables = json.loads(filtered_data) if filtered_data else []
-                for table in tables:
-                    if isinstance(table, dict) and "filename" in table:
-                        doc_name = table["filename"]
-                        if doc_name and doc_name not in source_documents:
-                            source_documents.append(doc_name)
-            except:
-                pass
-        
-        layout_info["source_documents"] = source_documents
-        
+
+        debug.print_function(
+            f"[func_generate_visual_layout] Found {len(relevant_images)} images from source documents"
+        )
+
+        # Generate layout description
+        layout_info["layout_description"] = _generate_document_based_description(
+            product_code, visual_type, source_documents, layout_info["technical_data"]
+        )
+
+        # Prepare image output for display/analysis
+        image_output = []
+        image_paths_for_display = []  # Simple paths for Display Images function
+
+        if relevant_images:
+            for img in relevant_images:
+                image_output.append(
+                    {
+                        "path": img["file_path"],
+                        "document": img["document_name"],
+                        "type": img["image_type"],
+                        "size": f"{img['width']}x{img['height']}",
+                        "page": img.get("page_number", "N/A"),
+                        "relevance": img["relevance_score"],
+                    }
+                )
+                # Add simple path for display function
+                image_paths_for_display.append(img["file_path"])
+
+        # Create display-ready image output string
+        if image_paths_for_display:
+            display_output = f"Found {len(image_paths_for_display)} images: {image_paths_for_display[0]}"
+            if len(image_paths_for_display) > 1:
+                additional_count = len(image_paths_for_display) - 1
+                additional_paths = ", ".join(
+                    image_paths_for_display[1:3]
+                )  # Show up to 2 more
+                display_output += f" (+ {additional_count} more: {additional_paths})"
+        else:
+            display_output = "No images found"
+
+        debug.print_function(
+            f"[func_generate_visual_layout] Generated {visual_type} layout with {len(image_output)} images"
+        )
+
         return (
             True,
             {
                 "Layout Output": json.dumps(layout_info, ensure_ascii=False, indent=2),
-                "Image Output": "No images - use Display Images function",
-                "Document Name": f"Layout info for {product_code}" if product_code else "Layout info",
+                "Image Output": display_output,  # Simple format for Display Images function
+                "Image Details": json.dumps(
+                    image_output, ensure_ascii=False
+                ),  # Detailed metadata
+                "Document Name": f"Visual layout from {', '.join(list(source_documents)[:2])}",
             },
         )
-    
+
     except Exception as e:
         logger.error(f"[func_generate_visual_layout] Error: {e}")
-        return (False, f"Error generating visual layout: {str(e)}")
+        return (False, f"Error generating visual layout: {e}")
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# GENERIC COMPOSABLE FUNCTIONS FOR HYDROSCAND DOMAIN  
-# ═══════════════════════════════════════════════════════════════════════════
-# These functions are designed to be generic, composable building blocks that
-# can be dynamically orchestrated by the agent to handle diverse Hydroscand
-# questions about hoses, products, specifications, and technical calculations.
+def _search_images_by_documents(
+    document_names: list, product_code: str, visual_type: str
+) -> list:
+    """Search for images specifically from the identified source documents."""
+    from agentic_reasoning.db.connection import get_output_connection
 
+    if not document_names:
+        return []
 
-def func_search_products(params: dict) -> tuple[bool, dict | str]:
-    """
-    Multi-criteria product search with flexible filtering.
-    
-    Searches the Hydroscand product catalog based on various criteria:
-    - Product category (e.g., "hydraulic hose", "sleeve", "coupling")
-    - Technical specifications (temperature, pressure, diameter, etc.)
-    - Keywords in description or name
-    - Certifications/standards
-    
-    Parameters:
-        category (str, optional): Product category to search within
-        keywords (str, optional): Keywords to search in product descriptions
-        specs (dict, optional): Technical specifications to filter by
-            - min_temp (float): Minimum temperature rating
-            - max_temp (float): Maximum temperature rating
-            - min_pressure (float): Minimum pressure rating
-            - min_diameter (float): Minimum diameter
-            - max_diameter (float): Maximum diameter
-        limit (int, optional): Maximum number of results (default: 50)
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - Products (list): List of matching products with details
-            - Count (int): Number of products found
-    """
-    import sqlite3
-    import json
-    
-    db_path = params.get("database_path", "data/database/harvested.db")
-    category = params.get("category", "").strip()
-    keywords = params.get("keywords", "").strip()
-    specs = params.get("specs", {})
-    limit = params.get("limit", 50)
-    
     try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        # Build dynamic SQL query
-        query = """
-            SELECT 
-                p.id as product_id,
-                p.product_code,
-                p.family_id,
-                pf.name as family_name,
-                pf.description,
-                p.specifications,
-                p.page_number
-            FROM products p
-            LEFT JOIN product_families pf ON p.family_id = pf.id
-            WHERE 1=1
-        """
-        query_params = []
-        
-        # Filter by category (family name)
-        if category:
-            query += " AND (pf.name LIKE ? OR pf.description LIKE ?)"
-            query_params.extend([f"%{category}%", f"%{category}%"])
-        
-        # Filter by keywords (in product code or family description)
-        if keywords:
-            keyword_list = keywords.split()
-            for kw in keyword_list:
-                query += " AND (p.product_code LIKE ? OR pf.name LIKE ? OR pf.description LIKE ?)"
-                query_params.extend([f"%{kw}%", f"%{kw}%", f"%{kw}%"])
-        
-        query += f" LIMIT ?"
-        query_params.append(limit)
-        
-        cursor.execute(query, query_params)
-        rows = cursor.fetchall()
-        
-        # Post-process results with spec filtering
-        products = []
-        for row in rows:
-            product = dict(row)
-            
-            # Parse specifications JSON
-            try:
-                product_specs = json.loads(product.get("specifications", "{}") or "{}")
-            except:
-                product_specs = {}
-            
-            # Apply specification filters
-            if specs:
-                # Temperature filters
-                if "min_temp" in specs:
-                    product_min_temp = product_specs.get("min_temperature", product_specs.get("min_temp", -999))
-                    if product_min_temp < specs["min_temp"]:
-                        continue
-                
-                if "max_temp" in specs:
-                    product_max_temp = product_specs.get("max_temperature", product_specs.get("max_temp", -999))
-                    if product_max_temp < specs["max_temp"]:
-                        continue
-                
-                # Pressure filter
-                if "min_pressure" in specs:
-                    product_pressure = product_specs.get("working_pressure", product_specs.get("pressure", 0))
-                    if product_pressure < specs["min_pressure"]:
-                        continue
-                
-                # Diameter filters
-                if "min_diameter" in specs:
-                    product_diameter = product_specs.get("inner_diameter", product_specs.get("diameter", 0))
-                    if product_diameter < specs["min_diameter"]:
-                        continue
-                
-                if "max_diameter" in specs:
-                    product_diameter = product_specs.get("inner_diameter", product_specs.get("diameter", 999))
-                    if product_diameter > specs["max_diameter"]:
-                        continue
-            
-            # Add parsed specs to product dict
-            product["parsed_specs"] = product_specs
-            products.append(product)
-        
-        conn.close()
-        
-        return (True, {
-            "Products": products,
-            "Count": len(products)
-        })
-        
-    except Exception as e:
-        return (False, f"Search error: {str(e)}")
+        with get_output_connection() as conn:
+            cursor = conn.cursor()
 
+            # Create placeholders for document names
+            placeholders = ",".join(["?" for _ in document_names])
 
-def func_filter_items(params: dict) -> tuple[bool, dict | str]:
-    """
-    Generic filtering engine with complex conditions.
-    
-    Filters a list of items (products, records, etc.) based on flexible criteria.
-    Supports multiple filter types:
-    - Field equality (field == value)
-    - Numeric comparisons (field > value, field < value)
-    - String matching (field contains substring)
-    - Range filters (min <= field <= max)
-    
-    Parameters:
-        items (list): List of items to filter (dicts)
-        filters (dict): Filter criteria as key-value pairs
-        filter_mode (str, optional): "AND" (all must match) or "OR" (any must match), default "AND"
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - FilteredItems (list): Items matching filter criteria
-            - Count (int): Number of items after filtering
-    """
-    items = params.get("items", [])
-    filters = params.get("filters", {})
-    filter_mode = params.get("filter_mode", "AND").upper()
-    
-    if not items:
-        return (False, "No items provided to filter")
-    
-    if not filters:
-        return (True, {"FilteredItems": items, "Count": len(items)})
-    
-    try:
-        filtered = []
-        
-        for item in items:
-            matches = []
-            
-            for key, condition in filters.items():
-                # Handle different condition types
-                if isinstance(condition, dict):
-                    # Complex condition (e.g., {">=": 100, "<=": 200})
-                    item_value = item.get(key)
-                    
-                    if "==" in condition:
-                        matches.append(item_value == condition["=="])
-                    if "!=" in condition:
-                        matches.append(item_value != condition["!="])
-                    if ">" in condition:
-                        matches.append(float(item_value or 0) > float(condition[">"]))
-                    if ">=" in condition:
-                        matches.append(float(item_value or 0) >= float(condition[">="]))
-                    if "<" in condition:
-                        matches.append(float(item_value or 0) < float(condition["<"]))
-                    if "<=" in condition:
-                        matches.append(float(item_value or 0) <= float(condition["<="]))
-                    if "contains" in condition:
-                        matches.append(condition["contains"].lower() in str(item_value).lower())
+            # Build query to find images from these specific documents
+            query = f"""
+            SELECT document_name, image_filename, image_type, image_width, image_height,
+                   relevance_score, ocr_text, has_technical_content, complexity_score, page_number
+            FROM saved_images
+            WHERE document_name IN ({placeholders})
+            AND has_technical_content = 1
+            AND image_type IN ('technical_diagram', 'technical_content')
+            ORDER BY relevance_score DESC, complexity_score DESC, image_area DESC
+            LIMIT 10
+            """
+
+            # Add .pdf extension to document names if not present
+            search_docs = []
+            for doc in document_names:
+                if not doc.endswith(".pdf"):
+                    search_docs.append(f"{doc}.pdf")
                 else:
-                    # Simple equality condition
-                    item_value = item.get(key)
-                    if isinstance(condition, str) and isinstance(item_value, str):
-                        matches.append(condition.lower() in item_value.lower())
-                    else:
-                        matches.append(item_value == condition)
-            
-            # Apply filter mode
-            if filter_mode == "AND":
-                if all(matches):
-                    filtered.append(item)
-            else:  # OR
-                if any(matches):
-                    filtered.append(item)
-        
-        return (True, {
-            "FilteredItems": filtered,
-            "Count": len(filtered)
-        })
-        
-    except Exception as e:
-        return (False, f"Filter error: {str(e)}")
+                    search_docs.append(doc)
 
+            debug.print_function(
+                f"[_search_images_by_documents] Searching documents: {search_docs}"
+            )
+            cursor.execute(query, search_docs)
+            results = cursor.fetchall()
 
-def func_compare_items(params: dict) -> tuple[bool, dict | str]:
-    """
-    LLM-powered intelligent product comparison with trade-off analysis.
-    
-    Provides contextual comparison that explains:
-    - WHY differences matter
-    - Which product suits which use case
-    - Trade-offs between options
-    - Technical implications of differences
-    
-    Parameters:
-        items (list): List of items to compare (dicts with item data)
-        fields (list, optional): Specific fields to compare
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - comparison_table (dict): Field-by-field comparison
-            - similarities (list): Common features
-            - differences (list): Key differences with significance
-    """
-    items = params.get("items", [])
-    fields = params.get("fields", [])
-    
-    if len(items) < 2:
-        return (False, "Need at least 2 items to compare")
-    
-    try:
-        # Load prompts and build LLM chain
-        prompt_loader = get_prompt_loader()
-        prompts = prompt_loader.get_prompt("function_execution", "compare_items")
-        
-        system_msg = prompts["system"]
-        user_template = prompts["user_template"]
-        
-        chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-        
-        # Format items and fields for prompt
-        items_text = json.dumps(items, indent=2)
-        fields_text = json.dumps(fields, indent=2) if fields else "all common fields"
-        
-        # Invoke LLM for intelligent comparison
-        result = chain.invoke({
-            "items": items_text,
-            "fields": fields_text
-        })
-        
-        debug.print_function(f"[func_compare_items] Comparing {len(items)} items, Result: {result[:200]}...")
-        
-        # Try to parse LLM response as JSON
-        try:
-            import re
-            json_match = re.search(r'\{.*\}', result, re.DOTALL)
-            if json_match:
-                comparison_result = json.loads(json_match.group())
-                comparison_table = comparison_result.get("comparison_table", {})
-                similarities = comparison_result.get("similarities", [])
-                differences = comparison_result.get("differences", [])
-                recommendation = comparison_result.get("recommendation", "")
-            else:
-                # Fallback: structure the text response
-                comparison_table = {"analysis": result}
-                similarities = []
-                differences = []
-                recommendation = ""
-        except:
-            # Return raw text as analysis
-            comparison_table = {"analysis": result}
-            similarities = []
-            differences = []
-            recommendation = ""
-        
-        return (True, {
-            "comparison_table": comparison_table,
-            "similarities": similarities,
-            "differences": differences,
-            "recommendation": recommendation,
-            "items_compared": len(items)
-        })
-        
-    except Exception as e:
-        logger.error(f"[func_compare_items] Error: {e}")
-        return (False, f"Comparison error: {str(e)}")
+            debug.print_function(
+                f"[_search_images_by_documents] Found {len(results)} images"
+            )
 
-
-def func_calculate(params: dict) -> tuple[bool, dict | str]:
-    """
-    LLM-powered hydraulic calculations with validation and recommendations.
-    
-    Handles complex calculations with:
-    - Formula application and validation
-    - Range checking and warnings
-    - Standard size recommendations
-    - Safety factor considerations
-    
-    Parameters:
-        calculation_type (str): Type of calculation
-        inputs (dict): Calculation inputs
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - result (float): Calculated value
-            - calculation_type (str): Type performed
-            - units (str): Result units
-            - formula_used (str): Formula explanation
-    """
-    calculation_type = params.get("calculation_type", "")
-    inputs = params.get("inputs", {})
-    
-    if not calculation_type:
-        return (False, "Missing required parameter: calculation_type")
-    
-    if not inputs:
-        return (False, "Missing required parameter: inputs")
-    
-    try:
-        # Load prompts and build LLM chain
-        prompt_loader = get_prompt_loader()
-        prompts = prompt_loader.get_prompt("function_execution", "calculate")
-        
-        system_msg = prompts["system"]
-        user_template = prompts["user_template"]
-        
-        chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-        
-        # Format inputs as readable text
-        inputs_text = json.dumps(inputs, indent=2)
-        
-        # Invoke LLM for intelligent calculation
-        result = chain.invoke({
-            "calculation_type": calculation_type.upper(),
-            "inputs": inputs_text
-        })
-        
-        debug.print_function(f"[func_calculate] Type: {calculation_type}, Result: {result[:200]}...")
-        
-        # Parse LLM response (expecting JSON-like format)
-        try:
-            import re
-            json_match = re.search(r'\{.*\}', result, re.DOTALL)
-            if json_match:
-                result_data = json.loads(json_match.group())
-                calc_result = result_data.get("result", 0)
-                units = result_data.get("units", "")
-                formula = result_data.get("formula_used", "")
-                notes = result_data.get("notes", "")
-            else:
-                # Fallback: extract number and use text as explanation
-                numbers = re.findall(r'-?\d+\.?\d*', result)
-                calc_result = float(numbers[0]) if numbers else 0
-                units = ""
-                formula = result
-                notes = ""
-        except:
-            calc_result = 0
-            units = ""
-            formula = result
-            notes = ""
-        
-        return (True, {
-            "result": calc_result,
-            "calculation_type": calculation_type,
-            "units": units,
-            "formula_used": formula,
-            "notes": notes,
-            "inputs": inputs
-        })
-        
-    except Exception as e:
-        logger.error(f"[func_calculate] Error: {e}")
-        return (False, f"Calculation error: {str(e)}")
-
-
-def func_convert_units(params: dict) -> tuple[bool, dict | str]:
-    """
-    LLM-powered unit conversion for hydraulic systems.
-    
-    Handles context-dependent conversions including:
-    - Standard conversions (bar, psi, mm, inch, etc.)
-    - Non-standard or industry-specific units
-    - Ambiguous units requiring context interpretation
-    - Approximate conversions when exact formula isn't available
-    
-    Parameters:
-        value (float): Value to convert
-        from_unit (str): Source unit
-        to_unit (str): Target unit
-        context (str): Optional context for interpretation
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - converted_value (float): Value in target units
-            - original_value (float): Original value
-            - from_unit (str): Source unit
-            - to_unit (str): Target unit
-            - explanation (str): Conversion explanation and assumptions
-    """
-    value = params.get("value")
-    from_unit = params.get("from_unit", "").strip()
-    to_unit = params.get("to_unit", "").strip()
-    context = params.get("context", "")
-    
-    if value is None:
-        return (False, "Missing required parameter: value")
-    
-    if not from_unit or not to_unit:
-        return (False, "Missing unit parameters")
-    
-    try:
-        # Load prompts and build LLM chain
-        prompt_loader = get_prompt_loader()
-        prompts = prompt_loader.get_prompt("function_execution", "convert_units")
-        
-        system_msg = prompts["system"]
-        user_template = prompts["user_template"]
-        
-        chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-        
-        # Invoke LLM for intelligent conversion
-        result = chain.invoke({
-            "value": str(value),
-            "from_unit": from_unit,
-            "to_unit": to_unit,
-            "context": context if context else "No additional context provided"
-        })
-        
-        debug.print_function(f"[func_convert_units] LLM result: {result[:200]}...")
-        
-        # Parse LLM response (expecting JSON-like format)
-        try:
-            # Try to extract JSON from response
-            import re
-            json_match = re.search(r'\{.*\}', result, re.DOTALL)
-            if json_match:
-                result_data = json.loads(json_match.group())
-                converted_value = result_data.get("converted_value", 0)
-                explanation = result_data.get("explanation", result)
-            else:
-                # Fallback: try to extract number from text
-                numbers = re.findall(r'-?\d+\.?\d*', result)
-                converted_value = float(numbers[0]) if numbers else 0
-                explanation = result
-        except:
-            # If parsing fails, return raw result
-            converted_value = 0
-            explanation = result
-        
-        return (True, {
-            "converted_value": converted_value,
-            "original_value": value,
-            "from_unit": from_unit,
-            "to_unit": to_unit,
-            "explanation": explanation
-        })
-        
-    except Exception as e:
-        logger.error(f"[func_convert_units] Error: {e}")
-        return (False, f"Conversion error: {str(e)}")
-
-
-def func_get_related_items(params: dict) -> tuple[bool, dict | str]:
-    """
-    Generic relationship navigator - find compatible items, alternatives, accessories.
-    
-    Navigate relationships between items in the catalog:
-    - Compatible products (e.g., sleeves for hoses, fittings for couplings)
-    - Alternative products (e.g., equivalent hoses from different manufacturers)
-    - Accessories (e.g., tools, adapters, protective covers)
-    - Replacement parts
-    
-    Parameters:
-        item_id (str): Product code or ID to find related items for
-        relationship_type (str): Type of relationship ("compatible", "alternative", "accessory", "replacement")
-        database_path (str, optional): Path to database
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - RelatedItems (list): List of related items with relationship details
-            - RelationshipType (str): Type of relationship queried
-            - Count (int): Number of related items found
-    """
-    import sqlite3
-    import json
-    
-    item_id = params.get("item_id", "").strip()
-    relationship_type = params.get("relationship_type", "compatible").lower()
-    db_path = params.get("database_path", "data/database/harvested.db")
-    
-    if not item_id:
-        return (False, "Missing required parameter: item_id")
-    
-    try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        # Query based on relationship type
-        if relationship_type == "compatible":
-            # Find compatible products (e.g., sleeves for hoses)
-            query = """
-                SELECT p.product_code, p.product_name, p.description, p.family_id, f.family_name
-                FROM Products p
-                LEFT JOIN ProductFamilies f ON p.family_id = f.family_id
-                WHERE p.description LIKE ? OR p.specifications LIKE ?
-                LIMIT 20
-            """
-            cursor.execute(query, (f"%{item_id}%", f"%{item_id}%"))
-            
-        elif relationship_type == "alternative":
-            # Find alternative products in same family
-            query = """
-                SELECT p.product_code, p.product_name, p.description, p.specifications
-                FROM Products p
-                WHERE p.family_id = (SELECT family_id FROM Products WHERE product_code = ?)
-                AND p.product_code != ?
-                LIMIT 20
-            """
-            cursor.execute(query, (item_id, item_id))
-        
-        else:
-            return (False, f"Unknown relationship type: {relationship_type}")
-        
-        rows = cursor.fetchall()
-        related_items = [dict(row) for row in rows]
-        
-        conn.close()
-        
-        return (True, {
-            "RelatedItems": related_items,
-            "RelationshipType": relationship_type,
-            "Count": len(related_items)
-        })
-        
-    except Exception as e:
-        return (False, f"Related items error: {str(e)}")
-
-
-def func_semantic_search(params: dict) -> tuple[bool, dict | str]:
-    """
-    Natural language search with synonym expansion and fuzzy matching.
-    
-    Performs intelligent search that understands synonyms, related terms,
-    and common variations. Expands queries automatically.
-    
-    Parameters:
-        query (str): Natural language search query
-        database_path (str, optional): Path to database
-        limit (int, optional): Maximum results (default: 20)
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - Results (list): Matching items with relevance scores
-            - ExpandedTerms (list): Terms added through synonym expansion
-            - Count (int): Number of results found
-    """
-    import sqlite3
-    
-    query = params.get("query", "").strip()
-    db_path = params.get("database_path", "data/database/harvested.db")
-    limit = params.get("limit", 20)
-    
-    if not query:
-        return (False, "Missing required parameter: query")
-    
-    # Synonym expansion dictionary
-    synonyms = {
-        "hose": ["hose", "tube", "pipe", "line"],
-        "hydraulic": ["hydraulic", "hydro", "pressure"],
-        "coupling": ["coupling", "connector", "fitting", "adapter"],
-        "sleeve": ["sleeve", "ferrule", "fitting"],
-        "temperature": ["temperature", "temp", "thermal"],
-        "pressure": ["pressure", "bar", "mpa", "psi"],
-    }
-    
-    # Expand query terms
-    query_terms = query.lower().split()
-    expanded_terms = set(query_terms)
-    
-    for term in query_terms:
-        for key, values in synonyms.items():
-            if term in values:
-                expanded_terms.update(values)
-    
-    expanded_list = list(expanded_terms)
-    
-    try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        # Build search with expanded terms
-        conditions = []
-        params_list = []
-        
-        for term in expanded_list:
-            conditions.append("(p.product_name LIKE ? OR p.description LIKE ? OR f.family_name LIKE ?)")
-            params_list.extend([f"%{term}%", f"%{term}%", f"%{term}%"])
-        
-        query_sql = f"""
-            SELECT p.product_code, p.product_name, p.description, f.family_name
-            FROM Products p
-            LEFT JOIN ProductFamilies f ON p.family_id = f.family_id
-            WHERE {' OR '.join(conditions)}
-            LIMIT ?
-        """
-        params_list.append(limit)
-        
-        cursor.execute(query_sql, params_list)
-        rows = cursor.fetchall()
-        
-        results = [dict(row) for row in rows]
-        conn.close()
-        
-        return (True, {
-            "Results": results,
-            "ExpandedTerms": expanded_list,
-            "Count": len(results)
-        })
-        
-    except Exception as e:
-        return (False, f"Semantic search error: {str(e)}")
-
-
-def func_aggregate_data(params: dict) -> tuple[bool, dict | str]:
-    """
-    Grouping and statistical aggregations on datasets.
-    
-    Performs GROUP BY operations and calculates statistics:
-    - Count, sum, average, min, max
-    - Group by any field
-    - Multiple aggregation functions
-    
-    Parameters:
-        items (list): List of items to aggregate
-        group_by (str): Field name to group by
-        aggregations (dict): Aggregation operations {"field": "operation"}
-            Operations: "count", "sum", "avg", "min", "max"
-            
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - Groups (dict): Aggregated results by group
-            - TotalGroups (int): Number of groups
-    """
-    items = params.get("items", [])
-    group_by = params.get("group_by", "")
-    aggregations = params.get("aggregations", {})
-    
-    if not items:
-        return (False, "No items provided")
-    
-    if not group_by:
-        return (False, "Missing group_by parameter")
-    
-    try:
-        from collections import defaultdict
-        
-        # Group items
-        groups = defaultdict(list)
-        for item in items:
-            group_key = item.get(group_by, "Unknown")
-            groups[group_key].append(item)
-        
-        # Calculate aggregations for each group
-        results = {}
-        for group_key, group_items in groups.items():
-            group_result = {"count": len(group_items)}
-            
-            for field, operation in aggregations.items():
-                values = [item.get(field) for item in group_items if item.get(field) is not None]
-                
-                if not values:
-                    group_result[f"{field}_{operation}"] = None
-                    continue
-                
-                # Convert to numeric if possible
-                try:
-                    numeric_values = [float(v) for v in values]
-                except:
-                    numeric_values = []
-                
-                if operation == "sum" and numeric_values:
-                    group_result[f"{field}_sum"] = sum(numeric_values)
-                elif operation == "avg" and numeric_values:
-                    group_result[f"{field}_avg"] = sum(numeric_values) / len(numeric_values)
-                elif operation == "min" and numeric_values:
-                    group_result[f"{field}_min"] = min(numeric_values)
-                elif operation == "max" and numeric_values:
-                    group_result[f"{field}_max"] = max(numeric_values)
-                elif operation == "count":
-                    group_result[f"{field}_count"] = len(values)
-            
-            results[str(group_key)] = group_result
-        
-        return (True, {
-            "Groups": results,
-            "TotalGroups": len(results)
-        })
-        
-    except Exception as e:
-        return (False, f"Aggregation error: {str(e)}")
-
-
-def func_transform_data(params: dict) -> tuple[bool, dict | str]:
-    """
-    Data format transformation and restructuring.
-    
-    Transform data between formats:
-    - Flatten nested structures
-    - Pivot tables
-    - Reshape arrays
-    - Extract specific fields
-    - Rename fields
-    
-    Parameters:
-        items (list): Data to transform
-        operation (str): Transformation type ("flatten", "pivot", "extract", "rename")
-        config (dict): Operation-specific configuration
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - TransformedData (list): Transformed data
-            - Operation (str): Operation performed
-    """
-    items = params.get("items", [])
-    operation = params.get("operation", "").lower()
-    config = params.get("config", {})
-    
-    if not items:
-        return (False, "No items provided")
-    
-    try:
-        if operation == "extract":
-            # Extract specific fields
-            fields = config.get("fields", [])
-            if not fields:
-                return (False, "Missing fields in config")
-            
-            transformed = []
-            for item in items:
-                extracted = {field: item.get(field) for field in fields if field in item}
-                transformed.append(extracted)
-            
-            return (True, {
-                "TransformedData": transformed,
-                "Operation": "extract"
-            })
-        
-        elif operation == "rename":
-            # Rename fields
-            field_map = config.get("field_map", {})
-            if not field_map:
-                return (False, "Missing field_map in config")
-            
-            transformed = []
-            for item in items:
-                renamed = {}
-                for old_name, new_name in field_map.items():
-                    if old_name in item:
-                        renamed[new_name] = item[old_name]
-                # Keep fields not in map
-                for key, value in item.items():
-                    if key not in field_map:
-                        renamed[key] = value
-                transformed.append(renamed)
-            
-            return (True, {
-                "TransformedData": transformed,
-                "Operation": "rename"
-            })
-        
-        elif operation == "flatten":
-            # Flatten nested structures
-            transformed = []
-            for item in items:
-                flattened = {}
-                for key, value in item.items():
-                    if isinstance(value, dict):
-                        for sub_key, sub_value in value.items():
-                            flattened[f"{key}_{sub_key}"] = sub_value
-                    else:
-                        flattened[key] = value
-                transformed.append(flattened)
-            
-            return (True, {
-                "TransformedData": transformed,
-                "Operation": "flatten"
-            })
-        
-        else:
-            return (False, f"Unknown operation: {operation}")
-        
-    except Exception as e:
-        return (False, f"Transform error: {str(e)}")
-
-
-def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
-    """
-    LLM-powered intelligent attribute extraction.
-    
-    Handles complex extraction scenarios:
-    - Unstructured text parsing
-    - Regex patterns with fallback to LLM
-    - JSON path navigation
-    - Field mapping with normalization
-    - Format standardization
-    
-    Parameters:
-        items (list): Items to extract from
-        extraction_type (str): Method ("regex", "json_path", "field_map", "intelligent")
-        config (dict): Extraction configuration
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - extracted_data (list): Extracted attributes
-            - extraction_type (str): Method used
-            - count (int): Number of items extracted
-    """
-    items = params.get("items", [])
-    extraction_type = params.get("extraction_type", "intelligent").lower()
-    config = params.get("config", {})
-    
-    if not items:
-        return (False, "Missing items parameter")
-    
-    # For intelligent extraction or when complex patterns needed, use LLM
-    if extraction_type == "intelligent" or extraction_type == "llm":
-        try:
-            # Load prompts and build LLM chain
-            prompt_loader = get_prompt_loader()
-            prompts = prompt_loader.get_prompt("function_execution", "extract_attributes")
-            
-            system_msg = prompts["system"]
-            user_template = prompts["user_template"]
-            
-            chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-            
-            # Format items and config for prompt
-            items_text = json.dumps(items, indent=2) if isinstance(items, list) else str(items)
-            config_text = json.dumps(config, indent=2) if isinstance(config, dict) else str(config)
-            
-            # Invoke LLM for intelligent extraction
-            result = chain.invoke({
-                "extraction_type": extraction_type.upper(),
-                "items": items_text,
-                "config": config_text
-            })
-            
-            debug.print_function(f"[func_extract_attributes] Type: {extraction_type}, Items: {len(items)}, Result: {result[:200]}...")
-            
-            # Try to parse LLM result as JSON array
-            try:
-                import re
-                json_match = re.search(r'\[.*\]', result, re.DOTALL)
-                if json_match:
-                    extracted_data = json.loads(json_match.group())
-                else:
-                    # Return raw result if not JSON
-                    extracted_data = [{"raw_extraction": result}]
-            except:
-                extracted_data = [{"raw_extraction": result}]
-            
-            return (True, {
-                "extracted_data": extracted_data,
-                "extraction_type": extraction_type,
-                "count": len(extracted_data)
-            })
-            
-        except Exception as e:
-            logger.error(f"[func_extract_attributes] Error: {e}")
-            return (False, f"Extraction error: {str(e)}")
-    
-    else:
-        # For simple extraction types, use basic logic
-        import re
-        extracted_data = []
-        
-        for item in items:
-            if extraction_type == "regex":
-                # Apply regex patterns from config
-                patterns = config.get("patterns", {})
-                extracted = {}
-                item_str = str(item)
-                for field, pattern in patterns.items():
-                    match = re.search(pattern, item_str, re.IGNORECASE)
-                    if match:
-                        extracted[field] = match.group(1) if match.groups() else match.group(0)
-                if extracted:
-                    extracted_data.append(extracted)
-                    
-            elif extraction_type == "field_map":
-                # Map fields from item
-                field_map = config.get("field_map", {})
-                if isinstance(item, dict):
-                    extracted = {}
-                    for target_field, source_field in field_map.items():
-                        if source_field in item:
-                            extracted[target_field] = item[source_field]
-                    if extracted:
-                        extracted_data.append(extracted)
-        
-        return (True, {
-            "extracted_data": extracted_data,
-            "extraction_type": extraction_type,
-            "count": len(extracted_data)
-        })
-
-
-def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
-    """
-    LLM-powered analysis for compatibility, recommendations, comparisons.
-    
-    Uses LLM for intelligent analysis tasks:
-    - Compatibility checking (Will product A work with product B?)
-    - Product recommendations (What's the best hose for X application?)
-    - Technical advice (Should I use 2SN or 4SP for this?)
-    - Requirement analysis
-    
-    Parameters:
-        task (str): Analysis task ("compatibility", "recommendation", "comparison", "advice")
-        context (dict): Context data for the task
-        question (str): Specific question to answer
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - Analysis (str): LLM analysis result
-            - Task (str): Task performed
-            - Confidence (str): Confidence level if applicable
-    """
-    task = params.get("task", "").lower()
-    context = params.get("context", {})
-    question = params.get("question", "")
-    
-    if not task:
-        return (False, "Missing task parameter")
-    
-    if not question:
-        return (False, "Missing question parameter")
-    
-    # Validate task type
-    valid_tasks = ["compatibility", "recommendation", "comparison", "advice"]
-    if task not in valid_tasks:
-        return (False, f"Invalid task '{task}'. Must be one of: {', '.join(valid_tasks)}")
-    
-    try:
-        # Load prompts from yaml
-        prompt_loader = get_prompt_loader()
-        prompts = prompt_loader.get_prompt("function_execution", "analyze_with_llm")
-        
-        system_msg = prompts["system"]
-        user_template = prompts["user_template"]
-        
-        # Build LLM chain
-        chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-        
-        # Format context for prompt
-        context_str = json.dumps(context, indent=2) if isinstance(context, dict) else str(context)
-        
-        # Invoke LLM
-        analysis = chain.invoke({
-            "task": task.upper(),
-            "context": context_str,
-            "question": question
-        })
-        
-        debug.print_function(f"[func_analyze_with_llm] Task: {task}, Analysis: {analysis[:200]}...")
-        
-        return (True, {
-            "Analysis": analysis,
-            "Task": task,
-            "Context": context_str[:500] if len(context_str) > 500 else context_str
-        })
-        
-    except Exception as e:
-        logger.error(f"[func_analyze_with_llm] Error: {e}")
-        return (False, f"LLM analysis error: {str(e)}")
-
-
-def func_lookup_standard(params: dict) -> tuple[bool, dict | str]:
-    """
-    LLM-powered standard reference lookup with interpretation.
-    
-    Provides intelligent lookup and explanation of:
-    - ISO standards (hydraulic hose specifications)
-    - SAE standards (hose types and ratings)
-    - DIN standards (German industrial standards)
-    - Thread standards (BSP, NPT, metric, etc.)
-    
-    Parameters:
-        standard_type (str): Type of standard (ISO, SAE, DIN, thread)
-        identifier (str): Standard identifier to look up
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - standard_details (dict): Complete standard information
-            - standard_type (str): Type of standard
-            - identifier (str): Identifier queried
-    """
-    standard_type = params.get("standard_type", "").upper()
-    identifier = params.get("identifier", "")
-    
-    if not standard_type or not identifier:
-        return (False, "Missing standard_type or identifier parameters")
-    
-    try:
-        # Load prompts and build LLM chain
-        prompt_loader = get_prompt_loader()
-        prompts = prompt_loader.get_prompt("function_execution", "lookup_standard")
-        
-        system_msg = prompts["system"]
-        user_template = prompts["user_template"]
-        
-        chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-        
-        # Invoke LLM for intelligent standard lookup
-        result = chain.invoke({
-            "standard_type": standard_type,
-            "identifier": identifier
-        })
-        
-        debug.print_function(f"[func_lookup_standard] Type: {standard_type}, ID: {identifier}, Result: {result[:200]}...")
-        
-        # Parse the response - it's typically structured text, not JSON
-        # We'll return the full explanation as the standard details
-        return (True, {
-            "standard_details": result,
-            "standard_type": standard_type,
-            "identifier": identifier
-        })
-        
-    except Exception as e:
-        logger.error(f"[func_lookup_standard] Error: {e}")
-        return (False, f"Standard lookup error: {str(e)}")
-
-
-def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
-    """
-    Hierarchical data traversal (product families, categories, subcategories).
-    
-    Navigate hierarchical structures:
-    - Parent → Children (e.g., Family → Products)
-    - Child → Parent (e.g., Product → Family)
-    - Siblings (e.g., other products in same family)
-    - Ancestors (e.g., Product → Family → Category)
-    
-    Parameters:
-        start_node (str): Starting point ID or code
-        direction (str): Navigation direction ("children", "parent", "siblings", "ancestors")
-        hierarchy_type (str): Type of hierarchy ("product_family", "category")
-        database_path (str, optional): Path to database
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - Nodes (list): Nodes found in navigation
-            - Direction (str): Direction navigated
-            - Count (int): Number of nodes found
-    """
-    import sqlite3
-    
-    start_node = params.get("start_node", "")
-    direction = params.get("direction", "children").lower()
-    hierarchy_type = params.get("hierarchy_type", "product_family")
-    db_path = params.get("database_path", "data/database/harvested.db")
-    
-    if not start_node:
-        return (False, "Missing start_node parameter")
-    
-    try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        if hierarchy_type == "product_family":
-            if direction == "children":
-                # Family → Products
-                query = """
-                    SELECT product_code, product_name, description
-                    FROM Products
-                    WHERE family_id = (SELECT family_id FROM ProductFamilies WHERE family_name LIKE ?)
-                    LIMIT 50
-                """
-                cursor.execute(query, (f"%{start_node}%",))
-                
-            elif direction == "parent":
-                # Product → Family
-                query = """
-                    SELECT f.family_id, f.family_name, f.description
-                    FROM ProductFamilies f
-                    JOIN Products p ON p.family_id = f.family_id
-                    WHERE p.product_code = ?
-                """
-                cursor.execute(query, (start_node,))
-                
-            elif direction == "siblings":
-                # Other products in same family
-                query = """
-                    SELECT product_code, product_name, description
-                    FROM Products
-                    WHERE family_id = (SELECT family_id FROM Products WHERE product_code = ?)
-                    AND product_code != ?
-                    LIMIT 50
-                """
-                cursor.execute(query, (start_node, start_node))
-            
-            else:
-                return (False, f"Unknown direction: {direction}")
-        
-        else:
-            return (False, f"Unknown hierarchy type: {hierarchy_type}")
-        
-        rows = cursor.fetchall()
-        nodes = [dict(row) for row in rows]
-        
-        conn.close()
-        
-        return (True, {
-            "Nodes": nodes,
-            "Direction": direction,
-            "Count": len(nodes)
-        })
-        
-    except Exception as e:
-        return (False, f"Navigation error: {str(e)}")
-
-
-def func_discover_items(params: dict) -> tuple[bool, dict | str]:
-    """
-    Pattern-based item discovery using wildcards and fuzzy matching.
-    
-    Discover items based on patterns:
-    - Wildcard searches (e.g., "H*2SN*" finds all 2SN hoses)
-    - Fuzzy matching (handles typos)
-    - Pattern-based discovery
-    - Range queries (e.g., "diameter between 10-20mm")
-    
-    Parameters:
-        pattern (str): Search pattern (supports * wildcards)
-        field (str): Field to search in
-        fuzzy (bool, optional): Enable fuzzy matching (default: False)
-        database_path (str, optional): Path to database
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - DiscoveredItems (list): Items matching the pattern
-            - Pattern (str): Pattern used
-            - Count (int): Number of items discovered
-    """
-    import sqlite3
-    import re
-    
-    pattern = params.get("pattern", "")
-    field = params.get("field", "product_code")
-    fuzzy = params.get("fuzzy", False)
-    db_path = params.get("database_path", "data/database/harvested.db")
-    
-    if not pattern:
-        return (False, "Missing pattern parameter")
-    
-    try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        # Convert wildcard pattern to SQL LIKE pattern
-        sql_pattern = pattern.replace("*", "%")
-        
-        query = f"""
-            SELECT product_code, product_name, description, family_id
-            FROM Products
-            WHERE {field} LIKE ?
-            LIMIT 50
-        """
-        
-        cursor.execute(query, (sql_pattern,))
-        rows = cursor.fetchall()
-        
-        discovered = [dict(row) for row in rows]
-        
-        conn.close()
-        
-        return (True, {
-            "DiscoveredItems": discovered,
-            "Pattern": pattern,
-            "Count": len(discovered)
-        })
-        
-    except Exception as e:
-        return (False, f"Discovery error: {str(e)}")
-
-
-def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
-    """
-    Domain metadata retrieval (families, categories, certifications).
-    
-    Retrieve metadata about the domain:
-    - List all product families
-    - List all categories
-    - Get available certifications
-    - Get field schemas
-    - Database statistics
-    
-    Parameters:
-        metadata_type (str): Type of metadata ("families", "categories", "certifications", "statistics")
-        database_path (str, optional): Path to database
-        
-    Returns:
-        tuple[bool, dict]: Success status and results dict with:
-            - Metadata (list or dict): Requested metadata
-            - Type (str): Metadata type retrieved
-    """
-    import sqlite3
-    
-    metadata_type = params.get("metadata_type", "").lower()
-    db_path = params.get("database_path", "data/database/harvested.db")
-    
-    if not metadata_type:
-        return (False, "Missing metadata_type parameter")
-    
-    try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        if metadata_type == "families":
-            query = "SELECT family_id, family_name, description FROM ProductFamilies ORDER BY family_name"
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            metadata = [dict(row) for row in rows]
-            
-        elif metadata_type == "statistics":
-            stats = {}
-            
-            # Count products
-            cursor.execute("SELECT COUNT(*) as count FROM Products")
-            stats["total_products"] = cursor.fetchone()["count"]
-            
-            # Count families
-            cursor.execute("SELECT COUNT(*) as count FROM ProductFamilies")
-            stats["total_families"] = cursor.fetchone()["count"]
-            
-            metadata = stats
-            
-        elif metadata_type == "categories":
-            # Get unique categories from family names or descriptions
-            query = "SELECT DISTINCT family_name FROM ProductFamilies ORDER BY family_name"
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            metadata = [row["family_name"] for row in rows]
-        
-        elif metadata_type == "location":
-            # Get location information for a specific product
-            product_code = params.get("product_code", "")
-            if not product_code:
-                return (False, "Missing product_code for location lookup")
-            
-            query = """
-                SELECT 
-                    p.product_code,
-                    p.page_number,
-                    pf.name as family_name,
-                    c.name as category_name,
-                    c.chapter
-                FROM products p
-                LEFT JOIN product_families pf ON p.family_id = pf.id
-                LEFT JOIN categories c ON pf.category_id = c.id
-                WHERE p.product_code = ?
-            """
-            cursor.execute(query, (product_code,))
-            row = cursor.fetchone()
-            
-            if row:
-                metadata = {
-                    "product_code": row["product_code"],
-                    "page_number": row["page_number"],
-                    "family": row["family_name"],
-                    "category": row["category_name"],
-                    "chapter": row["chapter"],
-                    "location_found": True
+            return [
+                {
+                    "document_name": row[0],
+                    "file_path": row[1],
+                    "image_type": row[2],
+                    "width": row[3],
+                    "height": row[4],
+                    "relevance_score": row[5] or 0.0,
+                    "ocr_text": row[6] or "",
+                    "has_technical_content": row[7],
+                    "complexity_score": row[8] or 0.0,
+                    "page_number": row[9] or 0,
                 }
-            else:
-                metadata = {"location_found": False, "error": f"Product {product_code} not found"}
-            
-        else:
-            return (False, f"Unknown metadata type: {metadata_type}")
-        
-        conn.close()
-        
-        return (True, {
-            "Metadata": metadata,
-            "Type": metadata_type
-        })
-        
+                for row in results
+            ]
     except Exception as e:
-        return (False, f"Metadata error: {str(e)}")
+        debug.print_function(f"[_search_images_by_documents] Error: {e}")
+
+    return []
+
+
+def _extract_technical_specs_from_filtered_data(tables: list) -> dict:
+    """Extract technical specifications from the filtered table data."""
+    specs = {
+        "product_specifications": [],
+        "found_in_documents": [],
+        "table_count": len(tables),
+    }
+
+    for table in tables:
+        if isinstance(table, dict):
+            # Extract document name from filename
+            if "filename" in table:
+                specs["found_in_documents"].append(table["filename"])
+
+            # Extract table content
+            if "tablecontent" in table and table["tablecontent"]:
+                try:
+                    table_data = json.loads(table["tablecontent"])
+                    if isinstance(table_data, list) and len(table_data) > 1:
+                        headers = table_data[0]
+                        for row in table_data[1:3]:  # Take first 2 data rows
+                            if row and len(row) <= len(headers):
+                                spec_row = {}
+                                for i, header in enumerate(headers):
+                                    if header and i < len(row) and row[i]:
+                                        spec_row[header] = row[i]
+                                if spec_row:
+                                    specs["product_specifications"].append(spec_row)
+                except (json.JSONDecodeError, TypeError):
+                    # Skip malformed table content
+                    continue
+
+    # Remove duplicates from documents
+    specs["found_in_documents"] = list(set(specs["found_in_documents"]))
+
+    return specs
+
+
+def _generate_document_based_description(
+    product_code: str, visual_type: str, source_documents: list, technical_data: dict
+) -> str:
+    """Generate description based on the document-focused approach."""
+    description = []
+
+    if product_code:
+        description.append(f"Visual Layout for {product_code}:")
+
+        if visual_type == "connector":
+            if "RPT" in product_code:
+                description.append("- Circular SAAB RPT series connector")
+                description.append("- Pin numbering typically clockwise from top")
+            elif "RNT" in product_code:
+                description.append("- Rectangular SAAB RNT series connector")
+                description.append("- Systematic pin arrangement")
+            else:
+                description.append("- SAAB connector configuration")
+        else:
+            description.append(f"- {visual_type.title()} information and diagrams")
+
+    if source_documents:
+        description.append(
+            f"\nSource Documents: {', '.join(list(source_documents)[:3])}"
+        )
+
+    if technical_data and technical_data.get("product_specifications"):
+        description.append(
+            f"\nTechnical Specifications: {len(technical_data['product_specifications'])} parameters found"
+        )
+
+        # Show a sample specification
+        sample_spec = technical_data["product_specifications"][0]
+        for key, value in list(sample_spec.items())[:3]:  # Show first 3 fields
+            if value:
+                description.append(f"- {key}: {value}")
+
+    return "\n".join(description)
+
+
+def _search_saved_images(product_code: str, keywords: str, visual_type: str) -> list:
+    """Search for relevant images in the saved_images database table."""
+    from agentic_reasoning.db.connection import get_output_connection
+
+    try:
+        with get_output_connection() as conn:
+            cursor = conn.cursor()
+
+            # Build search conditions for images
+            search_conditions = []
+            params = []
+
+            # Search by product code in document name
+            if product_code:
+                # Extract base product family (e.g., RPT2354 from RPT2354313/350)
+                base_code = _extract_product_family(product_code)
+                search_conditions.append(
+                    "(document_name LIKE ? OR document_name LIKE ?)"
+                )
+                params.extend([f"%{product_code}%", f"%{base_code}%"])
+
+            # Search by keywords in OCR text or document name
+            if keywords:
+                keyword_list = [k.strip() for k in keywords.split(",")]
+                for keyword in keyword_list[:3]:  # Limit to top 3 keywords
+                    if keyword:
+                        search_conditions.append(
+                            "(ocr_text LIKE ? OR document_name LIKE ?)"
+                        )
+                        params.extend([f"%{keyword}%", f"%{keyword}%"])
+
+            # Build the main search clause (OR combination of search terms)
+            if search_conditions:
+                main_search = f"({' OR '.join(search_conditions)})"
+
+                # Add image type filters based on visual type
+                type_conditions = _get_image_type_conditions(visual_type)
+
+                # Combine search with type filter using AND
+                if type_conditions:
+                    where_clause = f"{main_search} AND ({type_conditions})"
+                else:
+                    where_clause = main_search
+
+                query = f"""
+                SELECT document_name, image_filename, image_type, image_width, image_height,
+                       relevance_score, ocr_text, has_technical_content, complexity_score
+                FROM saved_images
+                WHERE {where_clause}
+                ORDER BY relevance_score DESC, complexity_score DESC, image_area DESC
+                LIMIT 10
+                """
+
+                debug.print_function(
+                    f"[_search_saved_images] Executing query with {len(params)} params"
+                )
+                cursor.execute(query, params)
+                results = cursor.fetchall()
+
+                debug.print_function(
+                    f"[_search_saved_images] Found {len(results)} images"
+                )
+
+                return [
+                    {
+                        "document_name": row[0],
+                        "file_path": row[1],
+                        "image_type": row[2],
+                        "width": row[3],
+                        "height": row[4],
+                        "relevance_score": row[5] or 0.0,
+                        "ocr_text": row[6] or "",
+                        "has_technical_content": row[7],
+                        "complexity_score": row[8] or 0.0,
+                    }
+                    for row in results
+                ]
+    except Exception as e:
+        debug.print_function(f"[_search_saved_images] Error: {e}")
+
+    return []
+
+
+def _extract_product_family(product_code: str) -> str:
+    """Extract the base product family from a full product code."""
+    import re
+
+    # Extract base family pattern (e.g., RPT2354 from RPT2354313/350)
+    if "RPT" in product_code:
+        match = re.search(r"RPT\s*(\d{4})", product_code)
+        if match:
+            return f"RPT{match.group(1)}"
+    elif "RNT" in product_code:
+        match = re.search(r"RNT\s*(\d{4})", product_code)
+        if match:
+            return f"RNT{match.group(1)}"
+    elif "C" in product_code:
+        match = re.search(r"C\d{7}", product_code)
+        if match:
+            return match.group(0)
+
+    return product_code
+
+
+def _get_image_type_conditions(visual_type: str) -> str:
+    """Get SQL conditions for filtering images by type."""
+    type_map = {
+        "connector": "image_type IN ('technical_diagram', 'technical_content')",
+        "circuit": "image_type IN ('technical_diagram', 'technical_content')",
+        "dimension": "image_type IN ('technical_diagram', 'technical_content')",
+        "installation": "image_type IN ('technical_diagram', 'technical_content')",
+        "diagram": "image_type IN ('technical_diagram', 'technical_content')",
+        "layout": "image_type IN ('technical_diagram', 'technical_content')",
+    }
+
+    base_condition = type_map.get(visual_type, "image_type = 'technical_diagram'")
+
+    # Always prefer technical content and exclude logos
+    return f"({base_condition}) AND has_technical_content = 1 AND image_type != 'logo'"
+
+
+def _determine_visual_type(query: str, keywords: str) -> str:
+    """Determine the type of visual content being requested."""
+    combined_text = f"{query} {keywords}".lower()
+
+    if any(term in combined_text for term in ["connector", "pin", "pinout", "contact"]):
+        return "connector"
+    elif any(
+        term in combined_text
+        for term in ["circuit", "schematic", "wiring", "electrical"]
+    ):
+        return "circuit"
+    elif any(
+        term in combined_text for term in ["dimension", "drawing", "mechanical", "size"]
+    ):
+        return "dimension"
+    elif any(term in combined_text for term in ["installation", "mount", "assembly"]):
+        return "installation"
+    elif any(term in combined_text for term in ["diagram", "chart", "graph"]):
+        return "diagram"
+    else:
+        return "layout"
+
+
+def _get_visual_keywords(visual_type: str) -> str:
+    """Get additional keywords based on visual type."""
+    keyword_map = {
+        "connector": "layout, pin, diagram, connector, schematic, pinout",
+        "circuit": "circuit, schematic, wiring, electrical, diagram",
+        "dimension": "dimension, drawing, mechanical, size, measurement",
+        "installation": "installation, mount, assembly, setup, guide",
+        "diagram": "diagram, chart, graph, illustration, figure",
+        "layout": "layout, arrangement, configuration, design",
+    }
+    return keyword_map.get(visual_type, "layout, diagram, illustration")
+
+
+def _get_stored_text_context(
+    product_code: str, keywords: str, visual_type: str
+) -> list:
+    """Retrieve relevant text context from stored_texts table."""
+    from agentic_reasoning.db.connection import get_output_connection
+
+    try:
+        with get_output_connection() as conn:
+            cursor = conn.cursor()
+
+            # Build search conditions
+            conditions = []
+            params = []
+
+            if product_code:
+                conditions.append("(document_name LIKE ? OR text LIKE ?)")
+                params.extend([f"%{product_code}%", f"%{product_code}%"])
+
+            if keywords:
+                keyword_list = [k.strip() for k in keywords.split(",")]
+                for keyword in keyword_list[:3]:  # Limit to top 3 keywords
+                    if keyword:
+                        conditions.append("(heading_name LIKE ? OR text LIKE ?)")
+                        params.extend([f"%{keyword}%", f"%{keyword}%"])
+
+            # Add visual-type specific terms
+            visual_terms = _get_visual_keywords(visual_type).split(", ")
+            for term in visual_terms[:2]:  # Limit to 2 visual terms
+                conditions.append("(heading_name LIKE ? OR text LIKE ?)")
+                params.extend([f"%{term}%", f"%{term}%"])
+
+            if conditions:
+                query = f"""
+                SELECT document_name, heading_name, text, page_number
+                FROM stored_texts
+                WHERE {' OR '.join(conditions)}
+                ORDER BY document_name, page_number
+                LIMIT 10
+                """
+                cursor.execute(query, params)
+                results = cursor.fetchall()
+
+                return [
+                    {
+                        "document": row[0],
+                        "heading": row[1] or "General",
+                        "text": row[2][:500] + "..." if len(row[2]) > 500 else row[2],
+                        "page": row[3],
+                    }
+                    for row in results
+                ]
+    except Exception as e:
+        debug.print_function(f"[_get_stored_text_context] Error: {e}")
+
+    return []
+
+
+def _extract_technical_details(tables: list, visual_type: str) -> dict:
+    """Extract technical details relevant to the visual type."""
+    details = {}
+
+    for table in tables:
+        if isinstance(table, list) and len(table) > 1:
+            headers = table[0] if table[0] else []
+
+            # Look for different types of data based on visual type
+            if visual_type == "connector":
+                # Look for pin-related data
+                pin_columns = []
+                for i, header in enumerate(headers):
+                    if header and any(
+                        keyword in header.lower()
+                        for keyword in ["pin", "contact", "position", "terminal"]
+                    ):
+                        pin_columns.append((i, header))
+
+                if pin_columns:
+                    details["pin_mapping"] = []
+                    for row in table[1:]:
+                        if row and len(row) > max([col[0] for col in pin_columns]):
+                            pin_info = {}
+                            for col_idx, col_name in pin_columns:
+                                if col_idx < len(row):
+                                    pin_info[col_name] = row[col_idx]
+                            if pin_info:
+                                details["pin_mapping"].append(pin_info)
+
+            elif visual_type == "dimension":
+                # Look for dimensional data
+                dim_columns = []
+                for i, header in enumerate(headers):
+                    if header and any(
+                        keyword in header.lower()
+                        for keyword in [
+                            "dimension",
+                            "size",
+                            "length",
+                            "width",
+                            "height",
+                            "diameter",
+                        ]
+                    ):
+                        dim_columns.append((i, header))
+
+                if dim_columns:
+                    details["dimensions"] = []
+                    for row in table[1:]:
+                        if row and len(row) > max([col[0] for col in dim_columns]):
+                            dim_info = {}
+                            for col_idx, col_name in dim_columns:
+                                if col_idx < len(row):
+                                    dim_info[col_name] = row[col_idx]
+                            if dim_info:
+                                details["dimensions"].append(dim_info)
+
+            # Always capture general specifications
+            if not details.get("specifications"):
+                details["specifications"] = []
+
+            # Add first few rows as general specs
+            for row in table[1:3]:  # Limit to first 2 data rows
+                if row:
+                    spec_info = {}
+                    for i, header in enumerate(headers[:5]):  # Limit to first 5 columns
+                        if i < len(row) and header:
+                            spec_info[header] = row[i]
+                    if spec_info:
+                        details["specifications"].append(spec_info)
+
+    return details
+
+
+def _generate_layout_description(
+    product_code: str, visual_type: str, technical_details: dict, text_context: list
+) -> str:
+    """Generate a descriptive text for the layout."""
+    description = []
+
+    if product_code:
+        if visual_type == "connector":
+            if "RPT" in product_code:
+                description.append(f"Connector Layout for {product_code}:")
+                description.append("- Circular connector with numbered pin positions")
+                description.append("- Standard SAAB RPT series configuration")
+                description.append(
+                    "- Pin numbering typically clockwise from top position"
+                )
+            elif "RNT" in product_code:
+                description.append(f"Connector Layout for {product_code}:")
+                description.append("- Rectangular connector configuration")
+                description.append("- SAAB RNT series standard layout")
+                description.append("- Pin arrangement in systematic rows/columns")
+            else:
+                description.append(f"Connector Layout for {product_code}:")
+                description.append("- Standard SAAB connector configuration")
+        else:
+            description.append(f"{visual_type.title()} Information for {product_code}:")
+
+    # Add information from text context
+    if text_context:
+        description.append("\nRelevant Technical Information:")
+        for context in text_context[:3]:  # Limit to top 3 contexts
+            if context["heading"] != "General":
+                description.append(
+                    f"- {context['heading']}: {context['text'][:100]}..."
+                )
+
+    # Add technical details summary
+    if technical_details:
+        if "pin_mapping" in technical_details:
+            description.append(
+                f"\nPin Configuration: {len(technical_details['pin_mapping'])} pins identified"
+            )
+        if "dimensions" in technical_details:
+            description.append(
+                f"\nDimensional Data: {len(technical_details['dimensions'])} measurements available"
+            )
+        if "specifications" in technical_details:
+            description.append(
+                f"\nTechnical Specifications: {len(technical_details['specifications'])} parameters listed"
+            )
+
+    return "\n".join(description)
+
+
+def _generate_ascii_layout(
+    technical_details: dict, product_code: str, visual_type: str
+) -> str:
+    """Generate ASCII art representation based on technical details."""
+    if visual_type != "connector" or not technical_details.get("pin_mapping"):
+        return ""
+
+    pin_mapping = technical_details["pin_mapping"]
+
+    # Create a simple circular layout for RPT series
+    if "RPT" in product_code:
+        layout = f"""
+    Connector Layout - {product_code}
+
+         13    14     1     2
+      12                      3
+   11                           4
+      10                      5
+         9     8     7     6
+
+    Pin Configuration:
+    """
+
+        for i, pin in enumerate(pin_mapping[:14]):  # Show first 14 pins
+            pin_num = i + 1
+            pin_desc = str(pin) if pin else f"Pin {pin_num}"
+            layout += f"    Pin {pin_num:2d}: {pin_desc}\n"
+
+    else:
+        # Generic rectangular layout
+        layout = f"""
+    Connector Layout - {product_code}
+
+    ┌─────────────────┐
+    │  Pin Layout     │
+    │                 │
+    """
+
+        for i, pin in enumerate(pin_mapping[:10]):  # Limit to 10 pins for readability
+            pin_num = i + 1
+            pin_desc = str(pin) if pin else f"Pin {pin_num}"
+            layout += f"    │ {pin_num:2d}: {pin_desc[:12]:<12} │\n"
+
+        layout += "    └─────────────────┘"
+
+    return layout
+
+
+def _generate_ascii_connector_layout(pin_mapping: list, product_code: str) -> str:
+    """Generate ASCII art representation of connector layout."""
+    if not pin_mapping:
+        return "No pin mapping data available for ASCII layout generation."
+
+    # Create a simple circular layout for RPT series
+    if "RPT" in product_code:
+        layout = """
+        Connector Layout - {product_code}
+
+             13    14     1     2
+          12                      3
+       11                           4
+          10                      5
+             9     8     7     6
+
+        Pin Configuration:
+        """.format(
+            product_code=product_code
+        )
+
+        for i, pin in enumerate(pin_mapping[:14]):  # Show first 14 pins
+            pin_num = i + 1
+            pin_desc = str(pin) if pin else f"Pin {pin_num}"
+            layout += f"        Pin {pin_num:2d}: {pin_desc}\n"
+
+    else:
+        # Generic rectangular layout
+        layout = f"""
+        Connector Layout - {product_code}
+
+        ┌─────────────────┐
+        │  Pin Layout     │
+        │                 │
+        """
+
+        for i, pin in enumerate(pin_mapping):
+            pin_num = i + 1
+            pin_desc = str(pin) if pin else f"Pin {pin_num}"
+            layout += f"        │ {pin_num:2d}: {pin_desc[:12]:<12} │\n"
+
+        layout += "        └─────────────────┘"
+
+    return layout
 
 
 # ── Function Registry ────────────────────────────────────────────────
@@ -3438,41 +2840,18 @@ def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
 # Used by execute_function_by_name() - must match FunctionTemplateLibrary entries
 
 FUNCTION_MAP = {
-    # Original SAAB-focused functions
     "Table Search": func_table_search,
-    "Display Images": func_display_images,
+    "Display Images": func_display_images,  # Display images in VS Code
     "Table Search On Document": func_table_search_on_document,
     "Filter Table": func_filter_table,
     "Filter Table By Field": func_filter_table_by_field,
-    "Analyze Data": func_analyze_data,
+    "Analyze Data": func_analyze_data,  # LLM-powered analysis
     "Extract Product Number": func_extract_product_number,
     "Suggest Keywords": func_suggest_keywords,
     "Normalize Product Number": func_normalize_product_number,
     "Assemble Table": func_assemble_table,
     "Find Latest Document": func_find_latest_document,
-    "Generate Visual Layout": func_generate_visual_layout,
-    
-    # New generic Hydroscand functions (15 total)
-    # Category 1: Search & Discovery (3)
-    "Search Products": func_search_products,
-    "Get Related Items": func_get_related_items,
-    "Semantic Search": func_semantic_search,
-    # Category 2: Data Processing (3)
-    "Filter Items": func_filter_items,
-    "Aggregate Data": func_aggregate_data,
-    "Transform Data": func_transform_data,
-    # Category 3: Comparison & Analysis (3)
-    "Compare Items": func_compare_items,
-    "Extract Attributes": func_extract_attributes,
-    "Analyze With LLM": func_analyze_with_llm,
-    # Category 4: Calculations & Conversions (3)
-    "Calculate": func_calculate,
-    "Convert Units": func_convert_units,
-    "Lookup Standard": func_lookup_standard,
-    # Category 5: Navigation & Discovery (3)
-    "Navigate Hierarchy": func_navigate_hierarchy,
-    "Discover Items": func_discover_items,
-    "Get Metadata": func_get_metadata,
+    "Generate Visual Layout": func_generate_visual_layout,  # Visual layouts and diagrams
 }
 
 

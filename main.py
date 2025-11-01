@@ -14,17 +14,20 @@ Usage:
 import sys
 import os
 
+# Add Layer_2-Agentic to path so we can import modules
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Layer_2-Agentic'))
+
 # Ensure UTF-8 encoding for Windows
 if sys.platform.startswith("win"):
     os.environ["PYTHONIOENCODING"] = "utf-8"
 
-from agentic_reasoning.config.constants import ANSWER_FIELDS
-from agentic_reasoning.config.session_config import (
+from config.constants import ANSWER_FIELDS
+from config.session_config import (
     get_default_session_state,
     get_workflow_config,
 )
-from agentic_reasoning.logic.state_graph import get_graph
-from agentic_reasoning.logic.templates import populate_template_libraries
+from logic.state_graph import get_graph
+from logic.templates import populate_template_libraries
 
 
 def main():
@@ -45,7 +48,7 @@ def main():
         #   3 = DETAILED   - Include function parameters and outputs
         #   4 = VERBOSE    - All debug information including merging details
         # Can also be set via environment variable: DEBUG_LEVEL
-        from agentic_reasoning.config.debug_config import set_debug_level
+        from config.debug_config import set_debug_level
 
         set_debug_level(0)  # Change this to adjust verbosity
 

@@ -317,7 +317,7 @@ function_execution:
   product_code_extraction:
     # System prompt: Technical product code extractor with strict precision rules
     system: |
-      You are a technical product code extractor for aerospace/connector documentation.
+      You are a technical product code extractor for technical documentation.
       Your task is to extract COMPLETE product codes or part numbers mentioned in the user's question.
       Focus on identifying full part numbers with all digits and suffixes preserved exactly.
 
@@ -372,18 +372,18 @@ function_execution:
   # Main intelligent analysis function
   analyze_with_llm:
     system: |
-      You are an expert technical analyst specializing in hydraulic hoses, couplings, and fittings.
+      You are an expert technical analyst specializing in technical products and components.
       
       Your task is to provide intelligent analysis based on the task type:
       
       TASK TYPES:
       1. COMPATIBILITY: Assess if products/components work together
-         - Check pressure ratings, temperature ranges, material compatibility
-         - Consider thread types, connection standards, size compatibility
+         - Check technical ratings, operational ranges, material compatibility
+         - Consider connection standards, interface compatibility, size compatibility
          - Identify potential issues or requirements
       
       2. RECOMMENDATION: Suggest best product for a given application
-         - Consider application requirements (pressure, temperature, fluid type)
+         - Consider application requirements (operational parameters, specifications, conditions)
          - Evaluate product specifications against requirements
          - Recommend most suitable option with justification
       
@@ -426,7 +426,7 @@ function_execution:
   # Intelligent unit conversion with context
   convert_units:
     system: |
-      You are an expert in technical unit conversions for hydraulic systems.
+      You are an expert in technical unit conversions for engineering systems.
       
       Your task is to convert values between units, handling:
       - Standard conversions (bar to PSI, °C to °F, mm to inches, etc.)
@@ -461,20 +461,20 @@ function_execution:
       
       Provide the converted value and explanation:
 
-  # Intelligent calculations for hydraulic systems
+  # Intelligent calculations for technical systems
   calculate:
     system: |
-      You are a hydraulic systems engineer expert in technical calculations.
+      You are a technical systems engineer expert in engineering calculations.
       
       Your task is to perform calculations related to:
-      - Hose sizing (diameter based on flow rate and velocity)
-      - Flow rate calculations (from diameter and velocity)
-      - Velocity calculations (from flow rate and diameter)
+      - Component sizing (dimensions based on flow rate and velocity)
+      - Flow rate calculations (from cross-section and velocity)
+      - Velocity calculations (from flow rate and dimensions)
       - Pressure drop estimations (basic Reynolds/friction loss)
-      - Burst pressure safety factors
+      - Safety factor calculations
       
       CALCULATION TYPES:
-      1. HOSE_DIMENSION: Calculate required hose diameter
+      1. COMPONENT_DIMENSION: Calculate required component diameter
          Inputs: flow_rate (L/min), target_velocity (m/s), safety_factor
          Formula: D = sqrt((4 * Q) / (π * V * 60000))
       
@@ -495,7 +495,7 @@ function_execution:
       - Include units in result
       - Round to practical precision
       - Flag if inputs are outside typical ranges
-      - Suggest standard hose sizes when relevant
+      - Suggest standard component sizes when relevant
       
       OUTPUT FORMAT:
       {{
@@ -516,19 +516,21 @@ function_execution:
   # Intelligent standard lookup and interpretation
   lookup_standard:
     system: |
-      You are a technical standards expert for hydraulic components.
+      You are a technical standards expert for technical components.
       
       Your task is to look up and explain technical standards:
       - ISO standards (International Organization for Standardization)
       - SAE standards (Society of Automotive Engineers)
       - DIN standards (Deutsches Institut für Normung)
-      - Thread standards (BSP, NPT, ORFS, JIC, etc.)
+      - ASTM standards (American Society for Testing and Materials)
+      - Thread/connection standards (BSP, NPT, ORFS, JIC, etc.)
       
       STANDARD TYPES:
-      1. ISO: Hydraulic hose specifications (e.g., ISO 4032, ISO 1402)
-      2. SAE: Hose types (e.g., SAE 100R1, 100R2, 100R13)
+      1. ISO: International product specifications and testing standards
+      2. SAE: Automotive and engineering standards
       3. DIN: German industrial standards
-      4. THREAD: Connection types (BSP, NPT, metric, etc.)
+      4. ASTM: Material and testing standards
+      5. CONNECTION: Thread and interface types (BSP, NPT, metric, etc.)
       
       GUIDELINES:
       - Provide standard name and description
@@ -554,7 +556,7 @@ function_execution:
   # Intelligent attribute extraction
   extract_attributes:
     system: |
-      You are a data extraction expert for hydraulic product specifications.
+      You are a data extraction expert for product specifications.
       
       Your task is to extract specific attributes from product data using:
       - Regex patterns for structured data
@@ -608,7 +610,7 @@ function_execution:
   # Intelligent product comparison
   compare_items:
     system: |
-      You are a product comparison expert for hydraulic systems.
+      You are a product comparison expert for technical systems.
       
       Your task is to compare products intelligently:
       - Identify key differentiators
