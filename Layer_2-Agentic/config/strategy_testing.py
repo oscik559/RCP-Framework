@@ -43,17 +43,22 @@ Integration with Testing Frameworks:
 
 # Individual strategy control - set True to enable, False to disable
 STRATEGY_TEST_CONFIG = {
-    "SIMPLE LOOKUP": True,  # Fast path for direct queries
-    "ENHANCED LOOKUP": True,  # Multi-step comprehensive analysis
+    # ── OLD GENERIC STRATEGIES (DISABLED) ──
+    "SIMPLE LOOKUP": False,  # Fast path for direct queries
+    "ENHANCED LOOKUP": False,  # Multi-step comprehensive analysis
     "VISUAL LAYOUT": False,  # Image processing (experimental)
-    "PARALLEL ENHANCED LOOKUP": True,  # Concurrent processing optimization
-    "PRODUCT COMPARISON": True,  # Compare multiple products side-by-side
-    "TECHNICAL CALCULATION": True,  # Perform technical calculations (flow rate, pressure, etc.)
-    "STANDARD COMPLIANCE": True,  # Check standards and certifications compliance
-    "SMART RECOMMENDATION": True,  # Provide product recommendations based on requirements
-    "HIERARCHICAL NAVIGATION": True,  # Navigate product hierarchy and categories
-    "SPECIFICATION ANALYSIS": True,  # Analyze and extract detailed specifications
-    "PRODUCT LOCATION": True,  # Locate products in catalogue (page numbers, chapters)
+    "PARALLEL ENHANCED LOOKUP": False,  # Concurrent processing optimization
+    
+    # ── NEW HYDROSCAND-SPECIFIC STRATEGIES ──
+    "PRODUCT COMPARISON": False,  # Compare multiple products side-by-side
+    "TECHNICAL CALCULATION": False,  # Perform technical calculations (flow rate, pressure, etc.)
+    "STANDARD COMPLIANCE": False,  # Check standards and certifications compliance
+    "SMART RECOMMENDATION": False,  # Provide product recommendations based on requirements
+    "HIERARCHICAL NAVIGATION": False,  # Navigate product hierarchy and categories
+    "SPECIFICATION ANALYSIS": False,  # Analyze and extract detailed specifications (complex multi-step)
+    "DIRECT SPECIFICATION LOOKUP": True,  # ← TESTING THIS - Fast path for small datasets (direct mode)
+    "ASSEMBLED SPECIFICATION LOOKUP": False,  # Scalable path for large datasets (assembly mode with temp.db)
+    "PRODUCT LOCATION": False,  # Locate products in catalogue (page numbers, chapters)
 }
 
 # Testing execution modes

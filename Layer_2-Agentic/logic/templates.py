@@ -92,6 +92,18 @@ strategies = [
         "Search Products, Extract Attributes, Calculate, Convert Units, Compare Items, Analyze With LLM",
     ),
     (
+        "DIRECT SPECIFICATION LOOKUP",  # Fast path for small datasets (< 20 products)
+        "lookup",
+        "Direct database lookup for specific product specifications with direct LLM analysis: query database → extract attributes → analyze with LLM (direct mode).",
+        "Query Database, Extract Attributes, Analyze With LLM",
+    ),
+    (
+        "ASSEMBLED SPECIFICATION LOOKUP",  # Scalable path for large datasets (20+ products)
+        "lookup",
+        "Scalable database lookup with temp.db assembly for large datasets: query database → extract attributes → assemble product data → analyze with LLM (assembly mode).",
+        "Query Database, Extract Attributes, Assemble Product Data, Analyze With LLM",
+    ),
+    (
         "PRODUCT LOCATION",  # Find where product is located in catalogue
         "location",
         "Locate product in catalogue: search products → get metadata → extract location information (page number, chapter, category).",
@@ -177,6 +189,11 @@ templates = [
         "Multi-criteria product search with flexible filtering by category, keywords, specifications, and certifications",
     ),
     (
+        "Query Database",
+        "search",
+        "SQL Agent for executing custom database queries with joins, filters, aggregations, and complex conditions",
+    ),
+    (
         "Get Related Items",
         "search",
         "Find related products by relationship type (compatible, alternatives, accessories, replacements)",
@@ -211,12 +228,17 @@ templates = [
     (
         "Extract Attributes",
         "extract",
-        "Attribute extraction via regex, JSON path, or field mapping",
+        "Deterministic attribute extraction from product data with schema-aware parsing (no LLM, pure data extraction)",
+    ),
+    (
+        "Assemble Product Data",
+        "assemble",
+        "Universal assembler that stores extracted data in temp.db for scalable LLM analysis with large datasets",
     ),
     (
         "Analyze With LLM",
         "analyze",
-        "LLM-powered intelligent analysis for compatibility, recommendations, and technical advice",
+        "Dual-mode LLM analysis: accepts direct context (small data) or queries temp.db (large assembled data)",
     ),
     # Category 4: Calculations & Conversions
     (
@@ -293,9 +315,19 @@ params = {
     # Category 1: Search & Discovery
     "Search Products": [
         ("category", "", "string"),
-        ("keywords", "[]", "json"),
+        ("keywords", "Input", "string"),  # Use user query to extract product names/keywords
         ("filters", "{}", "json"),
         ("limit", "50", "integer"),
+    ],
+    "Query Database": [
+        ("query_type", "select", "string"),  # "select", "count", "distinct", "custom"
+        ("table", "products", "string"),
+        ("filters", "Input", "string"),  # Smart mode: Can accept natural language query to extract product names
+        ("fields", "[]", "json"),
+        ("joins", "[]", "json"),
+        ("order_by", "", "string"),
+        ("limit", "100", "integer"),
+        ("custom_sql", "", "string"),
     ],
     "Get Related Items": [
         ("product_id", "", "string"),
@@ -330,13 +362,18 @@ params = {
     ],
     "Extract Attributes": [
         ("items", "", "json"),
-        ("extraction_type", "intelligent", "string"),
+        ("extraction_type", "auto", "string"),  # Changed to "auto" for deterministic schema-aware extraction
         ("config", "{}", "json"),
     ],
+    "Assemble Product Data": [
+        ("extracted_data", "", "json"),  # Collect extracted_data from Extract Attributes
+        ("source_type", "product_specifications", "string"),
+    ],
     "Analyze With LLM": [
-        ("task", "", "string"),
-        ("context", "{}", "json"),
-        ("question", "", "string"),
+        ("task", "advice", "string"),  # Technical advice/analysis
+        ("extracted_data", "", "json"),  # Auto-collect from Extract Attributes (direct mode)
+        ("assembled_data", "", "json"),  # Auto-collect from Assemble Product Data (assembly mode)
+        ("question", "Input", "string"),  # Use user's original query
     ],
     # Category 4: Calculations & Conversions
     "Calculate": [
@@ -408,6 +445,12 @@ outputs = {
         ("Count", "0", "integer"),
         ("items", "[]", "json"),  # For compatibility with downstream functions like Extract Attributes
     ],
+    "Query Database": [
+        ("results", "[]", "json"),
+        ("count", "0", "integer"),
+        ("fields", "[]", "json"),
+        ("items", "[]", "json"),  # For compatibility with Extract Attributes
+    ],
     "Get Related Items": [
         ("related_items", "[]", "json"),
         ("relationship_type", "", "string"),
@@ -444,6 +487,11 @@ outputs = {
         ("extracted_data", "[]", "json"),
         ("extraction_type", "", "string"),
         ("count", "0", "integer"),
+    ],
+    "Assemble Product Data": [
+        ("Assembled Data", "", "string"),  # JSON string for Analyze With LLM
+        ("records_inserted", "0", "integer"),
+        ("fields_discovered", "0", "integer"),
     ],
     "Analyze With LLM": [
         ("Analysis", "", "string"),

@@ -216,6 +216,7 @@ __marimo__/
 *.log
 logs/
 Layer_2/agentic_reasoning/config/logs/
+config/logs/  # Prevent root config/logs from being created
 
 # Database files (domain-specific databases)
 *.db
@@ -246,3 +247,7 @@ ehthumbs.db
 Desktop.ini
 
 
+
+# Database backups
+# data/database/backups/
+# data/database/*_backup_*.db

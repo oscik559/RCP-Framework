@@ -654,15 +654,46 @@ def _execute_sequential_function(session_state: SessionState) -> SessionState:
         param_dict[pname] = final_val
 
     # Step 2.5: Store the actual resolved parameter values in the database
+    import json as json_module
     for pname, pval in param_dict.items():
-        db.update_function_parameter(function_id, pname, str(pval))
+        # Use JSON serialization for lists/dicts to preserve structure
+        if isinstance(pval, (list, dict)):
+            param_str = json_module.dumps(pval)
+        else:
+            param_str = str(pval)
+        db.update_function_parameter(function_id, pname, param_str)
 
     # Step 3: Execute function with resolved parameters
     debug.print_function(f"Execute {fn} with {len(param_dict)} parameters")
+    # Print detailed input parameters for inspection
+    print(f"\n{'='*80}")
+    print(f"🔍 FUNCTION EXECUTION DETAILS")
+    print(f"{'='*80}")
+    print(f"📋 Function: {fn}")
+    print(f"🆔 Function ID: {function_id}")
+    print(f"📥 INPUT PARAMETERS ({len(param_dict)}):")
+    for pname, pval in param_dict.items():
+        val_preview = str(pval)[:200] if pval else "None"
+        print(f"   • {pname}: {val_preview}")
+    print(f"{'-'*80}")
+    
     # Note: Parameter details available in debug logs if needed
     try:
         handler = handler_from_name(fn)
         success, result = handler(param_dict)
+        
+        # Print detailed output for inspection
+        print(f"📤 OUTPUT:")
+        print(f"   ✓ Success: {success}")
+        if success and isinstance(result, dict):
+            for out_name, out_val in result.items():
+                val_preview = str(out_val)[:300] if out_val else "None"
+                print(f"   • {out_name}: {val_preview}")
+        else:
+            result_preview = str(result)[:300] if result else "None"
+            print(f"   • Result: {result_preview}")
+        print(f"{'='*80}\n")
+        
         debug.print_function(f"{fn} → Success: {success}")
     except ValueError as e:
         debug.print_error(f"{fn} → Handler not found: {e}")
@@ -697,7 +728,11 @@ def _execute_sequential_function(session_state: SessionState) -> SessionState:
             # Store each output with type inference
             for out_name, out_val in result.items():
                 if out_name in [template[0] for template in output_templates]:
-                    val_str = str(out_val)
+                    # Use JSON serialization for lists/dicts to preserve structure
+                    if isinstance(out_val, (list, dict)):
+                        val_str = json_module.dumps(out_val)
+                    else:
+                        val_str = str(out_val)
                     sql_type = infer_sql_type(val_str)
                     db.store_function_output(
                         function_id, fn, out_name, val_str, sql_type, strategy_name

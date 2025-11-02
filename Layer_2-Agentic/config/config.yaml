@@ -3,11 +3,15 @@
 model_path: agentic_reasoning/models/
 
 
-# Database Configuration
-# ────────────────────────────────────────────────────────────────────────────
-agentic_db: ../data/database/agentic.db      # Workflow state, execution tracking, templates
-harvested_db: ../data/database/harvested.db  # Hydroscand product database (335 products, 69 families)
-temp_db: ../data/database/temp.db            # Temporary data assembly and query processing══════════════════════════════
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+# Paths relative to project root (parents[2] from config_loader.py)
+agentic_db: data/database/agentic.db      # Agentic reasoning workflow database
+harvested_db: data/database/harvested.db  # Hydroscand product database (335 products, 69 families)
+temp_db: data/database/temp.db            # Temporary database for processing══════════════════════════════
+
+
 # AGENTIC REASONING SYSTEM CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════
 # 
@@ -47,9 +51,9 @@ model_path: models/
 
 
 # ─── Databases ────────────────────────────────────
-agentic_db: ../data/database/agentic.db
-harvested_db: ../data/database/harvested.db
-temp_db: ../data/database/temp.db
+agentic_db: data/database/agentic.db
+harvested_db: data/database/harvested.db
+temp_db: data/database/temp.db
 
 # ─── Data Directories ──────────────────────────────────────────────────
 # File system paths for document processing and storage
@@ -66,13 +70,13 @@ llms:
   # Basic tier: Fast responses for simple tasks (keyword generation, validation)
   # Used for: Quick classifications, simple extractions, boolean validations
   basic:
-    model: gpt-oss:20b-cloud                # Cloud-based GPT model for reliability
+    model: llama3.2:latest                  # Llama 3.2 for fast local inference
     temperature: 0.0                        # Deterministic output for consistency
 
   # Reasoning tier: Complex analysis and strategy selection
-  # Used for: Strategy planning, goal validation, complex decision making
+  # Used for: Strategy planning, goal validation, complex decision making, technical analysis
   reasoning:
-    model: gpt-oss:20b-cloud                # Cloud-based GPT model for complex reasoning
+    model: deepseek-r1:latest               # DeepSeek-R1 for advanced reasoning with chain-of-thought
     temperature: 0.0                        # Deterministic for strategy selection
 
   # Multimodal tier: Image and table processing capabilities  

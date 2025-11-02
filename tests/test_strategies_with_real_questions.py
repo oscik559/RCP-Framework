@@ -9,10 +9,10 @@ import sys
 import os
 import sqlite3
 
-# Add Layer_2 to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Layer_2'))
+# Add Layer_2-Agentic to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
 
-from agentic_reasoning.logic.function_library import (
+from logic.function_library import (
     func_search_products,
     func_compare_items,
     func_calculate,

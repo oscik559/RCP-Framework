@@ -224,11 +224,10 @@ def func_table_search(params: dict) -> tuple[bool, dict | str]:
     try:
         with get_output_connection() as db_connection:
             cursor = db_connection.cursor()
-            like_clause = " OR ".join(["tablecontent LIKE ?"] * len(unique_keywords))
+            like_clause = " OR ".join(["table_data LIKE ?"] * len(unique_keywords))
             cursor.execute(
                 f"""
-                SELECT id, filename, page_nr, heading_number, heading_name,
-                    table_name, tablecontent
+                SELECT id, filename, page_number, table_data
                 FROM extracted_tables
                 WHERE {like_clause}
             """,
@@ -766,12 +765,11 @@ def func_table_search_on_document(params: dict) -> tuple[bool, dict | str]:
             cur = conn.cursor()
             # Build WHERE clause for keywords and document name(s)
             # Use parentheses for correctness when multiple keywords/docs
-            like_clause = " OR ".join(["tablecontent LIKE ?"] * len(unique_keywords))
+            like_clause = " OR ".join(["table_data LIKE ?"] * len(unique_keywords))
             doc_clause = " OR ".join(["filename = ?"] * len(doc_names))
             where_clause = f"({like_clause}) AND ({doc_clause})"
             query = f"""
-                SELECT id, filename, page_nr, heading_number, heading_name,
-                       table_name, tablecontent
+                SELECT id, filename, page_number, table_data
                 FROM extracted_tables
                 WHERE {where_clause}
             """
@@ -2155,10 +2153,29 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
     """
     import sqlite3
     import json
+    import re
     
     db_path = params.get("database_path", "data/database/harvested.db")
     category = params.get("category", "").strip()
-    keywords = params.get("keywords", "").strip()
+    keywords_raw = params.get("keywords", "").strip()
+    
+    # Smart keyword extraction: If keywords looks like a natural language question,
+    # extract just the product names/codes using simple pattern matching
+    keywords = keywords_raw
+    if keywords_raw and len(keywords_raw.split()) > 3:
+        # Looks like a natural language query - extract product codes/names
+        # Look for patterns like: KAPPAFLEX 1, RPT 235, etc.
+        # Pattern: Uppercase word followed by optional number/code
+        product_pattern = r'\b([A-Z]{3,}(?:\s*[A-Z0-9]+)*)\b'
+        matches = re.findall(product_pattern, keywords_raw)
+        if matches:
+            # Use only the extracted product names
+            keywords = ' '.join(matches)
+            debug.print_function(f"Extracted product names from query: {keywords}")
+        else:
+            # No clear product names found - use semantic search instead
+            # For now, just use the whole query
+            debug.print_function(f"No product codes found, using full query")
     
     # Parse specs parameter - may come as string from workflow
     specs_raw = params.get("specs", {})
@@ -2266,6 +2283,209 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
         
     except Exception as e:
         return (False, f"Search error: {str(e)}")
+
+
+def func_query_database(params: dict) -> tuple[bool, dict | str]:
+    """
+    SQL Agent: Execute custom SQL queries on the harvested database.
+    
+    A powerful, flexible building block for any database operation:
+    - Custom SELECT queries with joins, filters, aggregations
+    - Access to all tables: products, product_families, categories
+    - Support for complex WHERE clauses, GROUP BY, ORDER BY
+    - Parameterized queries for safety
+    
+    Use Cases:
+    - Find all products in a specific family
+    - Aggregate specifications across product ranges
+    - Join products with family metadata
+    - Filter by complex specification criteria
+    - Get unique values (distinct families, categories, etc.)
+    
+    Parameters:
+        query_type (str): Type of query ("select", "count", "distinct", "custom")
+        table (str): Primary table to query ("products", "product_families", "categories")
+        filters (dict): Filter conditions (field: value pairs)
+        fields (list): Fields to select (default: all with *)
+        joins (list): Tables to join with their conditions
+        order_by (str): Sort order (e.g., "product_code ASC")
+        limit (int): Maximum results to return
+        custom_sql (str): For query_type="custom", provide full SQL query
+        
+    Returns:
+        tuple[bool, dict]: Success status and results dict with:
+            - results (list): Query results as list of dicts
+            - count (int): Number of results
+            - fields (list): Field names returned
+    """
+    import sqlite3
+    import json
+    import re
+    
+    db_path = params.get("database_path", "data/database/harvested.db")
+    query_type = params.get("query_type", "select").lower()
+    
+    # Smart Mode: If we receive a natural language query in filters or custom_sql,
+    # try to extract product family name and build a smart query
+    filters_raw = params.get("filters", {})
+    if isinstance(filters_raw, str) and filters_raw and not filters_raw.startswith("{"):
+        # This looks like a natural language query, not a JSON filter
+        # Extract product family name (e.g., "KAPPAFLEX 1" from query)
+        product_pattern = r'\b([A-Z]{3,}(?:\s+\d+)?)\b'
+        matches = re.findall(product_pattern, filters_raw)
+        
+        if matches:
+            # Build a custom query to find products in this family
+            family_name = matches[0]  # Take first match (e.g., "KAPPAFLEX 1")
+            debug.print_function(f"Smart mode: Extracted family name '{family_name}' from query")
+            
+            # Override to custom query mode
+            query_type = "custom"
+            params["custom_sql"] = f"""
+                SELECT p.id as product_id, p.product_code, p.family_id, 
+                       pf.name as family_name, pf.description,
+                       p.specifications, p.page_number
+                FROM products p
+                LEFT JOIN product_families pf ON p.family_id = pf.id
+                WHERE pf.name LIKE '%{family_name}%'
+                LIMIT 100
+            """
+            debug.print_function(f"Generated smart query for family: {family_name}")
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Mode 1: CUSTOM SQL - User provides full query
+        if query_type == "custom":
+            custom_sql = params.get("custom_sql", "").strip()
+            if not custom_sql:
+                return (False, "custom_sql parameter required for query_type='custom'")
+            
+            # Safety check: only allow SELECT queries
+            if not custom_sql.upper().startswith("SELECT"):
+                return (False, "Only SELECT queries are allowed for safety")
+            
+            cursor.execute(custom_sql)
+            rows = cursor.fetchall()
+            
+            results = [dict(row) for row in rows]
+            field_names = list(rows[0].keys()) if rows else []
+            
+            conn.close()
+            
+            debug.print_function(f"Custom SQL executed: {len(results)} results")
+            
+            return (True, {
+                "results": results,
+                "count": len(results),
+                "fields": field_names,
+                "query_type": "custom",
+                "items": results  # For compatibility with Extract Attributes
+            })
+        
+        # Mode 2: STRUCTURED QUERY - Build from parameters
+        table = params.get("table", "products")
+        fields_raw = params.get("fields", [])
+        
+        # Parse fields parameter
+        if isinstance(fields_raw, str):
+            try:
+                fields = json.loads(fields_raw) if fields_raw else []
+            except json.JSONDecodeError:
+                fields = [f.strip() for f in fields_raw.split(",") if f.strip()]
+        else:
+            fields = fields_raw
+        
+        # Build SELECT clause
+        if fields:
+            select_clause = ", ".join(fields)
+        else:
+            select_clause = "*"
+        
+        # Build base query
+        query = f"SELECT {select_clause} FROM {table}"
+        query_params = []
+        
+        # Handle JOINs
+        joins_raw = params.get("joins", [])
+        if isinstance(joins_raw, str):
+            try:
+                joins = json.loads(joins_raw) if joins_raw else []
+            except json.JSONDecodeError:
+                joins = []
+        else:
+            joins = joins_raw
+        
+        for join in joins:
+            if isinstance(join, dict):
+                join_table = join.get("table")
+                join_on = join.get("on")
+                join_type = join.get("type", "LEFT JOIN")
+                if join_table and join_on:
+                    query += f" {join_type} {join_table} ON {join_on}"
+        
+        # Build WHERE clause from filters
+        filters_raw = params.get("filters", {})
+        if isinstance(filters_raw, str):
+            try:
+                filters = json.loads(filters_raw) if filters_raw else {}
+            except json.JSONDecodeError:
+                filters = {}
+        else:
+            filters = filters_raw
+        
+        if filters:
+            where_conditions = []
+            for field, value in filters.items():
+                if isinstance(value, dict):
+                    # Handle operators: {"operator": "LIKE", "value": "%KAPPAFLEX%"}
+                    operator = value.get("operator", "=")
+                    filter_value = value.get("value")
+                    where_conditions.append(f"{field} {operator} ?")
+                    query_params.append(filter_value)
+                else:
+                    # Simple equality
+                    where_conditions.append(f"{field} = ?")
+                    query_params.append(value)
+            
+            if where_conditions:
+                query += " WHERE " + " AND ".join(where_conditions)
+        
+        # Handle ORDER BY
+        order_by = params.get("order_by", "")
+        if order_by:
+            query += f" ORDER BY {order_by}"
+        
+        # Handle LIMIT
+        limit = params.get("limit", 100)
+        if limit:
+            query += f" LIMIT ?"
+            query_params.append(limit)
+        
+        # Execute query
+        cursor.execute(query, query_params)
+        rows = cursor.fetchall()
+        
+        results = [dict(row) for row in rows]
+        field_names = list(rows[0].keys()) if rows else []
+        
+        conn.close()
+        
+        debug.print_function(f"Query executed on {table}: {len(results)} results")
+        
+        return (True, {
+            "results": results,
+            "count": len(results),
+            "fields": field_names,
+            "query_type": query_type,
+            "items": results  # For compatibility with other functions
+        })
+        
+    except Exception as e:
+        debug.print_error(f"Database query error: {e}")
+        return (False, f"Query error: {str(e)}")
 
 
 def func_filter_items(params: dict) -> tuple[bool, dict | str]:
@@ -2682,18 +2902,18 @@ def func_get_related_items(params: dict) -> tuple[bool, dict | str]:
         if relationship_type == "compatible":
             # Find compatible products (e.g., sleeves for hoses)
             query = """
-                SELECT p.product_code, p.product_name, p.description, p.family_id, f.family_name
+                SELECT p.product_code, p.specifications, p.family_id, f.family_name
                 FROM Products p
-                LEFT JOIN ProductFamilies f ON p.family_id = f.family_id
-                WHERE p.description LIKE ? OR p.specifications LIKE ?
+                LEFT JOIN ProductFamilies f ON p.family_id = f.id
+                WHERE p.specifications LIKE ?
                 LIMIT 20
             """
-            cursor.execute(query, (f"%{item_id}%", f"%{item_id}%"))
+            cursor.execute(query, (f"%{item_id}%",))
             
         elif relationship_type == "alternative":
             # Find alternative products in same family
             query = """
-                SELECT p.product_code, p.product_name, p.description, p.specifications
+                SELECT p.product_code, p.specifications
                 FROM Products p
                 WHERE p.family_id = (SELECT family_id FROM Products WHERE product_code = ?)
                 AND p.product_code != ?
@@ -2777,13 +2997,13 @@ def func_semantic_search(params: dict) -> tuple[bool, dict | str]:
         params_list = []
         
         for term in expanded_list:
-            conditions.append("(p.product_name LIKE ? OR p.description LIKE ? OR f.family_name LIKE ?)")
+            conditions.append("(p.product_code LIKE ? OR p.specifications LIKE ? OR f.family_name LIKE ?)")
             params_list.extend([f"%{term}%", f"%{term}%", f"%{term}%"])
         
         query_sql = f"""
-            SELECT p.product_code, p.product_name, p.description, f.family_name
+            SELECT p.product_code, p.specifications, f.family_name
             FROM Products p
-            LEFT JOIN ProductFamilies f ON p.family_id = f.family_id
+            LEFT JOIN ProductFamilies f ON p.family_id = f.id
             WHERE {' OR '.join(conditions)}
             LIMIT ?
         """
@@ -2977,39 +3197,170 @@ def func_transform_data(params: dict) -> tuple[bool, dict | str]:
         return (False, f"Transform error: {str(e)}")
 
 
-def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
+def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
     """
-    LLM-powered intelligent attribute extraction.
+    Assemble extracted product data into temporary database for scalable LLM analysis.
     
-    Handles complex extraction scenarios:
-    - Unstructured text parsing
-    - Regex patterns with fallback to LLM
-    - JSON path navigation
-    - Field mapping with normalization
-    - Format standardization
+    Universal assembler that:
+    - Takes extracted_data from Extract Attributes (or any structured list)
+    - Stores in temp.db with proper schema
+    - Enables flexible querying for LLM context building
+    - Handles small and large datasets efficiently
+    
+    This decouples data extraction from analysis, allowing:
+    - Multiple data sources to be assembled
+    - Progressive refinement (filter → aggregate → analyze)
+    - Reusable intermediate results across different strategies
     
     Parameters:
-        items (list): Items to extract from
-        extraction_type (str): Method ("regex", "json_path", "field_map", "intelligent")
-        config (dict): Extraction configuration
+        extracted_data (list): List of product dicts with flattened specifications
+        source_type (str, optional): Type of data being assembled (default: "product_specifications")
         
     Returns:
         tuple[bool, dict]: Success status and results dict with:
-            - extracted_data (list): Extracted attributes
-            - extraction_type (str): Method used
-            - count (int): Number of items extracted
+            - Assembled Data (str): JSON string with assembly summary for Analyze With LLM
+            - records_inserted (int): Number of records inserted
+            - fields_discovered (int): Number of unique fields
     """
+    from db.connection import get_temp_connection
+    
+    # Parse parameters - extracted_data may come from Extract Attributes
+    extracted_raw = params.get("extracted_data", [])
+    
+    if isinstance(extracted_raw, str):
+        try:
+            extracted_data = json.loads(extracted_raw) if extracted_raw else []
+        except json.JSONDecodeError as e:
+            return (False, f"Failed to parse extracted_data: {e}")
+    else:
+        extracted_data = extracted_raw
+    
+    if not extracted_data:
+        return (False, "No extracted_data provided for assembly")
+    
+    source_type = params.get("source_type", "product_specifications")
+    
+    try:
+        with get_temp_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Create temp table for product specifications
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS temp_product_specs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    product_id INTEGER,
+                    product_code TEXT,
+                    family_id INTEGER,
+                    family_name TEXT,
+                    page_number INTEGER,
+                    specifications TEXT,
+                    source_type TEXT
+                )
+            """)
+            
+            # Discover all unique specification fields
+            all_spec_fields = set()
+            for item in extracted_data:
+                for key in item.keys():
+                    if key.startswith("spec_"):
+                        all_spec_fields.add(key)
+            
+            # Insert records
+            records_inserted = 0
+            for item in extracted_data:
+                # Extract core fields
+                product_id = item.get("product_id")
+                product_code = item.get("product_code", "")
+                family_id = item.get("family_id")
+                family_name = item.get("family_name", "")
+                page_number = item.get("page_number")
+                
+                # Bundle all spec fields into JSON for flexible querying
+                specs = {k: v for k, v in item.items() if k.startswith("spec_")}
+                specs_json = json.dumps(specs)
+                
+                cursor.execute("""
+                    INSERT INTO temp_product_specs 
+                    (product_id, product_code, family_id, family_name, page_number, specifications, source_type)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (product_id, product_code, family_id, family_name, page_number, specs_json, source_type))
+                
+                records_inserted += 1
+            
+            conn.commit()
+            
+            # Create assembly summary for Analyze With LLM
+            summary = {
+                "temp_table": "temp_product_specs",
+                "records_inserted": records_inserted,
+                "fields_discovered": len(all_spec_fields),
+                "source_type": source_type,
+                "field_list": sorted(list(all_spec_fields)),
+                "sample_products": [item.get("product_code") for item in extracted_data[:5]]
+            }
+            
+            debug.print_function(f"Assembled {records_inserted} records with {len(all_spec_fields)} spec fields into temp.db")
+            
+            # Return in format compatible with Analyze With LLM
+            return (True, {
+                "Assembled Data": json.dumps([{
+                    "table_name": "Product Specifications Assembly",
+                    "tablecontent": json.dumps(summary)
+                }]),
+                "records_inserted": records_inserted,
+                "fields_discovered": len(all_spec_fields)
+            })
+            
+    except Exception as e:
+        debug.print_error(f"Assembly error: {e}")
+        return (False, f"Assembly error: {str(e)}")
+
+
+def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
+    """
+    Deterministic attribute extraction from structured product data.
+    
+    Extracts attributes from product items using schema-aware parsing.
+    NO LLM - pure data extraction for reliability and speed.
+    
+    Extraction Modes:
+    1. auto (default): Automatically parses specifications JSON and flattens all attributes
+    2. specific: Extract specific fields listed in config["fields"]
+    3. filter: Extract items matching specific criteria
+    
+    Parameters:
+        items (list): Product items with specifications (from Search Products)
+        extraction_type (str): "auto", "specific", or "filter" (default: "auto")
+        config (dict): Optional configuration
+            - fields (list): Specific fields to extract in "specific" mode
+            - filters (dict): Filter criteria in "filter" mode
+        
+    Returns:
+        tuple[bool, dict]: Success status and results dict with:
+            - extracted_data (list): Products with parsed specifications
+            - count (int): Number of items extracted
+            - fields_found (list): List of unique specification fields found
+    """
+    import json
+    import re
+    
     # Parse parameters safely - they may come as strings from workflow
     items_raw = params.get("items", [])
+    
     if isinstance(items_raw, str):
         try:
             items = json.loads(items_raw) if items_raw else []
-        except json.JSONDecodeError:
-            items = []
+            debug.print_function(f"Parsed {len(items)} items from JSON string")
+        except json.JSONDecodeError as e:
+            debug.print_error(f"JSON parse failed: {e}")
+            return (False, f"Failed to parse items JSON: {str(e)}")
     else:
         items = items_raw
     
-    extraction_type = params.get("extraction_type", "intelligent").lower()
+    if not items:
+        return (False, "No items provided for extraction")
+    
+    extraction_type = params.get("extraction_type", "auto").lower()
     
     config_raw = params.get("config", {})
     if isinstance(config_raw, str):
@@ -3020,116 +3371,181 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
     else:
         config = config_raw
     
-    if not items:
-        return (False, "Missing items parameter")
+    extracted_data = []
+    all_fields = set()
     
-    # For intelligent extraction or when complex patterns needed, use LLM
-    if extraction_type == "intelligent" or extraction_type == "llm":
-        try:
-            # Load prompts and build LLM chain
-            prompt_loader = get_prompt_loader()
-            prompts = prompt_loader.get_prompt("function_execution", "extract_attributes")
-            
-            system_msg = prompts["system"]
-            user_template = prompts["user_template"]
-            
-            chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-            
-            # Format items and config for prompt
-            items_text = json.dumps(items, indent=2) if isinstance(items, list) else str(items)
-            config_text = json.dumps(config, indent=2) if isinstance(config, dict) else str(config)
-            
-            # Invoke LLM for intelligent extraction
-            result = chain.invoke({
-                "extraction_type": extraction_type.upper(),
-                "items": items_text,
-                "config": config_text
-            })
-            
-            debug.print_function(f"[func_extract_attributes] Type: {extraction_type}, Items: {len(items)}, Result: {result[:200]}...")
-            
-            # Try to parse LLM result as JSON array
-            try:
-                import re
-                json_match = re.search(r'\[.*\]', result, re.DOTALL)
-                if json_match:
-                    extracted_data = json.loads(json_match.group())
-                else:
-                    # Return raw result if not JSON
-                    extracted_data = [{"raw_extraction": result}]
-            except:
-                extracted_data = [{"raw_extraction": result}]
-            
-            return (True, {
-                "extracted_data": extracted_data,
-                "extraction_type": extraction_type,
-                "count": len(extracted_data)
-            })
-            
-        except Exception as e:
-            logger.error(f"[func_extract_attributes] Error: {e}")
-            return (False, f"Extraction error: {str(e)}")
-    
-    else:
-        # For simple extraction types, use basic logic
-        import re
-        extracted_data = []
-        
+    try:
         for item in items:
-            if extraction_type == "regex":
-                # Apply regex patterns from config
-                patterns = config.get("patterns", {})
-                extracted = {}
-                item_str = str(item)
-                for field, pattern in patterns.items():
-                    match = re.search(pattern, item_str, re.IGNORECASE)
-                    if match:
-                        extracted[field] = match.group(1) if match.groups() else match.group(0)
-                if extracted:
-                    extracted_data.append(extracted)
+            if not isinstance(item, dict):
+                continue
+            
+            # Create extracted item with core product info
+            extracted_item = {
+                "product_id": item.get("product_id"),
+                "product_code": item.get("product_code"),
+                "family_id": item.get("family_id"),
+                "family_name": item.get("family_name"),
+                "page_number": item.get("page_number")
+            }
+            
+            # Parse specifications JSON if present
+            specs_raw = item.get("specifications", "{}")
+            if isinstance(specs_raw, str):
+                try:
+                    specs = json.loads(specs_raw)
+                except json.JSONDecodeError:
+                    specs = {}
+            else:
+                specs = specs_raw if isinstance(specs_raw, dict) else {}
+            
+            # Mode 1: AUTO - Extract all specification fields
+            if extraction_type == "auto":
+                # Flatten all specification fields into the extracted item
+                for spec_key, spec_value in specs.items():
+                    # Normalize field names (e.g., "Arb.tr. MPa" -> "working_pressure_mpa")
+                    normalized_key = spec_key.lower().replace(".", "_").replace(" ", "_")
+                    extracted_item[f"spec_{normalized_key}"] = spec_value
+                    all_fields.add(spec_key)
+                
+                # Also keep raw specs for reference
+                extracted_item["specifications"] = specs
+                extracted_data.append(extracted_item)
+            
+            # Mode 2: SPECIFIC - Extract only requested fields
+            elif extraction_type == "specific":
+                requested_fields = config.get("fields", [])
+                extracted_item["specifications"] = {}
+                
+                for field in requested_fields:
+                    # Try exact match first
+                    if field in specs:
+                        extracted_item["specifications"][field] = specs[field]
+                        all_fields.add(field)
+                    else:
+                        # Try case-insensitive match
+                        for spec_key, spec_value in specs.items():
+                            if spec_key.lower() == field.lower():
+                                extracted_item["specifications"][field] = spec_value
+                                all_fields.add(spec_key)
+                                break
+                
+                if extracted_item["specifications"]:
+                    extracted_data.append(extracted_item)
+            
+            # Mode 3: FILTER - Extract items matching criteria
+            elif extraction_type == "filter":
+                filters = config.get("filters", {})
+                matches = True
+                
+                for filter_field, filter_value in filters.items():
+                    item_value = specs.get(filter_field)
                     
-            elif extraction_type == "field_map":
-                # Map fields from item
-                field_map = config.get("field_map", {})
-                if isinstance(item, dict):
-                    extracted = {}
-                    for target_field, source_field in field_map.items():
-                        if source_field in item:
-                            extracted[target_field] = item[source_field]
-                    if extracted:
-                        extracted_data.append(extracted)
+                    # Handle different filter types
+                    if isinstance(filter_value, dict):
+                        # Range filter: {"min": 10, "max": 50}
+                        if "min" in filter_value:
+                            try:
+                                if float(item_value) < float(filter_value["min"]):
+                                    matches = False
+                                    break
+                            except (ValueError, TypeError):
+                                matches = False
+                                break
+                        if "max" in filter_value:
+                            try:
+                                if float(item_value) > float(filter_value["max"]):
+                                    matches = False
+                                    break
+                            except (ValueError, TypeError):
+                                matches = False
+                                break
+                    else:
+                        # Exact match filter
+                        if str(item_value).lower() != str(filter_value).lower():
+                            matches = False
+                            break
+                
+                if matches:
+                    extracted_item["specifications"] = specs
+                    for key in specs.keys():
+                        all_fields.add(key)
+                    extracted_data.append(extracted_item)
+        
+        debug.print_function(f"Extracted {len(extracted_data)} items with {len(all_fields)} unique fields")
         
         return (True, {
             "extracted_data": extracted_data,
-            "extraction_type": extraction_type,
-            "count": len(extracted_data)
+            "count": len(extracted_data),
+            "fields_found": sorted(list(all_fields)),
+            "extraction_mode": extraction_type
         })
+        
+    except Exception as e:
+        debug.print_error(f"Extraction error: {e}")
+        return (False, f"Extraction error: {str(e)}")
 
 
 def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
     """
-    LLM-powered analysis for compatibility, recommendations, comparisons.
+    LLM-powered analysis with dual-mode context handling and smart chunking.
     
-    Uses LLM for intelligent analysis tasks:
+    DUAL MODE ARCHITECTURE:
+    1. Direct Mode: Accept context directly from previous function (small datasets)
+    2. Assembly Mode: Query temp.db for context (large datasets, assembled data)
+    
+    This enables flexible composition:
+    - Extract Attributes → Analyze With LLM (direct, for small data)
+    - Extract Attributes → Assemble Product Data → Analyze With LLM (via temp.db, for large data)
+    - Multiple sources → Assemble → Analyze With LLM (complex workflows)
+    
+    FLEXIBLE QUERY TYPES:
+    The LLM can handle ANY type of analysis task, not just specifications:
     - Compatibility checking (Will product A work with product B?)
     - Product recommendations (What's the best hose for X application?)
     - Technical advice (Should I use 2SN or 4SP for this?)
-    - Requirement analysis
+    - Requirement analysis (What do I need for 350 bar at 80°C?)
+    - Safety assessments (Is this configuration safe?)
+    - Application guidance (Best practices for mobile hydraulics?)
+    - Troubleshooting (Why might a hose fail in this scenario?)
+    - Standards interpretation (What does ISO 1307 require?)
+    
+    CONTEXT LIMIT HANDLING:
+    - Automatically detects when context exceeds LLM limits (~8000 tokens)
+    - Uses intelligent chunking strategies for large datasets
+    - Prioritizes relevant data based on question keywords
+    - Falls back to temp.db queries for massive datasets
     
     Parameters:
-        task (str): Analysis task ("compatibility", "recommendation", "comparison", "advice")
-        context (dict): Context data for the task
-        question (str): Specific question to answer
+        task (str): Analysis task type (e.g., "compatibility", "recommendation", "general_query")
+        extracted_data (list): Direct context data from Extract Attributes (Direct Mode)
+        assembled_data (str): Assembly summary JSON from Assemble Product Data (Assembly Mode)
+        question (str): Any question requiring LLM analysis - not limited to specifications
+        max_context_chars (int): Maximum context size (default: 30000 chars ≈ 8000 tokens)
         
     Returns:
         tuple[bool, dict]: Success status and results dict with:
             - Analysis (str): LLM analysis result
             - Task (str): Task performed
-            - Confidence (str): Confidence level if applicable
+            - mode_used (str): "direct", "assembly", or "chunked"
+            - products_analyzed (int): Number of products analyzed
+            - context_truncated (bool): Whether context was truncated
     """
+    from db.connection import get_temp_connection
+    
     task = params.get("task", "").lower()
-    context = params.get("context", {})
+    extracted_data_param = params.get("extracted_data", [])
+    assembled_data = params.get("assembled_data", "")
     question = params.get("question", "")
+    max_context_chars = params.get("max_context_chars", 30000)  # ~8000 tokens
+    
+    # Parse extracted_data if it's a JSON string
+    if isinstance(extracted_data_param, str):
+        try:
+            extracted_data_raw = json.loads(extracted_data_param) if extracted_data_param else []
+        except json.JSONDecodeError:
+            extracted_data_raw = []
+    else:
+        extracted_data_raw = extracted_data_param
     
     if not task:
         return (False, "Missing task parameter")
@@ -3137,12 +3553,132 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
     if not question:
         return (False, "Missing question parameter")
     
-    # Validate task type
-    valid_tasks = ["compatibility", "recommendation", "comparison", "advice"]
-    if task not in valid_tasks:
-        return (False, f"Invalid task '{task}'. Must be one of: {', '.join(valid_tasks)}")
+    # NOTE: No longer validating specific task types - accept ANY analysis task
+    # This allows flexibility for various question types beyond just specifications
     
     try:
+        # DETERMINE MODE: Assembly, Direct, or Chunked
+        mode_used = "direct"
+        context_str = ""
+        products_analyzed = 0
+        context_truncated = False
+        
+        if assembled_data:
+            # ASSEMBLY MODE: Query temp.db for context
+            mode_used = "assembly"
+            debug.print_function("[func_analyze_with_llm] Using ASSEMBLY mode - querying temp.db")
+            
+            try:
+                with get_temp_connection() as conn:
+                    cursor = conn.cursor()
+                    
+                    # Query assembled product specifications
+                    cursor.execute("""
+                        SELECT product_code, family_name, specifications, page_number
+                        FROM temp_product_specs
+                        ORDER BY family_name, product_code
+                    """)
+                    rows = cursor.fetchall()
+                    
+                    if not rows:
+                        return (False, "No data found in temp.db assembly")
+                    
+                    # Build context from temp.db
+                    products_analyzed = len(rows)
+                    context_parts = [f"=== ASSEMBLED PRODUCT SPECIFICATIONS ({products_analyzed} products) ===\n"]
+                    
+                    for row in rows:
+                        context_parts.append(f"\nProduct: {row[0]} (Family: {row[1]}, Page: {row[3]})")
+                        
+                        # Parse specifications JSON
+                        specs = json.loads(row[2]) if row[2] else {}
+                        for spec_key, spec_value in specs.items():
+                            # Clean up key for display
+                            display_key = spec_key.replace("spec_", "").replace("_", " ").title()
+                            context_parts.append(f"  {display_key}: {spec_value}")
+                    
+                    context_str = "\n".join(context_parts)
+                    debug.print_function(f"Built context from temp.db: {len(context_str)} characters, {products_analyzed} products")
+                    
+            except Exception as e:
+                debug.print_error(f"Failed to query temp.db: {e}")
+                return (False, f"Assembly mode failed: {e}")
+        
+        else:
+            # DIRECT MODE: Use provided extracted_data
+            mode_used = "direct"
+            debug.print_function("[func_analyze_with_llm] Using DIRECT mode - extracted_data from Extract Attributes")
+            
+            if not extracted_data_raw or (isinstance(extracted_data_raw, (list, dict)) and not extracted_data_raw):
+                return (False, "No context provided (neither extracted_data nor assembled_data)")
+            
+            # Format context for prompt
+            if isinstance(extracted_data_raw, list):
+                # List of items - format as readable text
+                products_analyzed = len(extracted_data_raw)
+                
+                # SMART CHUNKING: Check if context will exceed limits
+                # First, try to build full context
+                context_parts = [f"=== PRODUCT DATA ({products_analyzed} items) ===\n"]
+                items_to_include = extracted_data_raw
+                
+                # Extract keywords from question for relevance filtering
+                question_lower = question.lower()
+                question_keywords = set(question_lower.split())
+                
+                # Try to prioritize items that match question keywords
+                if len(extracted_data_raw) > 20:  # Only filter if we have many items
+                    scored_items = []
+                    for item in extracted_data_raw:
+                        score = 0
+                        item_text = json.dumps(item).lower()
+                        for keyword in question_keywords:
+                            if len(keyword) > 3 and keyword in item_text:  # Skip short words
+                                score += 1
+                        scored_items.append((score, item))
+                    
+                    # Sort by relevance score (descending)
+                    scored_items.sort(key=lambda x: x[0], reverse=True)
+                    items_to_include = [item for score, item in scored_items]
+                    
+                    debug.print_function(f"[func_analyze_with_llm] Sorted {len(items_to_include)} items by relevance to question")
+                
+                # Build context with chunking strategy
+                for i, item in enumerate(items_to_include, 1):
+                    item_text = f"\n{i}. Product: {item.get('product_code', 'Unknown')}"
+                    # Show all fields (not just specs)
+                    for key, value in item.items():
+                        if key != 'product_code':  # Already shown
+                            display_key = key.replace("spec_", "").replace("_", " ").title()
+                            item_text += f"\n   {display_key}: {value}"
+                    
+                    # Check if adding this item would exceed limit
+                    test_context = "\n".join(context_parts) + item_text
+                    if len(test_context) > max_context_chars:
+                        debug.print_function(f"[func_analyze_with_llm] Context limit reached at item {i}/{products_analyzed}")
+                        context_parts.append(f"\n... and {products_analyzed - i + 1} more products (truncated due to context limits)")
+                        context_truncated = True
+                        mode_used = "chunked"
+                        break
+                    
+                    context_parts.append(item_text)
+                
+                context_str = "\n".join(context_parts)
+                
+                if context_truncated:
+                    debug.print_function(f"[func_analyze_with_llm] ⚠️ Context truncated: {len(context_str)}/{max_context_chars} chars, showing most relevant items")
+                
+            else:
+                # Dict or string - use as-is
+                products_analyzed = 1
+                context_str = json.dumps(extracted_data_raw, indent=2) if isinstance(extracted_data_raw, dict) else str(extracted_data_raw)
+                
+                # Check if single item exceeds limit
+                if len(context_str) > max_context_chars:
+                    context_str = context_str[:max_context_chars] + "\n... (truncated)"
+                    context_truncated = True
+                    mode_used = "chunked"
+        
         # Load prompts from yaml
         prompt_loader = get_prompt_loader()
         prompts = prompt_loader.get_prompt("function_execution", "analyze_with_llm")
@@ -3150,11 +3686,8 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
         system_msg = prompts["system"]
         user_template = prompts["user_template"]
         
-        # Build LLM chain
-        chain = _build_llm_processing_chain(system_msg, user_template, "basic")
-        
-        # Format context for prompt
-        context_str = json.dumps(context, indent=2) if isinstance(context, dict) else str(context)
+        # Build LLM chain with REASONING tier for better analysis
+        chain = _build_llm_processing_chain(system_msg, user_template, "reasoning")
         
         # Invoke LLM
         analysis = chain.invoke({
@@ -3163,12 +3696,22 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
             "question": question
         })
         
-        debug.print_function(f"[func_analyze_with_llm] Task: {task}, Analysis: {analysis[:200]}...")
+        # Clean up deepseek-r1 thinking tags if present
+        # deepseek-r1 outputs format: <think>reasoning...</think>actual answer
+        if "<think>" in analysis and "</think>" in analysis:
+            # Extract only the answer part (after </think>)
+            analysis = analysis.split("</think>", 1)[-1].strip()
+            debug.print_function(f"[func_analyze_with_llm] Stripped <think> tags from reasoning model output")
+        
+        debug.print_function(f"[func_analyze_with_llm] Task: {task}, Mode: {mode_used}, Products: {products_analyzed}, Analysis length: {len(analysis)} chars, Truncated: {context_truncated}")
         
         return (True, {
             "Analysis": analysis,
             "Task": task,
-            "Context": context_str[:500] if len(context_str) > 500 else context_str
+            "mode_used": mode_used,
+            "products_analyzed": products_analyzed,
+            "context_truncated": context_truncated,
+            "context_size_chars": len(context_str)
         })
         
     except Exception as e:
@@ -3274,7 +3817,7 @@ def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
             if direction == "children":
                 # Family → Products
                 query = """
-                    SELECT product_code, product_name, description
+                    SELECT product_code, specifications
                     FROM Products
                     WHERE family_id = (SELECT family_id FROM ProductFamilies WHERE family_name LIKE ?)
                     LIMIT 50
@@ -3284,9 +3827,9 @@ def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
             elif direction == "parent":
                 # Product → Family
                 query = """
-                    SELECT f.family_id, f.family_name, f.description
+                    SELECT f.id as family_id, f.family_name, f.description
                     FROM ProductFamilies f
-                    JOIN Products p ON p.family_id = f.family_id
+                    JOIN Products p ON p.family_id = f.id
                     WHERE p.product_code = ?
                 """
                 cursor.execute(query, (start_node,))
@@ -3294,7 +3837,7 @@ def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
             elif direction == "siblings":
                 # Other products in same family
                 query = """
-                    SELECT product_code, product_name, description
+                    SELECT product_code, specifications
                     FROM Products
                     WHERE family_id = (SELECT family_id FROM Products WHERE product_code = ?)
                     AND product_code != ?
@@ -3365,7 +3908,7 @@ def func_discover_items(params: dict) -> tuple[bool, dict | str]:
         sql_pattern = pattern.replace("*", "%")
         
         query = f"""
-            SELECT product_code, product_name, description, family_id
+            SELECT product_code, specifications, family_id
             FROM Products
             WHERE {field} LIKE ?
             LIMIT 50
@@ -3514,18 +4057,20 @@ FUNCTION_MAP = {
     "Find Latest Document": func_find_latest_document,
     "Generate Visual Layout": func_generate_visual_layout,
     
-    # New generic Hydroscand functions (15 total)
-    # Category 1: Search & Discovery (3)
+    # New generic Hydroscand functions (17 total)
+    # Category 1: Search & Discovery (4)
     "Search Products": func_search_products,
+    "Query Database": func_query_database,  # SQL Agent for flexible database queries
     "Get Related Items": func_get_related_items,
     "Semantic Search": func_semantic_search,
     # Category 2: Data Processing (3)
     "Filter Items": func_filter_items,
     "Aggregate Data": func_aggregate_data,
     "Transform Data": func_transform_data,
-    # Category 3: Comparison & Analysis (3)
+    # Category 3: Comparison & Analysis (4)
     "Compare Items": func_compare_items,
     "Extract Attributes": func_extract_attributes,
+    "Assemble Product Data": func_assemble_product_data,  # Universal assembler for temp.db
     "Analyze With LLM": func_analyze_with_llm,
     # Category 4: Calculations & Conversions (3)
     "Calculate": func_calculate,

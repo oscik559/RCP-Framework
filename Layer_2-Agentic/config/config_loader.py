@@ -70,7 +70,8 @@ def _resolve_path(value: str) -> str:
 def _normalize_paths(config: dict) -> dict:
     """Normalize well-known path entries to absolute paths."""
     path_keys = {
-        "log_dir",
+        # Note: log_dir is NOT included here because it's handled specially
+        # in the logger setup section to ensure it's always relative to Layer_2-Agentic
         "model_path",
         "agentic_db",
         "harvested_db",
@@ -140,7 +141,10 @@ CONFIG = load_config()
 
 # ── Centralized logger ─────────────────────────────
 
-LOG_DIR = Path(CONFIG.get("log_dir", "agentic_reasoning/logs"))
+# Resolve log directory relative to this file's location (Layer_2-Agentic/config/)
+# This ensures logs are always created in Layer_2-Agentic/config/logs/ regardless of where the script is run from
+BASE_DIR = Path(__file__).resolve().parent.parent  # Layer_2-Agentic directory
+LOG_DIR = BASE_DIR / CONFIG.get("log_dir", "config/logs")
 LOG_FILE = CONFIG.get("log_file", "project.log")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_LEVEL = CONFIG.get("log_level", "INFO").upper()
