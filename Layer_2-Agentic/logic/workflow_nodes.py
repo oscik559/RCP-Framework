@@ -640,6 +640,10 @@ def _execute_sequential_function(session_state: SessionState) -> SessionState:
             if pname == "Input" and not values:
                 final_val = query
                 debug.print_params(f"{pname} ← User query (first function)")
+            elif not values:
+                # Warning: Parameter has no value from previous functions
+                debug.print_warning(f"{pname} ← No prior outputs found, using empty string")
+                final_val = ""
             else:
                 debug.print_params(f"{pname} ← {len(values)} merged outputs")
         else:

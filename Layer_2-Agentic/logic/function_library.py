@@ -162,7 +162,8 @@ def func_table_search(params: dict) -> tuple[bool, dict | str]:
     keywords_raw = params.get("Keyword Output", "").strip()
     debug.print_function(f"[func_table_search] Received keywords: {repr(keywords_raw)}")
     if not keywords_raw:
-        return (False, "Keyword Output parameter missing")
+        logger.error(f"[func_table_search] Keyword Output parameter is empty. Available params: {list(params.keys())}")
+        return (False, "Keyword Output parameter missing or empty. This function requires keywords from a previous function like 'Extract Product Number'.")
 
     keywords = _parse_keywords_from_string(keywords_raw, "func_table_search")
     if not keywords:
@@ -2158,7 +2159,17 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
     db_path = params.get("database_path", "data/database/harvested.db")
     category = params.get("category", "").strip()
     keywords = params.get("keywords", "").strip()
-    specs = params.get("specs", {})
+    
+    # Parse specs parameter - may come as string from workflow
+    specs_raw = params.get("specs", {})
+    if isinstance(specs_raw, str):
+        try:
+            specs = json.loads(specs_raw) if specs_raw else {}
+        except json.JSONDecodeError:
+            specs = {}
+    else:
+        specs = specs_raw
+    
     limit = params.get("limit", 50)
     
     try:
@@ -2249,7 +2260,8 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
         
         return (True, {
             "Products": products,
-            "Count": len(products)
+            "Count": len(products),
+            "items": products  # For compatibility with Extract Attributes (will be JSON stringified when stored)
         })
         
     except Exception as e:
@@ -2277,8 +2289,25 @@ def func_filter_items(params: dict) -> tuple[bool, dict | str]:
             - FilteredItems (list): Items matching filter criteria
             - Count (int): Number of items after filtering
     """
-    items = params.get("items", [])
-    filters = params.get("filters", {})
+    # Parse parameters safely - they may come as strings from workflow
+    items_raw = params.get("items", [])
+    if isinstance(items_raw, str):
+        try:
+            items = json.loads(items_raw) if items_raw else []
+        except json.JSONDecodeError:
+            items = []
+    else:
+        items = items_raw
+    
+    filters_raw = params.get("filters", {})
+    if isinstance(filters_raw, str):
+        try:
+            filters = json.loads(filters_raw) if filters_raw else {}
+        except json.JSONDecodeError:
+            filters = {}
+    else:
+        filters = filters_raw
+    
     filter_mode = params.get("filter_mode", "AND").upper()
     
     if not items:
@@ -2358,8 +2387,24 @@ def func_compare_items(params: dict) -> tuple[bool, dict | str]:
             - similarities (list): Common features
             - differences (list): Key differences with significance
     """
-    items = params.get("items", [])
-    fields = params.get("fields", [])
+    # Parse parameters safely - they may come as strings from workflow
+    items_raw = params.get("items", [])
+    if isinstance(items_raw, str):
+        try:
+            items = json.loads(items_raw) if items_raw else []
+        except json.JSONDecodeError:
+            items = []
+    else:
+        items = items_raw
+    
+    fields_raw = params.get("fields", [])
+    if isinstance(fields_raw, str):
+        try:
+            fields = json.loads(fields_raw) if fields_raw else []
+        except json.JSONDecodeError:
+            fields = []
+    else:
+        fields = fields_raw
     
     if len(items) < 2:
         return (False, "Need at least 2 items to compare")
@@ -2954,9 +2999,26 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             - extraction_type (str): Method used
             - count (int): Number of items extracted
     """
-    items = params.get("items", [])
+    # Parse parameters safely - they may come as strings from workflow
+    items_raw = params.get("items", [])
+    if isinstance(items_raw, str):
+        try:
+            items = json.loads(items_raw) if items_raw else []
+        except json.JSONDecodeError:
+            items = []
+    else:
+        items = items_raw
+    
     extraction_type = params.get("extraction_type", "intelligent").lower()
-    config = params.get("config", {})
+    
+    config_raw = params.get("config", {})
+    if isinstance(config_raw, str):
+        try:
+            config = json.loads(config_raw) if config_raw else {}
+        except json.JSONDecodeError:
+            config = {}
+    else:
+        config = config_raw
     
     if not items:
         return (False, "Missing items parameter")

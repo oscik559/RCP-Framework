@@ -478,6 +478,12 @@ def process_query():
         # Create session state for the query
         session_id = generate_session_id()  # Use the same logic as main.py
 
+        # Clear any old session data to ensure fresh start
+        from logic.database_manager import DatabaseManager
+        db = DatabaseManager()
+        db.clear_session_data(session_id)
+        print(f"✅ Cleared old session data for session {session_id}")
+
         # Create progress tracker
         tracker = ProgressTracker(session_id)
         active_trackers[session_id] = tracker

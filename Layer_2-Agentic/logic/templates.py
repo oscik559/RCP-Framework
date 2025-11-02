@@ -303,7 +303,7 @@ params = {
         ("limit", "20", "integer"),
     ],
     "Semantic Search": [
-        ("query", "", "string"),
+        ("query", "Input", "string"),
         ("top_k", "10", "integer"),
         ("filters", "{}", "json"),
     ],
@@ -329,8 +329,8 @@ params = {
         ("fields", "[]", "json"),
     ],
     "Extract Attributes": [
-        ("items", "[]", "json"),
-        ("extraction_type", "regex", "string"),
+        ("items", "", "json"),
+        ("extraction_type", "intelligent", "string"),
         ("config", "{}", "json"),
     ],
     "Analyze With LLM": [
@@ -355,9 +355,10 @@ params = {
     ],
     # Category 5: Navigation & Discovery
     "Navigate Hierarchy": [
-        ("item_id", "", "string"),
+        ("start_node", "", "string"),
         ("direction", "children", "string"),
-        ("levels", "1", "integer"),
+        ("hierarchy_type", "product_family", "string"),
+        ("database_path", "data/database/harvested.db", "string"),
     ],
     "Discover Items": [
         ("pattern", "", "string"),
@@ -403,9 +404,9 @@ outputs = {
     # New Generic Hydroscand Functions
     # Category 1: Search & Discovery
     "Search Products": [
-        ("products", "[]", "json"),
-        ("count", "0", "integer"),
-        ("query_used", "", "string"),
+        ("Products", "[]", "json"),
+        ("Count", "0", "integer"),
+        ("items", "[]", "json"),  # For compatibility with downstream functions like Extract Attributes
     ],
     "Get Related Items": [
         ("related_items", "[]", "json"),

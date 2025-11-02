@@ -34,16 +34,16 @@ temp_db: ../data/database/temp.db            # Temporary data assembly and query
 
 # ─── Configuration Paths ────────────────────────────────────────────────
 # System configuration file location for dynamic reloading and validation
-config_file: agentic_reasoning/config/config.yaml
+config_file: config/config.yaml
 
 # ─── Log Paths ──────────────────────────────────────────────────────────
 # Application logging configuration for debug output and error tracking
-log_dir: agentic_reasoning/config/logs/   # Directory for log files (inside Layer_2)
+log_dir: config/logs/   # Directory for log files (inside Layer_2-Agentic)
 log_file: app.log                         # Main application log file
 log_level: info                           # Logging verbosity (debug/info/warning/error)
 
 # ─── Model Paths ───────────────────────────────────────────────────────
-model_path: agentic_reasoning/models/
+model_path: models/
 
 
 # ─── Databases ────────────────────────────────────

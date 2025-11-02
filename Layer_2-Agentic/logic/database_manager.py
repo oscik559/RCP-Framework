@@ -17,8 +17,11 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict, Any, Set
 import sqlite3
 import threading
+import logging
 
 from db.connection import get_agentic_connection
+
+logger = logging.getLogger("DATABASE_MANAGER")
 
 
 @dataclass
@@ -182,6 +185,70 @@ class DatabaseManager:
             cur.execute("DELETE FROM GoalInSession WHERE GoalID=?", (goal_id,))
 
             conn.commit()
+
+    def clear_session_data(self, session_id: int) -> None:
+        """
+        Clear all data for a specific session.
+        
+        This ensures that each new session starts with a clean slate and doesn't
+        accumulate data from previous sessions. Cleans up all related tables
+        in proper order to maintain referential integrity.
+        
+        Args:
+            session_id: The session ID to clear data for
+        """
+        with get_agentic_connection() as conn:
+            cur = conn.cursor()
+            
+            # Clean up in proper order to maintain referential integrity
+            # First, delete function outputs and parameters
+            cur.execute(
+                """DELETE FROM FunctionOutputInSession
+                   WHERE FunctionID IN (
+                       SELECT fis.FunctionID FROM FunctionInSession fis
+                       JOIN StrategyInSession sis ON fis.StrategyID = sis.StrategyID
+                       JOIN GoalInSession gis ON sis.GoalID = gis.GoalID
+                       WHERE gis.SessionID = ?
+                   )""",
+                (session_id,),
+            )
+            
+            cur.execute(
+                """DELETE FROM FunctionParametersInSession
+                   WHERE FunctionID IN (
+                       SELECT fis.FunctionID FROM FunctionInSession fis
+                       JOIN StrategyInSession sis ON fis.StrategyID = sis.StrategyID
+                       JOIN GoalInSession gis ON sis.GoalID = gis.GoalID
+                       WHERE gis.SessionID = ?
+                   )""",
+                (session_id,),
+            )
+            
+            # Then delete functions
+            cur.execute(
+                """DELETE FROM FunctionInSession
+                   WHERE StrategyID IN (
+                       SELECT sis.StrategyID FROM StrategyInSession sis
+                       JOIN GoalInSession gis ON sis.GoalID = gis.GoalID
+                       WHERE gis.SessionID = ?
+                   )""",
+                (session_id,),
+            )
+            
+            # Then delete strategies
+            cur.execute(
+                """DELETE FROM StrategyInSession
+                   WHERE GoalID IN (
+                       SELECT GoalID FROM GoalInSession WHERE SessionID = ?
+                   )""",
+                (session_id,),
+            )
+            
+            # Finally delete goals
+            cur.execute("DELETE FROM GoalInSession WHERE SessionID = ?", (session_id,))
+            
+            conn.commit()
+            logger.info(f"✅ Cleared all data for session {session_id}")
 
     def create_goal(
         self,

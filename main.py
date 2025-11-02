@@ -56,9 +56,10 @@ def main():
         # QUERY SELECTION - Configure your query here
         # =================================================================
         # Example queries (domain-specific examples should be configured per application):
-        user_query = "What products are available in the Hydroscand catalog?"
+        user_query = "What is the maximum working pressure for this hose KAPPAFLEX 1 at 100 °C?"
         
         # For testing, you can uncomment and modify these:
+        # user_query = "What products are available in the Hydroscand catalog?"
         # user_query = "Find product by code 1103-03-04"
         # user_query = "Compare different hose products"
         # user_query = "What are the specifications of product family 1103?"
@@ -79,6 +80,12 @@ def main():
         # Setup
         print("[SETUP] Initializing libraries...")
         populate_template_libraries()
+        
+        # Clear any old session data to ensure fresh start
+        print(f"[SETUP] Clearing old session data for session {init_state['sessionID']}...")
+        from logic.database_manager import DatabaseManager
+        db = DatabaseManager()
+        db.clear_session_data(init_state['sessionID'])
 
         # Execute
         print("\n[AI] Running workflow...\n")
