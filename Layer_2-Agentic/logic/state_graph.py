@@ -26,9 +26,9 @@ from pathlib import Path
 
 from langgraph.graph import END, StateGraph
 
-from agentic_reasoning.config.debug_config import debug
-from agentic_reasoning.logic.types import SessionState
-from agentic_reasoning.logic.workflow_nodes import (
+from config.debug_config import debug
+from logic.types import SessionState
+from logic.workflow_nodes import (
     node_done,
     node_function_execute,
     node_function_validate,

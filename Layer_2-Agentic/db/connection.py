@@ -5,7 +5,7 @@ import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 
-from agentic_reasoning.config.config_loader import CONFIG
+from config.config_loader import CONFIG
 
 logger = logging.getLogger("CONNECTION")
 

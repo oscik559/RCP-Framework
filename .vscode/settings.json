@@ -1,0 +1,8 @@
+{
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/Layer_2-Agentic"
+  ],
+  "python.autoComplete.extraPaths": [
+    "${workspaceFolder}/Layer_2-Agentic"
+  ]
+}

@@ -10,13 +10,13 @@ Tests the 5 priority functions:
 """
 
 import sys
-import json
+import sys
 from pathlib import Path
 
-# Add logic directory to path
-sys.path.insert(0, str(Path(__file__).parent / "logic"))
+# Add Layer_2-Agentic to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "Layer_2-Agentic"))
 
-from function_library import (
+from logic.function_library import (
     func_search_products,
     func_filter_items,
     func_compare_items,

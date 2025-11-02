@@ -33,7 +33,7 @@ Key Features:
 
 Usage:
 ======
-    from agentic_reasoning.db.schema_manager import init_db
+    from db.schema_manager import init_db
 
     # Initialize database with fresh schema
     init_db(drop_and_recreate=True)
@@ -46,7 +46,7 @@ import logging
 import sqlite3
 from pathlib import Path
 
-from agentic_reasoning.db.connection import get_agentic_connection
+from db.connection import get_agentic_connection
 
 logger = logging.getLogger("SCHEMA_MANAGER")
 

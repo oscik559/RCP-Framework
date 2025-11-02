@@ -21,8 +21,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from langchain_ollama import ChatOllama
 
-from agentic_reasoning.config.config_loader import CONFIG
-from agentic_reasoning.db.connection import get_output_connection
+from config.config_loader import CONFIG
+from db.connection import get_output_connection
 
 logger = logging.getLogger("ASYNC_HELPERS")
 

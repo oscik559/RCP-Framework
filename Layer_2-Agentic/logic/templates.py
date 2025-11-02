@@ -19,8 +19,8 @@ Strategy Function Plans:
 
 import logging
 
-from agentic_reasoning.db.connection import get_agentic_connection
-from agentic_reasoning.db.schema_manager import init_db
+from db.connection import get_agentic_connection
+from db.schema_manager import init_db
 
 logger = logging.getLogger("TEMPLATE")
 

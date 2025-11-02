@@ -47,12 +47,12 @@ import re
 import sqlite3
 from typing import Any, Dict, List, Optional
 
-from agentic_reasoning.config.debug_config import debug
-from agentic_reasoning.config.prompt_loader import get_prompt_loader
-from agentic_reasoning.logic.function_library import FUNCTION_MAP
-from agentic_reasoning.logic.llm_helpers import get_basic_llm, get_reasoning_llm
-from agentic_reasoning.logic.database_manager import DatabaseManager
-from agentic_reasoning.logic.workflow_helpers import (
+from config.debug_config import debug
+from config.prompt_loader import get_prompt_loader
+from logic.function_library import FUNCTION_MAP
+from logic.llm_helpers import get_basic_llm, get_reasoning_llm
+from logic.database_manager import DatabaseManager
+from logic.workflow_helpers import (
     collect_outputs,
     handler_from_name,
     infer_sql_type,
@@ -60,8 +60,8 @@ from agentic_reasoning.logic.workflow_helpers import (
     parse_json_response,
     safe_json_parse,
 )
-from agentic_reasoning.logic.types import SessionState
-from agentic_reasoning.logic.exceptions import (
+from logic.types import SessionState
+from logic.exceptions import (
     WorkflowError,
     StrategyError,
     FunctionError,
@@ -94,8 +94,8 @@ def _create_goal_with_llm_definition(db, session_id: int, query: str) -> int:
     Returns:
         Goal ID of the created goal
     """
-    from agentic_reasoning.config.prompt_loader import get_prompt_loader
-    from agentic_reasoning.logic.llm_helpers import get_basic_llm
+    from config.prompt_loader import get_prompt_loader
+    from logic.llm_helpers import get_basic_llm
 
     import json
     import re
@@ -105,7 +105,7 @@ def _create_goal_with_llm_definition(db, session_id: int, query: str) -> int:
     prompt = prompt_loader.format_prompt("goal_definition", query=query)
 
     try:
-        from agentic_reasoning.logic.llm_helpers import invoke_llm_with_retry
+        from logic.llm_helpers import invoke_llm_with_retry
         
         llm = get_basic_llm()
         response = invoke_llm_with_retry(
@@ -283,7 +283,7 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
             return session_state
 
     # ─── LLM Strategy Selection ─────────────────────────
-    from agentic_reasoning.config.prompt_loader import get_prompt_loader
+    from config.prompt_loader import get_prompt_loader
 
     prompt_loader = get_prompt_loader()
 
@@ -304,7 +304,7 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
 
     # Show testing configuration on first strategy selection
     if not tried_strategies:
-        from agentic_reasoning.config.strategy_testing import print_testing_status
+        from config.strategy_testing import print_testing_status
 
         print_testing_status()
 
@@ -381,7 +381,7 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
     )
 
     # Import retry helper
-    from agentic_reasoning.logic.llm_helpers import invoke_llm_with_retry
+    from logic.llm_helpers import invoke_llm_with_retry
     
     # Use retry logic for LLM invocation
     try:
@@ -1399,7 +1399,7 @@ def node_goal_validate(session_state: SessionState) -> SessionState:
             full_evidence=output_text,
         )
 
-        from agentic_reasoning.logic.llm_helpers import invoke_llm_with_retry
+        from logic.llm_helpers import invoke_llm_with_retry
         
         llm = get_reasoning_llm()
         response = invoke_llm_with_retry(

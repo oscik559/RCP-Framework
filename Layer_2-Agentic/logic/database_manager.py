@@ -18,7 +18,7 @@ from typing import List, Optional, Tuple, Dict, Any, Set
 import sqlite3
 import threading
 
-from agentic_reasoning.db.connection import get_agentic_connection
+from db.connection import get_agentic_connection
 
 
 @dataclass
@@ -991,7 +991,7 @@ class DatabaseManager:
 
     def get_available_strategies(self) -> List[str]:
         """Get all available strategy names from the library, filtered by testing configuration."""
-        from agentic_reasoning.config.strategy_testing import get_enabled_strategies
+        from config.strategy_testing import get_enabled_strategies
 
         with get_agentic_connection() as conn:
             cur = conn.cursor()

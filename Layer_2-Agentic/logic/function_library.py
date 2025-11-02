@@ -28,21 +28,21 @@ from typing import Any, Dict, Tuple
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
-from agentic_reasoning.config.config_loader import CONFIG
-from agentic_reasoning.config.debug_config import debug
-from agentic_reasoning.config.prompt_loader import get_prompt_loader
-from agentic_reasoning.db.connection import (
+from config.config_loader import CONFIG
+from config.debug_config import debug
+from config.prompt_loader import get_prompt_loader
+from db.connection import (
     get_agentic_connection,
     get_output_connection,
 )
-from agentic_reasoning.logic.llm_helpers import get_basic_llm, get_reasoning_llm
+from logic.llm_helpers import get_basic_llm, get_reasoning_llm
 
 logger = logging.getLogger("FUNCTION_LIBRARY")
 DB_PATH_OUTPUT = CONFIG["harvested_db"]
 
 # Import async helpers for performance improvements
 try:
-    from agentic_reasoning.logic.async_helpers import (
+    from logic.async_helpers import (
         run_async_table_search,
         run_async_multiple_llm_calls,
     )
@@ -84,7 +84,7 @@ def _build_llm_processing_chain(
     """
     # Create a fresh LLM instance to avoid context contamination
     if llm_type == "basic":
-        from agentic_reasoning.config.config_loader import CONFIG
+        from config.config_loader import CONFIG
         from langchain_ollama import ChatOllama
         import time
 
@@ -97,7 +97,7 @@ def _build_llm_processing_chain(
             system=None,  # Reset system context
         )
     else:
-        from agentic_reasoning.config.config_loader import CONFIG
+        from config.config_loader import CONFIG
         from langchain_ollama import ChatOllama
         import time
 
@@ -713,7 +713,7 @@ def func_table_search_on_document(params: dict) -> tuple[bool, dict | str]:
     # Try vector-enhanced search for semantic matching
     vector_results = []
     try:
-        from agentic_reasoning.logic.vector_helpers import VectorTableSearch
+        from logic.vector_helpers import VectorTableSearch
 
         vector_search = VectorTableSearch()
 
@@ -988,7 +988,7 @@ def func_filter_table_by_field(params: dict) -> tuple[bool, dict | str]:
 
 def func_assemble_table(params: dict) -> tuple[bool, dict | str]:
     """Assemble filtered table data into temporary database with dynamic schema."""
-    from agentic_reasoning.db.connection import get_temp_connection
+    from db.connection import get_temp_connection
 
     # ── Parameter validation following standard conventions ──
     filtered_data = params.get("Filtered Data", "")
@@ -1561,7 +1561,7 @@ def func_analyze_data(params: dict) -> tuple[bool, dict | str]:
         (True, {"Answer": final_response_text})
         or (False, error_message)
     """
-    from agentic_reasoning.db.connection import get_temp_connection
+    from db.connection import get_temp_connection
 
     # 1 ── validate params ---------------------------------------------------
     assembled_data = params.get("Assembled Data", "").strip()

@@ -1,178 +1,132 @@
-# Tests
+# Tests and Analysis Tools
 
-This folder contains all test scripts for the agentic reasoning framework.
+This folder contains all testing, debugging, and analysis utilities for the SAAB Agentic Reasoning System.
 
-## Test Suites
+## 📋 Test Files
 
-### FAQ Testing
-- **test_FAQ.py** - Curated test questions from actual company FAQ (30 questions)
-  - Tests with real customer questions from Chapter 1 (Hydraulic Hoses)
-  - Interactive test runner with multiple modes
-  - Categories: specification, comparison, calculation, standards, etc.
+### Core Tests
+
+- `test_function_library.py` - Unit tests for function library
+- `test_database.py` - Database functionality tests  
+- `test_workflow.py` - Workflow execution tests
+- `conftest.py` - PyTest configuration
+
+### JSON Handling Tests
+
+- `test_json_fix.py` - JSON parsing and cleaning tests
+- `test_simple_fix.py` - Simplified JSON fix validation  
+- `simple_json_fix.py` - JSON fixing utility functions
 
 ### Strategy Testing
-- **test_new_strategies.py** - Tests for newly added reasoning strategies
-- **test_strategies_with_real_questions.py** - Strategy testing with real FAQ questions
-- **test_agent_with_real_questions.py** - Full agent workflow testing
 
-### Component Testing
-- **test_location.py** - Tests for PRODUCT LOCATION strategy
-- **test_llm_functions.py** - Direct LLM function testing
+- `test_strategies.py` - Individual strategy testing
+- `test_parallel_strategy.py` - Parallel strategy validation
+- `comprehensive_parallel_testing.py` - Full parallel strategy analysis
+- `strategy_performance_analyzer.py` - Performance comparison across strategies
 
-## Running Tests
+### Integration Tests
 
-### Prerequisites
-```bash
-# Ensure you're in project root
-cd /Users/worktime/Desktop/Project_Hydroscand-Hoses
+- `test_llm_isolation.py` - LLM isolation testing
+- `parallel_strategy_analysis.py` - Parallel execution analysis
+- `parallel_strategy_success_summary.py` - Success rate summaries
 
-# Activate virtual environment
-source .venv/bin/activate
+## 🔍 Analysis Tools
 
-# Set PYTHONPATH
-export PYTHONPATH=Layer_2:$PYTHONPATH
-```
+### Database Analysis
 
-### Run All FAQ Tests
-```bash
-python tests/test_FAQ.py
-```
+- `check_db.py` - Database structure and content inspection
+- `check_db_schema.py` - Database schema validation
+- `check_query.py` - Query validation and testing
+- `check_failed_tests.py` - Failed test analysis
+- `check_test_structure.py` - Test structure validation
+- `analyze_data.py` - Data analysis and exploration
 
-### Run Location Tests
-```bash
-python tests/test_location.py
-```
+### System Analysis  
 
-### Run Strategy Tests
-```bash
-python tests/test_new_strategies.py
-```
+- `system_analysis.py` - Overall system performance analysis
+- `comprehensive_analysis.py` - Cross-component analysis
 
-### Run Layer 2 Framework Tests
+### Query Analysis
 
-#### Unit Tests
-```bash
-python tests/layer2/unit/test_database.py
-python tests/layer2/unit/test_function_library.py
-```
+- `get_failed_queries.py` - Failed query extraction and analysis
 
-#### Integration Tests
-```bash
-python tests/layer2/integration/test_workflow.py
-python tests/layer2/integration/test_strategies.py
-```
+## 📊 Results Data
 
-#### Performance Tests
-```bash
-python tests/layer2/performance/strategy_comparison_test.py
-```
+### Test Results
 
-## Test Organization
+- `failed_queries.txt` - List of failed queries for analysis
+
+## File Organization Standards
+
+# Tests Directory
+
+This directory contains all tests for the Project_Hydroscand-Hoses system.
+
+## 📁 Structure
 
 ```
 tests/
-├── README.md (this file)
-│
-├── # High-Level Tests (Root level)
-├── test_FAQ.py                              # Real FAQ questions (30 tests)
-├── test_agent_with_real_questions.py        # Full workflow tests
-├── test_llm_functions.py                    # LLM function tests
-├── test_location.py                         # Location strategy tests
-├── test_new_strategies.py                   # New strategy tests
-├── test_strategies_with_real_questions.py   # Strategy validation tests
-│
-└── layer2/                                  # Framework-Level Tests
-    ├── README.md                            # Layer 2 test documentation
-    ├── unit/                                # Unit tests
-    │   ├── test_database.py
-    │   ├── test_function_library.py
-    │   └── test_llm_isolation.py
-    ├── integration/                         # Integration tests
-    │   ├── test_workflow.py
-    │   ├── test_strategies.py
-    │   └── test_main_fix.py
-    ├── performance/                         # Performance tests
-    │   ├── strategy_comparison_test.py
-    │   ├── strategy_performance_analyzer.py
-    │   └── parallel_strategy_analysis.py
-    └── utilities/                           # Test utilities
-        ├── database_checker.py
-        ├── system_analysis.py
-        └── query_analyzer.py
+├── test_*.py              # High-level integration tests
+├── unit/                  # Unit tests for individual components
+├── integration/           # Integration tests for workflows
+├── performance/           # Performance and benchmarking tests
+└── utilities/             # Testing utilities and diagnostics
 ```
 
-## Test Coverage
+## Usage Examples
 
-### Strategies Tested
-- ✅ SIMPLE LOOKUP
-- ✅ ENHANCED LOOKUP
-- ✅ PARALLEL ENHANCED LOOKUP
-- ✅ VISUAL LAYOUT
-- ✅ PRODUCT COMPARISON
-- ✅ TECHNICAL CALCULATION
-- ✅ STANDARD COMPLIANCE
-- ✅ SMART RECOMMENDATION
-- ✅ HIERARCHICAL NAVIGATION
-- ✅ SPECIFICATION ANALYSIS
-- ✅ PRODUCT LOCATION
+## 🚀 Running Tests
 
-### Question Categories Tested
-- Specification lookups (temperature, pressure, dimensions)
-- Product comparisons (2SN vs 2SC, etc.)
-- Technical calculations (flow rate, hose sizing)
-- Standards compliance (SAE, ISO, EN, DIN)
-- Application-specific queries
-- Product selection recommendations
-- Certifications and compliance
-- Special features
-- Product location (page numbers)
-
-## Test Results
-
-Each test outputs:
-- ✅ Success/failure status
-- Strategy selected
-- Answer generated
-- Execution time
-- Error details (if any)
-
-## Adding New Tests
-
-1. Create test file: `tests/test_<feature>.py`
-2. Follow existing test structure:
-   ```python
-   import sys
-   sys.path.insert(0, 'Layer_2')
-   from agentic_reasoning.config.session_config import get_default_session_state, get_workflow_config
-   from agentic_reasoning.logic.state_graph import get_graph
-   
-   # Your test code
-   ```
-3. Update this README with test description
-4. Ensure test can run from project root
-
-## Troubleshooting
-
-### Import Errors
+### Run All Tests
 ```bash
-# Ensure PYTHONPATH is set
-export PYTHONPATH=Layer_2:$PYTHONPATH
+pytest tests/
 ```
 
-### Database Errors
+### Run Specific Categories
 ```bash
-# Verify database exists
-ls -la data/database/*.db
+# High-level integration tests
+pytest tests/test_*.py
+
+# Unit tests
+pytest tests/unit/
+
+# Integration tests
+pytest tests/integration/
+
+# Performance tests
+pytest tests/performance/
 ```
 
-### LLM Connection Issues
+### Run Individual Test Files
 ```bash
-# Check Ollama is running
-ollama list
+# System verification
+python tests/test_layer2_complete.py
+
+# Function tests
+python tests/test_new_functions.py
+
+# Ollama diagnostics
+python tests/diagnose_ollama.py
 ```
 
-## Related Documentation
+### Strategy Performance Analysis
 
-- **Function Documentation**: See `../docs/GENERIC_FUNCTIONS_SUMMARY.md`
-- **Strategy Documentation**: See `../docs/NEW_STRATEGIES_SUMMARY.md`
-- **Setup Guide**: See `../docs/SETUP.md`
+```bash
+python tests/strategy_performance_analyzer.py
+```
+
+### Database Inspection
+
+```bash
+python tests/check_db.py
+```
+
+### Debug Specific Issues
+
+```bash
+python tests/debug_lookup_analysis.py
+```
+
+All tools are designed for reuse during development and troubleshooting.
+
+

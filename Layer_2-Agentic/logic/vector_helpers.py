@@ -47,9 +47,9 @@ except (ImportError, ModuleNotFoundError):
     # Fallback to Chroma if FAISS is not available
     FAISS_AVAILABLE = False
 
-from agentic_reasoning.config.config_loader import CONFIG
-from agentic_reasoning.db.connection import get_output_connection
-from agentic_reasoning.logic.llm_helpers import get_embedding_model
+from config.config_loader import CONFIG
+from db.connection import get_output_connection
+from logic.llm_helpers import get_embedding_model
 
 logger = logging.getLogger("VECTOR_DB")
 
@@ -442,8 +442,8 @@ class EnhancedKeywordSuggester:
                 logger.info("ℹ️ Vector search not available, using LLM-only approach")
 
             # Step 2: Get LLM-based keywords (existing functionality)
-            from agentic_reasoning.logic.llm_helpers import get_basic_llm
-            from agentic_reasoning.config.prompt_loader import get_prompt_loader
+            from logic.llm_helpers import get_basic_llm
+            from config.prompt_loader import get_prompt_loader
 
             prompt_loader = get_prompt_loader()
             try:

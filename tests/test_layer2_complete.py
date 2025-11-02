@@ -14,6 +14,9 @@ Tests all components of the agentic reasoning system:
 import sys
 import os
 
+# Add Layer_2-Agentic to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
+
 def test_1_configuration():
     """Test 1: Configuration Loading"""
     print("\n" + "="*70)
@@ -21,9 +24,9 @@ def test_1_configuration():
     print("="*70)
     
     try:
-        from agentic_reasoning.config import constants
-        from agentic_reasoning.config import session_config
-        from agentic_reasoning.config import debug_config
+        from config import constants
+        from config import session_config
+        from config import debug_config
         
         print("✅ Constants loaded")
         print(f"   - DEFAULT_LLM_TIMEOUT: {constants.DEFAULT_LLM_TIMEOUT}")
@@ -53,7 +56,7 @@ def test_2_domain_config():
     
     try:
         # Test Hydroscand domain configuration
-        from agentic_reasoning.config.domain_config import (
+        from config.domain_config import (
             DOMAIN_NAME,
             DOMAIN_DESCRIPTION,
             DATABASE_PATH,
@@ -98,7 +101,7 @@ def test_3_database_schema():
     print("="*70)
     
     try:
-        from agentic_reasoning.db.schema_manager import (
+        from db.schema_manager import (
             get_schema_sql,
             get_schema_info,
             init_db
@@ -124,7 +127,7 @@ def test_3_database_schema():
             temp_db = tmp.name
         
         print(f"\n✅ Testing database initialization (temp db)...")
-        from agentic_reasoning.db.connection import get_agentic_connection
+        from db.connection import get_agentic_connection
         # init_db uses agentic.db by default, skip custom db path test
         print("   - Skipping custom db test (init_db uses agentic.db)")
         
@@ -143,7 +146,7 @@ def test_4_database_connection():
     print("="*70)
     
     try:
-        from agentic_reasoning.config.domain_config import DATABASE_PATH
+        from config.domain_config import DATABASE_PATH
         import sqlite3
         import os
         
@@ -195,14 +198,14 @@ def test_5_core_components():
     try:
         # Test templates
         print("✅ Testing templates...")
-        from agentic_reasoning.logic.templates import populate_template_libraries
+        from logic.templates import populate_template_libraries
         populate_template_libraries()
         print("   - Template libraries populated")
         
         # Test state graph
         print("\n✅ Testing state graph...")
         try:
-            from agentic_reasoning.logic.state_graph import get_graph
+            from logic.state_graph import get_graph
             graph = get_graph()
             print(f"   - Graph created: {type(graph).__name__}")
         except ImportError as ie:
@@ -213,7 +216,7 @@ def test_5_core_components():
         # Test function library (may also fail)
         print("\n✅ Testing function library...")
         try:
-            from agentic_reasoning.logic import function_library
+            from logic import function_library
             print(f"   - Function library loaded")
         except ImportError as ie:
             print(f"   ⚠️  Function library import failed: {ie}")

@@ -50,8 +50,8 @@ import json
 import re
 from typing import Any, Dict, List, Optional
 
-from agentic_reasoning.logic.database_manager import DatabaseManager
-from agentic_reasoning.config.debug_config import debug
+from logic.database_manager import DatabaseManager
+from config.debug_config import debug
 
 
 def infer_sql_type(value: str) -> str:
@@ -271,7 +271,7 @@ def handler_from_name(fname: str):
     Returns:
         Callable function from function_library
     """
-    from agentic_reasoning.logic.function_library import FUNCTION_MAP
+    from logic.function_library import FUNCTION_MAP
 
     if fname in FUNCTION_MAP:
         return FUNCTION_MAP[fname]
