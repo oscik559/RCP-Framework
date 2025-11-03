@@ -1441,63 +1441,36 @@
                     let html = `
                         <div class="status-grid">
                             <div class="status-item">
-                                <div style="font-size: 0.95rem; margin-bottom: 10px;">
-                                    <span style="font-size: 1.3rem;">📄</span> 
-                                    <strong style="font-size: 0.9rem; color: #b0b0b0;">PDF Files:</strong> 
-                                    <span style="font-size: 1.15rem; font-weight: 600; color: #e5e5e5;">${data.pdf_count}</span>
-                                    <span style="color: #8a8a8a; font-size: 0.85rem;">documents</span>
-                                </div>
-                                <div style="font-size: 0.95rem;">
-                                    <span style="font-size: 1.3rem;">🖼️</span> 
-                                    <strong style="font-size: 0.9rem; color: #b0b0b0;">PNG Pages:</strong> 
-                                    <span style="font-size: 1.15rem; font-weight: 600; color: #e5e5e5;">${data.png_count}</span>
-                                    <span style="color: #8a8a8a; font-size: 0.85rem;">pages</span>
-                                </div>
+                                <strong>� PDF Files:</strong> ${data.pdf_count} documents<br>
+                                <strong>�️ PNG Pages:</strong> ${data.png_count} pages
                             </div>
                             <div class="status-item">
-                                <div style="font-size: 0.95rem; margin-bottom: 10px;">
-                                    <span style="font-size: 1.3rem;">🎨</span> 
-                                    <strong style="font-size: 0.9rem; color: #b0b0b0;">Extracted Images:</strong> 
-                                    <span style="font-size: 1.15rem; font-weight: 600; color: #e5e5e5;">${data.image_count}</span>
-                                    <span style="color: #8a8a8a; font-size: 0.85rem;">files</span>
-                                </div>
-                                <div style="font-size: 0.95rem;">
-                                    <span style="font-size: 1.3rem;">💾</span> 
-                                    <strong style="font-size: 0.9rem; color: #b0b0b0;">Database:</strong> 
-                                    <span style="color: ${dbColor}; font-size: 1rem; font-weight: 600;">${dbStatus} ${data.database.status}</span>
-                                </div>
+                                <strong>🎨 Extracted Images:</strong> ${data.image_count} files<br>
+                                <strong>� Database:</strong> <span style="color: ${dbColor}">${dbStatus} ${data.database.status}</span>
                             </div>
                         </div>
-                        <h6 style="color: #b0b0b0; font-size: 0.9rem; font-weight: 600; margin: 24px 0 12px 0; letter-spacing: 0.05em;">
-                            <span style="font-size: 1.1rem;">📊</span> PRODUCT CATALOG DATABASE
-                        </h6>
+                        <h6>📊 Product Catalog Database:</h6>
                         <div class="pipeline-records">
                             <div class="record-item">
-                                <div class="record-name" style="font-size: 0.95rem;">
-                                    <span style="font-size: 1.1rem; margin-right: 6px;">📑</span> Categories
-                                </div>
-                                <div class="record-count" style="font-size: 1.2rem; font-weight: 700;">
-                                    ${data.database.categories}
+                                <div class="record-name">Categories</div>
+                                <div class="record-count" style="color: #3b82f6">
+                                    ${data.database.categories} categories
                                 </div>
                             </div>
                             <div class="record-item">
-                                <div class="record-name" style="font-size: 0.95rem;">
-                                    <span style="font-size: 1.1rem; margin-right: 6px;">📦</span> Product Families
-                                </div>
-                                <div class="record-count" style="font-size: 1.2rem; font-weight: 700;">
-                                    ${data.database.product_families}
+                                <div class="record-name">Product Families</div>
+                                <div class="record-count" style="color: #3b82f6">
+                                    ${data.database.product_families} families
                                 </div>
                             </div>
                             <div class="record-item">
-                                <div class="record-name" style="font-size: 0.95rem;">
-                                    <span style="font-size: 1.1rem; margin-right: 6px;">🔧</span> Products
-                                </div>
-                                <div class="record-count" style="font-size: 1.2rem; font-weight: 700;">
-                                    ${data.database.products}
+                                <div class="record-name">Products</div>
+                                <div class="record-count" style="color: #3b82f6">
+                                    ${data.database.products} products
                                 </div>
                             </div>
                         </div>
-                        <small style="color: #8a8a8a; margin-top: 16px; display: block; font-size: 0.8rem; line-height: 1.4;">
+                        <small style="color: #8a8a8a; margin-top: 12px; display: block;">
                             Status reflects Layer 1 extraction pipeline outputs and harvested database
                         </small>
                     `;

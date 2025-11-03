@@ -76,7 +76,7 @@ llms:
   # Reasoning tier: Complex analysis and strategy selection
   # Used for: Strategy planning, goal validation, complex decision making, technical analysis
   reasoning:
-    model: deepseek-r1:latest               # DeepSeek-R1 for advanced reasoning with chain-of-thought
+    model: llama3.2:latest  #deepseek-r1:latest               # DeepSeek-R1 for advanced reasoning with chain-of-thought
     temperature: 0.0                        # Deterministic for strategy selection
 
   # Multimodal tier: Image and table processing capabilities  
