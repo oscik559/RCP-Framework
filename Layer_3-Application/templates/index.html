@@ -37,18 +37,34 @@
             margin-bottom: 48px;
         }
 
+        .domain-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
         .header h1 {
             color: #ffffff;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
         }
 
         .header p {
-            color: #8a8a8a;
-            font-size: 0.95rem;
+            color: #b0b0b0;
+            font-size: 1rem;
             font-weight: 400;
+            line-height: 1.5;
         }
 
         .query-form {
@@ -472,19 +488,20 @@
         .pipeline-section {
             margin-top: 40px;
             padding: 30px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: #0f0f0f;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
         }
 
         .pipeline-section h4 {
             margin-bottom: 10px;
-            color: #333;
-            font-size: 1.4rem;
+            color: #e5e5e5;
+            font-size: 1.3rem;
+            font-weight: 600;
         }
 
         .pipeline-description {
-            color: #666;
+            color: #8a8a8a;
             margin-bottom: 20px;
             font-style: italic;
         }
@@ -496,49 +513,56 @@
         }
 
         .pipeline-btn {
-            padding: 12px 24px;
-            border: none;
+            padding: 10px 20px;
+            border: 1px solid #2a2a2a;
             border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
+            background: #1a1a1a;
+            color: #e5e5e5;
         }
 
-        .status-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
+        .status-btn:hover {
+            background: #2a2a2a;
+            border-color: #10b981;
         }
 
-        .run-btn {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
+        .run-btn:hover {
+            background: #2a2a2a;
+            border-color: #3b82f6;
         }
 
         .cancel-btn {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            color: white;
+            background: #1a1a1a;
+            border-color: #ef4444;
+            color: #ef4444;
         }
 
         .run-selected-btn {
-            background: linear-gradient(135deg, #fd7e14 0%, #e55100 100%);
+            background: #3b82f6;
+            border-color: #3b82f6;
             color: white;
         }
 
+        .run-selected-btn:hover {
+            background: #2563eb;
+        }
+
         .pipeline-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
         }
 
         .pipeline-status, .pipeline-options, .pipeline-progress {
             margin-top: 20px;
             padding: 20px;
-            background: white;
+            background: #1a1a1a;
             border-radius: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #2a2a2a;
         }
 
         .status-header, .options-header {
@@ -547,7 +571,12 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .status-header h5, .options-header h5 {
+            color: #e5e5e5;
+            font-weight: 600;
         }
 
         .close-btn {
@@ -555,7 +584,7 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #999;
+            color: #8a8a8a;
             padding: 0;
             width: 30px;
             height: 30px;
@@ -565,7 +594,7 @@
         }
 
         .close-btn:hover {
-            color: #333;
+            color: #e5e5e5;
         }
 
         .pipeline-checkboxes {
@@ -580,14 +609,15 @@
             gap: 12px;
             cursor: pointer;
             padding: 15px;
-            border: 2px solid #e9ecef;
+            border: 1px solid #2a2a2a;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            background: #0f0f0f;
         }
 
         .pipeline-checkbox:hover {
-            border-color: #667eea;
-            background-color: #f8f9fa;
+            border-color: #3b82f6;
+            background-color: #1a1a1a;
         }
 
         .pipeline-checkbox input[type="checkbox"] {
@@ -597,18 +627,18 @@
         .checkmark {
             width: 20px;
             height: 20px;
-            border: 2px solid #ddd;
+            border: 2px solid #2a2a2a;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             flex-shrink: 0;
         }
 
         .pipeline-checkbox input[type="checkbox"]:checked + .checkmark {
-            background-color: #667eea;
-            border-color: #667eea;
+            background-color: #3b82f6;
+            border-color: #3b82f6;
         }
 
         .pipeline-checkbox input[type="checkbox"]:checked + .checkmark::after {
@@ -624,11 +654,12 @@
         .checkbox-content strong {
             display: block;
             margin-bottom: 4px;
-            color: #333;
+            color: #e5e5e5;
+            font-weight: 500;
         }
 
         .checkbox-content small {
-            color: #666;
+            color: #8a8a8a;
             line-height: 1.3;
         }
 
@@ -816,8 +847,9 @@
 <body>
     <div class="container">
         <div class="header">
+            <span class="domain-badge" id="domainBadge">Loading...</span>
             <h1>AI Technical Assistant</h1>
-            <p>Query technical documentation with AI</p>
+            <p id="domainDescription">Query technical documentation with AI</p>
         </div>
 
         <form class="query-form" id="queryForm">
@@ -927,28 +959,29 @@
 
         <div class="examples">
             <h4>Examples</h4>
-            <div class="example-query" onclick="setQuery('What are the specifications for [product ID]?')">
-                What are the specifications for [product ID]?
+            <!-- Project-specific example queries -->
+            <div class="example-query" onclick="setQuery('What is the maximum working pressure for this hose KAPPAFLEX 1 at 100 °C?')">
+                What is the maximum working pressure for this hose KAPPAFLEX 1 at 100 °C?
             </div>
-            <div class="example-query" onclick="setQuery('Compare [product A] with [product B]')">
-                Compare [product A] with [product B]
+            <div class="example-query" onclick="setQuery('What temperature range is used for the EGEFLEX 1 hoses')">
+                What temperature range is used for the EGEFLEX 1 hoses
             </div>
-            <div class="example-query" onclick="setQuery('Find products in the [category] family')">
-                Find products in the [category] family
+            <div class="example-query" onclick="setQuery('What are the construction details for the ISOBAR 350 X-HP hoses (english please)')">
+                What are the construction details for the ISOBAR 350 X-HP hoses (english please)
             </div>
         </div>
 
         <!-- Data Pipeline Management Section -->
         <div class="pipeline-section" id="pipelineSection">
-            <h4>⚙️ Data Pipeline Management</h4>
-            <p class="pipeline-description">Process PDF documents to extract tables, images, text, and summaries</p>
+            <h4>⚙️ Data Extraction Pipeline</h4>
+            <p class="pipeline-description">Layer 1 extraction pipelines to process PDF catalog and populate database</p>
             
             <div class="pipeline-controls">
                 <button class="pipeline-btn status-btn" onclick="showPipelineStatus()">
-                    📊 Show Status
+                    📊 Database Status
                 </button>
                 <button class="pipeline-btn run-btn" onclick="showPipelineOptions()">
-                    🚀 Run Pipelines
+                    🚀 Run Extraction
                 </button>
             </div>
 
@@ -971,35 +1004,43 @@
                 </div>
                 <div class="pipeline-checkboxes">
                     <label class="pipeline-checkbox">
-                        <input type="checkbox" value="text-extractor" checked>
+                        <input type="checkbox" value="pdf-to-png" checked>
                         <span class="checkmark"></span>
                         <div class="checkbox-content">
-                            <strong>Text Extractor</strong>
-                            <small>Extract structured text and headings from PDFs</small>
+                            <strong>1. PDF to PNG</strong>
+                            <small>Convert PDF pages to PNG images for processing</small>
                         </div>
                     </label>
                     <label class="pipeline-checkbox">
-                        <input type="checkbox" value="table-extractor" checked>
+                        <input type="checkbox" value="detect-headers" checked>
                         <span class="checkmark"></span>
                         <div class="checkbox-content">
-                            <strong>Table Extractor</strong>
-                            <small>Extract and export tables to Excel/CSV</small>
+                            <strong>2. Detect Headers/Footers</strong>
+                            <small>Identify and mark repeating header/footer regions</small>
                         </div>
                     </label>
                     <label class="pipeline-checkbox">
-                        <input type="checkbox" value="image-extractor">
+                        <input type="checkbox" value="detect-tables" checked>
                         <span class="checkmark"></span>
                         <div class="checkbox-content">
-                            <strong>Image Extractor</strong>
-                            <small>Extract and classify images (technical diagrams, logos)</small>
+                            <strong>3. Detect Tables</strong>
+                            <small>Locate table regions and extract structured data</small>
                         </div>
                     </label>
                     <label class="pipeline-checkbox">
-                        <input type="checkbox" value="doc-summarizer">
+                        <input type="checkbox" value="extract-product" checked>
                         <span class="checkmark"></span>
                         <div class="checkbox-content">
-                            <strong>Document Summarizer</strong>
-                            <small>Generate AI summaries and extract keywords</small>
+                            <strong>4. Extract Products</strong>
+                            <small>Parse product specifications and populate harvested database</small>
+                        </div>
+                    </label>
+                    <label class="pipeline-checkbox">
+                        <input type="checkbox" value="extract-images">
+                        <span class="checkmark"></span>
+                        <div class="checkbox-content">
+                            <strong>5. Extract Images</strong>
+                            <small>Extract product images and diagrams from catalog</small>
                         </div>
                     </label>
                 </div>
@@ -1042,6 +1083,22 @@
 
         let currentSessionId = null;
         let progressInterval = null;
+
+        // Load domain information on page load
+        async function loadDomainInfo() {
+            try {
+                const response = await fetch('/api/domain');
+                const data = await response.json();
+                document.getElementById('domainBadge').textContent = data.name;
+                document.getElementById('domainDescription').textContent = data.description;
+            } catch (error) {
+                console.error('Failed to load domain info:', error);
+                document.getElementById('domainBadge').textContent = 'Technical Assistant';
+            }
+        }
+
+        // Load domain info when page loads
+        loadDomainInfo();
 
         function setQuery(query) {
             queryInput.value = query;
@@ -1370,37 +1427,44 @@
                         return;
                     }
                     
+                    const dbStatus = data.database.status === 'ready' ? '✅' : '⚠️';
+                    const dbColor = data.database.status === 'ready' ? '#28a745' : '#dc3545';
+                    
                     let html = `
                         <div class="status-grid">
                             <div class="status-item">
-                                <strong>📁 PDF Directory:</strong> ${data.pdf_directory}<br>
-                                <strong>📊 PDF Files:</strong> ${data.pdf_count} documents
+                                <strong>� PDF Files:</strong> ${data.pdf_count} documents<br>
+                                <strong>�️ PNG Pages:</strong> ${data.png_count} pages
                             </div>
                             <div class="status-item">
-                                <strong>🖼️ Extracted Images:</strong> ${data.image_count} files<br>
-                                <strong>📂 Image Directory:</strong> ${data.image_directory}
+                                <strong>🎨 Extracted Images:</strong> ${data.image_count} files<br>
+                                <strong>� Database:</strong> <span style="color: ${dbColor}">${dbStatus} ${data.database.status}</span>
                             </div>
                         </div>
-                        <h6>Pipeline Data Records:</h6>
+                        <h6>📊 Product Catalog Database:</h6>
                         <div class="pipeline-records">
-                    `;
-                    
-                    for (const [id, info] of Object.entries(data.pipelines)) {
-                        const statusColor = info.status === 'ready' ? '#28a745' : '#dc3545';
-                        html += `
                             <div class="record-item">
-                                <div class="record-name">${info.name}</div>
-                                <div class="record-count" style="color: ${statusColor}">
-                                    ${info.record_count} records
+                                <div class="record-name">Categories</div>
+                                <div class="record-count" style="color: #3b82f6">
+                                    ${data.database.categories} categories
                                 </div>
-                                <div class="record-table">${info.table}</div>
                             </div>
-                        `;
-                    }
-                    
-                    html += `
+                            <div class="record-item">
+                                <div class="record-name">Product Families</div>
+                                <div class="record-count" style="color: #3b82f6">
+                                    ${data.database.product_families} families
+                                </div>
+                            </div>
+                            <div class="record-item">
+                                <div class="record-name">Products</div>
+                                <div class="record-count" style="color: #3b82f6">
+                                    ${data.database.products} products
+                                </div>
+                            </div>
                         </div>
-                        <small>Last updated: ${new Date(data.timestamp).toLocaleString()}</small>
+                        <small style="color: #8a8a8a; margin-top: 12px; display: block;">
+                            Status reflects Layer 1 extraction pipeline outputs and harvested database
+                        </small>
                     `;
                     
                     contentDiv.innerHTML = html;

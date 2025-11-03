@@ -16,6 +16,10 @@ These are real-world questions that customers ask, testing:
 
 import sys
 import os
+import sqlite3
+import csv
+from pathlib import Path
+from datetime import datetime
 
 # Add Layer_2 to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Layer_2'))
@@ -278,6 +282,114 @@ FAQ_CHAPTER1_QUESTIONS = [
         "note": "Tests document/instruction location"
     },
 ]
+
+# Alias for external imports / clearer name for company questions
+COMPANY_FAQ_QUESTIONS = FAQ_CHAPTER1_QUESTIONS
+
+
+def _default_temp_db_path():
+    """Return default temp DB path (data/database/temp.db relative to repo root)."""
+    base = Path(__file__).resolve().parent
+    # repo root is one level up from this file
+    repo_root = base
+    # default data path
+    return repo_root.joinpath('data', 'database', 'temp.db')
+
+
+def ensure_cache_table(temp_db_path: str | Path | None = None):
+    """Ensure the question_answer_cache table exists in temp DB."""
+    if temp_db_path is None:
+        temp_db_path = _default_temp_db_path()
+    temp_db_path = str(temp_db_path)
+    os.makedirs(os.path.dirname(temp_db_path), exist_ok=True)
+    conn = sqlite3.connect(temp_db_path)
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS question_answer_cache (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                question TEXT NOT NULL,
+                answer TEXT NOT NULL,
+                strategy TEXT,
+                saved_by TEXT,
+                timestamp TEXT
+            )
+            """
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def save_answer_to_tempdb(question: str, answer: str, strategy: str | None = None, saved_by: str | None = None, temp_db_path: str | Path | None = None):
+    """Save a question+answer pair to the temp DB cache.
+
+    Returns the inserted row id.
+    """
+    if temp_db_path is None:
+        temp_db_path = _default_temp_db_path()
+    temp_db_path = str(temp_db_path)
+    ensure_cache_table(temp_db_path)
+    conn = sqlite3.connect(temp_db_path)
+    try:
+        cur = conn.cursor()
+        ts = datetime.utcnow().isoformat()
+        cur.execute(
+            "INSERT INTO question_answer_cache (question, answer, strategy, saved_by, timestamp) VALUES (?, ?, ?, ?, ?)",
+            (question, answer, strategy, saved_by, ts),
+        )
+        conn.commit()
+        return cur.lastrowid
+    finally:
+        conn.close()
+
+
+def get_cached_answers(limit: int = 100, temp_db_path: str | Path | None = None):
+    """Return recent cached Q/A rows as list of dicts."""
+    if temp_db_path is None:
+        temp_db_path = _default_temp_db_path()
+    temp_db_path = str(temp_db_path)
+    if not os.path.exists(temp_db_path):
+        return []
+    conn = sqlite3.connect(temp_db_path)
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT id, question, answer, strategy, saved_by, timestamp FROM question_answer_cache ORDER BY id DESC LIMIT ?",
+            (limit,)
+        )
+        rows = cur.fetchall()
+        results = []
+        for r in rows:
+            results.append({
+                "id": r[0],
+                "question": r[1],
+                "answer": r[2],
+                "strategy": r[3],
+                "saved_by": r[4],
+                "timestamp": r[5],
+            })
+        return results
+    finally:
+        conn.close()
+
+
+def save_answer_to_csv(question: str, answer: str, strategy: str | None = None, saved_by: str | None = None, csv_path: str | Path | None = None):
+    """Append a QA row to a CSV file. Default location: data/exports/qa_cache.csv"""
+    base = Path(__file__).resolve().parent
+    if csv_path is None:
+        csv_path = base.joinpath('data', 'exports', 'qa_cache.csv')
+    csv_path = Path(csv_path)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    ts = datetime.utcnow().isoformat()
+    exists = csv_path.exists()
+    with csv_path.open('a', newline='', encoding='utf-8') as fh:
+        writer = csv.writer(fh)
+        if not exists:
+            writer.writerow(['timestamp', 'question', 'answer', 'strategy', 'saved_by'])
+        writer.writerow([ts, question, answer, strategy or '', saved_by or ''])
+
 
 
 def print_header(title):

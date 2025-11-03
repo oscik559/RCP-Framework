@@ -3244,19 +3244,26 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
         with get_temp_connection() as conn:
             cursor = conn.cursor()
             
-            # Create temp table for product specifications
+            # CRITICAL: Clear existing data to prevent stale data pollution
+            # Drop and recreate table to ensure clean state for fresh assembly
+            debug.print_function("🧹 Clearing temp.db for fresh assembly...")
+            cursor.execute("DROP TABLE IF EXISTS temp_product_specs")
+            
+            # Create temp table for product specifications with family context
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS temp_product_specs (
+                CREATE TABLE temp_product_specs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     product_id INTEGER,
                     product_code TEXT,
                     family_id INTEGER,
                     family_name TEXT,
+                    family_construction_details TEXT,
                     page_number INTEGER,
                     specifications TEXT,
                     source_type TEXT
                 )
             """)
+            debug.print_function("✅ temp.db cleaned and ready for fresh data")
             
             # Discover all unique specification fields
             all_spec_fields = set()
@@ -3265,7 +3272,7 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
                     if key.startswith("spec_"):
                         all_spec_fields.add(key)
             
-            # Insert records
+            # Insert records with family context (already included from Extract Attributes)
             records_inserted = 0
             for item in extracted_data:
                 # Extract core fields
@@ -3275,15 +3282,19 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
                 family_name = item.get("family_name", "")
                 page_number = item.get("page_number")
                 
+                # Family construction details already extracted by Extract Attributes
+                family_construction_dict = item.get("family_construction_details", {})
+                family_construction = json.dumps(family_construction_dict) if family_construction_dict else "{}"
+                
                 # Bundle all spec fields into JSON for flexible querying
                 specs = {k: v for k, v in item.items() if k.startswith("spec_")}
                 specs_json = json.dumps(specs)
                 
                 cursor.execute("""
                     INSERT INTO temp_product_specs 
-                    (product_id, product_code, family_id, family_name, page_number, specifications, source_type)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (product_id, product_code, family_id, family_name, page_number, specs_json, source_type))
+                    (product_id, product_code, family_id, family_name, family_construction_details, page_number, specifications, source_type)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (product_id, product_code, family_id, family_name, family_construction, page_number, specs_json, source_type))
                 
                 records_inserted += 1
             
@@ -3318,18 +3329,23 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
 
 def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
     """
-    Deterministic attribute extraction from structured product data.
+    Hierarchical attribute extraction respecting database parent-child relationships.
     
-    Extracts attributes from product items using schema-aware parsing.
-    NO LLM - pure data extraction for reliability and speed.
+    Extracts attributes with proper inheritance:
+    - Category query → Extract category + all families + all products
+    - Family query → Extract family (construction, temp range) + all products
+    - Product query → Extract product + inherit family context
+    
+    This leverages the normalized database design:
+    categories → product_families → products
     
     Extraction Modes:
-    1. auto (default): Automatically parses specifications JSON and flattens all attributes
+    1. auto (default): Automatically extracts with full hierarchical context
     2. specific: Extract specific fields listed in config["fields"]
     3. filter: Extract items matching specific criteria
     
     Parameters:
-        items (list): Product items with specifications (from Search Products)
+        items (list): Product items with specifications (from Query Database)
         extraction_type (str): "auto", "specific", or "filter" (default: "auto")
         config (dict): Optional configuration
             - fields (list): Specific fields to extract in "specific" mode
@@ -3337,9 +3353,10 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
         
     Returns:
         tuple[bool, dict]: Success status and results dict with:
-            - extracted_data (list): Products with parsed specifications
+            - extracted_data (list): Products with full hierarchical context
             - count (int): Number of items extracted
             - fields_found (list): List of unique specification fields found
+            - families_included (list): List of family names with context
     """
     import json
     import re
@@ -3373,20 +3390,78 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
     
     extracted_data = []
     all_fields = set()
+    families_included = set()
+    
+    # STEP 1: Fetch family context for all products (respect DB hierarchy)
+    unique_family_ids = set()
+    for item in items:
+        if isinstance(item, dict) and item.get("family_id"):
+            unique_family_ids.add(item.get("family_id"))
+    
+    family_context_cache = {}
+    if unique_family_ids:
+        try:
+            debug.print_function(f"Fetching hierarchical context for {len(unique_family_ids)} families...")
+            with get_output_connection() as output_conn:
+                output_cursor = output_conn.cursor()
+                family_ids_str = ",".join(str(fid) for fid in unique_family_ids)
+                output_cursor.execute(f"""
+                    SELECT id, name, construction_details, applications, subtitle, description
+                    FROM product_families
+                    WHERE id IN ({family_ids_str})
+                """)
+                for row in output_cursor.fetchall():
+                    family_id = row[0]
+                    
+                    # Safely parse JSON fields
+                    try:
+                        construction_details = json.loads(row[2]) if row[2] else {}
+                    except (json.JSONDecodeError, TypeError):
+                        construction_details = {}
+                    
+                    try:
+                        applications = json.loads(row[3]) if row[3] else {}
+                    except (json.JSONDecodeError, TypeError):
+                        applications = {}
+                    
+                    family_context_cache[family_id] = {
+                        "family_name": row[1],
+                        "construction_details": construction_details,
+                        "applications": applications,
+                        "subtitle": row[4],
+                        "description": row[5]
+                    }
+            debug.print_function(f"✅ Loaded context for {len(family_context_cache)} families")
+        except Exception as e:
+            debug.print_warning(f"Could not fetch family context: {e}")
+            # Continue without family context rather than failing
     
     try:
+        # STEP 2: Extract product data with inherited family context
         for item in items:
             if not isinstance(item, dict):
                 continue
             
-            # Create extracted item with core product info
+            family_id = item.get("family_id")
+            family_context = family_context_cache.get(family_id, {})
+            
+            # Create extracted item with FULL hierarchical context
             extracted_item = {
                 "product_id": item.get("product_id"),
                 "product_code": item.get("product_code"),
-                "family_id": item.get("family_id"),
+                "family_id": family_id,
                 "family_name": item.get("family_name"),
-                "page_number": item.get("page_number")
+                "page_number": item.get("page_number"),
+                
+                # HIERARCHICAL CONTEXT: Include family-level attributes
+                "family_construction_details": family_context.get("construction_details", {}),
+                "family_applications": family_context.get("applications", {}),
+                "family_subtitle": family_context.get("subtitle"),
+                "family_description": family_context.get("description")
             }
+            
+            if family_context:
+                families_included.add(item.get("family_name"))
             
             # Parse specifications JSON if present
             specs_raw = item.get("specifications", "{}")
@@ -3398,7 +3473,7 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             else:
                 specs = specs_raw if isinstance(specs_raw, dict) else {}
             
-            # Mode 1: AUTO - Extract all specification fields
+            # Mode 1: AUTO - Extract all specification fields with family context
             if extraction_type == "auto":
                 # Flatten all specification fields into the extracted item
                 for spec_key, spec_value in specs.items():
@@ -3471,18 +3546,114 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
                         all_fields.add(key)
                     extracted_data.append(extracted_item)
         
-        debug.print_function(f"Extracted {len(extracted_data)} items with {len(all_fields)} unique fields")
+        debug.print_function(f"Extracted {len(extracted_data)} items with {len(all_fields)} unique fields from {len(families_included)} families")
         
         return (True, {
             "extracted_data": extracted_data,
+            "extraction_type": extraction_type,
             "count": len(extracted_data),
             "fields_found": sorted(list(all_fields)),
-            "extraction_mode": extraction_type
+            "families_included": sorted(list(families_included)),
+            "extraction_mode": extraction_type  # Keep for backward compatibility
         })
         
     except Exception as e:
         debug.print_error(f"Extraction error: {e}")
         return (False, f"Extraction error: {str(e)}")
+
+
+def _filter_assembled_data(question: str, max_products: int = 50) -> tuple[list, int]:
+    """
+    Helper function: Filter relevant data from temp.db to solve context limit issue.
+    
+    CONTEXT LIMIT SOLUTION:
+    Instead of loading ALL assembled data into LLM context (which can exceed 30K chars),
+    this helper intelligently filters data to only include relevant products:
+    1. Extracts keywords from the question
+    2. Queries temp.db with WHERE filters for relevant products
+    3. Returns small subset (max 50 products) for main LLM analysis
+    
+    This helper does NOT answer the question - it only filters/prepares the data.
+    The main analysis function receives the filtered data and provides the answer.
+    
+    Args:
+        question: User question to extract keywords from
+        max_products: Maximum number of products to return (default 50)
+        
+    Returns:
+        tuple: (filtered_products_list, total_products_in_db)
+    """
+    try:
+        from db.connection import get_temp_connection
+        
+        debug.print_function(f"🔍 Filtering assembled data for: {question[:50]}...")
+        
+        with get_temp_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Get total count
+            cursor.execute("SELECT COUNT(*) FROM temp_product_specs")
+            total_in_db = cursor.fetchone()[0]
+            
+            # Extract keywords from question for smart filtering
+            import re
+            # Remove common words
+            stopwords = {'what', 'is', 'the', 'for', 'this', 'at', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'with'}
+            words = re.findall(r'\b[a-zA-Z0-9]+\b', question.lower())
+            keywords = [w for w in words if len(w) > 2 and w not in stopwords]
+            
+            debug.print_function(f"� Extracted keywords: {keywords}")
+            
+            # Build smart query with keyword filtering
+            if keywords:
+                # Try to match keywords in family_name or product_code
+                conditions = []
+                for kw in keywords[:5]:  # Limit to first 5 keywords
+                    conditions.append(f"UPPER(family_name) LIKE '%{kw.upper()}%'")
+                    conditions.append(f"UPPER(product_code) LIKE '%{kw.upper()}%'")
+                
+                where_clause = " OR ".join(conditions)
+                query = f"""
+                    SELECT product_code, family_name, family_construction_details, specifications, page_number
+                    FROM temp_product_specs
+                    WHERE {where_clause}
+                    LIMIT {max_products}
+                """
+            else:
+                # No clear keywords - return first N products
+                query = f"""
+                    SELECT product_code, family_name, family_construction_details, specifications, page_number
+                    FROM temp_product_specs
+                    LIMIT {max_products}
+                """
+            
+            debug.print_function(f"Executing filter query...")
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        
+        debug.print_function(f"✅ Filtered: {len(rows)} products from {total_in_db} total")
+        
+        # Convert rows to structured data
+        filtered_products = []
+        for row in rows:
+            product = {
+                'product_code': row[0],
+                'family_name': row[1],
+                'family_construction': json.loads(row[2]) if row[2] else {},
+                'specifications': json.loads(row[3]) if row[3] else {},
+                'page_number': row[4]
+            }
+            filtered_products.append(product)
+        
+        debug.print_function(f"✅ Filtered {len(filtered_products)} products from {total_in_db} total")
+        
+        return (filtered_products, total_in_db)
+        
+    except Exception as e:
+        import traceback
+        debug.print_error(f"Error filtering assembled data: {e}")
+        debug.print_error(f"Traceback: {traceback.format_exc()}")
+        raise
 
 
 def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
@@ -3534,7 +3705,8 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
     
     task = params.get("task", "").lower()
     extracted_data_param = params.get("extracted_data", [])
-    assembled_data = params.get("assembled_data", "")
+    # Try both parameter name formats for backwards compatibility
+    assembled_data = params.get("Assembled Data", params.get("assembled_data", ""))
     question = params.get("question", "")
     max_context_chars = params.get("max_context_chars", 30000)  # ~8000 tokens
     
@@ -3564,41 +3736,111 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
         context_truncated = False
         
         if assembled_data:
-            # ASSEMBLY MODE: Query temp.db for context
-            mode_used = "assembly"
-            debug.print_function("[func_analyze_with_llm] Using ASSEMBLY mode - querying temp.db")
+            # ASSEMBLY MODE: Use SQL Agent to FILTER data, then LLM analyzes
+            # SQL Agent filters relevant products from temp.db (solves context limits)
+            # Main LLM receives filtered data and provides the analysis
+            mode_used = "assembly_sql_agent"
+            debug.print_function("[func_analyze_with_llm] Using ASSEMBLY SQL AGENT mode - filtering data from temp.db")
             
             try:
+                # Step 1: Filter data intelligently (solves context limit)
+                filtered_products, total_in_db = _filter_assembled_data(question, max_products=50)
+                products_analyzed = len(filtered_products)
+                
+                # Step 2: Format filtered data into context (should be small now)
+                context_parts = [f"=== FILTERED PRODUCT DATA ({products_analyzed} of {total_in_db} products) ===\n"]
+                
+                # Group by family to show construction details once per family
+                families_shown = set()
+                
+                for product in filtered_products:
+                    family_name = product['family_name']
+                    
+                    # Show family construction details (once per family)
+                    if family_name and family_name not in families_shown:
+                        families_shown.add(family_name)
+                        context_parts.append(f"\n=== {family_name} Family Details ===")
+                        family_construction = product.get('family_construction', {})
+                        if family_construction:
+                            for key, value in family_construction.items():
+                                context_parts.append(f"  {key}: {value}")
+                        context_parts.append("")  # Blank line
+                    
+                    # Show individual product
+                    context_parts.append(f"\nProduct: {product['product_code']} (Family: {family_name}, Page: {product['page_number']})")
+                    specs = product['specifications']
+                    for spec_key, spec_value in specs.items():
+                        display_key = spec_key.replace("spec_", "").replace("_", " ").title()
+                        context_parts.append(f"  {display_key}: {spec_value}")
+                
+                context_str = "\n".join(context_parts)
+                
+                # Check if still too large (shouldn't happen with filtered data)
+                if len(context_str) > max_context_chars:
+                    debug.print_warning(f"Filtered data still large ({len(context_str)} chars), truncating...")
+                    context_str = context_str[:max_context_chars] + "\n... (truncated)"
+                    context_truncated = True
+                
+                debug.print_function(f"📦 Filtered context: {len(context_str)} chars, {products_analyzed} products")
+                # Successfully filtered - will continue to Step 3 (LLM analysis) after exception handlers
+                    
+            except (ImportError, AttributeError) as e:
+                debug.print_warning(f"LangChain SQL Agent not available: {e}")
+                debug.print_warning("SQL Agent filtering failed, but continuing with fallback filter...")
+                
+                # Don't fail - just use the filtered data we got from _filter_assembled_data
+                # The helper function already did keyword-based filtering
+                # Continue to Step 3 below
+                    
+            except Exception as e:
+                debug.print_warning(f"LangChain SQL Agent not available: {e}")
+                debug.print_warning("Falling back to direct query mode...")
+                
+                # FALLBACK: Traditional query-all approach
                 with get_temp_connection() as conn:
                     cursor = conn.cursor()
                     
-                    # Query assembled product specifications
                     cursor.execute("""
                         SELECT product_code, family_name, specifications, page_number
                         FROM temp_product_specs
                         ORDER BY family_name, product_code
+                        LIMIT 100
                     """)
                     rows = cursor.fetchall()
                     
                     if not rows:
                         return (False, "No data found in temp.db assembly")
                     
-                    # Build context from temp.db
                     products_analyzed = len(rows)
                     context_parts = [f"=== ASSEMBLED PRODUCT SPECIFICATIONS ({products_analyzed} products) ===\n"]
                     
                     for row in rows:
                         context_parts.append(f"\nProduct: {row[0]} (Family: {row[1]}, Page: {row[3]})")
-                        
-                        # Parse specifications JSON
                         specs = json.loads(row[2]) if row[2] else {}
                         for spec_key, spec_value in specs.items():
-                            # Clean up key for display
                             display_key = spec_key.replace("spec_", "").replace("_", " ").title()
                             context_parts.append(f"  {display_key}: {spec_value}")
                     
                     context_str = "\n".join(context_parts)
-                    debug.print_function(f"Built context from temp.db: {len(context_str)} characters, {products_analyzed} products")
+                    
+                    # Check context limit even in fallback
+                    if len(context_str) > max_context_chars:
+                        context_str = context_str[:max_context_chars] + "\n... (truncated due to context limits)"
+                        context_truncated = True
+                        mode_used = "assembly_fallback_truncated"
+                    else:
+                        mode_used = "assembly_fallback"
+                    
+                    # Now use traditional LLM analysis on the context
+                    prompt_loader = get_prompt_loader()
+                    prompts = prompt_loader.get_prompt("function_execution", "analyze_with_llm")
+                    chain = _build_llm_processing_chain(prompts["system"], prompts["user_template"], "reasoning")
+                    
+                    analysis = chain.invoke({
+                        "task": task.upper(),
+                        "context": context_str,
+                        "question": question
+                    })
                     
             except Exception as e:
                 debug.print_error(f"Failed to query temp.db: {e}")
@@ -3645,10 +3887,12 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
                 
                 # Build context with chunking strategy
                 for i, item in enumerate(items_to_include, 1):
-                    item_text = f"\n{i}. Product: {item.get('product_code', 'Unknown')}"
+                    product_code = item.get('product_code', 'Unknown')
+                    page_num = item.get('page_number', 'N/A')
+                    item_text = f"\n{i}. Product: {product_code} (Page {page_num})"
                     # Show all fields (not just specs)
                     for key, value in item.items():
-                        if key != 'product_code':  # Already shown
+                        if key not in ['product_code', 'page_number']:  # Already shown
                             display_key = key.replace("spec_", "").replace("_", " ").title()
                             item_text += f"\n   {display_key}: {value}"
                     
@@ -3679,6 +3923,7 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
                     context_truncated = True
                     mode_used = "chunked"
         
+        # Step 3: Invoke main LLM to analyze the context (filtered or direct)
         # Load prompts from yaml
         prompt_loader = get_prompt_loader()
         prompts = prompt_loader.get_prompt("function_execution", "analyze_with_llm")
@@ -3688,6 +3933,8 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
         
         # Build LLM chain with REASONING tier for better analysis
         chain = _build_llm_processing_chain(system_msg, user_template, "reasoning")
+        
+        debug.print_function(f"💭 Main LLM analyzing {len(context_str)} chars of context...")
         
         # Invoke LLM
         analysis = chain.invoke({
@@ -3708,6 +3955,7 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
         return (True, {
             "Analysis": analysis,
             "Task": task,
+            "Context": f"{mode_used} mode: {products_analyzed} products analyzed, {len(context_str)} chars context{', truncated' if context_truncated else ''}",
             "mode_used": mode_used,
             "products_analyzed": products_analyzed,
             "context_truncated": context_truncated,

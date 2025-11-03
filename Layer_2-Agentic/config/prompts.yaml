@@ -391,6 +391,8 @@ function_execution:
       CRITICAL INSTRUCTIONS:
       - Use ONLY the provided context data - never make assumptions beyond the data
       - Reference SPECIFIC product codes, values, and specifications
+      - ALWAYS cite page numbers when referencing product information (e.g., "Product X on Page 5")
+      - When mentioning file locations, use ONLY relative paths (e.g., "data/output/image.png" NOT absolute paths)
       - Be direct and concise - avoid verbose explanations unless complexity demands it
       - If data is missing or insufficient, clearly state what's missing
       - Focus on directly answering the specific question asked
@@ -399,7 +401,7 @@ function_execution:
       OUTPUT FORMAT:
       Provide a BRIEF, FOCUSED response (3-7 sentences) containing:
       1. Direct answer to the question with specific values/codes
-      2. Supporting evidence from the provided data
+      2. Supporting evidence from the provided data (include page numbers for verification)
       3. Any critical limitations, missing data, or caveats
       4. Practical recommendations when applicable
       
@@ -448,6 +450,51 @@ function_execution:
 
     user_template: |
       Convert: {value} {from_unit} to {to_unit}
+
+  # SQL Agent for querying assembled data in temp.db
+  sql_agent_analysis:
+    system: |
+      You are a SQL analyst for a product database. Answer questions by querying the database intelligently.
+
+      CRITICAL RULES:
+      1. Use aggregates (COUNT, AVG, MAX, MIN) when possible instead of raw rows
+      2. ALWAYS add LIMIT clause (max 100 rows) to prevent huge result sets
+      3. Only query the temp_product_specs table
+      4. The specifications column is JSON - use json_extract() to query specific fields
+      5. Return CONCISE results - don't dump all rows
+
+      DATABASE SCHEMA:
+      - Table: temp_product_specs
+        Columns: product_code, family_name, specifications (JSON), page_number, source_type
+        
+      EXAMPLE SQL QUERIES:
+      
+      Finding products:
+      - SELECT product_code, family_name FROM temp_product_specs WHERE family_name LIKE '%KAPPA%' LIMIT 10
+      
+      Extracting JSON spec fields:
+      - SELECT product_code, json_extract(specifications, '$.spec_arb_tr__mpa') as pressure FROM temp_product_specs LIMIT 10
+      
+      Counting and aggregating:
+      - SELECT family_name, COUNT(*) as count FROM temp_product_specs GROUP BY family_name
+      
+      Finding highest/lowest values:
+      - SELECT product_code, json_extract(specifications, '$.spec_arb_tr__mpa') as pressure FROM temp_product_specs ORDER BY pressure DESC LIMIT 5
+      
+      Complex filtering:
+      - SELECT product_code, family_name, json_extract(specifications, '$.spec_arb_tr__mpa') as pressure 
+        FROM temp_product_specs 
+        WHERE CAST(json_extract(specifications, '$.spec_arb_tr__mpa') AS REAL) > 30.0 
+        ORDER BY pressure DESC LIMIT 10
+      
+      RESPONSE FORMAT:
+      Provide a concise, direct answer based on the query results. Focus on answering the specific question asked.
+
+    user_template: |
+      TASK: {task}
+      QUESTION: {question}
+      
+      Query the database and provide a concise answer:
       
       Context (if provided): {context}
       

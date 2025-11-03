@@ -337,16 +337,43 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
                 strategy_outputs = db.get_strategy_outputs(strategy_id)
                 if strategy_outputs:
                     # Look for the best analysis result first
+                    # Priority order: Analysis, Analyze Output, Answer, then any other outputs
                     analysis_result = None
+                    
+                    # First pass: Look for Analysis (from func_analyze_with_llm)
                     for name, value in strategy_outputs:
-                        if name == "Analyze Output":
+                        if name == "Analysis":
                             analysis_result = value
                             break
+                    
+                    # Second pass: Look for legacy Analyze Output or Answer
+                    if not analysis_result:
+                        for name, value in strategy_outputs:
+                            if name in ("Analyze Output", "Answer", "answer"):
+                                analysis_result = value
+                                break
+                    
+                    # Third pass: If still no analysis, filter out intermediate data outputs
+                    if not analysis_result:
+                        # Exclude raw data outputs (assembled data, extracted data, results lists)
+                        filtered_outputs = []
+                        for name, value in strategy_outputs:
+                            # Skip raw data outputs
+                            if name.lower() in ("results", "assembled data", "extracted_data", "items", "records"):
+                                continue
+                            # Skip outputs that look like raw JSON lists
+                            if isinstance(value, str) and value.strip().startswith('[{"'):
+                                continue
+                            filtered_outputs.append((name, value))
+                        
+                        if filtered_outputs:
+                            # Use the first meaningful output
+                            analysis_result = filtered_outputs[0][1]
 
                     if analysis_result:
                         session_state["finalAnswer"] = analysis_result
                     else:
-                        # Fallback to combined output if no analysis found
+                        # Last resort: combine all outputs
                         output_text = "; ".join(
                             [f"{name}: {value}" for name, value in strategy_outputs]
                         )

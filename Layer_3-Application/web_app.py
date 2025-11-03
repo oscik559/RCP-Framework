@@ -25,6 +25,7 @@ from logic.types import SessionState
 from config.debug_config import debug
 from config.session_config import generate_session_id
 from config.config_loader import CONFIG
+from config.domain_config import DOMAIN_NAME, DOMAIN_DESCRIPTION
 from db.connection import (
     get_agentic_connection,
     get_output_connection,
@@ -259,7 +260,18 @@ def initialize_workflow():
 @app.route("/")
 def index():
     """Main page with query input form"""
-    return render_template("index.html")
+    return render_template("index.html", 
+                         domain_name=DOMAIN_NAME,
+                         domain_description=DOMAIN_DESCRIPTION)
+
+
+@app.route("/api/domain")
+def get_domain_info():
+    """Get domain configuration information"""
+    return jsonify({
+        "name": DOMAIN_NAME,
+        "description": DOMAIN_DESCRIPTION
+    })
 
 
 @app.route("/progress/<int:session_id>")
@@ -620,22 +632,20 @@ pipeline_trackers = {}
 def get_pipeline_status():
     """Get status of all pipelines and data inventory"""
     try:
-        from config.domain_config import DOMAIN_TABLES, get_table_name
-        
-        # Get domain-specific table names
-        SUMMARY_TABLE = get_table_name("summarized_doc")
-        SAVED_IMAGES = get_table_name("saved_images")
-        EXTRACTED_TABLES = get_table_name("extracted_tables")
-        STORED_TEXTS = get_table_name("stored_texts")
-
         # Check PDF directory
-        pdf_dir = CONFIG["pdf_dir"]
+        pdf_dir = CONFIG.get("pdf_dir", "PDF")
         pdf_files = []
         if os.path.exists(pdf_dir):
             pdf_files = [f for f in os.listdir(pdf_dir) if f.lower().endswith(".pdf")]
 
+        # Check PNG pages directory
+        png_dir = "data/png_pages"
+        png_count = 0
+        if os.path.exists(png_dir):
+            png_count = len([f for f in os.listdir(png_dir) if f.lower().endswith(".png")])
+
         # Check extracted images
-        image_dir = CONFIG["extracted_image_dir"]
+        image_dir = "data/output"
         image_count = 0
         if os.path.exists(image_dir):
             for root, dirs, files in os.walk(image_dir):
@@ -643,49 +653,51 @@ def get_pipeline_status():
                     [f for f in files if f.lower().endswith((".png", ".jpg", ".jpeg"))]
                 )
 
-        # Check database tables
-        pipeline_status = {}
-        with get_output_connection() as conn:
-            pipelines = {
-                "doc-summarizer": {
-                    "name": "Document Summarizer",
-                    "table": SUMMARY_TABLE,
-                },
-                "image-extractor": {"name": "Image Extractor", "table": SAVED_IMAGES},
-                "table-extractor": {
-                    "name": "Table Extractor",
-                    "table": EXTRACTED_TABLES,
-                },
-                "text-extractor": {"name": "Text Extractor", "table": STORED_TEXTS},
+        # Query harvested database for actual product data
+        harvested_db_path = CONFIG.get("harvested_db", "data/database/harvested.db")
+        database_status = {}
+        
+        try:
+            import sqlite3
+            with sqlite3.connect(harvested_db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Get categories count
+                cursor.execute("SELECT COUNT(*) FROM categories")
+                categories_count = cursor.fetchone()[0]
+                
+                # Get product families count
+                cursor.execute("SELECT COUNT(*) FROM product_families")
+                families_count = cursor.fetchone()[0]
+                
+                # Get products count
+                cursor.execute("SELECT COUNT(*) FROM products")
+                products_count = cursor.fetchone()[0]
+                
+                database_status = {
+                    "categories": categories_count,
+                    "product_families": families_count,
+                    "products": products_count,
+                    "status": "ready"
+                }
+        except Exception as e:
+            database_status = {
+                "categories": 0,
+                "product_families": 0,
+                "products": 0,
+                "status": "error",
+                "error": str(e)
             }
-
-            for pipeline_id, info in pipelines.items():
-                try:
-                    cursor = conn.cursor()
-                    cursor.execute(f"SELECT COUNT(*) FROM {info['table']}")
-                    count = cursor.fetchone()[0]
-                    pipeline_status[pipeline_id] = {
-                        "name": info["name"],
-                        "table": info["table"],
-                        "record_count": count,
-                        "status": "ready",
-                    }
-                except Exception as e:
-                    pipeline_status[pipeline_id] = {
-                        "name": info["name"],
-                        "table": info["table"],
-                        "record_count": 0,
-                        "status": "error",
-                        "error": str(e),
-                    }
 
         return jsonify(
             {
                 "pdf_directory": pdf_dir,
                 "pdf_count": len(pdf_files),
+                "png_directory": png_dir,
+                "png_count": png_count,
                 "image_directory": image_dir,
                 "image_count": image_count,
-                "pipelines": pipeline_status,
+                "database": database_status,
                 "timestamp": datetime.now().isoformat(),
             }
         )
@@ -711,31 +723,53 @@ def run_pipeline():
 
         # Start pipeline execution in background thread
         def run_pipelines():
-            import importlib
-
-            pipeline_modules = {
-                "doc-summarizer": "agentic_reasoning.pipelines.doc_summarizer",
-                "image-extractor": "agentic_reasoning.pipelines.image_extractor",
-                "table-extractor": "agentic_reasoning.pipelines.table_extractor",
-                "text-extractor": "agentic_reasoning.pipelines.text_extractor",
+            import subprocess
+            
+            # Map pipeline IDs to Layer 1 extraction scripts
+            layer1_scripts = {
+                "pdf-to-png": "../Layer_1-Extraction/1_pdf_to_png.py",
+                "detect-headers": "../Layer_1-Extraction/2_detect_headers_footers.py",
+                "detect-tables": "../Layer_1-Extraction/3_detect_tables.py",
+                "extract-product": "../Layer_1-Extraction/4_extract_product.py",
+                "extract-images": "../Layer_1-Extraction/5_extract_images.py",
             }
+            
+            python_path = sys.executable  # Use same Python interpreter
 
             for i, pipeline_id in enumerate(pipeline_ids):
-                if pipeline_id in pipeline_modules:
+                if pipeline_id in layer1_scripts:
+                    script_path = os.path.join(os.path.dirname(__file__), layer1_scripts[pipeline_id])
                     tracker.update_progress(
                         i, pipeline_id, "running", f"Running {pipeline_id}..."
                     )
 
                     try:
-                        # Import and run the pipeline module
-                        module = importlib.import_module(pipeline_modules[pipeline_id])
-                        tracker.update_progress(
-                            i,
-                            pipeline_id,
-                            "completed",
-                            f"{pipeline_id} completed successfully",
+                        # Run the Layer 1 extraction script
+                        result = subprocess.run(
+                            [python_path, script_path],
+                            capture_output=True,
+                            text=True,
+                            timeout=600  # 10 minute timeout
                         )
+                        
+                        if result.returncode == 0:
+                            tracker.update_progress(
+                                i,
+                                pipeline_id,
+                                "completed",
+                                f"{pipeline_id} completed successfully",
+                            )
+                        else:
+                            error_msg = result.stderr[:200] if result.stderr else "Unknown error"
+                            tracker.update_progress(
+                                i, pipeline_id, "failed", f"{pipeline_id} failed: {error_msg}"
+                            )
+                            print(f"Pipeline {pipeline_id} failed: {result.stderr}")
 
+                    except subprocess.TimeoutExpired:
+                        tracker.update_progress(
+                            i, pipeline_id, "failed", f"{pipeline_id} timed out after 10 minutes"
+                        )
                     except Exception as e:
                         tracker.update_progress(
                             i, pipeline_id, "failed", f"{pipeline_id} failed: {str(e)}"

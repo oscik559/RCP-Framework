@@ -372,7 +372,7 @@ params = {
     "Analyze With LLM": [
         ("task", "advice", "string"),  # Technical advice/analysis
         ("extracted_data", "", "json"),  # Auto-collect from Extract Attributes (direct mode)
-        ("assembled_data", "", "json"),  # Auto-collect from Assemble Product Data (assembly mode)
+        ("Assembled Data", "", "json"),  # Auto-collect from Assemble Product Data (assembly mode) - MUST match output key exactly
         ("question", "Input", "string"),  # Use user's original query
     ],
     # Category 4: Calculations & Conversions

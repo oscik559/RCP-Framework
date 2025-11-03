@@ -56,8 +56,8 @@ STRATEGY_TEST_CONFIG = {
     "SMART RECOMMENDATION": False,  # Provide product recommendations based on requirements
     "HIERARCHICAL NAVIGATION": False,  # Navigate product hierarchy and categories
     "SPECIFICATION ANALYSIS": False,  # Analyze and extract detailed specifications (complex multi-step)
-    "DIRECT SPECIFICATION LOOKUP": True,  # ← TESTING THIS - Fast path for small datasets (direct mode)
-    "ASSEMBLED SPECIFICATION LOOKUP": False,  # Scalable path for large datasets (assembly mode with temp.db)
+    "DIRECT SPECIFICATION LOOKUP": False,  # Fast path for small datasets (direct mode)
+    "ASSEMBLED SPECIFICATION LOOKUP": True,  # ← TESTING THIS - Scalable path for large datasets (assembly mode with temp.db)
     "PRODUCT LOCATION": False,  # Locate products in catalogue (page numbers, chapters)
 }
 
