@@ -109,6 +109,13 @@ strategies = [
         "Locate product in catalogue: search products → get metadata → extract location information (page number, chapter, category).",
         "Search Products, Get Metadata, Transform Data",
     ),
+    # ── New Modular Strategic Patterns ──────────────────────────────────────
+    (
+        "APPLICATION SEARCH PATTERN",  # Semantic application-based search
+        "application_search",
+        "Semantic search for product applications: find products by use case, environment, industry, or compatibility requirements using intelligent semantic matching.",
+        "Semantic Search, Extract Attributes, Search Products, Filter Items, Aggregate Data, Analyze With LLM",
+    ),
 ]
 
 # ── Function Templates ──────────────────────────────────────────────────────

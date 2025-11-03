@@ -181,7 +181,7 @@ def get_embedding_model():
     Returns:
         OllamaEmbeddings: Embedding model instance for creating document embeddings
     """
-    model_name = "nomic-embed-text:latest"
+    model_name = "embeddinggemma:latest"
     logger.info(f"Using embedding model: {model_name}")
     return OllamaEmbeddings(model=model_name)
 
