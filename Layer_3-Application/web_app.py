@@ -9,12 +9,13 @@ and receive answers from the multi-agent LLM system.
 import os
 import sys
 import logging
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 import traceback
 import threading
 import time
 import json
+from typing import Optional, Dict, Any, List
 
 # Add Layer_2-Agentic to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
@@ -40,7 +41,7 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.WARNING)  # Only show warnings and errors, not INFO requests
 
 # Global workflow instance
-workflow = None
+workflow: Optional[Any] = None
 
 
 class ProgressTracker:
@@ -89,7 +90,7 @@ class ProgressTracker:
         ]
         self.current_functions = []
         self.progress_log = []
-        self.final_result = None
+        self.final_result: Optional[Dict[str, Any]] = None
         self.executed_functions = []
         self.step_states = {
             step["id"]: "pending" for step in self.steps
@@ -463,7 +464,9 @@ def execute_workflow_with_progress(init_state, tracker):
         print(f"✅ Progress monitoring thread started")
 
         # Execute the actual workflow
-        result = workflow.invoke(init_state)
+        if workflow is None:
+            raise RuntimeError("Workflow is not initialized")
+        result = workflow.invoke(init_state)  # type: ignore
 
         # Give monitoring a moment to catch final updates
         time.sleep(0.5)
@@ -595,9 +598,10 @@ def process_query():
                 cleanup_thread.start()
 
             except Exception as e:
+                import traceback as tb
                 error_msg = f"Error processing query: {str(e)}"
                 print(f"❌ {error_msg}")
-                traceback.print_exc()
+                tb.print_exc()
                 tracker.emit_progress("error", "error", error_msg)
 
                 # Clean up tracker

@@ -39,7 +39,7 @@ from langchain_ollama import ChatOllama, OllamaEmbeddings  # type: ignore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings  # type: ignore
 
 
-def get_ollama_model(model_name: str, temperature: float = 0.0, timeout: float = 60.0):
+def get_ollama_model(model_name: str, temperature: float = 0.0):
     """
     Create an Ollama chat model instance with specified parameters.
     
@@ -47,20 +47,19 @@ def get_ollama_model(model_name: str, temperature: float = 0.0, timeout: float =
     settings. Used by other helper functions and workflow nodes.
 
     Args:
-        model_name (str): Name of the Ollama model to use (e.g., "llama3.2:latest")
+        model_name (str): Name of the Ollama model to use (e.g., "gemma3:latest")
         temperature (float): Temperature setting for response randomness (0.0-1.0)
                            Lower values = more deterministic, higher = more creative
-        timeout (float): Request timeout in seconds (default: 60.0)
 
     Returns:
         ChatOllama: Configured Ollama chat model instance ready for use
     """
-    logger.info(f"Using Ollama model: {model_name} (timeout={timeout}s)")
+    logger.info(f"Using Ollama model: {model_name}")
     return ChatOllama(
         model=model_name, 
         temperature=temperature,
-        timeout=timeout,
-        num_ctx=4096,  # Limit context window to prevent memory issues
+        num_ctx=2048,  # Reduced context window to prevent memory issues
+        keep_alive="5m",  # Keep model loaded for 5 minutes
     )
 
 
@@ -80,7 +79,7 @@ def invoke_llm_with_retry(
         llm: Configured ChatOllama instance
         messages: List of message dicts with 'role' and 'content' keys
         max_retries: Maximum number of retry attempts (default: 3)
-        base_delay: Initial delay between retries in seconds (default: 2.0)
+        base_delay: Initial delay between retries in seconds (default: 5.0)
         
     Returns:
         LLM response object
@@ -103,6 +102,26 @@ def invoke_llm_with_retry(
             if "not found" in error_msg.lower() or "invalid" in error_msg.lower():
                 logger.error("Terminal error detected, not retrying")
                 raise
+                
+            # Special handling for runner process termination - longer delay
+            if "runner process has terminated" in error_msg.lower():
+                logger.warning("Ollama runner process terminated - model may need to reload")
+                if attempt < max_retries - 1:
+                    delay = 15.0  # Fixed 15 second delay for process restart
+                    logger.warning(f"⏳ Waiting {delay}s for Ollama to restart...")
+                    time.sleep(delay)
+                    
+                    # Try to ping Ollama to see if it's responsive
+                    try:
+                        import requests
+                        response = requests.get("http://127.0.0.1:11434/api/tags", timeout=5)
+                        if response.status_code == 200:
+                            logger.info("✅ Ollama server is responsive, retrying...")
+                        else:
+                            logger.warning(f"⚠️ Ollama server returned {response.status_code}")
+                    except Exception as ping_error:
+                        logger.warning(f"⚠️ Cannot ping Ollama: {ping_error}")
+                    continue
             
             # If not last attempt, wait with exponential backoff
             if attempt < max_retries - 1:
@@ -128,7 +147,7 @@ def get_basic_llm():
     """
     cfg = CONFIG["llms"]["basic"]
     logger.info(f"Using basic LLM: {cfg['model']}")
-    return ChatOllama(model=cfg["model"], temperature=cfg["temperature"])
+    return get_ollama_model(cfg["model"], cfg["temperature"])
 
 
 def get_reasoning_llm():
@@ -140,7 +159,7 @@ def get_reasoning_llm():
     """
     cfg = CONFIG["llms"]["reasoning"]
     logger.info(f"Using reasoning LLM: {cfg['model']}")
-    return ChatOllama(model=cfg["model"], temperature=cfg["temperature"])
+    return get_ollama_model(cfg["model"], cfg["temperature"])
 
 
 def get_multimodal_llm():
@@ -152,7 +171,7 @@ def get_multimodal_llm():
     """
     cfg = CONFIG["llms"]["multimodal"]
     logger.info(f"Using multimodal LLM: {cfg['model']}")
-    return ChatOllama(model=cfg["model"], temperature=cfg["temperature"])
+    return get_ollama_model(cfg["model"], cfg["temperature"])
 
 
 def get_embedding_model():
@@ -177,7 +196,16 @@ def get_retrieval_qa(llm, vectorstore):
 
     Returns:
         RetrievalQA: Configured retrieval-augmented generation chain
+        
+    Raises:
+        ImportError: If RetrievalQA is not available (langchain_classic not installed)
     """
+    if RetrievalQA is None:
+        raise ImportError(
+            "RetrievalQA is not available. Please install langchain_classic: "
+            "pip install langchain_classic"
+        )
+    
     logger.info("Creating RetrievalQA chain")
     return RetrievalQA.from_chain_type(
         llm=llm,
