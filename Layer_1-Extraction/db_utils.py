@@ -16,7 +16,7 @@ class DatabaseManager:
     def __init__(self, db_path="data/database/harvested.db"):
         """Initialize database manager."""
         self.db_path = Path(db_path)
-        self.schema_path = Path("Layer_1/harvested_schema.sql")
+        self.schema_path = Path("Layer_1-Extraction/harvested_schema.sql")
         
         # Ensure data directory exists
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -57,7 +57,8 @@ class DatabaseManager:
                 'page_regions',
                 'categories', 
                 'product_families', 
-                'products'
+                'products',
+                'product_knowledge'
             ]
             
             cursor.execute("""
@@ -118,7 +119,7 @@ class DatabaseManager:
             cursor = conn.cursor()
             
             # Get table information
-            required_tables = ['page_regions', 'categories', 'product_families', 'products']
+            required_tables = ['page_regions', 'categories', 'product_families', 'products', 'product_knowledge']
             table_info = []
             
             for table_name in required_tables:

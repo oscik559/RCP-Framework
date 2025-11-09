@@ -198,3 +198,75 @@ END;
 CREATE TRIGGER IF NOT EXISTS families_ad AFTER DELETE ON product_families BEGIN
     DELETE FROM product_families_fts WHERE rowid = old.id;
 END;
+
+-- ============================================================================
+-- LEVEL 0.5: Product Knowledge (General information and documentation)
+-- Purpose: Capture product descriptions, assembly instructions, standards,
+--          and other knowledge that doesn't fit the hierarchical product structure
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS product_knowledge (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    
+    -- Source information
+    pdf_name TEXT NOT NULL,                -- PDF filename this knowledge came from
+    page_number INTEGER,                   -- Page where knowledge appears
+    
+    -- Classification
+    category TEXT,                         -- "PRESSKOPPLINGAR", "HÖGTRYCKSSLANG", etc.
+    knowledge_type TEXT NOT NULL,          -- "DESCRIPTION", "ASSEMBLY", "STANDARDS", "TOC", "INTRO"
+    section_title TEXT,                    -- Section heading or title
+    
+    -- Content
+    content TEXT NOT NULL,                 -- Full extracted text content
+    content_language TEXT DEFAULT 'sv',    -- Language code (sv=Swedish, en=English)
+    
+    -- Metadata
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Constraints
+    CHECK(knowledge_type IN ('DESCRIPTION', 'ASSEMBLY', 'STANDARDS', 'TOC', 'INTRO', 'TECHNICAL', 'SAFETY', 'OTHER'))
+);
+
+-- ============================================================================
+-- INDEXES for Product Knowledge
+-- ============================================================================
+CREATE INDEX IF NOT EXISTS idx_knowledge_pdf ON product_knowledge(pdf_name);
+CREATE INDEX IF NOT EXISTS idx_knowledge_page ON product_knowledge(page_number);
+CREATE INDEX IF NOT EXISTS idx_knowledge_category ON product_knowledge(category);
+CREATE INDEX IF NOT EXISTS idx_knowledge_type ON product_knowledge(knowledge_type);
+
+-- ============================================================================
+-- FULL-TEXT SEARCH (FTS5) for Product Knowledge
+-- Purpose: Fast search across all product documentation and knowledge
+-- ============================================================================
+CREATE VIRTUAL TABLE IF NOT EXISTS product_knowledge_fts USING fts5(
+    section_title,
+    content,
+    category,
+    content=product_knowledge,
+    content_rowid=id
+);
+
+-- ============================================================================
+-- TRIGGERS to Keep Knowledge FTS Index in Sync
+-- ============================================================================
+
+-- Trigger: Insert into FTS when new knowledge is added
+CREATE TRIGGER IF NOT EXISTS knowledge_ai AFTER INSERT ON product_knowledge BEGIN
+    INSERT INTO product_knowledge_fts(rowid, section_title, content, category)
+    VALUES (new.id, new.section_title, new.content, new.category);
+END;
+
+-- Trigger: Update FTS when knowledge is modified
+CREATE TRIGGER IF NOT EXISTS knowledge_au AFTER UPDATE ON product_knowledge BEGIN
+    UPDATE product_knowledge_fts 
+    SET section_title = new.section_title,
+        content = new.content,
+        category = new.category
+    WHERE rowid = new.id;
+END;
+
+-- Trigger: Delete from FTS when knowledge is removed
+CREATE TRIGGER IF NOT EXISTS knowledge_ad AFTER DELETE ON product_knowledge BEGIN
+    DELETE FROM product_knowledge_fts WHERE rowid = old.id;
+END;
