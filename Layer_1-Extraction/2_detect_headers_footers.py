@@ -12,6 +12,7 @@ from pathlib import Path
 import fitz  # PyMuPDF
 import sqlite3
 from PIL import Image, ImageDraw, ImageFont
+sys.path.append(str(Path(__file__).parent.parent / "data" / "database"))
 from db_utils import DatabaseManager
 
 

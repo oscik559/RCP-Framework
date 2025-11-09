@@ -51,6 +51,7 @@ from io import BytesIO
 import requests
 import fitz  # PyMuPDF
 from PIL import Image
+sys.path.append(str(Path(__file__).parent.parent / "data" / "database"))
 from db_utils import DatabaseManager
 
 

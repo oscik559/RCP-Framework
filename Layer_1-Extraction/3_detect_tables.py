@@ -17,6 +17,7 @@ import sqlite3
 import requests
 import base64
 from io import BytesIO
+sys.path.append(str(Path(__file__).parent.parent / "data" / "database"))
 from db_utils import DatabaseManager
 
 
