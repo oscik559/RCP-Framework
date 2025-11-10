@@ -30,8 +30,8 @@ class RegionManager:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # Header/Footer detection thresholds (relative to page height)
-        self.header_threshold = 0.05  # Top 5% of page for headers
-        self.footer_threshold = 0.95  # Bottom 5% of page (from 95% down)
+        self.header_threshold = 0.07  # Top 5% of page for headers
+        self.footer_threshold = 0.93  # Bottom 5% of page (from 95% down)
         
         # Initialize database with full schema
         self.db_manager.init_database()

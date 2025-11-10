@@ -24,8 +24,10 @@ from db_utils import DatabaseManager
 class TableDetector:
     def __init__(self):
         """Initialize the TableDetector."""
-        self.pages_dir = Path("data/png_pages")
-        self.tables_dir = Path("data/tables")
+        # Get script directory for relative paths
+        self.script_dir = Path(__file__).parent
+        self.pages_dir = self.script_dir / "data/png_pages"
+        self.tables_dir = self.script_dir / "data/tables"
         self.db_manager = DatabaseManager()
         
         # Create directories
@@ -66,6 +68,130 @@ class TableDetector:
             "header_region": fitz.Rect(result[2], result[3], result[4], result[5]),
             "footer_region": fitz.Rect(result[6], result[7], result[8], result[9])
         }
+    
+    def separate_columns(self, tables, page_width=595):
+        """
+        Separate tables into left and right columns based on page layout.
+        
+        Args:
+            tables: List of table dictionaries with bbox
+            page_width: Page width in points (default 595 for A4)
+            
+        Returns:
+            Tuple of (left_column_tables, right_column_tables)
+        """
+        column_mid = page_width / 2  # ~297 points for A4
+        
+        left_col = []
+        right_col = []
+        
+        for table in tables:
+            table_center_x = (table["bbox"][0] + table["bbox"][2]) / 2
+            
+            if table_center_x < column_mid:
+                left_col.append(table)
+            else:
+                right_col.append(table)
+        
+        # Sort each column by vertical position (top to bottom)
+        left_col.sort(key=lambda t: t["bbox"][1])
+        right_col.sort(key=lambda t: t["bbox"][1])
+        
+        return left_col, right_col
+    
+    def merge_column_tables(self, column_tables, merge_threshold=50):
+        """
+        Merge tables within a single column that are vertically adjacent.
+        
+        Args:
+            column_tables: List of tables in one column, sorted top to bottom
+            merge_threshold: Maximum vertical gap to consider for merging (default: 50 points)
+            
+        Returns:
+            List of merged table dictionaries
+        """
+        if len(column_tables) <= 1:
+            return column_tables
+        
+        merged = []
+        current_group = [column_tables[0]]
+        
+        for i in range(1, len(column_tables)):
+            current = column_tables[i]
+            last_in_group = current_group[-1]
+            
+            # Calculate vertical gap
+            vertical_gap = current["bbox"][1] - last_in_group["bbox"][3]
+            
+            # Calculate width similarity
+            last_width = last_in_group["bbox"][2] - last_in_group["bbox"][0]
+            current_width = current["bbox"][2] - current["bbox"][0]
+            width_ratio = min(last_width, current_width) / max(last_width, current_width) if max(last_width, current_width) > 0 else 0
+            
+            # COLUMN-AWARE merging criteria:
+            # 1. Small vertical gap (<50 points - tables close together)
+            # 2. Similar widths (>80% - same column width)
+            # 3. Positive gap (no overlaps)
+            should_merge = (
+                0 < vertical_gap < merge_threshold and
+                width_ratio > 0.80
+            )
+            
+            if should_merge:
+                current_group.append(current)
+            else:
+                # Finalize current group and start new one
+                if len(current_group) > 1:
+                    # Merge the group into one table
+                    merged_table = self._merge_table_group(current_group)
+                    merged.append(merged_table)
+                else:
+                    merged.append(current_group[0])
+                
+                current_group = [current]
+        
+        # Don't forget the last group
+        if len(current_group) > 1:
+            merged_table = self._merge_table_group(current_group)
+            merged.append(merged_table)
+        else:
+            merged.append(current_group[0])
+        
+        # Re-assign table IDs
+        for idx, table in enumerate(merged, 1):
+            table["table_id"] = idx
+        
+        return merged
+    
+    def _merge_table_group(self, table_group):
+        """
+        Merge a group of tables into a single table with combined bbox.
+        
+        Args:
+            table_group: List of table dictionaries to merge
+            
+        Returns:
+            Merged table dictionary
+        """
+        # Calculate combined bounding box
+        min_x0 = min(t["bbox"][0] for t in table_group)
+        min_y0 = min(t["bbox"][1] for t in table_group)
+        max_x1 = max(t["bbox"][2] for t in table_group)
+        max_y1 = max(t["bbox"][3] for t in table_group)
+        
+        combined_bbox = [min_x0, min_y0, max_x1, max_y1]
+        
+        merged_table = {
+            "table_id": table_group[0]["table_id"],
+            "bbox": combined_bbox,
+            "rows": 0,  # Will be updated after VLM extraction
+            "columns": 0,
+            "area": (max_x1 - min_x0) * (max_y1 - min_y0),
+            "content": [],
+            "merged_from": len(table_group)
+        }
+        
+        return merged_table
     
     def is_table_in_exclusion_zone(self, table_bbox, exclusion_regions):
         """
@@ -142,48 +268,20 @@ class TableDetector:
                     print(f"Excluded table {i+1} (in header/footer region): {bbox}")
                     continue
                 
-                # Extract table content using VLM instead of PyMuPDF extraction
-                table_content = self.extract_table_with_vlm(page, bbox, page_number)
-                
-                # Count rows and columns from VLM extraction
-                rows = len(table_content) if table_content else 0
-                cols = len(table_content[0]) if table_content and len(table_content) > 0 else 0
-                
                 table_id = len(tables) + 1
                 
+                # Store preliminary table info with bbox
                 table_info = {
                     "table_id": table_id,
                     "bbox": list(bbox),
-                    "rows": rows,
-                    "columns": cols,
+                    "rows": 0,  # Will be updated after VLM extraction
+                    "columns": 0,  # Will be updated after VLM extraction
                     "area": (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]),
-                    "content": table_content if table_content else []  # Full VLM-extracted content
+                    "content": []  # Will be filled by VLM
                 }
                 
-                # Save individual table data to tables folder with proper numbering
-                if table_content:
-                    table_filename = f"page_{page_number:03d}_table_{table_id}_{rows}x{cols}.json"
-                    table_path = self.tables_dir / table_filename
-                    
-                    individual_table_info = {
-                        "page": page_number,
-                        "table_id": table_id,
-                        "table_bbox": list(bbox),
-                        "rows": rows,
-                        "columns": cols,
-                        "content": table_content,
-                        "extraction_method": "VLM",
-                        "model": "qwen3-vl:235b-cloud"
-                    }
-                    
-                    with open(table_path, 'w', encoding='utf-8') as f:
-                        json.dump(individual_table_info, f, indent=2, ensure_ascii=False)
-                    
-                    print(f"Saved table data: {table_path}")
-                
                 tables.append(table_info)
-                
-                print(f"Table {table_info['table_id']}: {rows}x{cols} at {bbox}")
+                print(f"Detected Table {table_id} at {bbox}")
         
         except Exception as e:
             print(f"Error detecting tables: {e}")
@@ -195,7 +293,30 @@ class TableDetector:
         doc.close()
         
         print(f"Found {len(tables)} valid tables, excluded {len(excluded_tables)} tables in header/footer regions")
-        return tables
+        
+        # COLUMN-AWARE MERGING: Separate into columns and merge within each column
+        if tables and len(tables) > 1:
+            page_width = page.rect.width
+            
+            # Separate tables into left and right columns
+            left_col, right_col = self.separate_columns(tables, page_width)
+            print(f"Separated into columns - Left: {len(left_col)}, Right: {len(right_col)}")
+            
+            # Merge tables within each column
+            left_merged = self.merge_column_tables(left_col, merge_threshold=50)
+            right_merged = self.merge_column_tables(right_col, merge_threshold=50)
+            
+            print(f"After column merging - Left: {len(left_col)} → {len(left_merged)}, Right: {len(right_col)} → {len(right_merged)}")
+            
+            # Combine back together and sort by position
+            tables = left_merged + right_merged
+            tables.sort(key=lambda t: (t["bbox"][1], t["bbox"][0]))  # Sort top-to-bottom, left-to-right
+            
+            # Re-assign table IDs
+            for idx, table in enumerate(tables, 1):
+                table["table_id"] = idx
+        
+        return tables, page
     
     def _detect_table_patterns(self, page, exclusion_regions=None):
         """
@@ -537,20 +658,20 @@ Return ONLY the JSON array with the actual table content."""
         """
         print(f"Detecting tables in PDF: {pdf_path}, Page: {page_number}")
         
-        # Get PDF page dimensions
+        # Open document (will be used throughout the process)
         doc = fitz.open(pdf_path)
-        page = doc.load_page(page_number - 1)
-        pdf_page_size = (page.rect.width, page.rect.height)
-        doc.close()
+        page_obj = doc.load_page(page_number - 1)
+        pdf_page_size = (page_obj.rect.width, page_obj.rect.height)
         
         # Get exclusion regions for visualization
         pdf_name = Path(pdf_path).stem
         exclusion_regions = self.get_exclusion_regions(pdf_name, page_number)
         
-        # Detect tables (exclusion is handled inside this method)
-        tables = self.detect_tables_in_pdf_page(pdf_path, page_number)
+        # Detect tables (returns table list and page object - but we already have page_obj)
+        tables_list, _ = self.detect_tables_in_pdf_page(pdf_path, page_number)
         
-        if not tables:
+        if not tables_list:
+            doc.close()
             print(f"No tables detected on page {page_number}")
             return {
                 "page": page_number, 
@@ -561,7 +682,7 @@ Return ONLY the JSON array with the actual table content."""
                 "visualization": None
             }
         
-        print(f"Detected {len(tables)} table(s) on page {page_number}")
+        print(f"Detected {len(tables_list)} table(s) on page {page_number}")
         
         # Determine PNG path
         if png_path is None:
@@ -570,22 +691,59 @@ Return ONLY the JSON array with the actual table content."""
             png_path = self.pages_dir / png_filename
         
         if not png_path.exists():
+            doc.close()
             print(f"Warning: PNG file not found: {png_path}")
             print("You may need to run pdf_to_png.py first to generate PNG files.")
             return {
                 "page": page_number, 
-                "tables": tables, 
-                "tables_detected": len(tables),
+                "tables": tables_list, 
+                "tables_detected": len(tables_list),
                 "png_path": None,
-                "individual_table_files": [
-                    f"page_{page_number:03d}_table_{t['table_id']}_{t['rows']}x{t['columns']}.json" 
-                    for t in tables if t.get('content')
-                ],
+                "individual_table_files": [],
                 "visualization": None
             }
         
-        # Draw table bounding boxes with exclusion regions
-        self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number)
+        # Draw table bounding boxes FIRST (before VLM extraction)
+        print("Drawing table bounding boxes on visualization...")
+        self.draw_table_boxes(png_path, tables_list, pdf_page_size, exclusion_regions, page_number)
+        
+        # NOW extract table content with VLM for each detected table
+        print("Extracting table content with VLM...")
+        for table in tables_list:
+            table_content = self.extract_table_with_vlm(page_obj, table["bbox"], page_number)
+            
+            # Update table info with extracted content
+            rows = len(table_content) if table_content else 0
+            cols = len(table_content[0]) if table_content and len(table_content) > 0 else 0
+            
+            table["rows"] = rows
+            table["columns"] = cols
+            table["content"] = table_content if table_content else []
+            
+            # Save individual table data to tables folder
+            if table_content:
+                table_filename = f"page_{page_number:03d}_table_{table['table_id']}_{rows}x{cols}.json"
+                table_path = self.tables_dir / table_filename
+                
+                individual_table_info = {
+                    "page": page_number,
+                    "table_id": table['table_id'],
+                    "table_bbox": table["bbox"],
+                    "rows": rows,
+                    "columns": cols,
+                    "content": table_content,
+                    "extraction_method": "VLM",
+                    "model": "qwen3-vl:235b-cloud"
+                }
+                
+                with open(table_path, 'w', encoding='utf-8') as f:
+                    json.dump(individual_table_info, f, indent=2, ensure_ascii=False)
+                
+                print(f"Saved table data: {table_path}")
+                print(f"Table {table['table_id']}: {rows}x{cols} at {table['bbox']}")
+        
+        # Close document after all processing
+        doc.close()
         
         # Create summary results (individual tables are already saved in tables folder)
         visualization_file = f"page_{page_number:03d}_tables_visualization.png"
@@ -593,17 +751,17 @@ Return ONLY the JSON array with the actual table content."""
             "page": page_number,
             "pdf_page_size": pdf_page_size,
             "png_size": Image.open(png_path).size,
-            "tables": tables,  # Keep the actual tables list for process_all_pages
-            "tables_detected": len(tables),
+            "tables": tables_list,  # Keep the actual tables list for process_all_pages
+            "tables_detected": len(tables_list),
             "individual_table_files": [
                 f"page_{page_number:03d}_table_{t['table_id']}_{t['rows']}x{t['columns']}.json" 
-                for t in tables if t.get('content')
+                for t in tables_list if t.get('content')
             ],
             "visualization": visualization_file,
             "detection_summary": {
-                "total_tables": len(tables),
-                "largest_table": max(tables, key=lambda t: t["area"])["table_id"] if tables else None,
-                "total_area": sum(t["area"] for t in tables)
+                "total_tables": len(tables_list),
+                "largest_table": max(tables_list, key=lambda t: t["area"])["table_id"] if tables_list else None,
+                "total_area": sum(t["area"] for t in tables_list)
             }
         }
         
@@ -612,12 +770,13 @@ Return ONLY the JSON array with the actual table content."""
         
         return results
 
-    def process_all_pages(self, pdf_path):
+    def process_all_pages(self, pdf_path, start_page=1):
         """
         Process all pages in a PDF for table detection.
         
         Args:
             pdf_path: Path to PDF file
+            start_page: Page number to start from (default: 1)
             
         Returns:
             Dictionary with results for all pages
@@ -626,11 +785,12 @@ Return ONLY the JSON array with the actual table content."""
         total_pages = len(doc)
         doc.close()
         
-        print(f"Processing {total_pages} pages from {pdf_path}")
+        print(f"Processing pages {start_page} to {total_pages} from {pdf_path}")
         
         all_results = {
             "pdf_path": str(pdf_path),
             "total_pages": total_pages,
+            "start_page": start_page,
             "pages": {},
             "summary": {
                 "pages_with_tables": 0,
@@ -639,7 +799,7 @@ Return ONLY the JSON array with the actual table content."""
             }
         }
         
-        for page_num in range(1, total_pages + 1):
+        for page_num in range(start_page, total_pages + 1):
             try:
                 print(f"\n--- Processing page {page_num}/{total_pages} ---")
                 results = self.process_pdf_page(pdf_path, page_num)
@@ -670,17 +830,69 @@ Return ONLY the JSON array with the actual table content."""
 
 def main():
     parser = argparse.ArgumentParser(description="Detect tables in PDF pages and visualize on PNG images")
-    parser.add_argument("--pdf-path", default="PDF/Produktbok.pdf", help="Path to PDF file (default: PDF/Produktbok.pdf)")
+    parser.add_argument("--pdf-path", default="Press_Couplings.pdf", help="Path to PDF file (default: Press_Couplings.pdf)")
     parser.add_argument("--page", type=int, help="Specific page number to process (omit to process all pages)")
     parser.add_argument("--png-path", help="Optional path to specific PNG file (only works with --page)")
     parser.add_argument("--all-pages", action="store_true", help="Process all pages in the PDF")
     
     args = parser.parse_args()
     
-    # Check if PDF exists
-    pdf_path = Path(args.pdf_path)
-    if not pdf_path.exists():
-        print(f"Error: PDF file not found: {pdf_path}")
+    # Get script directory for finding PDF files
+    script_dir = Path(__file__).parent
+    
+    # Find PDF file in multiple locations
+    pdf_path = None
+    search_paths = [
+        Path(args.pdf_path),                      # Absolute or relative to CWD
+        script_dir / args.pdf_path,               # Relative to script
+        script_dir / "PDF" / args.pdf_path,       # In script's PDF folder
+        script_dir.parent / "PDF" / args.pdf_path # In project's PDF folder
+    ]
+    
+    for path in search_paths:
+        if path.exists():
+            pdf_path = path
+            break
+    
+    if not pdf_path or not pdf_path.exists():
+        print(f"Error: PDF file not found: {args.pdf_path}")
+        print("Searched in:")
+        for path in search_paths:
+            print(f"  - {path.absolute()}")
+        sys.exit(1)
+    
+def main():
+    parser = argparse.ArgumentParser(description="Detect tables in PDF pages and visualize on PNG images")
+    parser.add_argument("--pdf-path", default="Press_Couplings.pdf", help="Path to PDF file (default: Press_Couplings.pdf)")
+    parser.add_argument("--page", type=int, help="Specific page number to process (omit to process all pages)")
+    parser.add_argument("--png-path", help="Optional path to specific PNG file (only works with --page)")
+    parser.add_argument("--all-pages", action="store_true", help="Process all pages in the PDF")
+    parser.add_argument("--start-page", type=int, default=5, help="Starting page number for batch processing (default: 5)")
+    
+    args = parser.parse_args()
+    
+    # Get script directory for finding PDF files
+    script_dir = Path(__file__).parent
+    
+    # Find PDF file in multiple locations
+    pdf_path = None
+    search_paths = [
+        Path(args.pdf_path),                      # Absolute or relative to CWD
+        script_dir / args.pdf_path,               # Relative to script
+        script_dir / "PDF" / args.pdf_path,       # In script's PDF folder
+        script_dir.parent / "PDF" / args.pdf_path # In project's PDF folder
+    ]
+    
+    for path in search_paths:
+        if path.exists():
+            pdf_path = path
+            break
+    
+    if not pdf_path or not pdf_path.exists():
+        print(f"Error: PDF file not found: {args.pdf_path}")
+        print("Searched in:")
+        for path in search_paths:
+            print(f"  - {path.absolute()}")
         sys.exit(1)
     
     # Initialize detector
@@ -688,10 +900,7 @@ def main():
     
     try:
         # Determine processing mode
-        if args.all_pages or args.page is None:
-            # Process all pages
-            results = detector.process_all_pages(pdf_path)
-        else:
+        if args.page is not None:
             # Process single page
             results = detector.process_pdf_page(
                 pdf_path, 
@@ -710,6 +919,10 @@ def main():
                 print(f"All files saved in data/tables/")
             else:
                 print(f"\nNo tables detected on page {args.page}")
+        else:
+            # Process all pages starting from start_page
+            print(f"Processing all pages starting from page {args.start_page}...")
+            results = detector.process_all_pages(pdf_path, start_page=args.start_page)
             
     except Exception as e:
         print(f"Error during table detection: {e}")

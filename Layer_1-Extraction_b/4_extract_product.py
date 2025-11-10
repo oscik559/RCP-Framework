@@ -3,19 +3,25 @@
 Coupling Product Extractor
 ===========================
 
-Specialized extractor for coupling (presskopplingar) products.
-Adapted from the hose product extractor with coupling-specific logic.
+Enhanced extractor for coupling (presskopplingar) products that captures:
+- Product codes (e.g., 4270-2, 4200-11)
+- Product descriptions (e.g., M-gängad, G-gängad)
+- Thread specifications (e.g., Rak inv., 24° låtsningskona)
+- Product groups (e.g., PRODUKTGRUPP 300)
+- Technical specifications from tables
 
-Key differences from hose extraction:
-- Focus on thread specifications (G-thread, JIC, SAE, ORFS, etc.)
-- Hose compatibility instead of dimensions
-- Different table structures
-- Assembly requirements
+EXTRACTION STRATEGY:
+-------------------
+1. Extract text blocks from PDF to find product headers
+2. Match product codes using regex patterns
+3. Extract descriptive text near product codes
+4. Load table data for specifications
+5. Combine into complete product records
 
 USAGE:
 -----
-python 2_extract_couplings.py --pdf Produktbok_2020_Coupling.pdf --page 170
-python 2_extract_couplings.py --pdf Produktbok_2020_Coupling.pdf --pages 170-180
+python 4_extract_product.py --pdf Press_Couplings.pdf --page 5
+python 4_extract_product.py --pdf Press_Couplings.pdf --pages 5-10
 """
 
 import os
@@ -23,24 +29,31 @@ import sys
 import json
 import sqlite3
 import argparse
+import re
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 import fitz  # PyMuPDF
 
-# Add Layer_1-Extraction to path
-sys.path.append(str(Path(__file__).parent.parent / "Layer_1-Extraction"))
+# Add current directory to path for local imports
+sys.path.insert(0, str(Path(__file__).parent))
 from db_utils import DatabaseManager
 
 
 class CouplingExtractor:
     """
-    Extracts coupling product data from catalog pages.
+    Enhanced coupling extractor that captures product details from text and tables.
     
-    Handles:
-    - Product families (e.g., Hylsa EN15C, G-gängade kopplingar)
-    - Individual coupling products with specifications
-    - Thread types and compatibility information
-    - Hose compatibility mappings
+    Extracts:
+    - Product codes (4270-2, 4200-11, etc.)
+    - Product descriptions (M-gängad, G-gängad, etc.)
+    - Thread specifications (Rak inv., 24° låtsningskona med O-ring)
+    - Product groups (PRODUKTGRUPP 300)
+    - Table specifications (dimensions, pressures, etc.)
     """
+    
+    # Regex patterns for product extraction
+    PRODUCT_CODE_PATTERN = re.compile(r'\b(\d{4}-\d{1,2}[A-Z]*)\b')
+    PRODUCT_GROUP_PATTERN = re.compile(r'PRODUKTGRUPP\s+(\d+)', re.IGNORECASE)
     
     def __init__(self, use_test_db=False):
         """
@@ -49,15 +62,23 @@ class CouplingExtractor:
         Args:
             use_test_db (bool): If True, use harvested_test.db instead of harvested.db
         """
-        # Use test database if requested
-        db_path = "data/database/harvested_test.db" if use_test_db else "data/database/harvested.db"
-        self.db_manager = DatabaseManager(db_path)
+        # Use test database if requested, default to Layer_1-Extraction_b/data/database
+        script_dir = Path(__file__).parent
+        if use_test_db:
+            db_path = script_dir / "data/database/harvested_test.db"
+        else:
+            db_path = script_dir / "data/database/harvested.db"
+        
+        self.db_manager = DatabaseManager(str(db_path))
         
         if not self.db_manager.init_database():
             raise RuntimeError("Database initialization failed")
         
-        self.tables_dir = Path("data/tables")
+        self.tables_dir = script_dir / "data/tables"
         self.tables_dir.mkdir(parents=True, exist_ok=True)
+        
+        print(f"📁 Using database: {db_path}")
+        print(f"📁 Tables directory: {self.tables_dir}")
     
     def load_table_data(self, page_number):
         """
@@ -86,26 +107,33 @@ class CouplingExtractor:
     
     def extract_page_text(self, pdf_path, page_number):
         """
-        Extract text from page.
+        Extract text from page with position information.
         
         Args:
             pdf_path (Path): Path to PDF
             page_number (int): Page number (1-based)
             
         Returns:
-            dict: Page text and metadata
+            dict: Page text and metadata including text blocks with positions
         """
         try:
             doc = fitz.open(pdf_path)
             page = doc.load_page(page_number - 1)
             
+            # Get text with detailed structure
             text_dict = page.get_text("dict")
             plain_text = page.get_text("text")
+            
+            # Get text blocks with positions
+            blocks = page.get_text("blocks")  # Returns tuples: (x0, y0, x1, y1, "text", block_no, block_type)
             
             result = {
                 'page_number': page_number,
                 'text_dict': text_dict,
-                'plain_text': plain_text
+                'plain_text': plain_text,
+                'blocks': blocks,
+                'page_width': page.rect.width,
+                'page_height': page.rect.height
             }
             
             doc.close()
@@ -115,40 +143,154 @@ class CouplingExtractor:
             print(f"❌ Error extracting page {page_number}: {e}")
             return None
     
-    def parse_coupling_family(self, text, page_number):
+    def find_product_headers(self, blocks: List, page_width: float) -> List[Dict]:
         """
-        Parse coupling family information from page text.
+        Find product header blocks containing product codes and descriptions.
         
         Args:
-            text (str): Page text
-            page_number (int): Page number
+            blocks: Text blocks from PyMuPDF
+            page_width: Page width for column detection
             
         Returns:
-            dict: Family information or None
+            List of product header dictionaries with position and text
         """
-        # Look for family code patterns (e.g., "4200-07", "4201-1")
-        import re
-        family_pattern = r'(\d{4}-\d{1,2})'
+        product_headers = []
         
-        # Look for family names (e.g., "Hylsa EN15C", "G-gängade kopplingar")
-        # This is simplified - in production you'd use more sophisticated parsing
+        for block in blocks:
+            if len(block) < 5:
+                continue
+            
+            x0, y0, x1, y1, text, *_ = block
+            text = text.strip()
+            
+            # Look for product codes (e.g., 4270-2, 4200-11)
+            product_codes = self.PRODUCT_CODE_PATTERN.findall(text)
+            
+            if product_codes:
+                # Extract product group if present
+                product_group_match = self.PRODUCT_GROUP_PATTERN.search(text)
+                product_group = product_group_match.group(1) if product_group_match else None
+                
+                # Determine column (left or right)
+                center_x = (x0 + x1) / 2
+                column = 'left' if center_x < page_width / 2 else 'right'
+                
+                # Extract description lines (usually near product code)
+                lines = [line.strip() for line in text.split('\n') if line.strip()]
+                
+                for product_code in product_codes:
+                    # Find the line with this product code
+                    code_line_idx = None
+                    for idx, line in enumerate(lines):
+                        if product_code in line:
+                            code_line_idx = idx
+                            break
+                    
+                    # Extract description (lines after product code)
+                    description_parts = []
+                    if code_line_idx is not None and code_line_idx + 1 < len(lines):
+                        # Get up to 3 lines after product code
+                        for i in range(code_line_idx + 1, min(code_line_idx + 4, len(lines))):
+                            desc = lines[i]
+                            # Skip if it looks like another product code or group
+                            if not self.PRODUCT_CODE_PATTERN.match(desc) and 'PRODUKTGRUPP' not in desc:
+                                description_parts.append(desc)
+                    
+                    product_headers.append({
+                        'product_code': product_code,
+                        'description': ' | '.join(description_parts),
+                        'product_group': product_group,
+                        'bbox': (x0, y0, x1, y1),
+                        'column': column,
+                        'full_text': text
+                    })
         
-        # For now, return None - this needs to be enhanced with actual patterns
-        return None
+        return product_headers
     
-    def extract_products_from_table(self, table_data, family_id, page_number):
+    def match_products_with_tables(self, product_headers: List[Dict], tables: List[Dict]) -> Dict:
+        """
+        Match product headers with their corresponding specification tables.
+        
+        Args:
+            product_headers: List of product header dictionaries
+            tables: List of table dictionaries with bbox information
+            
+        Returns:
+            Dictionary mapping product codes to their table data
+        """
+        matches = {}
+        
+        for product in product_headers:
+            product_code = product['product_code']
+            product_y = product['bbox'][3]  # Bottom of product header
+            column = product['column']
+            
+            # Find the closest table below this product in the same column
+            closest_table = None
+            min_distance = float('inf')
+            
+            for table in tables:
+                table_bbox = table.get('bbox', [0, 0, 0, 0])
+                table_y = table_bbox[1]  # Top of table
+                
+                # Check if table is in same column
+                table_center_x = (table_bbox[0] + table_bbox[2]) / 2
+                table_column = 'left' if table_center_x < 297.5 else 'right'
+                
+                if table_column != column:
+                    continue
+                
+                # Check if table is below product header
+                if table_y > product_y:
+                    distance = table_y - product_y
+                    if distance < min_distance:
+                        min_distance = distance
+                        closest_table = table
+            
+            if closest_table:
+                matches[product_code] = {
+                    'product_info': product,
+                    'table_data': closest_table
+                }
+            else:
+                # No table found, still save product info
+                matches[product_code] = {
+                    'product_info': product,
+                    'table_data': None
+                }
+        
+        return matches
+    
+    def extract_products_from_table(self, table_data, product_info, page_number):
         """
         Extract individual products from table data.
         
         Args:
             table_data (dict): Table dictionary
-            family_id (int): Parent family ID
+            product_info (dict): Product header information
             page_number (int): Page number
             
         Returns:
             list: List of product dictionaries
         """
         products = []
+        
+        if not table_data:
+            # No table, create single product from header info only
+            specs = {
+                'type': 'COUPLING',
+                'description': product_info['description'],
+                'product_group': product_info['product_group'],
+                'page': page_number
+            }
+            
+            return [{
+                'product_code': product_info['product_code'],
+                'product_name': product_info['description'],
+                'specifications': json.dumps(specs, ensure_ascii=False),
+                'page_number': page_number,
+                'bbox': product_info['bbox']
+            }]
         
         content = table_data.get('content', [])
         if not content:
@@ -171,6 +313,9 @@ class CouplingExtractor:
             # Build specifications
             specs = {
                 'type': 'COUPLING',
+                'family_code': product_info['product_code'],
+                'description': product_info['description'],
+                'product_group': product_info['product_group'],
                 'artikelnr': article_nr,
                 'page': page_number
             }
@@ -178,25 +323,18 @@ class CouplingExtractor:
             # Try to extract common coupling fields
             for col_idx, value in enumerate(row[1:], start=1):
                 if col_idx < len(headers):
-                    header = headers[col_idx].strip().lower()
+                    header = headers[col_idx].strip()
                     
-                    # Map header to spec field
-                    if 'används' in header or 'anvands' in header:
-                        specs['used_with'] = value.strip()
-                    elif 'slang' in header:
-                        specs['hose_id'] = value.strip()
-                    elif 'gäng' in header or 'gang' in header:
-                        specs['thread'] = value.strip()
-                    elif 'dimension' in header:
-                        specs['dimension'] = value.strip()
-                    else:
-                        # Generic field
-                        specs[f'col_{col_idx}'] = value.strip()
+                    # Store with original header name
+                    if value and value.strip():
+                        specs[header] = value.strip()
             
             products.append({
                 'product_code': article_nr,
+                'product_name': f"{product_info['description']} - {article_nr}",
                 'specifications': json.dumps(specs, ensure_ascii=False),
-                'page_number': page_number
+                'page_number': page_number,
+                'bbox': table_data.get('bbox')
             })
         
         return products
@@ -245,7 +383,7 @@ class CouplingExtractor:
         
         Args:
             category_id (int): Parent category ID
-            family_code (str): Family code
+            family_code (str): Family code (e.g., 4270-2)
             name (str): Family name
             **kwargs: Additional family fields
             
@@ -255,11 +393,11 @@ class CouplingExtractor:
         conn = self.db_manager.get_connection()
         cursor = conn.cursor()
         
-        # Try to find existing
+        # Try to find existing by family_code
         cursor.execute("""
             SELECT id FROM product_families
-            WHERE family_code = ? AND name = ?
-        """, (family_code, name))
+            WHERE family_code = ?
+        """, (family_code,))
         
         row = cursor.fetchone()
         if row:
@@ -291,17 +429,20 @@ class CouplingExtractor:
         conn.commit()
         conn.close()
         
+        print(f"   📦 Created family: {family_code} - {name}")
         return family_id
     
-    def save_product(self, family_id, product_code, specifications, page_number):
+    def save_product(self, family_id, product_code, product_name, specifications, page_number, bbox=None):
         """
         Save product to database.
         
         Args:
             family_id (int): Parent family ID
             product_code (str): Product code
+            product_name (str): Product name/description
             specifications (str): JSON specifications
             page_number (int): Page number
+            bbox (tuple): Bounding box (x0, y0, x1, y1)
             
         Returns:
             bool: Success status
@@ -310,27 +451,32 @@ class CouplingExtractor:
         cursor = conn.cursor()
         
         try:
+            bbox_json = json.dumps(bbox) if bbox else None
+            
             cursor.execute("""
                 INSERT OR REPLACE INTO products (
                     family_id,
                     product_code,
                     specifications,
+                    bounding_box,
                     page_number
-                ) VALUES (?, ?, ?, ?)
-            """, (family_id, product_code, specifications, page_number))
+                ) VALUES (?, ?, ?, ?, ?)
+            """, (family_id, product_code, specifications, bbox_json, page_number))
             
             conn.commit()
             conn.close()
+            
+            print(f"      ✓ {product_code}: {product_name}")
             return True
             
         except Exception as e:
-            print(f"⚠️  Error saving product {product_code}: {e}")
+            print(f"      ✗ Error saving product {product_code}: {e}")
             conn.close()
             return False
     
     def process_page(self, pdf_path, page_number):
         """
-        Process a single page.
+        Process a single page with enhanced product extraction.
         
         Args:
             pdf_path (Path): PDF path
@@ -343,49 +489,73 @@ class CouplingExtractor:
         
         stats = {
             'families': 0,
-            'products': 0
+            'products': 0,
+            'product_headers': 0
         }
+        
+        # Extract page text
+        page_data = self.extract_page_text(pdf_path, page_number)
+        if not page_data:
+            print(f"   ❌ Failed to extract page text")
+            return stats
+        
+        # Find product headers
+        product_headers = self.find_product_headers(
+            page_data['blocks'],
+            page_data['page_width']
+        )
+        
+        stats['product_headers'] = len(product_headers)
+        
+        if not product_headers:
+            print(f"   ⚠️  No product headers found on page {page_number}")
+            return stats
+        
+        print(f"   Found {len(product_headers)} product headers")
+        for ph in product_headers:
+            print(f"      • {ph['product_code']}: {ph['description'][:50] if ph['description'] else 'No description'}")
         
         # Load table data
         tables = self.load_table_data(page_number)
-        
-        if not tables:
-            print(f"   ⚠️  No tables found for page {page_number}")
-            print(f"   💡 Run: python Layer_1-Extraction/3_detect_tables.py --pdf {pdf_path} first")
-            return stats
-        
         print(f"   Found {len(tables)} tables")
         
-        # For coupling catalog, we need manual family mapping
-        # This is a simplified version - you'd enhance this with actual parsing
+        # Match products with their tables
+        product_matches = self.match_products_with_tables(product_headers, tables)
         
-        # Example: Create a default family for demonstration
+        # Create category
         category_id = self.save_category(
             name="PRESSKOPPLINGAR",
-            chapter="4:2",
+            chapter="4",
             description="Press couplings for hydraulic hoses"
         )
         
-        # Create a placeholder family
-        # In production, you'd parse the page text to extract family info
-        family_id = self.save_family(
-            category_id=category_id,
-            family_code="4200-XX",  # Placeholder
-            name=f"Couplings from page {page_number}",
-            page_number=page_number
-        )
-        stats['families'] = 1
-        
-        # Extract products from tables
-        for table in tables:
-            products = self.extract_products_from_table(table, family_id, page_number)
+        # Process each product family
+        for product_code, match_data in product_matches.items():
+            product_info = match_data['product_info']
+            table_data = match_data['table_data']
             
+            # Create family for this product series
+            family_id = self.save_family(
+                category_id=category_id,
+                family_code=product_code,
+                name=product_info['description'] or product_code,
+                description=product_info['description'],
+                page_number=page_number
+            )
+            stats['families'] += 1
+            
+            # Extract products from table (or just header if no table)
+            products = self.extract_products_from_table(table_data, product_info, page_number)
+            
+            # Save products
             for product in products:
                 success = self.save_product(
                     family_id,
                     product['product_code'],
+                    product['product_name'],
                     product['specifications'],
-                    product['page_number']
+                    product['page_number'],
+                    product.get('bbox')
                 )
                 
                 if success:
