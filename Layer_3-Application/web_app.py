@@ -376,12 +376,17 @@ def execute_workflow_with_progress(init_state, tracker):
 
             # Fallback if no strategy found in database
             if not strategy_found:
+                # Use the strategy that's actually enabled in testing configuration
+                from config.strategy_testing import get_enabled_strategies
+                enabled_strategies = get_enabled_strategies()
+                fallback_strategy = enabled_strategies[0] if enabled_strategies else "SIMPLE LOOKUP"
+                
                 tracker.set_strategy(
-                    "SIMPLE LOOKUP",
-                    "Default strategy - direct product search and analysis",
+                    fallback_strategy,
+                    f"Enabled strategy from configuration - {fallback_strategy.lower().replace('_', ' ')}",
                 )
                 tracker.emit_progress(
-                    "strategy_plan", "completed", "Strategy selected: SIMPLE LOOKUP"
+                    "strategy_plan", "completed", f"Strategy selected: {fallback_strategy}"
                 )
 
             # Function execution monitoring

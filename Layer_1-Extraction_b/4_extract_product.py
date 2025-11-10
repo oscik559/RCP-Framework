@@ -143,6 +143,59 @@ class CouplingExtractor:
             print(f"❌ Error extracting page {page_number}: {e}")
             return None
     
+    def save_product_knowledge(self, content, page_number, pdf_name="Press_Couplings.pdf", 
+                             knowledge_type="TECHNICAL", section_title=None, category="PRESSKOPPLINGAR"):
+        """
+        Save product knowledge/documentation to database.
+        
+        Args:
+            content (str): Text content to save
+            page_number (int): Page number
+            pdf_name (str): Source PDF filename  
+            knowledge_type (str): Type of knowledge (TECHNICAL, DESCRIPTION, etc.)
+            section_title (str): Section heading
+            category (str): Product category
+            
+        Returns:
+            bool: Success status
+        """
+        if not content or len(content.strip()) < 10:
+            return False
+            
+        conn = self.db_manager.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                INSERT INTO product_knowledge (
+                    pdf_name,
+                    page_number,
+                    category,
+                    knowledge_type,
+                    section_title,
+                    content,
+                    content_language
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                pdf_name,
+                page_number,
+                category,
+                knowledge_type,
+                section_title,
+                content.strip(),
+                'sv'  # Swedish content
+            ))
+            
+            conn.commit()
+            conn.close()
+            
+            return True
+            
+        except Exception as e:
+            print(f"      ✗ Error saving knowledge: {e}")
+            conn.close()
+            return False
+    
     def find_product_headers(self, blocks: List, page_width: float) -> List[Dict]:
         """
         Find product header blocks containing product codes and descriptions.
@@ -263,7 +316,7 @@ class CouplingExtractor:
     
     def extract_products_from_table(self, table_data, product_info, page_number):
         """
-        Extract individual products from table data.
+        Extract individual products from table data and store table content in DB.
         
         Args:
             table_data (dict): Table dictionary
@@ -281,7 +334,8 @@ class CouplingExtractor:
                 'type': 'COUPLING',
                 'description': product_info['description'],
                 'product_group': product_info['product_group'],
-                'page': page_number
+                'page': page_number,
+                'extraction_source': 'header_only'
             }
             
             return [{
@@ -289,12 +343,21 @@ class CouplingExtractor:
                 'product_name': product_info['description'],
                 'specifications': json.dumps(specs, ensure_ascii=False),
                 'page_number': page_number,
-                'bbox': product_info['bbox']
+                'bbox': product_info['bbox'],
+                'table_data': None
             }]
         
         content = table_data.get('content', [])
         if not content:
             return products
+        
+        # Store the complete table structure for reference
+        table_metadata = {
+            'table_bbox': table_data.get('bbox'),
+            'table_dimensions': f"{len(content)}x{len(content[0]) if content else 0}",
+            'extraction_source': 'table_content',
+            'raw_table_data': table_data  # Store complete table data
+        }
         
         # Detect header row (first row usually)
         headers = content[0] if content else []
@@ -310,31 +373,46 @@ class CouplingExtractor:
             if not article_nr or not article_nr[0].isdigit():
                 continue
             
-            # Build specifications
+            # Build comprehensive specifications including table position
             specs = {
                 'type': 'COUPLING',
                 'family_code': product_info['product_code'],
-                'description': product_info['description'],
+                'family_description': product_info['description'],
                 'product_group': product_info['product_group'],
                 'artikelnr': article_nr,
-                'page': page_number
+                'page': page_number,
+                'table_row': row_idx,
+                'extraction_source': 'table_content'
             }
             
-            # Try to extract common coupling fields
+            # Extract structured field mappings from table headers and values
+            field_mappings = {}
             for col_idx, value in enumerate(row[1:], start=1):
                 if col_idx < len(headers):
                     header = headers[col_idx].strip()
+                    clean_value = value.strip() if value else ""
                     
-                    # Store with original header name
-                    if value and value.strip():
-                        specs[header] = value.strip()
+                    if clean_value:
+                        # Store with original header name and normalized key
+                        field_key = header.lower().replace(' ', '_').replace('-', '_')
+                        specs[header] = clean_value  # Original header
+                        specs[field_key] = clean_value  # Normalized key
+                        field_mappings[header] = clean_value
+            
+            # Add table metadata to specifications
+            specs['table_metadata'] = table_metadata
+            specs['field_mappings'] = field_mappings
+            specs['headers'] = headers
             
             products.append({
                 'product_code': article_nr,
                 'product_name': f"{product_info['description']} - {article_nr}",
                 'specifications': json.dumps(specs, ensure_ascii=False),
                 'page_number': page_number,
-                'bbox': table_data.get('bbox')
+                'bbox': table_data.get('bbox'),
+                'table_data': table_data,  # Include full table data
+                'table_row_index': row_idx,
+                'table_headers': headers
             })
         
         return products
@@ -432,9 +510,90 @@ class CouplingExtractor:
         print(f"   📦 Created family: {family_code} - {name}")
         return family_id
     
-    def save_product(self, family_id, product_code, product_name, specifications, page_number, bbox=None):
+    def save_extracted_table(self, table_data, page_number, pdf_name="Press_Couplings.pdf"):
         """
-        Save product to database.
+        Save raw extracted table data to database for later analysis.
+        
+        Args:
+            table_data (dict): Complete table data from JSON
+            page_number (int): Page number
+            pdf_name (str): Source PDF filename
+            
+        Returns:
+            int: Table ID if saved successfully, None otherwise
+        """
+        if not table_data:
+            return None
+            
+        conn = self.db_manager.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Check if extracted_tables table exists, create if needed
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS extracted_tables (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    filename TEXT NOT NULL,
+                    page_number INTEGER NOT NULL,
+                    table_number INTEGER NOT NULL,
+                    bbox TEXT,
+                    table_data TEXT NOT NULL,
+                    dimensions TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(filename, page_number, table_number)
+                )
+            """)
+            
+            bbox = table_data.get('bbox', [])
+            bbox_json = json.dumps(bbox) if bbox else None
+            
+            content = table_data.get('content', [])
+            dimensions = f"{len(content)}x{len(content[0]) if content else 0}"
+            
+            # Extract table number from filename or use sequence
+            cursor.execute("""
+                SELECT COALESCE(MAX(table_number), 0) + 1 
+                FROM extracted_tables 
+                WHERE filename = ? AND page_number = ?
+            """, (pdf_name, page_number))
+            
+            table_number = cursor.fetchone()[0]
+            
+            # Store complete table data as JSON
+            cursor.execute("""
+                INSERT OR REPLACE INTO extracted_tables (
+                    filename,
+                    page_number, 
+                    table_number,
+                    bbox,
+                    table_data,
+                    dimensions
+                ) VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                pdf_name,
+                page_number,
+                table_number,
+                bbox_json,
+                json.dumps(table_data, ensure_ascii=False),
+                dimensions
+            ))
+            
+            table_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+            
+            print(f"      📊 Saved table {table_number} ({dimensions}) for page {page_number}")
+            return table_id
+            
+        except Exception as e:
+            print(f"      ✗ Error saving table data: {e}")
+            conn.rollback()
+            conn.close()
+            return None
+
+    def save_product(self, family_id, product_code, product_name, specifications, page_number, bbox=None, table_data=None):
+        """
+        Save product to database with enhanced table tracking.
         
         Args:
             family_id (int): Parent family ID
@@ -443,6 +602,7 @@ class CouplingExtractor:
             specifications (str): JSON specifications
             page_number (int): Page number
             bbox (tuple): Bounding box (x0, y0, x1, y1)
+            table_data (dict): Associated table data
             
         Returns:
             bool: Success status
@@ -515,6 +675,9 @@ class CouplingExtractor:
         for ph in product_headers:
             print(f"      • {ph['product_code']}: {ph['description'][:50] if ph['description'] else 'No description'}")
         
+        # Save general page knowledge (non-product text content)
+        self.extract_and_save_page_knowledge(page_data, page_number, pdf_path.name)
+        
         # Load table data
         tables = self.load_table_data(page_number)
         print(f"   Found {len(tables)} tables")
@@ -528,6 +691,13 @@ class CouplingExtractor:
             chapter="4",
             description="Press couplings for hydraulic hoses"
         )
+        
+        # First, save all table data to extracted_tables for reference
+        table_ids = {}
+        for table in tables:
+            table_id = self.save_extracted_table(table, page_number)
+            if table_id:
+                table_ids[id(table)] = table_id
         
         # Process each product family
         for product_code, match_data in product_matches.items():
@@ -547,15 +717,30 @@ class CouplingExtractor:
             # Extract products from table (or just header if no table)
             products = self.extract_products_from_table(table_data, product_info, page_number)
             
-            # Save products
+            # Get table ID for linking
+            table_id = table_ids.get(id(table_data)) if table_data else None
+            
+            # Save products with table references
             for product in products:
+                # Add table reference to specifications if available
+                if table_id and product.get('table_data'):
+                    specs_dict = json.loads(product['specifications'])
+                    specs_dict['extracted_table_id'] = table_id
+                    specs_dict['table_reference'] = {
+                        'table_id': table_id,
+                        'row_index': product.get('table_row_index'),
+                        'headers': product.get('table_headers', [])
+                    }
+                    product['specifications'] = json.dumps(specs_dict, ensure_ascii=False)
+                
                 success = self.save_product(
                     family_id,
                     product['product_code'],
                     product['product_name'],
                     product['specifications'],
                     product['page_number'],
-                    product.get('bbox')
+                    product.get('bbox'),
+                    product.get('table_data')
                 )
                 
                 if success:
