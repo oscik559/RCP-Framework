@@ -270,18 +270,30 @@ class TableDetector:
                 
                 table_id = len(tables) + 1
                 
-                # Store preliminary table info with bbox
+                # Extract table content directly with PyMuPDF (NO VLM NEEDED!)
+                try:
+                    table_content = table.extract()  # Returns list of lists
+                    rows = len(table_content) if table_content else 0
+                    cols = len(table_content[0]) if table_content and len(table_content) > 0 else 0
+                except Exception as e:
+                    print(f"Warning: Could not extract content for table {table_id}: {e}")
+                    table_content = []
+                    rows = 0
+                    cols = 0
+                
+                # Store complete table info with extracted content
                 table_info = {
                     "table_id": table_id,
                     "bbox": list(bbox),
-                    "rows": 0,  # Will be updated after VLM extraction
-                    "columns": 0,  # Will be updated after VLM extraction
+                    "rows": rows,
+                    "columns": cols,
                     "area": (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]),
-                    "content": []  # Will be filled by VLM
+                    "content": table_content,
+                    "extraction_method": "PyMuPDF"  # No VLM needed!
                 }
                 
                 tables.append(table_info)
-                print(f"Detected Table {table_id} at {bbox}")
+                print(f"Detected Table {table_id} at {bbox} - {rows}x{cols}")
         
         except Exception as e:
             print(f"Error detecting tables: {e}")
@@ -290,14 +302,15 @@ class TableDetector:
         if not tables:
             tables = self._detect_table_patterns(page, exclusion_regions)
         
-        doc.close()
-        
         print(f"Found {len(tables)} valid tables, excluded {len(excluded_tables)} tables in header/footer regions")
         
         # COLUMN-AWARE MERGING: Separate into columns and merge within each column
+        # Get page width BEFORE closing the document
+        page_width = page.rect.width if tables and len(tables) > 1 else 595
+        
+        doc.close()
+        
         if tables and len(tables) > 1:
-            page_width = page.rect.width
-            
             # Separate tables into left and right columns
             left_col, right_col = self.separate_columns(tables, page_width)
             print(f"Separated into columns - Left: {len(left_col)}, Right: {len(right_col)}")
@@ -409,7 +422,7 @@ class TableDetector:
     
     def extract_table_with_vlm(self, page, table_bbox, page_number):
         """
-        Extract table content using VLM by cropping the table area and sending to qwen model.
+        Extract table content using VLM by cropping the table area and sending to vision model.
         
         Args:
             page: PyMuPDF page object
@@ -417,7 +430,7 @@ class TableDetector:
             page_number: Page number for context
             
         Returns:
-            List of lists containing table data, or None if extraction failed
+            Tuple of (table_data, model_name) or (None, None) if extraction failed
         """
         try:
             # Render the table area to an image
@@ -445,43 +458,38 @@ class TableDetector:
             table_image.save(buffer, format='PNG')
             img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
             
-            # Try chat API first, then fallback to generate API
-            api_endpoints = [
-                "http://localhost:11434/api/chat",
-                "http://localhost:11434/api/generate"
+            # Try different models and APIs
+            # Model-specific API preferences
+            # llama3.2-vision: ONLY supports chat API (per documentation)
+            # qwen3-vl: Works with generate API
+            model_endpoints = [
+                ("qwen3-vl:235b-cloud", "http://localhost:11434/api/generate"),
+                ("llama3.2-vision:11b", "http://localhost:11434/api/chat"),  # Chat API only
+                ("qwen3-vl:235b-cloud", "http://localhost:11434/api/chat"),
             ]
             
-            prompt_content = """Look at this table image and extract ALL the text content exactly as it appears. 
+            # Simpler prompt for better compatibility
+            prompt_content = """Extract the table data from this image and return it as a JSON array.
 
-I need you to read every single cell in the table and return the data as a JSON array. Each row should be an array containing the exact text from each column.
-
-Important instructions:
-- Read the ACTUAL text in each cell, don't make up placeholder names
-- Include ALL columns you can see (there should be 6-7 columns typically)
-- Include the header row with column names like "Artikelnr", "ID mm", etc.
-- Include all data rows with product numbers, measurements, etc.
-- If a cell contains multiple lines of text, keep them together
-- If you see numbers, include them exactly as shown
-- Preserve Swedish text exactly as it appears
-
-Example format:
+Read each row and column exactly as shown. Return format:
 [
-  ["Artikelnr", "ID mm", "ID tum", "YD mm", "Arb.tr. MPa", "Böjradie mm", "Vikt kg/m"],
-  ["1101-14-04", "6,5", "1/4\"", "13,4", "22,5", "100", "0,21"],
-  ...
+  ["Column1", "Column2", "Column3"],
+  ["value1", "value2", "value3"],
+  ["value1", "value2", "value3"]
 ]
 
-Return ONLY the JSON array with the actual table content."""
+Return ONLY the JSON array, nothing else."""
 
             success = False
             content = None
+            used_model = None
             
-            for api_url in api_endpoints:
+            for model_name, api_url in model_endpoints:
                 try:
                     if "chat" in api_url:
                         # Chat API format
                         payload = {
-                            "model": "qwen3-vl:235b-cloud",
+                            "model": model_name,
                             "messages": [
                                 {
                                     "role": "user",
@@ -498,7 +506,7 @@ Return ONLY the JSON array with the actual table content."""
                     else:
                         # Generate API format
                         payload = {
-                            "model": "qwen3-vl:235b-cloud",
+                            "model": model_name,
                             "prompt": prompt_content,
                             "images": [img_base64],
                             "stream": False,
@@ -508,7 +516,7 @@ Return ONLY the JSON array with the actual table content."""
                             }
                         }
                     
-                    print(f"Trying {api_url}...")
+                    print(f"Trying {model_name} via {api_url.split('/')[-1]}...")
                     response = requests.post(api_url, json=payload, timeout=120)
                     
                     if response.status_code == 200:
@@ -520,41 +528,52 @@ Return ONLY the JSON array with the actual table content."""
                         
                         if content:
                             success = True
-                            print(f"Successfully got response from {api_url}")
+                            used_model = model_name
+                            print(f"✅ Success with {model_name}")
                             break
                     else:
-                        print(f"API {api_url} failed with status {response.status_code}")
+                        print(f"   Failed: status {response.status_code}")
                         
                 except Exception as e:
-                    print(f"Error with {api_url}: {e}")
+                    print(f"   Error: {str(e)[:50]}")
                     continue
             
             if not success or not content:
-                print("All VLM API endpoints failed")
-                return None
+                print("❌ All VLM models/APIs failed")
+                return None, None
+            
+            # Debug: show what we got
+            if not content or len(content.strip()) == 0:
+                print(f"⚠️  Model returned empty content")
+                return None, None
             
             # Try to parse JSON response
             try:
                 # Remove any markdown formatting if present
                 if content.startswith('```json'):
                     content = content[7:]
+                elif content.startswith('```'):
+                    content = content[3:]
                 if content.endswith('```'):
                     content = content[:-3]
                 content = content.strip()
                 
-                table_data = json.loads(content)
-                print(f"VLM extracted table with {len(table_data)} rows, {len(table_data[0]) if table_data else 0} columns")
+                if not content:
+                    print(f"⚠️  Empty content after cleanup")
+                    return None, None
                 
-                return table_data
+                table_data = json.loads(content)
+                print(f"📊 Extracted {len(table_data)} rows, {len(table_data[0]) if table_data else 0} cols")
+                
+                return table_data, used_model
                 
             except json.JSONDecodeError as e:
-                print(f"Failed to parse VLM response as JSON: {e}")
-                print(f"Raw response: {content[:200]}...")
-                return None
+                print(f"❌ JSON parse error: {str(e)[:50]}")
+                return None, None
                 
         except Exception as e:
-            print(f"Error in VLM table extraction: {e}")
-            return None
+            print(f"❌ VLM extraction error: {e}")
+            return None, None
     def draw_table_boxes(self, png_path, tables, pdf_page_size, exclusion_regions=None, page_number=None):
         """
         Draw bounding boxes around detected tables on PNG image and save to tables folder.
@@ -709,38 +728,50 @@ Return ONLY the JSON array with the actual table content."""
         
         # NOW extract table content with VLM for each detected table
         print("Extracting table content with VLM...")
-        for table in tables_list:
-            table_content = self.extract_table_with_vlm(page_obj, table["bbox"], page_number)
-            
-            # Update table info with extracted content
-            rows = len(table_content) if table_content else 0
-            cols = len(table_content[0]) if table_content and len(table_content) > 0 else 0
-            
-            table["rows"] = rows
-            table["columns"] = cols
-            table["content"] = table_content if table_content else []
-            
-            # Save individual table data to tables folder
-            if table_content:
-                table_filename = f"page_{page_number:03d}_table_{table['table_id']}_{rows}x{cols}.json"
-                table_path = self.tables_dir / table_filename
+        for i, table in enumerate(tables_list, 1):
+            print(f"  Processing table {i}/{len(tables_list)}...")
+            try:
+                table_content, model_used = self.extract_table_with_vlm(page_obj, table["bbox"], page_number)
                 
-                individual_table_info = {
-                    "page": page_number,
-                    "table_id": table['table_id'],
-                    "table_bbox": table["bbox"],
-                    "rows": rows,
-                    "columns": cols,
-                    "content": table_content,
-                    "extraction_method": "VLM",
-                    "model": "qwen3-vl:235b-cloud"
-                }
+                # Update table info with extracted content
+                rows = len(table_content) if table_content else 0
+                cols = len(table_content[0]) if table_content and len(table_content) > 0 else 0
                 
-                with open(table_path, 'w', encoding='utf-8') as f:
-                    json.dump(individual_table_info, f, indent=2, ensure_ascii=False)
+                table["rows"] = rows
+                table["columns"] = cols
+                table["content"] = table_content if table_content else []
                 
-                print(f"Saved table data: {table_path}")
-                print(f"Table {table['table_id']}: {rows}x{cols} at {table['bbox']}")
+                # Save individual table data to tables folder
+                if table_content:
+                    table_filename = f"page_{page_number:03d}_table_{table['table_id']}_{rows}x{cols}.json"
+                    table_path = self.tables_dir / table_filename
+                    
+                    individual_table_info = {
+                        "page": page_number,
+                        "table_id": table['table_id'],
+                        "table_bbox": table["bbox"],
+                        "rows": rows,
+                        "columns": cols,
+                        "content": table_content,
+                        "extraction_method": "VLM",
+                        "model": model_used or "unknown"
+                    }
+                    
+                    with open(table_path, 'w', encoding='utf-8') as f:
+                        json.dump(individual_table_info, f, indent=2, ensure_ascii=False)
+                    
+                    print(f"  ✅ Saved: {table_path.name}")
+                else:
+                    print(f"  ⚠️  No content extracted for table {table['table_id']}")
+                    
+            except Exception as e:
+                print(f"  ❌ Error extracting table {i}: {e}")
+                import traceback
+                traceback.print_exc()
+                # Continue with next table instead of failing completely
+                table["rows"] = 0
+                table["columns"] = 0
+                table["content"] = []
         
         # Close document after all processing
         doc.close()
@@ -926,6 +957,8 @@ def main():
             
     except Exception as e:
         print(f"Error during table detection: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
