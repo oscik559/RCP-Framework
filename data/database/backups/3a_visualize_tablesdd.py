@@ -313,7 +313,7 @@ class TableVisualizer:
         
         return [x0, y0, x1, y1]
     
-    def draw_table_boxes(self, png_path, tables, pdf_page_size, exclusion_regions, page_number, pdf_name=None):
+    def draw_table_boxes(self, png_path, tables, pdf_page_size, exclusion_regions, page_number):
         """Draw bounding boxes around detected tables on PNG image."""
         image = Image.open(png_path)
         draw = ImageDraw.Draw(image)
@@ -369,10 +369,8 @@ class TableVisualizer:
                           fill="white", outline=color)
             draw.text((label_x, label_y), label, fill=color, font=font)
         
-        # Save visualization with PDF name
-        if pdf_name is None:
-            pdf_name = "document"
-        tables_png_filename = f"{pdf_name}_page_{page_number:03d}_tables_visualization.png"
+        # Save visualization
+        tables_png_filename = f"page_{page_number:03d}_tables_visualization.png"
         tables_png_path = self.tables_dir / tables_png_filename
         image.save(tables_png_path)
         print(f"✅ Visualization saved: {tables_png_path}")
@@ -406,8 +404,7 @@ class TableVisualizer:
             return None
         
         # Draw visualization
-        pdf_name = Path(pdf_path).stem
-        viz_path = self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number, pdf_name)
+        viz_path = self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number)
         
         return {
             "page": page_number,

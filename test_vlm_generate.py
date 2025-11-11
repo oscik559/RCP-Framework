@@ -48,15 +48,32 @@ def test_generate_api():
     # Test generate API
     api_url = "http://localhost:11434/api/generate"
     
-    prompt = """Extract the table text and return as JSON array."""
+    prompt = """Analyze this table image and extract all the data in a structured format. 
+    
+    Instructions:
+    - Extract ALL text from the table, including headers
+    - Maintain the exact table structure (rows and columns)
+    - Return data as a JSON array where each row is an array of cell values
+    - Include empty strings for empty cells
+    - Focus on accuracy over speed
+    
+    Example format:
+    [
+        ["Artikelnr:", "Ganga", "Typ", "Slang ID"],
+        ["4202-02-03", "G 1/8\"", "", ""],
+        ["4202-02-04", "G 1/8\"", "", "1/4\""]
+    ]
+    
+    Return ONLY the JSON array, no additional text or explanations."""
     
     payload = {
-        "model": "qwen3-vl:235b-cloud",
+        "model": "llama3.2-vision:latest",
         "prompt": prompt,
         "images": [img_base64],
         "stream": False,
         "options": {
-            "temperature": 0.1
+            "temperature": 0.1,
+            "num_predict": 2000
         }
     }
     
