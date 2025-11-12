@@ -74,11 +74,19 @@ class CouplingExtractor:
         if not self.db_manager.init_database():
             raise RuntimeError("Database initialization failed")
         
-        self.tables_dir = script_dir / "data/tables"
-        self.tables_dir.mkdir(parents=True, exist_ok=True)
+        # Use main project tables directory  
+        main_data_dir = script_dir.parent / "data"
+        self.tables_dir = main_data_dir / "tables"
+        
+        # Local directories
+        local_data_dir = script_dir / "data"
+        local_data_dir.mkdir(parents=True, exist_ok=True)
+        self.regions_dir = local_data_dir / "regions"
+        self.regions_dir.mkdir(parents=True, exist_ok=True)
         
         print(f"📁 Using database: {db_path}")
         print(f"📁 Tables directory: {self.tables_dir}")
+        print(f"📁 Regions directory: {self.regions_dir}")
     
     def load_table_data(self, page_number):
         """
@@ -104,6 +112,35 @@ class CouplingExtractor:
                 print(f"⚠️  Could not load {table_file}: {e}")
         
         return tables
+    
+    def load_family_regions(self, page_number):
+        """
+        Load family regions detected above tables.
+        
+        Args:
+            page_number (int): Page number
+            
+        Returns:
+            list: List of family region dictionaries
+        """
+        family_regions = []
+        
+        # Load family regions file
+        regions_file = self.regions_dir / f"page_{page_number:03d}_family_regions.json"
+        
+        if not regions_file.exists():
+            print(f"⚠️  No family regions found: {regions_file.name}")
+            return family_regions
+        
+        try:
+            with open(regions_file, 'r', encoding='utf-8') as f:
+                regions_data = json.load(f)
+                family_regions = regions_data.get('family_regions', [])
+                
+        except Exception as e:
+            print(f"⚠️  Could not load family regions: {e}")
+        
+        return family_regions
     
     def extract_page_text(self, pdf_path, page_number):
         """
@@ -195,6 +232,105 @@ class CouplingExtractor:
             print(f"      ✗ Error saving knowledge: {e}")
             conn.close()
             return False
+    
+    def extract_and_save_page_knowledge(self, page_data, page_number, pdf_name):
+        """
+        Extract and save general page knowledge (non-product specific content).
+        
+        Args:
+            page_data (dict): Page data from extract_page_text
+            page_number (int): Page number
+            pdf_name (str): PDF filename
+        """
+        plain_text = page_data.get('plain_text', '')
+        
+        if plain_text and len(plain_text.strip()) > 50:
+            # Save as general technical content
+            self.save_product_knowledge(
+                content=plain_text,
+                page_number=page_number,
+                pdf_name=pdf_name,
+                knowledge_type="TECHNICAL",
+                section_title=f"Page {page_number} Content"
+            )
+    
+    def extract_family_info_from_region(self, family_region: Dict, page_data: Dict) -> Dict:
+        """
+        Extract family information from a detected family region.
+        
+        Args:
+            family_region (Dict): Family region with bbox coordinates
+            page_data (Dict): Page data from extract_page_text
+            
+        Returns:
+            Dict: Extracted family information
+        """
+        bbox = family_region['bbox']
+        blocks = page_data.get('blocks', [])
+        
+        # Extract text from blocks within the family region
+        family_text_blocks = []
+        
+        for block in blocks:
+            if len(block) < 5:
+                continue
+            
+            x0, y0, x1, y1, text, *_ = block
+            
+            # Check if block overlaps with family region
+            if (x0 < bbox[2] and x1 > bbox[0] and 
+                y0 < bbox[3] and y1 > bbox[1]):
+                
+                family_text_blocks.append({
+                    'bbox': [x0, y0, x1, y1],
+                    'text': text.strip(),
+                    'y_center': (y0 + y1) / 2
+                })
+        
+        # Sort blocks by vertical position (top to bottom)
+        family_text_blocks.sort(key=lambda b: b['y_center'])
+        
+        # Extract family components
+        family_info = {
+            'family_code': None,
+            'family_name': None,
+            'description': None,
+            'product_group': None,
+            'raw_text': '',
+            'text_blocks': family_text_blocks
+        }
+        
+        # Combine all text for analysis
+        all_text = ' '.join([block['text'] for block in family_text_blocks])
+        family_info['raw_text'] = all_text
+        
+        # Basic pattern matching for key information
+        lines = all_text.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Look for product group
+            if 'PRODUKTGRUPP' in line.upper():
+                group_match = re.search(r'PRODUKTGRUPP\s+(\d+)', line, re.IGNORECASE)
+                if group_match:
+                    family_info['product_group'] = group_match.group(1)
+            
+            # Look for family code (4-digit numbers)
+            elif re.match(r'^\d{4}$', line):
+                family_info['family_code'] = line
+            
+            # Look for family names (common threading types)
+            elif any(term in line for term in ['gängad', 'Gängad', 'inv.', 'låtsningskona']):
+                if not family_info['family_name']:
+                    family_info['family_name'] = line
+                else:
+                    # Additional description
+                    family_info['description'] = line
+        
+        return family_info
     
     def find_product_headers(self, blocks: List, page_width: float) -> List[Dict]:
         """
@@ -320,7 +456,7 @@ class CouplingExtractor:
         
         Args:
             table_data (dict): Table dictionary
-            product_info (dict): Product header information
+            product_info (dict): Product information (family_info or legacy product_info)
             page_number (int): Page number
             
         Returns:
@@ -328,22 +464,36 @@ class CouplingExtractor:
         """
         products = []
         
+        # Handle both family_info and legacy product_info structures
+        if 'family_code' in product_info:
+            # New family_info structure
+            family_code = product_info['family_code']
+            description = product_info['family_name']
+            product_group = product_info['product_group']
+            bbox = None  # Family regions don't have individual bbox
+        else:
+            # Legacy product_info structure
+            family_code = product_info.get('product_code')
+            description = product_info.get('description')
+            product_group = product_info.get('product_group')
+            bbox = product_info.get('bbox')
+        
         if not table_data:
-            # No table, create single product from header info only
+            # No table, create single product from info only
             specs = {
                 'type': 'COUPLING',
-                'description': product_info['description'],
-                'product_group': product_info['product_group'],
+                'description': description,
+                'product_group': product_group,
                 'page': page_number,
                 'extraction_source': 'header_only'
             }
             
             return [{
-                'product_code': product_info['product_code'],
-                'product_name': product_info['description'],
+                'product_code': family_code,
+                'product_name': description,
                 'specifications': json.dumps(specs, ensure_ascii=False),
                 'page_number': page_number,
-                'bbox': product_info['bbox'],
+                'bbox': bbox,
                 'table_data': None
             }]
         
@@ -376,9 +526,9 @@ class CouplingExtractor:
             # Build comprehensive specifications including table position
             specs = {
                 'type': 'COUPLING',
-                'family_code': product_info['product_code'],
-                'family_description': product_info['description'],
-                'product_group': product_info['product_group'],
+                'family_code': family_code,
+                'family_description': description,
+                'product_group': product_group,
                 'artikelnr': article_nr,
                 'page': page_number,
                 'table_row': row_idx,
@@ -406,7 +556,7 @@ class CouplingExtractor:
             
             products.append({
                 'product_code': article_nr,
-                'product_name': f"{product_info['description']} - {article_nr}",
+                'product_name': f"{description} - {article_nr}",
                 'specifications': json.dumps(specs, ensure_ascii=False),
                 'page_number': page_number,
                 'bbox': table_data.get('bbox'),
@@ -678,12 +828,34 @@ class CouplingExtractor:
         # Save general page knowledge (non-product text content)
         self.extract_and_save_page_knowledge(page_data, page_number, pdf_path.name)
         
-        # Load table data
+        # Load table data and family regions
         tables = self.load_table_data(page_number)
-        print(f"   Found {len(tables)} tables")
+        family_regions = self.load_family_regions(page_number)
+        print(f"   Found {len(tables)} tables, {len(family_regions)} family regions")
         
-        # Match products with their tables
-        product_matches = self.match_products_with_tables(product_headers, tables)
+        # If we have family regions, use them instead of regex-based headers
+        if family_regions:
+            # Extract family information from regions
+            family_info_list = []
+            for i, family_region in enumerate(family_regions):
+                family_info = self.extract_family_info_from_region(family_region, page_data)
+                family_info['region_id'] = i + 1
+                family_info['table_id'] = family_region.get('table_id', i + 1)
+                family_info_list.append(family_info)
+                
+                print(f"      Family {i+1}: code='{family_info['family_code']}', name='{family_info['family_name']}', group='{family_info['product_group']}'")
+            
+            # Match family info with tables directly by position/ID
+            product_matches = {}
+            for i, (family_info, table) in enumerate(zip(family_info_list, tables)):
+                family_code = family_info['family_code'] or f"FAMILY_{i+1}"
+                product_matches[family_code] = {
+                    'family_info': family_info,
+                    'table_data': table
+                }
+        else:
+            # Fallback to regex-based matching
+            product_matches = self.match_products_with_tables(product_headers, tables)
         
         # Create category
         category_id = self.save_category(
@@ -701,21 +873,51 @@ class CouplingExtractor:
         
         # Process each product family
         for product_code, match_data in product_matches.items():
-            product_info = match_data['product_info']
+            # Handle both new family_info structure and old product_info structure
+            if 'family_info' in match_data:
+                family_info = match_data['family_info']
+                family_code = family_info['family_code'] or product_code
+                family_name = family_info['family_name'] or 'Unknown Family'
+                family_description = family_info['description']
+                product_group = family_info['product_group']
+                
+                # Build construction details JSON
+                construction_details = {
+                    'product_group': product_group,
+                    'raw_family_text': family_info['raw_text'],
+                    'extraction_source': 'family_region'
+                }
+                
+            else:
+                # Fallback to old structure
+                product_info = match_data['product_info']
+                family_code = product_code
+                family_name = product_info.get('description', product_code)
+                family_description = product_info.get('description')
+                product_group = product_info.get('product_group')
+                
+                construction_details = {
+                    'product_group': product_group,
+                    'extraction_source': 'regex_headers'
+                }
+            
             table_data = match_data['table_data']
             
             # Create family for this product series
             family_id = self.save_family(
                 category_id=category_id,
-                family_code=product_code,
-                name=product_info['description'] or product_code,
-                description=product_info['description'],
+                family_code=family_code,
+                name=family_name,
+                description=family_description,
+                construction_details=json.dumps(construction_details, ensure_ascii=False),
                 page_number=page_number
             )
             stats['families'] += 1
             
             # Extract products from table (or just header if no table)
-            products = self.extract_products_from_table(table_data, product_info, page_number)
+            # Use family_info if available, otherwise fall back to product_info
+            info_for_extraction = family_info if 'family_info' in match_data else match_data.get('product_info', {})
+            products = self.extract_products_from_table(table_data, info_for_extraction, page_number)
             
             # Get table ID for linking
             table_id = table_ids.get(id(table_data)) if table_data else None

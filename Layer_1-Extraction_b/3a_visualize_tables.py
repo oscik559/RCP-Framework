@@ -32,11 +32,13 @@ class TableVisualizer:
         self.script_dir = Path(__file__).parent
         self.pages_dir = self.script_dir / "data/png_pages"
         self.tables_dir = self.script_dir / "data/tables"
+        self.family_dir = self.script_dir / "data/family"  # For family information
         self.db_manager = DatabaseManager()
         self.merge_threshold = merge_threshold
         
         # Create directories
         self.tables_dir.mkdir(parents=True, exist_ok=True)
+        self.family_dir.mkdir(parents=True, exist_ok=True)
         
         # Initialize database with full schema
         self.db_manager.init_database()
@@ -219,6 +221,153 @@ class TableVisualizer:
             "merged_from": len(table_group)
         }
     
+    def extract_family_info_above_table(self, pdf_path, page_number, table_bbox, num_lines=6):
+        """
+        Extract family information from the region above a table.
+        Returns 6 lines of text (some may be empty) plus parsed family data.
+        
+        Args:
+            pdf_path: Path to PDF file
+            page_number: Page number (1-indexed)
+            table_bbox: Table bounding box [x0, y0, x1, y1]
+            num_lines: Number of lines to extract (default: 6)
+            
+        Returns:
+            dict: Family information with raw lines and parsed data
+        """
+        doc = fitz.open(pdf_path)
+        page = doc.load_page(page_number - 1)
+        
+        # Define family region above table
+        x0, y0, x1, y1 = table_bbox
+        
+        # Family region: 4 lines (code + name + description + group) at ~8-9 points per line = ~40 points
+        family_height = 42  # Balanced to capture 4 key lines without overflow
+        margin = 12  # Tight margin to avoid gaps
+        family_x0 = x0 - 5
+        family_x1 = x1 + 5
+        family_y1 = y0 - margin
+        family_y0 = max(0, family_y1 - family_height)
+        
+        # Extract text from family region
+        family_rect = fitz.Rect(family_x0, family_y0, family_x1, family_y1)
+        raw_text_result = page.get_text("text", clip=family_rect)
+        raw_text = str(raw_text_result) if raw_text_result else ""
+        
+        doc.close()
+        
+        # Split into lines and clean
+        lines = [line.strip() for line in raw_text.split('\n')]
+        
+        # Remove empty lines but track their positions
+        cleaned_lines = []
+        for line in lines:
+            # Remove PDF artifacts
+            line = line.replace('\u0015', '').replace('\u0012', '').replace('\u0005', '')
+            cleaned_lines.append(line if line.strip() else "")
+        
+        # Ensure we have exactly num_lines (pad with empty strings if needed)
+        while len(cleaned_lines) < num_lines:
+            cleaned_lines.append("")
+        
+        # Take only the requested number of lines
+        family_lines = cleaned_lines[:num_lines]
+        
+        # Parse family information from lines
+        family_data = self._parse_family_lines(family_lines)
+        
+        return {
+            "line_1": family_lines[0],
+            "line_2": family_lines[1],
+            "line_3": family_lines[2],
+            "line_4": family_lines[3],
+            "line_5": family_lines[4],
+            "line_6": family_lines[5],
+            "parsed": family_data
+        }
+    
+    def _parse_family_lines(self, lines):
+        """
+        Parse family lines to extract structured information.
+        
+        Common patterns:
+        - Line 1: Family code (e.g., 4200-12, 4311)
+        - Line 2: Name/Type (e.g., G-gängad, Hylsa EN2SN)
+        - Line 3: Connection type (e.g., Rak inv., 90° Smidd inv.)
+        - Line 4: Description (e.g., 60° tätningskona med O-ring)
+        - Line 5: Additional info (often empty)
+        - Line 6: Product group (e.g., PRODUKTGRUPP 30)
+        """
+        import re
+        
+        parsed = {
+            "family_code": "",
+            "name": "",
+            "connection_type": "",
+            "description": "",
+            "product_group": "",
+            "additional_info": ""
+        }
+        
+        for i, line in enumerate(lines, 1):
+            if not line.strip():
+                continue
+            
+            # Detect family code (4-digit or 4-digit-2digit pattern)
+            if re.match(r'^\d{4}(-\d{2})?$', line.strip()):
+                parsed["family_code"] = line.strip()
+            
+            # Detect product group
+            elif 'PRODUKTGRUPP' in line.upper():
+                parsed["product_group"] = line.strip()
+            
+            # Detect connection types (threading, angles)
+            elif any(pattern in line for pattern in ['gängad', '°', 'Rak', 'Smidd', 'inv.', 'utv.']):
+                if not parsed["connection_type"]:
+                    parsed["connection_type"] = line.strip()
+                elif not parsed["description"]:
+                    parsed["description"] = line.strip()
+            
+            # Detect sleeve/hose types
+            elif any(keyword in line.upper() for keyword in ['HYLSA', 'SLANG', 'EN', 'DIN']):
+                if not parsed["name"]:
+                    parsed["name"] = line.strip()
+                else:
+                    parsed["description"] = line.strip()
+            
+            # General meaningful content
+            elif len(line.strip()) > 3:
+                if not parsed["name"]:
+                    parsed["name"] = line.strip()
+                elif not parsed["description"]:
+                    parsed["description"] = line.strip()
+                else:
+                    parsed["additional_info"] = line.strip()
+        
+        return parsed
+    
+    def save_family_information(self, page_number, families_data):
+        """
+        Save family information to JSON file.
+        
+        Args:
+            page_number: Page number
+            families_data: List of family information dictionaries
+        """
+        output_file = self.family_dir / f"page_{page_number:03d}_family_info.json"
+        
+        structured_data = {
+            "page_number": page_number,
+            "total_families": len(families_data),
+            "families": families_data
+        }
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(structured_data, f, indent=2, ensure_ascii=False)
+        
+        print(f"   📋 Saved family information to {output_file.name}")
+        return True
+    
     def detect_tables_in_pdf_page(self, pdf_path, page_number):
         """Detect tables in a PDF page using PyMuPDF, excluding header/footer regions."""
         doc = fitz.open(pdf_path)
@@ -313,8 +462,8 @@ class TableVisualizer:
         
         return [x0, y0, x1, y1]
     
-    def draw_table_boxes(self, png_path, tables, pdf_page_size, exclusion_regions, page_number, pdf_name=None):
-        """Draw bounding boxes around detected tables on PNG image."""
+    def draw_table_boxes(self, png_path, tables, pdf_page_size, exclusion_regions, page_number, pdf_name=None, families_data=None):
+        """Draw bounding boxes around detected tables and family regions on PNG image."""
         image = Image.open(png_path)
         draw = ImageDraw.Draw(image)
         
@@ -348,6 +497,58 @@ class TableVisualizer:
             draw.rectangle(footer_png, outline="red", width=2)
             draw.text((footer_png[0] + 5, footer_png[1] + 5), "FOOTER (EXCLUDED)", 
                      fill="red", font=font_small)
+        
+        # Draw family regions (if provided)
+        if families_data:
+            for family in families_data:
+                table_id = family.get("table_id")
+                
+                # Find the corresponding table to get its bbox
+                table = next((t for t in tables if t["table_id"] == table_id), None)
+                if not table:
+                    continue
+                
+                # Calculate family region bbox (same logic as extraction)
+                table_bbox = table["bbox"]
+                x0, y0, x1, y1 = table_bbox
+                
+                # Family region: 4 lines (code + name + description + group) at ~8-9 points per line = ~40 points
+                family_height = 42  # Balanced to capture 4 key lines without overflow
+                margin = 12  # Tight margin to avoid gaps
+                family_x0 = x0 - 5
+                family_x1 = x1 + 5
+                family_y1 = y0 - margin
+                family_y0 = max(0, family_y1 - family_height)
+                
+                family_pdf_bbox = [family_x0, family_y0, family_x1, family_y1]
+                family_png_bbox = self.scale_bbox_to_png(family_pdf_bbox, pdf_page_size, image.size)
+                
+                # Draw family region box (green)
+                draw.rectangle(family_png_bbox, outline="green", width=3)
+                
+                # Add family label
+                family_label = f"Family {family.get('family_id', '?')}"
+                if family.get("parsed", {}).get("family_code"):
+                    family_label += f": {family['parsed']['family_code']}"
+                
+                label_x = family_png_bbox[0]
+                label_y = max(0, family_png_bbox[1] - 25)
+                
+                bbox_label = draw.textbbox((label_x, label_y), family_label, font=font)
+                draw.rectangle([bbox_label[0]-2, bbox_label[1]-2, bbox_label[2]+2, bbox_label[3]+2], 
+                              fill="white", outline="green")
+                draw.text((label_x, label_y), family_label, fill="green", font=font)
+                
+                # Draw connecting line from family to table
+                family_center_x = (family_png_bbox[0] + family_png_bbox[2]) / 2
+                family_bottom = family_png_bbox[3]
+                table_png_bbox = self.scale_bbox_to_png(table_bbox, pdf_page_size, image.size)
+                table_center_x = (table_png_bbox[0] + table_png_bbox[2]) / 2
+                table_top = table_png_bbox[1]
+                
+                # Draw dashed line (approximate with short segments)
+                draw.line([(family_center_x, family_bottom), (table_center_x, table_top)], 
+                         fill="green", width=2)
         
         # Draw detected tables
         for i, table in enumerate(tables):
@@ -405,13 +606,47 @@ class TableVisualizer:
             print(f"⚠️  PNG not found: {png_path}")
             return None
         
-        # Draw visualization
+        # Extract family information for each table
+        print(f"\n📖 Extracting family information for {len(tables)} tables...")
+        families_data = []
+        
+        for i, table in enumerate(tables, 1):
+            table_bbox = table["bbox"]
+            family_info = self.extract_family_info_above_table(pdf_path, page_number, table_bbox)
+            
+            # Add table association
+            family_info["table_id"] = table["table_id"]
+            family_info["family_id"] = i
+            families_data.append(family_info)
+            
+            # Display extracted family info
+            print(f"   Family {i} (Table {table['table_id']}):")
+            for line_num in range(1, 7):
+                line_content = family_info[f"line_{line_num}"]
+                if line_content:
+                    print(f"      Line {line_num}: {line_content}")
+                else:
+                    print(f"      Line {line_num}: (empty)")
+            
+            parsed = family_info["parsed"]
+            if parsed["family_code"]:
+                print(f"      → Family Code: {parsed['family_code']}")
+            if parsed["name"]:
+                print(f"      → Name: {parsed['name']}")
+            if parsed["product_group"]:
+                print(f"      → Product Group: {parsed['product_group']}")
+        
+        # Draw visualization (with family regions)
         pdf_name = Path(pdf_path).stem
-        viz_path = self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number, pdf_name)
+        viz_path = self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number, pdf_name, families_data)
+        
+        # Save family information
+        self.save_family_information(page_number, families_data)
         
         return {
             "page": page_number,
             "tables_detected": len(tables),
+            "families_extracted": len(families_data),
             "visualization": viz_path
         }
     
