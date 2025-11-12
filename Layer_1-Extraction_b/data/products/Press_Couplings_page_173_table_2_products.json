@@ -1,0 +1,185 @@
+{
+  "pdf_page_number": 8,
+  "footer_page_number": 173,
+  "table_number": 2,
+  "family_id": 96,
+  "extraction_method": "vlm",
+  "product_count": 25,
+  "products": [
+    {
+      "family_id": 96,
+      "product_code": "4203-02-03",
+      "specifications": "{\"Artikelnr.\": \"4203-02-03\", \"Gänga\": \"G 1/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-02-04",
+      "specifications": "{\"Artikelnr.\": \"4203-02-04\", \"Gänga\": \"G 1/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-04-03",
+      "specifications": "{\"Artikelnr.\": \"4203-04-03\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-04-04",
+      "specifications": "{\"Artikelnr.\": \"4203-04-04\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-04-06",
+      "specifications": "{\"Artikelnr.\": \"4203-04-06\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-06-04",
+      "specifications": "{\"Artikelnr.\": \"4203-06-04\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-06-05",
+      "specifications": "{\"Artikelnr.\": \"4203-06-05\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-06-06",
+      "specifications": "{\"Artikelnr.\": \"4203-06-06\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-06-08",
+      "specifications": "{\"Artikelnr.\": \"4203-06-08\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-08-06",
+      "specifications": "{\"Artikelnr.\": \"4203-08-06\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-08-06-5",
+      "specifications": "{\"Artikelnr.\": \"4203-08-06-5\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/8\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-08-08",
+      "specifications": "{\"Artikelnr.\": \"4203-08-08\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-08-08-5",
+      "specifications": "{\"Artikelnr.\": \"4203-08-08-5\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/2\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-08-10-5",
+      "specifications": "{\"Artikelnr.\": \"4203-08-10-5\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"5/8\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-08-12-5",
+      "specifications": "{\"Artikelnr.\": \"4203-08-12-5\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/4\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-10-08",
+      "specifications": "{\"Artikelnr.\": \"4203-10-08\", \"Gänga\": \"G 5/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-10-10",
+      "specifications": "{\"Artikelnr.\": \"4203-10-10\", \"Gänga\": \"G 5/8\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-12-08",
+      "specifications": "{\"Artikelnr.\": \"4203-12-08\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-12-10",
+      "specifications": "{\"Artikelnr.\": \"4203-12-10\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-12-12",
+      "specifications": "{\"Artikelnr.\": \"4203-12-12\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-16-12",
+      "specifications": "{\"Artikelnr.\": \"4203-16-12\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-16-16",
+      "specifications": "{\"Artikelnr.\": \"4203-16-16\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-20-20",
+      "specifications": "{\"Artikelnr.\": \"4203-20-20\", \"Gänga\": \"G 1 1/4\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-24-24",
+      "specifications": "{\"Artikelnr.\": \"4203-24-24\", \"Gänga\": \"G 1 1/2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 96,
+      "product_code": "4203-32-32",
+      "specifications": "{\"Artikelnr.\": \"4203-32-32\", \"Gänga\": \"G 2\\\"\", \"Typ\": \"90° IR\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

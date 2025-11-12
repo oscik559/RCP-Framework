@@ -219,7 +219,7 @@ Layer_2/agentic_reasoning/config/logs/
 config/logs/  # Prevent root config/logs from being created
 
 # Database files (domain-specific databases)
-*.db
+# *.db
 *.sqlite
 *.sqlite3
 

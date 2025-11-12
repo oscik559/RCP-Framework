@@ -1,0 +1,45 @@
+{
+  "pdf_page_number": 15,
+  "footer_page_number": 180,
+  "table_number": 6,
+  "family_id": 130,
+  "extraction_method": "vlm",
+  "product_count": 5,
+  "products": [
+    {
+      "family_id": 130,
+      "product_code": "4268-12-12",
+      "specifications": "{\"Artikelnr.\": \"4268-12-12\", \"Flänsstorlek\": \"3/4\\\"\", \"Typ\": \"SC 45°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 130,
+      "product_code": "4268-16-12",
+      "specifications": "{\"Artikelnr.\": \"4268-16-12\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SC 45°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 130,
+      "product_code": "4268-16-16",
+      "specifications": "{\"Artikelnr.\": \"4268-16-16\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SC 45°\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 130,
+      "product_code": "4268-20-20",
+      "specifications": "{\"Artikelnr.\": \"4268-20-20\", \"Flänsstorlek\": \"1 1/4\\\"\", \"Typ\": \"SC 45°\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 130,
+      "product_code": "4268-24-24",
+      "specifications": "{\"Artikelnr.\": \"4268-24-24\", \"Flänsstorlek\": \"1 1/2\\\"\", \"Typ\": \"SC 45°\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

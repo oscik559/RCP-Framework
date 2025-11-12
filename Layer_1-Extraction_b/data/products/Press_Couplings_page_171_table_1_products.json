@@ -1,0 +1,66 @@
+{
+  "pdf_page_number": 6,
+  "footer_page_number": 171,
+  "table_number": 1,
+  "family_id": 84,
+  "extraction_method": "vlm",
+  "product_count": 8,
+  "products": [
+    {
+      "family_id": 84,
+      "product_code": "4200-26-03",
+      "specifications": "{\"Artikelnr.\": \"4200-26-03\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 84,
+      "product_code": "4200-26-04",
+      "specifications": "{\"Artikelnr.\": \"4200-26-04\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 84,
+      "product_code": "4200-26-05",
+      "specifications": "{\"Artikelnr.\": \"4200-26-05\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 84,
+      "product_code": "4200-26-06",
+      "specifications": "{\"Artikelnr.\": \"4200-26-06\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 84,
+      "product_code": "4200-26-08",
+      "specifications": "{\"Artikelnr.\": \"4200-26-08\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 84,
+      "product_code": "4200-26-10",
+      "specifications": "{\"Artikelnr.\": \"4200-26-10\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 84,
+      "product_code": "4200-26-12",
+      "specifications": "{\"Artikelnr.\": \"4200-26-12\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 84,
+      "product_code": "4200-26-16",
+      "specifications": "{\"Artikelnr.\": \"4200-26-16\", \"Används med\": \"P.T.F.E. slät\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "pdf_page_number": 12,
+  "footer_page_number": 177,
+  "table_number": 3,
+  "family_id": 114,
+  "extraction_method": "vlm",
+  "product_count": 7,
+  "products": [
+    {
+      "family_id": 114,
+      "product_code": "4218-07-04-1",
+      "specifications": "{\"Artikelnr.\": \"4218-07-04-1\", \"Gänga\": \"7/16\\\"-20 UNF\", \"Typ\": \"K JIC 90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 114,
+      "product_code": "4218-09-06-1",
+      "specifications": "{\"Artikelnr.\": \"4218-09-06-1\", \"Gänga\": \"9/16\\\"-18 UNF\", \"Typ\": \"K JIC 90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 114,
+      "product_code": "4218-12-08-1",
+      "specifications": "{\"Artikelnr.\": \"4218-12-08-1\", \"Gänga\": \"3/4\\\"-16 UNF\", \"Typ\": \"K JIC 90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 114,
+      "product_code": "4218-14-08-1",
+      "specifications": "{\"Artikelnr.\": \"4218-14-08-1\", \"Gänga\": \"7/8\\\"-14 UNF\", \"Typ\": \"K JIC 90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 114,
+      "product_code": "4218-14-10-1",
+      "specifications": "{\"Artikelnr.\": \"4218-14-10-1\", \"Gänga\": \"7/8\\\"-14 UNF\", \"Typ\": \"K JIC 90° IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 114,
+      "product_code": "4218-17-12-1",
+      "specifications": "{\"Artikelnr.\": \"4218-17-12-1\", \"Gänga\": \"1 1/16\\\"-12 UN\", \"Typ\": \"K JIC 90° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 114,
+      "product_code": "4218-21-16-1",
+      "specifications": "{\"Artikelnr.\": \"4218-21-16-1\", \"Gänga\": \"1 5/16\\\"-12 UN\", \"Typ\": \"K JIC 90° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "pdf_page_number": 18,
+  "footer_page_number": 183,
+  "table_number": 1,
+  "family_id": 139,
+  "extraction_method": "vlm",
+  "product_count": 22,
+  "products": [
+    {
+      "family_id": 139,
+      "product_code": "4223-14-03",
+      "specifications": "{\"Artikelnr.\": \"4223-14-03\", \"Gänga\": \"M 14 x 1,5\", \"Rör\": \"6 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-14-04",
+      "specifications": "{\"Artikelnr.\": \"4223-14-04\", \"Gänga\": \"M 14 x 1,5\", \"Rör\": \"6 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-16-03",
+      "specifications": "{\"Artikelnr.\": \"4223-16-03\", \"Gänga\": \"M 16 x 1,5\", \"Rör\": \"8 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-16-04",
+      "specifications": "{\"Artikelnr.\": \"4223-16-04\", \"Gänga\": \"M 16 x 1,5\", \"Rör\": \"8 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-18-04",
+      "specifications": "{\"Artikelnr.\": \"4223-18-04\", \"Gänga\": \"M 18 x 1,5\", \"Rör\": \"10 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-18-05",
+      "specifications": "{\"Artikelnr.\": \"4223-18-05\", \"Gänga\": \"M 18 x 1,5\", \"Rör\": \"10 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-18-06",
+      "specifications": "{\"Artikelnr.\": \"4223-18-06\", \"Gänga\": \"M 18 x 1,5\", \"Rör\": \"10 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-20-04",
+      "specifications": "{\"Artikelnr.\": \"4223-20-04\", \"Gänga\": \"M 20 x 1,5\", \"Rör\": \"12 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-20-05",
+      "specifications": "{\"Artikelnr.\": \"4223-20-05\", \"Gänga\": \"M 20 x 1,5\", \"Rör\": \"12 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-20-06",
+      "specifications": "{\"Artikelnr.\": \"4223-20-06\", \"Gänga\": \"M 20 x 1,5\", \"Rör\": \"12 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-20-08",
+      "specifications": "{\"Artikelnr.\": \"4223-20-08\", \"Gänga\": \"M 22 x 1,5\", \"Rör\": \"14 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-22-06",
+      "specifications": "{\"Artikelnr.\": \"4223-22-06\", \"Gänga\": \"M 22 x 1,5\", \"Rör\": \"14 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-22-08",
+      "specifications": "{\"Artikelnr.\": \"4223-22-08\", \"Gänga\": \"M 22 x 1,5\", \"Rör\": \"14 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-24-08",
+      "specifications": "{\"Artikelnr.\": \"4223-24-08\", \"Gänga\": \"M 24 x 1,5\", \"Rör\": \"16 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-30-10",
+      "specifications": "{\"Artikelnr.\": \"4223-30-10\", \"Gänga\": \"M 30 x 2,0\", \"Rör\": \"20 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-30-12",
+      "specifications": "{\"Artikelnr.\": \"4223-30-12\", \"Gänga\": \"M 30 x 2,0\", \"Rör\": \"20 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-36-12",
+      "specifications": "{\"Artikelnr.\": \"4223-36-12\", \"Gänga\": \"M 36 x 2,0\", \"Rör\": \"25 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-36-16",
+      "specifications": "{\"Artikelnr.\": \"4223-36-16\", \"Gänga\": \"M 36 x 2,0\", \"Rör\": \"25 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-42-16",
+      "specifications": "{\"Artikelnr.\": \"4223-42-16\", \"Gänga\": \"M 42 x 2,0\", \"Rör\": \"30 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-42-20",
+      "specifications": "{\"Artikelnr.\": \"4223-42-20\", \"Gänga\": \"M 42 x 2,0\", \"Rör\": \"30 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-52-20",
+      "specifications": "{\"Artikelnr.\": \"4223-52-20\", \"Gänga\": \"M 52 x 2,0\", \"Rör\": \"38 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 139,
+      "product_code": "4223-52-24",
+      "specifications": "{\"Artikelnr.\": \"4223-52-24\", \"Gänga\": \"M 52 x 2,0\", \"Rör\": \"38 mm\", \"Typ\": \"SKS\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

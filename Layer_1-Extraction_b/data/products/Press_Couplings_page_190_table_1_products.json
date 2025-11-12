@@ -1,0 +1,45 @@
+{
+  "pdf_page_number": 25,
+  "footer_page_number": 190,
+  "table_number": 1,
+  "family_id": 173,
+  "extraction_method": "vlm",
+  "product_count": 5,
+  "products": [
+    {
+      "family_id": 173,
+      "product_code": "3C147480400",
+      "specifications": "{\"Artikelnr.\": \"3C147480400\", \"Typ\": \"1/4\\\" Demoneringsring\", \"WEO\": \"10 mm\", \"Ant/förp\": \"10\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 173,
+      "product_code": "3C147480600",
+      "specifications": "{\"Artikelnr.\": \"3C147480600\", \"Typ\": \"3/8\\\" Demoneringsring\", \"WEO\": \"13 mm\", \"Ant/förp\": \"10\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 173,
+      "product_code": "3C147480800",
+      "specifications": "{\"Artikelnr.\": \"3C147480800\", \"Typ\": \"1/2\\\" Demoneringsring\", \"WEO\": \"16 mm\", \"Ant/förp\": \"10\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 173,
+      "product_code": "3C147481200",
+      "specifications": "{\"Artikelnr.\": \"3C147481200\", \"Typ\": \"3/4\\\" Demoneringsring\", \"WEO\": \"23 mm\", \"Ant/förp\": \"10\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 173,
+      "product_code": "3C147481600",
+      "specifications": "{\"Artikelnr.\": \"3C147481600\", \"Typ\": \"1\\\" Demoneringsring\", \"WEO\": \"30 mm\", \"Ant/förp\": \"10\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

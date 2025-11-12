@@ -1,0 +1,73 @@
+{
+  "pdf_page_number": 6,
+  "footer_page_number": 171,
+  "table_number": 2,
+  "family_id": 85,
+  "extraction_method": "vlm",
+  "product_count": 9,
+  "products": [
+    {
+      "family_id": 85,
+      "product_code": "4200-14-03",
+      "specifications": "{\"Artikelnr.\": \"4200-14-03\", \"Används med\": \"Termoplast R7/R8\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-04",
+      "specifications": "{\"Artikelnr.\": \"4200-14-04\", \"Används med\": \"Termoplast R7/R8\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-05",
+      "specifications": "{\"Artikelnr.\": \"4200-14-05\", \"Används med\": \"Termoplast R7/R8\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-06",
+      "specifications": "{\"Artikelnr.\": \"4200-14-06\", \"Används med\": \"Termoplast R7/R8\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-08",
+      "specifications": "{\"Artikelnr.\": \"4200-14-08\", \"Används med\": \"Termoplast R7/R8\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-10",
+      "specifications": "{\"Artikelnr.\": \"4200-14-10\", \"Används med\": \"Termoplast R7/R8\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-12",
+      "specifications": "{\"Artikelnr.\": \"4200-14-12\", \"Används med\": \"Termoplast R7/R8\", \"Slang ID\": \"3/4\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-16",
+      "specifications": "{\"Artikelnr.\": \"4200-14-16\", \"Används med\": \"Termoplast R7\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 85,
+      "product_code": "4200-14-16R8",
+      "specifications": "{\"Artikelnr.\": \"4200-14-16R8\", \"Används med\": \"Termoplast R8\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

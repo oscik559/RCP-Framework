@@ -1,0 +1,178 @@
+{
+  "pdf_page_number": 20,
+  "footer_page_number": 185,
+  "table_number": 4,
+  "family_id": 146,
+  "extraction_method": "vlm",
+  "product_count": 24,
+  "products": [
+    {
+      "family_id": 146,
+      "product_code": "4282-10-03",
+      "specifications": "{\"Artikelnr.\": \"4282-10-03\", \"Bult-Gänga\": \"M 10 x 1,0\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/16\\\"\", \"Höjd\": \"10,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-10-04",
+      "specifications": "{\"Artikelnr.\": \"4282-10-04\", \"Bult-Gänga\": \"M 10 x 1,0\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/4\\\"\", \"Höjd\": \"10,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-12-03",
+      "specifications": "{\"Artikelnr.\": \"4282-12-03\", \"Bult-Gänga\": \"M 12 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/16\\\"\", \"Höjd\": \"12,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-12-04",
+      "specifications": "{\"Artikelnr.\": \"4282-12-04\", \"Bult-Gänga\": \"M 12 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/4\\\"\", \"Höjd\": \"12,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-12-05",
+      "specifications": "{\"Artikelnr.\": \"4282-12-05\", \"Bult-Gänga\": \"M 12 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"5/16\\\"\", \"Höjd\": \"12,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-14-03",
+      "specifications": "{\"Artikelnr.\": \"4282-14-03\", \"Bult-Gänga\": \"M 14 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/16\\\"\", \"Höjd\": \"14,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-14-04",
+      "specifications": "{\"Artikelnr.\": \"4282-14-04\", \"Bult-Gänga\": \"M 14 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/4\\\"\", \"Höjd\": \"14,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-14-05",
+      "specifications": "{\"Artikelnr.\": \"4282-14-05\", \"Bult-Gänga\": \"M 14 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"5/16\\\"\", \"Höjd\": \"14,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-14-06",
+      "specifications": "{\"Artikelnr.\": \"4282-14-06\", \"Bult-Gänga\": \"M 14 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/8\\\"\", \"Höjd\": \"14,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-16-04",
+      "specifications": "{\"Artikelnr.\": \"4282-16-04\", \"Bult-Gänga\": \"M 16 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/4\\\"\", \"Höjd\": \"17,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-16-05",
+      "specifications": "{\"Artikelnr.\": \"4282-16-05\", \"Bult-Gänga\": \"M 16 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"5/16\\\"\", \"Höjd\": \"17,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-16-06",
+      "specifications": "{\"Artikelnr.\": \"4282-16-06\", \"Bult-Gänga\": \"M 16 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/8\\\"\", \"Höjd\": \"17,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-18-04",
+      "specifications": "{\"Artikelnr.\": \"4282-18-04\", \"Bult-Gänga\": \"M 18 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/4\\\"\", \"Höjd\": \"20,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-18-05",
+      "specifications": "{\"Artikelnr.\": \"4282-18-05\", \"Bult-Gänga\": \"M 18 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"5/16\\\"\", \"Höjd\": \"20,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-18-06",
+      "specifications": "{\"Artikelnr.\": \"4282-18-06\", \"Bult-Gänga\": \"M 18 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/8\\\"\", \"Höjd\": \"20,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-18-08",
+      "specifications": "{\"Artikelnr.\": \"4282-18-08\", \"Bult-Gänga\": \"M 18 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/2\\\"\", \"Höjd\": \"20,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-20-06",
+      "specifications": "{\"Artikelnr.\": \"4282-20-06\", \"Bult-Gänga\": \"M 20 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/8\\\"\", \"Höjd\": \"23,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-20-08",
+      "specifications": "{\"Artikelnr.\": \"4282-20-08\", \"Bult-Gänga\": \"M 20 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/2\\\"\", \"Höjd\": \"23,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-22-06",
+      "specifications": "{\"Artikelnr.\": \"4282-22-06\", \"Bult-Gänga\": \"M 22 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/8\\\"\", \"Höjd\": \"22,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-22-08",
+      "specifications": "{\"Artikelnr.\": \"4282-22-08\", \"Bult-Gänga\": \"M 22 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1/2\\\"\", \"Höjd\": \"22,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-22-10",
+      "specifications": "{\"Artikelnr.\": \"4282-22-10\", \"Bult-Gänga\": \"M 22 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"5/8\\\"\", \"Höjd\": \"22,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-26-12",
+      "specifications": "{\"Artikelnr.\": \"4282-26-12\", \"Bult-Gänga\": \"M 26 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/4\\\"\", \"Höjd\": \"29,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-30-12",
+      "specifications": "{\"Artikelnr.\": \"4282-30-12\", \"Bult-Gänga\": \"M 30 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"3/4\\\"\", \"Höjd\": \"30,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 146,
+      "product_code": "4282-30-16",
+      "specifications": "{\"Artikelnr.\": \"4282-30-16\", \"Bult-Gänga\": \"M 30 x 1,5\", \"Typ\": \"Banjo\", \"Slang ID\": \"1\\\"\", \"Höjd\": \"37,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

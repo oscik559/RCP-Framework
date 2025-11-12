@@ -1,0 +1,178 @@
+{
+  "pdf_page_number": 13,
+  "footer_page_number": 178,
+  "table_number": 4,
+  "family_id": 119,
+  "extraction_method": "vlm",
+  "product_count": 24,
+  "products": [
+    {
+      "family_id": 119,
+      "product_code": "4240-02-03",
+      "specifications": "{\"Artikelnr.\": \"4240-02-03\", \"Gänga\": \"1/8\\\"-27 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-02-04",
+      "specifications": "{\"Artikelnr.\": \"4240-02-04\", \"Gänga\": \"1/8\\\"-27 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-04-03",
+      "specifications": "{\"Artikelnr.\": \"4240-04-03\", \"Gänga\": \"1/4\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-04-04",
+      "specifications": "{\"Artikelnr.\": \"4240-04-04\", \"Gänga\": \"1/4\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-04-05",
+      "specifications": "{\"Artikelnr.\": \"4240-04-05\", \"Gänga\": \"1/4\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-04-06",
+      "specifications": "{\"Artikelnr.\": \"4240-04-06\", \"Gänga\": \"1/4\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-06-04",
+      "specifications": "{\"Artikelnr.\": \"4240-06-04\", \"Gänga\": \"3/8\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-06-05",
+      "specifications": "{\"Artikelnr.\": \"4240-06-05\", \"Gänga\": \"3/8\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-06-06",
+      "specifications": "{\"Artikelnr.\": \"4240-06-06\", \"Gänga\": \"3/8\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-06-08",
+      "specifications": "{\"Artikelnr.\": \"4240-06-08\", \"Gänga\": \"3/8\\\"-18 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-08-05",
+      "specifications": "{\"Artikelnr.\": \"4240-08-05\", \"Gänga\": \"1/2\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-08-06",
+      "specifications": "{\"Artikelnr.\": \"4240-08-06\", \"Gänga\": \"1/2\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-08-08",
+      "specifications": "{\"Artikelnr.\": \"4240-08-08\", \"Gänga\": \"1/2\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-08-10",
+      "specifications": "{\"Artikelnr.\": \"4240-08-10\", \"Gänga\": \"1/2\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-12-08",
+      "specifications": "{\"Artikelnr.\": \"4240-12-08\", \"Gänga\": \"3/4\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-12-10",
+      "specifications": "{\"Artikelnr.\": \"4240-12-10\", \"Gänga\": \"3/4\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-12-12",
+      "specifications": "{\"Artikelnr.\": \"4240-12-12\", \"Gänga\": \"3/4\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-12-16",
+      "specifications": "{\"Artikelnr.\": \"4240-12-16\", \"Gänga\": \"3/4\\\"-14 NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-16-12",
+      "specifications": "{\"Artikelnr.\": \"4240-16-12\", \"Gänga\": \"1\\\"-11½ NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-16-16",
+      "specifications": "{\"Artikelnr.\": \"4240-16-16\", \"Gänga\": \"1\\\"-11½ NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-20-16",
+      "specifications": "{\"Artikelnr.\": \"4240-20-16\", \"Gänga\": \"1 1/4\\\"-11½ NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-20-20",
+      "specifications": "{\"Artikelnr.\": \"4240-20-20\", \"Gänga\": \"1 1/4\\\"-11½ NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-24-24",
+      "specifications": "{\"Artikelnr.\": \"4240-24-24\", \"Gänga\": \"1 1/2\\\"-11½ NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 119,
+      "product_code": "4240-32-32",
+      "specifications": "{\"Artikelnr.\": \"4240-32-32\", \"Gänga\": \"2\\\"-11½ NPTF\", \"Typ\": \"UF\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

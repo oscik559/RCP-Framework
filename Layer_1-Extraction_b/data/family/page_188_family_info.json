@@ -1,0 +1,111 @@
+{
+  "page_number": 188,
+  "total_families": 7,
+  "families": [
+    {
+      "family_code": "4284",
+      "name": "M JI",
+      "description": "",
+      "construction_details": "Japansk standard\nKomatsu 60° kona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.06832565799836,
+        62.20158386230469,
+        294.83687264578685,
+        119.00577545166016
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4233-2",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "Rak inv.\nUniversalkona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.51544782850476,
+        61.41966247558594,
+        529.4896714952257,
+        118.2238540649414
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4234-2",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "90° böj\nUniversalkona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.51544782850476,
+        273.7181396484375,
+        529.4896714952257,
+        330.5223083496094
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "4287",
+      "name": "G JI",
+      "description": "",
+      "construction_details": "Japansk standard\n\"Toyota\" 60° kona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.06832565799836,
+        284.108154296875,
+        294.83687264578685,
+        340.9123229980469
+      ],
+      "table_id": 4,
+      "family_id": 4
+    },
+    {
+      "family_code": "4235-2",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "45° böj inv.\nUniversalkona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.51544782850476,
+        441.4950256347656,
+        529.4896714952257,
+        498.2991943359375
+      ],
+      "table_id": 5,
+      "family_id": 5
+    },
+    {
+      "family_code": "4231",
+      "name": "Kobelco",
+      "description": "",
+      "construction_details": "",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.06832565799836,
+        450.7285461425781,
+        294.83687264578685,
+        507.53271484375
+      ],
+      "table_id": 6,
+      "family_id": 6
+    },
+    {
+      "family_code": "4221",
+      "name": "Fransk typ",
+      "description": "",
+      "construction_details": "M-gänga rak utv.\n24° kona, ansl. för tumrör",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.51544782850476,
+        587.9625244140625,
+        529.4896714952257,
+        644.7667236328125
+      ],
+      "table_id": 7,
+      "family_id": 7
+    }
+  ]
+}

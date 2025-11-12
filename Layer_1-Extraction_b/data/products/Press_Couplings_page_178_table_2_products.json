@@ -1,0 +1,59 @@
+{
+  "pdf_page_number": 13,
+  "footer_page_number": 178,
+  "table_number": 2,
+  "family_id": 117,
+  "extraction_method": "vlm",
+  "product_count": 7,
+  "products": [
+    {
+      "family_id": 117,
+      "product_code": "4217-07-04-7",
+      "specifications": "{\"Artikelnr.\": \"4217-07-04-7\", \"Gänga\": \"7/16\\\"-20 UNF\", \"Typ\": \"JIC 45° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 117,
+      "product_code": "4217-09-04-7",
+      "specifications": "{\"Artikelnr.\": \"4217-09-04-7\", \"Gänga\": \"9/16\\\"-18 UNF\", \"Typ\": \"JIC 45° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 117,
+      "product_code": "4217-12-06-7",
+      "specifications": "{\"Artikelnr.\": \"4217-12-06-7\", \"Gänga\": \"3/4\\\"-16 UNF\", \"Typ\": \"JIC 45° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 117,
+      "product_code": "4217-12-08-7",
+      "specifications": "{\"Artikelnr.\": \"4217-12-08-7\", \"Gänga\": \"3/4\\\"-16 UNF\", \"Typ\": \"JIC 45° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 117,
+      "product_code": "4217-14-08-7",
+      "specifications": "{\"Artikelnr.\": \"4217-14-08-7\", \"Gänga\": \"7/8\\\"-14 UNF\", \"Typ\": \"JIC 45° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 117,
+      "product_code": "4217-17-12-7",
+      "specifications": "{\"Artikelnr.\": \"4217-17-12-7\", \"Gänga\": \"1 1/16\\\"-12 UN\", \"Typ\": \"JIC 45° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 117,
+      "product_code": "4217-21-16-7",
+      "specifications": "{\"Artikelnr.\": \"4217-21-16-7\", \"Gänga\": \"1 5/16\\\"-12 UN\", \"Typ\": \"JIC 45° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

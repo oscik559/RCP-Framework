@@ -4,6 +4,11 @@ Table Bounding Box Visualization Only
 
 This script detects tables and draws bounding boxes WITHOUT VLM extraction.
 Use this to verify table detection before running the full extraction.
+
+Features:
+- Visualizes tables with blue boxes
+- Extracts family information with green boxes
+- Maps extracted lines directly to database schema fields
 """
 
 import os
@@ -15,6 +20,12 @@ from PIL import Image, ImageDraw, ImageFont
 import json
 sys.path.append(str(Path(__file__).parent.parent / "data" / "database"))
 from db_utils import DatabaseManager
+
+# Import CategoryExtractor to reuse category extraction logic
+sys.path.append(str(Path(__file__).parent))
+from importlib import import_module
+extract_categories = import_module('2b_extract_categories')
+CategoryExtractor = extract_categories.CategoryExtractor
 
 
 class TableVisualizer:
@@ -33,15 +44,22 @@ class TableVisualizer:
         self.pages_dir = self.script_dir / "data/png_pages"
         self.tables_dir = self.script_dir / "data/tables"
         self.family_dir = self.script_dir / "data/family"  # For family information
-        self.db_manager = DatabaseManager()
+        # Use local database in Layer_1-Extraction_b/data/database/
+        db_path = self.script_dir / "data" / "database" / "harvested.db"
+        self.db_manager = DatabaseManager(str(db_path))
         self.merge_threshold = merge_threshold
         
         # Create directories
         self.tables_dir.mkdir(parents=True, exist_ok=True)
         self.family_dir.mkdir(parents=True, exist_ok=True)
+        self.products_dir = self.script_dir / "data/products"  # For product tables
+        self.products_dir.mkdir(parents=True, exist_ok=True)
         
         # Initialize database with full schema
         self.db_manager.init_database()
+        
+        # Initialize category extractor for reuse
+        self.category_extractor = CategoryExtractor()
     
     def get_exclusion_regions(self, pdf_name, page_number):
         """Get header/footer regions from database to exclude from table detection."""
@@ -81,6 +99,107 @@ class TableVisualizer:
         footer_intersects = table_rect.intersects(exclusion_regions["footer_region"])
         
         return header_intersects or footer_intersects
+    
+    def get_category_id_for_page(self, pdf_path, page_number, exclusion_regions):
+        """
+        Extract category from page header using CategoryExtractor and get/create category_id.
+        
+        Args:
+            pdf_path: Path to PDF file
+            page_number: Page number (1-indexed) 
+            exclusion_regions: Dict with header_region
+            
+        Returns:
+            int: category_id from database
+        """
+        # Open PDF and extract category from header using CategoryExtractor logic
+        doc = fitz.open(pdf_path)
+        page = doc.load_page(page_number - 1)
+        
+        pdf_name = Path(pdf_path).stem
+        
+        # Get header region
+        if not exclusion_regions or not exclusion_regions.get("header_region"):
+            # Use default header region if not available
+            header_bbox = [0, 0, page.rect.width, 60]
+        else:
+            header_bbox = exclusion_regions["header_region"]
+        
+        # Extract text from header (using CategoryExtractor's logic)
+        text_instances = self.category_extractor.extract_header_text(page, header_bbox)
+        
+        # Parse category information (using CategoryExtractor's logic)
+        category_info = self.category_extractor.parse_category_info(text_instances)
+        
+        doc.close()
+        
+        if not category_info or not category_info.get("name"):
+            print(f"      ⚠️  No category found in header for page {page_number}, using default category_id=1")
+            return 1
+        
+        # Look up category in database by name
+        conn = self.db_manager.get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id FROM categories 
+            WHERE name = ? 
+            LIMIT 1
+        ''', (category_info["name"],))
+        
+        result = cursor.fetchone()
+        
+        if result:
+            category_id = result[0]
+            conn.close()
+            return category_id
+        else:
+            # Category not in database yet, insert it
+            cursor.execute('''
+                INSERT INTO categories (name, chapter, description, page_number)
+                VALUES (?, ?, ?, ?)
+            ''', (
+                category_info["name"],
+                category_info.get("chapter", ""),
+                category_info.get("description", ""),
+                page_number
+            ))
+            conn.commit()
+            category_id = cursor.lastrowid
+            print(f"      ✨ Inserted new category '{category_info['name']}' (ID: {category_id})")
+            conn.close()
+            return category_id
+    
+    def extract_page_number_from_footer(self, page, footer_region):
+        """Extract the actual page number from the footer region of the PDF."""
+        # Get text from footer region
+        text_instances = page.get_text("dict")["blocks"]
+        
+        page_numbers = []
+        for block in text_instances:
+            if block.get("type") != 0:  # Skip non-text blocks
+                continue
+            
+            # Check if block is in footer region
+            block_bbox = block.get("bbox", [0, 0, 0, 0])
+            if block_bbox[1] < footer_region[1]:  # Above footer
+                continue
+            
+            # Extract text from footer
+            for line in block.get("lines", []):
+                for span in line.get("spans", []):
+                    text = span.get("text", "").strip()
+                    
+                    # Look for numbers in the footer
+                    if text.isdigit():
+                        page_numbers.append(int(text))
+        
+        # Return the most likely page number (usually the largest number in footer)
+        if page_numbers:
+            # Return the last number found (usually at the end of footer)
+            return page_numbers[-1]
+        
+        return None
     
     def separate_columns(self, tables, page_width=595):
         """Separate tables into left and right columns based on page layout."""
@@ -223,8 +342,8 @@ class TableVisualizer:
     
     def extract_family_info_above_table(self, pdf_path, page_number, table_bbox, num_lines=6):
         """
-        Extract family information from the region above a table.
-        Returns 6 lines of text (some may be empty) plus parsed family data.
+        Extract family information from the region above a table using orange text detection.
+        Extracts 6 lines but maps to 5 database fields (skipping line 4 for construction_details often empty).
         
         Args:
             pdf_path: Path to PDF file
@@ -233,37 +352,94 @@ class TableVisualizer:
             num_lines: Number of lines to extract (default: 6)
             
         Returns:
-            dict: Family information with raw lines and parsed data
+            dict: Family information with database schema fields and bbox
         """
         doc = fitz.open(pdf_path)
         page = doc.load_page(page_number - 1)
         
-        # Define family region above table
+        # Define search region above table
         x0, y0, x1, y1 = table_bbox
         
-        # Family region: 4 lines (code + name + description + group) at ~8-9 points per line = ~40 points
-        family_height = 42  # Balanced to capture 4 key lines without overflow
-        margin = 12  # Tight margin to avoid gaps
-        family_x0 = x0 - 5
-        family_x1 = x1 + 5
-        family_y1 = y0 - margin
-        family_y0 = max(0, family_y1 - family_height)
+        # Search in a large area above table to find orange text
+        search_height = 100  # Look up to 100 points above table
+        search_margin = 5
+        search_x0 = x0 - search_margin
+        search_x1 = x1 + search_margin
+        search_y1 = y0 - 5  # Small gap from table
+        search_y0 = max(0, search_y1 - search_height)
         
-        # Extract text from family region
+        # Get text with formatting to detect orange color
+        search_rect = fitz.Rect(search_x0, search_y0, search_x1, search_y1)
+        text_dict = page.get_text("dict", clip=search_rect)
+        
+        # Find orange text blocks (family codes are in orange)
+        orange_blocks = []
+        for block in text_dict.get("blocks", []):
+            if block.get("type") == 0:  # Text block
+                for line in block.get("lines", []):
+                    for span in line.get("spans", []):
+                        color = span.get("color", 0)
+                        # Orange color found in PDF: 15492616 (0xEC5418 = RGB 236,84,24)
+                        # Allow range for slight variations
+                        if 15400000 <= color <= 15600000:  # Orange range
+                            bbox = span.get("bbox", [0, 0, 0, 0])
+                            text = span.get("text", "").strip()
+                            if text:
+                                orange_blocks.append({
+                                    "text": text,
+                                    "bbox": bbox,
+                                    "y0": bbox[1],
+                                    "y1": bbox[3]
+                                })
+        
+        # If we found orange text, use it to define the family region
+        if orange_blocks:
+            # Sort by vertical position (top to bottom)
+            orange_blocks.sort(key=lambda b: b["y0"])
+            
+            # Find the topmost and bottommost orange text
+            top_orange_y = orange_blocks[0]["y0"]
+            bottom_orange_y = orange_blocks[-1]["y1"]
+            
+            # Extend region slightly to capture text below orange header
+            family_x0 = x0 - 5
+            family_x1 = x1 + 5
+            family_y0 = max(0, top_orange_y - 3)  # Start just above orange text
+            family_y1 = min(search_y1, bottom_orange_y + 40)  # Extend ~40pts below for name/desc
+        else:
+            # Fallback: use fixed region if no orange text found
+            family_height = 42
+            margin = 5
+            family_x0 = x0 - 5
+            family_x1 = x1 + 5
+            family_y1 = y0 - margin
+            family_y0 = max(0, family_y1 - family_height)
+        
+        # Extract text from family region using dict method for better character extraction
         family_rect = fitz.Rect(family_x0, family_y0, family_x1, family_y1)
-        raw_text_result = page.get_text("text", clip=family_rect)
-        raw_text = str(raw_text_result) if raw_text_result else ""
+        text_dict_family = page.get_text("dict", clip=family_rect)
+        
+        # Extract text from dict while preserving line structure
+        raw_lines = []
+        for block in text_dict_family.get("blocks", []):
+            if block.get("type") == 0:  # Text block
+                for line in block.get("lines", []):
+                    line_text = ""
+                    for span in line.get("spans", []):
+                        line_text += span.get("text", "")
+                    raw_lines.append(line_text.strip())
         
         doc.close()
         
-        # Split into lines and clean
-        lines = [line.strip() for line in raw_text.split('\n')]
-        
-        # Remove empty lines but track their positions
+        # Clean extracted lines
         cleaned_lines = []
-        for line in lines:
-            # Remove PDF artifacts
+        for line in raw_lines:
+            # Remove PDF artifacts and normalize unicode
             line = line.replace('\u0015', '').replace('\u0012', '').replace('\u0005', '')
+            # Fix PDF encoding issues - degree symbol often extracted as \x98
+            line = line.replace('\x98', '°')
+            # Fix common OCR issues
+            line = line.replace('4niied', 'Unified').replace('4nified', 'Unified')
             cleaned_lines.append(line if line.strip() else "")
         
         # Ensure we have exactly num_lines (pad with empty strings if needed)
@@ -273,91 +449,61 @@ class TableVisualizer:
         # Take only the requested number of lines
         family_lines = cleaned_lines[:num_lines]
         
-        # Parse family information from lines
-        family_data = self._parse_family_lines(family_lines)
+        # Smart field mapping based on content
+        # Line 0: family_code (always)
+        # Line 1: name (always)
+        # Find "PRODUKTGRUPP" to identify subtitle line
+        # Everything between name and subtitle goes to construction_details
+        
+        family_code = family_lines[0] if len(family_lines) > 0 else ""
+        name = family_lines[1] if len(family_lines) > 1 else ""
+        
+        # Find which line contains "PRODUKTGRUPP" for subtitle
+        subtitle_line_idx = -1
+        for i in range(2, len(family_lines)):
+            if "PRODUKTGRUPP" in family_lines[i]:
+                subtitle_line_idx = i
+                break
+        
+        # Build construction_details from lines between name and subtitle
+        construction_parts = []
+        if subtitle_line_idx > 2:
+            # Lines 2 to (subtitle_line_idx - 1) go to construction_details
+            for i in range(2, subtitle_line_idx):
+                if family_lines[i]:
+                    construction_parts.append(family_lines[i])
+        
+        construction_details = "\n".join(construction_parts)
+        subtitle = family_lines[subtitle_line_idx] if subtitle_line_idx >= 0 else ""
+        
+        # Clean family_code: replace tilde with dash
+        family_code = family_code.replace("~", "-")
         
         return {
-            "line_1": family_lines[0],
-            "line_2": family_lines[1],
-            "line_3": family_lines[2],
-            "line_4": family_lines[3],
-            "line_5": family_lines[4],
-            "line_6": family_lines[5],
-            "parsed": family_data
+            "family_code": family_code,
+            "name": name,
+            "description": "",  # Empty for this extraction
+            "construction_details": construction_details,
+            "subtitle": subtitle,
+            "bbox": [family_x0, family_y0, family_x1, family_y1]
         }
     
-    def _parse_family_lines(self, lines):
+    def save_family_information(self, actual_page_number, families_data, pdf_path, pdf_page_number, exclusion_regions):
         """
-        Parse family lines to extract structured information.
-        
-        Common patterns:
-        - Line 1: Family code (e.g., 4200-12, 4311)
-        - Line 2: Name/Type (e.g., G-gängad, Hylsa EN2SN)
-        - Line 3: Connection type (e.g., Rak inv., 90° Smidd inv.)
-        - Line 4: Description (e.g., 60° tätningskona med O-ring)
-        - Line 5: Additional info (often empty)
-        - Line 6: Product group (e.g., PRODUKTGRUPP 30)
-        """
-        import re
-        
-        parsed = {
-            "family_code": "",
-            "name": "",
-            "connection_type": "",
-            "description": "",
-            "product_group": "",
-            "additional_info": ""
-        }
-        
-        for i, line in enumerate(lines, 1):
-            if not line.strip():
-                continue
-            
-            # Detect family code (4-digit or 4-digit-2digit pattern)
-            if re.match(r'^\d{4}(-\d{2})?$', line.strip()):
-                parsed["family_code"] = line.strip()
-            
-            # Detect product group
-            elif 'PRODUKTGRUPP' in line.upper():
-                parsed["product_group"] = line.strip()
-            
-            # Detect connection types (threading, angles)
-            elif any(pattern in line for pattern in ['gängad', '°', 'Rak', 'Smidd', 'inv.', 'utv.']):
-                if not parsed["connection_type"]:
-                    parsed["connection_type"] = line.strip()
-                elif not parsed["description"]:
-                    parsed["description"] = line.strip()
-            
-            # Detect sleeve/hose types
-            elif any(keyword in line.upper() for keyword in ['HYLSA', 'SLANG', 'EN', 'DIN']):
-                if not parsed["name"]:
-                    parsed["name"] = line.strip()
-                else:
-                    parsed["description"] = line.strip()
-            
-            # General meaningful content
-            elif len(line.strip()) > 3:
-                if not parsed["name"]:
-                    parsed["name"] = line.strip()
-                elif not parsed["description"]:
-                    parsed["description"] = line.strip()
-                else:
-                    parsed["additional_info"] = line.strip()
-        
-        return parsed
-    
-    def save_family_information(self, page_number, families_data):
-        """
-        Save family information to JSON file.
+        Save family information to JSON file and database.
         
         Args:
-            page_number: Page number
+            actual_page_number: Actual page number from footer (for database storage)
             families_data: List of family information dictionaries
+            pdf_path: Path to PDF file (for category extraction)
+            pdf_page_number: PDF page number (for opening correct page)
+            exclusion_regions: Dict with header_region (for category extraction)
         """
-        output_file = self.family_dir / f"page_{page_number:03d}_family_info.json"
+        # Save to JSON file
+        output_file = self.family_dir / f"page_{actual_page_number:03d}_family_info.json"
         
         structured_data = {
-            "page_number": page_number,
+            "page_number": actual_page_number,
             "total_families": len(families_data),
             "families": families_data
         }
@@ -366,6 +512,49 @@ class TableVisualizer:
             json.dump(structured_data, f, indent=2, ensure_ascii=False)
         
         print(f"   📋 Saved family information to {output_file.name}")
+        
+        # Insert into database
+        conn = self.db_manager.get_connection()
+        cursor = conn.cursor()
+        
+        # Get category_id for this page by extracting category from header
+        # Use pdf_page_number to open the correct page in the PDF
+        category_id = self.get_category_id_for_page(pdf_path, pdf_page_number, exclusion_regions)
+        
+        for family in families_data:
+            try:
+                # Build construction_details JSON
+                construction_json = json.dumps({
+                    "details": family.get("construction_details", "")
+                }, ensure_ascii=False) if family.get("construction_details") else None
+                
+                # Insert family with category_id from database
+                cursor.execute('''
+                    INSERT OR REPLACE INTO product_families 
+                    (category_id, family_code, name, subtitle, description, construction_details, page_number)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    category_id,
+                    family.get("family_code", ""),
+                    family.get("name", ""),
+                    family.get("subtitle", ""),
+                    family.get("description", ""),
+                    construction_json,
+                    actual_page_number  # Use actual_page_number for database storage
+                ))
+                
+                # Get the inserted family ID
+                family_db_id = cursor.lastrowid
+                family["db_id"] = family_db_id
+                
+                print(f"      ✅ Inserted family {family.get('family_code')} to DB (ID: {family_db_id})")
+                
+            except Exception as e:
+                print(f"      ⚠️  Error inserting family {family.get('family_code')} to DB: {e}")
+        
+        conn.commit()
+        conn.close()
+        
         return True
     
     def detect_tables_in_pdf_page(self, pdf_path, page_number):
@@ -501,26 +690,11 @@ class TableVisualizer:
         # Draw family regions (if provided)
         if families_data:
             for family in families_data:
-                table_id = family.get("table_id")
-                
-                # Find the corresponding table to get its bbox
-                table = next((t for t in tables if t["table_id"] == table_id), None)
-                if not table:
+                # Use the bbox that was calculated during extraction (based on orange text detection)
+                family_pdf_bbox = family.get("bbox")
+                if not family_pdf_bbox:
                     continue
                 
-                # Calculate family region bbox (same logic as extraction)
-                table_bbox = table["bbox"]
-                x0, y0, x1, y1 = table_bbox
-                
-                # Family region: 4 lines (code + name + description + group) at ~8-9 points per line = ~40 points
-                family_height = 42  # Balanced to capture 4 key lines without overflow
-                margin = 12  # Tight margin to avoid gaps
-                family_x0 = x0 - 5
-                family_x1 = x1 + 5
-                family_y1 = y0 - margin
-                family_y0 = max(0, family_y1 - family_height)
-                
-                family_pdf_bbox = [family_x0, family_y0, family_x1, family_y1]
                 family_png_bbox = self.scale_bbox_to_png(family_pdf_bbox, pdf_page_size, image.size)
                 
                 # Draw family region box (green)
@@ -528,8 +702,9 @@ class TableVisualizer:
                 
                 # Add family label
                 family_label = f"Family {family.get('family_id', '?')}"
-                if family.get("parsed", {}).get("family_code"):
-                    family_label += f": {family['parsed']['family_code']}"
+                # Use family_code for label
+                if family.get("family_code"):
+                    family_label += f": {family['family_code']}"
                 
                 label_x = family_png_bbox[0]
                 label_y = max(0, family_png_bbox[1] - 25)
@@ -540,15 +715,18 @@ class TableVisualizer:
                 draw.text((label_x, label_y), family_label, fill="green", font=font)
                 
                 # Draw connecting line from family to table
-                family_center_x = (family_png_bbox[0] + family_png_bbox[2]) / 2
-                family_bottom = family_png_bbox[3]
-                table_png_bbox = self.scale_bbox_to_png(table_bbox, pdf_page_size, image.size)
-                table_center_x = (table_png_bbox[0] + table_png_bbox[2]) / 2
-                table_top = table_png_bbox[1]
-                
-                # Draw dashed line (approximate with short segments)
-                draw.line([(family_center_x, family_bottom), (table_center_x, table_top)], 
-                         fill="green", width=2)
+                table_id = family.get("table_id")
+                table = next((t for t in tables if t["table_id"] == table_id), None)
+                if table:
+                    family_center_x = (family_png_bbox[0] + family_png_bbox[2]) / 2
+                    family_bottom = family_png_bbox[3]
+                    table_png_bbox = self.scale_bbox_to_png(table["bbox"], pdf_page_size, image.size)
+                    table_center_x = (table_png_bbox[0] + table_png_bbox[2]) / 2
+                    table_top = table_png_bbox[1]
+                    
+                    # Draw connecting line
+                    draw.line([(family_center_x, family_bottom), (table_center_x, table_top)], 
+                             fill="green", width=2)
         
         # Draw detected tables
         for i, table in enumerate(tables):
@@ -584,10 +762,23 @@ class TableVisualizer:
         """Visualize table detection for a single page."""
         print(f"\n=== Page {page_number} ===")
         
-        # Get PDF page dimensions
+        # Get PDF page dimensions and extract actual page number from footer
         doc = fitz.open(pdf_path)
         page = doc.load_page(page_number - 1)
         pdf_page_size = (page.rect.width, page.rect.height)
+        
+        # Get exclusion regions to find footer
+        pdf_name = Path(pdf_path).stem
+        exclusion_regions = self.get_exclusion_regions(pdf_name, page_number)
+        
+        # Extract actual page number from footer
+        actual_page_number = page_number  # Default to PDF page number
+        if exclusion_regions and exclusion_regions.get("footer_region"):
+            footer_page_num = self.extract_page_number_from_footer(page, exclusion_regions["footer_region"])
+            if footer_page_num:
+                actual_page_number = footer_page_num
+                print(f"📄 Footer page number: {actual_page_number}")
+        
         doc.close()
         
         # Detect tables
@@ -621,27 +812,19 @@ class TableVisualizer:
             
             # Display extracted family info
             print(f"   Family {i} (Table {table['table_id']}):")
-            for line_num in range(1, 7):
-                line_content = family_info[f"line_{line_num}"]
-                if line_content:
-                    print(f"      Line {line_num}: {line_content}")
-                else:
-                    print(f"      Line {line_num}: (empty)")
-            
-            parsed = family_info["parsed"]
-            if parsed["family_code"]:
-                print(f"      → Family Code: {parsed['family_code']}")
-            if parsed["name"]:
-                print(f"      → Name: {parsed['name']}")
-            if parsed["product_group"]:
-                print(f"      → Product Group: {parsed['product_group']}")
+            print(f"      family_code: {family_info.get('family_code', '')}")
+            print(f"      name: {family_info.get('name', '')}")
+            print(f"      description: {family_info.get('description', '')}")
+            print(f"      subtitle: {family_info.get('subtitle', '')}")
+            print(f"      construction_details: {family_info.get('construction_details', '')}")
         
         # Draw visualization (with family regions)
         pdf_name = Path(pdf_path).stem
         viz_path = self.draw_table_boxes(png_path, tables, pdf_page_size, exclusion_regions, page_number, pdf_name, families_data)
         
-        # Save family information
-        self.save_family_information(page_number, families_data)
+        # Save family information with actual page number from footer
+        # Pass both actual_page_number (for storage) and page_number (for PDF extraction)
+        self.save_family_information(actual_page_number, families_data, pdf_path, page_number, exclusion_regions)
         
         return {
             "page": page_number,
@@ -716,7 +899,7 @@ def main():
     # Initialize visualizer with threshold
     if args.no_merge:
         print("Table merging DISABLED - keeping all tables separate")
-        visualizer = TableVisualizer(merge_threshold=0)  # Setting to 0 disables merging
+        visualizer = TableVisualizer(merge_threshold=0)
     else:
         print(f"Using merge threshold: {args.merge_threshold} points")
         visualizer = TableVisualizer(merge_threshold=args.merge_threshold)

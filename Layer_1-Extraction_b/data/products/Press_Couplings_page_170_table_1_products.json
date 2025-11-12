@@ -1,0 +1,59 @@
+{
+  "pdf_page_number": 5,
+  "footer_page_number": 170,
+  "table_number": 1,
+  "family_id": 76,
+  "extraction_method": "vlm",
+  "product_count": 7,
+  "products": [
+    {
+      "family_id": 76,
+      "product_code": "4200-07-04",
+      "specifications": "{\"Artikelnr.\": \"4200-07-04\", \"Används med\": \"EN1SC\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 76,
+      "product_code": "4200-07-05",
+      "specifications": "{\"Artikelnr.\": \"4200-07-05\", \"Används med\": \"EN1SC\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 76,
+      "product_code": "4200-07-06",
+      "specifications": "{\"Artikelnr.\": \"4200-07-06\", \"Används med\": \"EN1SC\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 76,
+      "product_code": "4200-07-08",
+      "specifications": "{\"Artikelnr.\": \"4200-07-08\", \"Används med\": \"EN1SC\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 76,
+      "product_code": "4200-07-10",
+      "specifications": "{\"Artikelnr.\": \"4200-07-10\", \"Används med\": \"EN1SC\", \"Slang ID\": \"3/8\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 76,
+      "product_code": "4200-07-12",
+      "specifications": "{\"Artikelnr.\": \"4200-07-12\", \"Används med\": \"EN1SC\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 76,
+      "product_code": "4200-07-16",
+      "specifications": "{\"Artikelnr.\": \"4200-07-16\", \"Används med\": \"EN1SC\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

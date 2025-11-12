@@ -1,0 +1,87 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 6,
+  "family_id": 170,
+  "extraction_method": "vlm",
+  "product_count": 11,
+  "products": [
+    {
+      "family_id": 170,
+      "product_code": "3C147100403",
+      "specifications": "{\"Artikelnr.\": \"3C147100403\", \"Typ\": \"Plug-in rak\", \"WEO\": \"10 mm\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147100404",
+      "specifications": "{\"Artikelnr.\": \"3C147100404\", \"Typ\": \"Plug-in rak\", \"WEO\": \"10 mm\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147100604",
+      "specifications": "{\"Artikelnr.\": \"3C147100604\", \"Typ\": \"Plug-in rak\", \"WEO\": \"13 mm\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147100605",
+      "specifications": "{\"Artikelnr.\": \"3C147100605\", \"Typ\": \"Plug-in rak\", \"WEO\": \"13 mm\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147100606",
+      "specifications": "{\"Artikelnr.\": \"3C147100606\", \"Typ\": \"Plug-in rak\", \"WEO\": \"13 mm\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147100806",
+      "specifications": "{\"Artikelnr.\": \"3C147100806\", \"Typ\": \"Plug-in rak\", \"WEO\": \"16 mm\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147100808",
+      "specifications": "{\"Artikelnr.\": \"3C147100808\", \"Typ\": \"Plug-in rak\", \"WEO\": \"16 mm\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147101208",
+      "specifications": "{\"Artikelnr.\": \"3C147101208\", \"Typ\": \"Plug-in rak\", \"WEO\": \"23 mm\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147101210",
+      "specifications": "{\"Artikelnr.\": \"3C147101210\", \"Typ\": \"Plug-in rak\", \"WEO\": \"23 mm\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147101212",
+      "specifications": "{\"Artikelnr.\": \"3C147101212\", \"Typ\": \"Plug-in rak\", \"WEO\": \"23 mm\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 170,
+      "product_code": "3C147101616",
+      "specifications": "{\"Artikelnr.\": \"3C147101616\", \"Typ\": \"Plug-in rak\", \"WEO\": \"30 mm\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

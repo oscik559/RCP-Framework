@@ -1,0 +1,73 @@
+{
+  "pdf_page_number": 20,
+  "footer_page_number": 185,
+  "table_number": 5,
+  "family_id": 147,
+  "extraction_method": "vlm",
+  "product_count": 9,
+  "products": [
+    {
+      "family_id": 147,
+      "product_code": "4282-01-10",
+      "specifications": "{\"Artikelnr.\": \"4282-01-10\", \"Gänga\": \"M 10x1,0\", \"Typ\": \"Banjobult\", \"Längd\": \"21,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-12",
+      "specifications": "{\"Artikelnr.\": \"4282-01-12\", \"Gänga\": \"M 12x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"25,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-14",
+      "specifications": "{\"Artikelnr.\": \"4282-01-14\", \"Gänga\": \"M 14x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"30,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-16",
+      "specifications": "{\"Artikelnr.\": \"4282-01-16\", \"Gänga\": \"M 16x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"32,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-18",
+      "specifications": "{\"Artikelnr.\": \"4282-01-18\", \"Gänga\": \"M 18x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"36,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-20",
+      "specifications": "{\"Artikelnr.\": \"4282-01-20\", \"Gänga\": \"M 20x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"39,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-22",
+      "specifications": "{\"Artikelnr.\": \"4282-01-22\", \"Gänga\": \"M 22x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"41,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-26",
+      "specifications": "{\"Artikelnr.\": \"4282-01-26\", \"Gänga\": \"M 26x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"48,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 147,
+      "product_code": "4282-01-30",
+      "specifications": "{\"Artikelnr.\": \"4282-01-30\", \"Gänga\": \"M 30x1,5\", \"Typ\": \"Banjobult\", \"Längd\": \"53,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

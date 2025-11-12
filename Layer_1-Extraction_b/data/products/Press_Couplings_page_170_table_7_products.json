@@ -1,0 +1,59 @@
+{
+  "pdf_page_number": 5,
+  "footer_page_number": 170,
+  "table_number": 7,
+  "family_id": 82,
+  "extraction_method": "vlm",
+  "product_count": 7,
+  "products": [
+    {
+      "family_id": 82,
+      "product_code": "4200-19-04",
+      "specifications": "{\"Artikelnr.\": \"4200-19-04\", \"Används med\": \"EN4SP/Deltaflex\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 82,
+      "product_code": "4200-19-06",
+      "specifications": "{\"Artikelnr.\": \"4200-19-06\", \"Används med\": \"EN4SP/Deltaflex/IsoBar 350\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 82,
+      "product_code": "4200-19-08",
+      "specifications": "{\"Artikelnr.\": \"4200-19-08\", \"Används med\": \"EN4SP/Deltaflex /IsoBar 350\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 82,
+      "product_code": "4200-19-10",
+      "specifications": "{\"Artikelnr.\": \"4200-19-10\", \"Används med\": \"EN4SP/Deltaflex\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 82,
+      "product_code": "4200-19-12",
+      "specifications": "{\"Artikelnr.\": \"4200-19-12\", \"Används med\": \"EN4SP/4SH/Deltaflex./IsoBar 350\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 82,
+      "product_code": "4200-19-16",
+      "specifications": "{\"Artikelnr.\": \"4200-19-16\", \"Används med\": \"EN 4SP/ 4SH/ Deltaflex /Isobar350\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 82,
+      "product_code": "4200-19-20",
+      "specifications": "{\"Artikelnr.\": \"4200-19-20\", \"Används med\": \"EN4SP\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

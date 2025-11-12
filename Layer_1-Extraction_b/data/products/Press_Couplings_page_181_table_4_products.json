@@ -1,0 +1,150 @@
+{
+  "pdf_page_number": 16,
+  "footer_page_number": 181,
+  "table_number": 4,
+  "family_id": 134,
+  "extraction_method": "vlm",
+  "product_count": 20,
+  "products": [
+    {
+      "family_id": 134,
+      "product_code": "4272-06-03-2",
+      "specifications": "{\"Artikelnr.\": \"4272-06-03-2\", \"Gänga\": \"M 12 x 1.5\", \"Rör\": \"6 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-06-04",
+      "specifications": "{\"Artikelnr.\": \"4272-06-04\", \"Gänga\": \"M 12 x 1.5\", \"Rör\": \"6 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-08-03-2",
+      "specifications": "{\"Artikelnr.\": \"4272-08-03-2\", \"Gänga\": \"M 14 x 1.5\", \"Rör\": \"8 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-08-04-2",
+      "specifications": "{\"Artikelnr.\": \"4272-08-04-2\", \"Gänga\": \"M 14 x 1.5\", \"Rör\": \"8 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-10-04-2",
+      "specifications": "{\"Artikelnr.\": \"4272-10-04-2\", \"Gänga\": \"M 16 x 1.5\", \"Rör\": \"10 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-10-05-2",
+      "specifications": "{\"Artikelnr.\": \"4272-10-05-2\", \"Gänga\": \"M 16 x 1.5\", \"Rör\": \"10 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-10-06",
+      "specifications": "{\"Artikelnr.\": \"4272-10-06\", \"Gänga\": \"M 16 x 1.5\", \"Rör\": \"10 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-12-04-2",
+      "specifications": "{\"Artikelnr.\": \"4272-12-04-2\", \"Gänga\": \"M 18 x 1.5\", \"Rör\": \"12 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-12-05-2",
+      "specifications": "{\"Artikelnr.\": \"4272-12-05-2\", \"Gänga\": \"M 18 x 1.5\", \"Rör\": \"12 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-12-06-2",
+      "specifications": "{\"Artikelnr.\": \"4272-12-06-2\", \"Gänga\": \"M 18 x 1.5\", \"Rör\": \"12 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-15-06-2",
+      "specifications": "{\"Artikelnr.\": \"4272-15-06-2\", \"Gänga\": \"M 22 x 1.5\", \"Rör\": \"15 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-15-08-2",
+      "specifications": "{\"Artikelnr.\": \"4272-15-08-2\", \"Gänga\": \"M 22 x 1.5\", \"Rör\": \"15 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-18-08-2",
+      "specifications": "{\"Artikelnr.\": \"4272-18-08-2\", \"Gänga\": \"M 26 x 1.5\", \"Rör\": \"18 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-18-10-2",
+      "specifications": "{\"Artikelnr.\": \"4272-18-10-2\", \"Gänga\": \"M 26 x 1.5\", \"Rör\": \"18 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-18-12",
+      "specifications": "{\"Artikelnr.\": \"4272-18-12\", \"Gänga\": \"M 26 x 1.5\", \"Rör\": \"18 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-22-10-2",
+      "specifications": "{\"Artikelnr.\": \"4272-22-10-2\", \"Gänga\": \"M 30 x 2.0\", \"Rör\": \"22 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-22-12-2",
+      "specifications": "{\"Artikelnr.\": \"4272-22-12-2\", \"Gänga\": \"M 30 x 2.0\", \"Rör\": \"22 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-28-16-2",
+      "specifications": "{\"Artikelnr.\": \"4272-28-16-2\", \"Gänga\": \"M 36 x 2.0\", \"Rör\": \"28 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-35-20-2",
+      "specifications": "{\"Artikelnr.\": \"4272-35-20-2\", \"Gänga\": \"M 45 x 2.0\", \"Rör\": \"35 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 134,
+      "product_code": "4272-42-24-2",
+      "specifications": "{\"Artikelnr.\": \"4272-42-24-2\", \"Gänga\": \"M 52 x 2.0\", \"Rör\": \"42 mm\", \"Typ\": \"DKLO 45°\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

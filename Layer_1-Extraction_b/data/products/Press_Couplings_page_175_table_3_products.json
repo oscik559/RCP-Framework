@@ -1,0 +1,31 @@
+{
+  "pdf_page_number": 10,
+  "footer_page_number": 175,
+  "table_number": 3,
+  "family_id": 107,
+  "extraction_method": "vlm",
+  "product_count": 3,
+  "products": [
+    {
+      "family_id": 107,
+      "product_code": "4314-20-20-1",
+      "specifications": "{\"Artikelnr.\": \"4314-20-20-1\", \"Gänga\": \"G 1 1/4\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 107,
+      "product_code": "4314-24-24-1",
+      "specifications": "{\"Artikelnr.\": \"4314-24-24-1\", \"Gänga\": \"G 1 1/2\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 107,
+      "product_code": "4314-32-32-1",
+      "specifications": "{\"Artikelnr.\": \"4314-32-32-1\", \"Gänga\": \"G 2\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

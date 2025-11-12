@@ -192,21 +192,57 @@ class VLMTableDetector:
         self.script_dir = Path(__file__).parent
         self.pages_dir = self.script_dir / "data/png_pages"
         self.tables_dir = self.script_dir / "data/tables"
+        self.products_dir = self.script_dir / "data/products"
+        self.family_dir = self.script_dir / "data/family"
         self.db_manager = DatabaseManager()
         
         # Create directories
         self.tables_dir.mkdir(parents=True, exist_ok=True)
+        self.products_dir.mkdir(parents=True, exist_ok=True)
         
         # Initialize database with full schema
         self.db_manager.init_database()
         
-        # Enhanced Local VLM initialization - using qwen3-vl:32b locally
-        self.local_vlm = OllamaVLM("qwen3-vl:32b")
+        # Enhanced Local VLM initialization - using qwen3-vl:235b-instruct-cloud
+        self.local_vlm = OllamaVLM("qwen3-vl:235b-instruct-cloud")
         
-        # VLM configuration - local only
+        # VLM configuration - using cloud model
         self.vlm_endpoints = [
-            {"url": "http://localhost:11434/api/chat", "model": "qwen3-vl:32b"}
+            {"url": "http://localhost:11434/api/chat", "model": "qwen3-vl:235b-instruct-cloud"}
         ]
+    
+    def extract_page_number_from_footer(self, page, footer_region):
+        """Extract the actual page number from the footer region of the PDF."""
+        if not footer_region:
+            return None
+        
+        # Get text from footer region
+        text_instances = page.get_text("dict")["blocks"]
+        
+        page_numbers = []
+        for block in text_instances:
+            if block.get("type") != 0:  # Skip non-text blocks
+                continue
+            
+            # Check if block is in footer region
+            block_bbox = block.get("bbox", [0, 0, 0, 0])
+            if block_bbox[1] < footer_region[1]:  # Above footer
+                continue
+            
+            # Extract text from footer
+            for line in block.get("lines", []):
+                for span in line.get("spans", []):
+                    text = span.get("text", "").strip()
+                    
+                    # Look for numbers in the footer
+                    if text.isdigit():
+                        page_numbers.append(int(text))
+        
+        # Return the most likely page number (usually the largest number in footer)
+        if page_numbers:
+            return page_numbers[-1]
+        
+        return None
     
     def get_exclusion_regions(self, pdf_name, page_number):
         """Get header/footer regions from database to exclude from table detection."""
@@ -315,22 +351,29 @@ class VLMTableDetector:
         return merged
     
     def merge_table_group(self, table_group):
-        """Merge a group of tables into a single table."""
+        """Merge a group of tables into a single table, preserving both PyMuPDF and VLM data."""
         # Calculate merged bounding box
         min_x = min(table['bbox'][0] for table in table_group)
         min_y = min(table['bbox'][1] for table in table_group)
         max_x = max(table['bbox'][2] for table in table_group)
         max_y = max(table['bbox'][3] for table in table_group)
         
-        # Combine all rows from all tables
+        # Combine all rows from all tables (PyMuPDF data)
         merged_rows = []
         for table in table_group:
             if 'rows' in table and table['rows']:
                 merged_rows.extend(table['rows'])
         
+        # Combine all VLM rows from all tables
+        merged_vlm_rows = []
+        for table in table_group:
+            if 'vlm_rows' in table and table['vlm_rows']:
+                merged_vlm_rows.extend(table['vlm_rows'])
+        
         return {
             'bbox': (min_x, min_y, max_x, max_y),
             'rows': merged_rows,
+            'vlm_rows': merged_vlm_rows,
             'merged_from': len(table_group)
         }
     
@@ -481,14 +524,18 @@ class VLMTableDetector:
         return cropped_table
     
     def detect_tables_in_page(self, pdf_path, page_number, use_vlm=True):
-        """Detect and extract tables from a specific page."""
+        """Detect and extract tables from a specific page.
+        
+        Returns:
+            tuple: (tables_list, footer_page_number) where footer_page_number is the actual page number from the document footer
+        """
         pdf_name = Path(pdf_path).stem
         
         # Open PDF
         pdf_doc = fitz.open(pdf_path)
         if page_number > pdf_doc.page_count:
             print(f"Page {page_number} not found in PDF")
-            return []
+            return [], None
         
         page = pdf_doc[page_number - 1]
         
@@ -496,12 +543,25 @@ class VLMTableDetector:
         png_path = self.pages_dir / f"{pdf_name}_page_{page_number:03d}.png"
         if not png_path.exists():
             print(f"PNG file not found: {png_path}")
-            return []
+            return [], None
         
         png_img = Image.open(png_path)
         
         # Get exclusion regions
         exclusion_regions = self.get_exclusion_regions(pdf_name, page_number)
+        
+        # Extract actual page number from footer
+        footer_page_number = None
+        if exclusion_regions.get('footer'):
+            footer_page_number = self.extract_page_number_from_footer(page, exclusion_regions['footer'])
+            if footer_page_number:
+                print(f"📄 Footer page number: {footer_page_number} (PDF page index: {page_number})")
+            else:
+                print(f"⚠️  Could not extract page number from footer, using PDF index: {page_number}")
+                footer_page_number = page_number
+        else:
+            print(f"⚠️  No footer region found, using PDF index: {page_number}")
+            footer_page_number = page_number
         
         # Detect tables using PyMuPDF
         tables = page.find_tables()
@@ -567,14 +627,190 @@ class VLMTableDetector:
             for i, table in enumerate(final_tables):
                 table['final_index'] = i + 1
             
-            return final_tables
+            return final_tables, footer_page_number
         
-        return detected_tables
+        return detected_tables, footer_page_number
     
-    def save_table_data(self, table_data, pdf_name, page_number, table_number):
-        """Save table data to JSON file."""
+    def get_family_for_table(self, footer_page_number, table_number):
+        """
+        Get the family_id for a table based on the family info JSON file.
+        Uses the table_id from the family JSON to match with the current table.
+        
+        Args:
+            footer_page_number: The actual page number from the document footer (stored in database)
+            table_number: The table index on the page
+            
+        Returns:
+            int: Database ID of the family, or None if not found
+        """
+        # Load family info JSON for this page (uses footer page number for filename)
+        family_json_path = self.family_dir / f"page_{footer_page_number:03d}_family_info.json"
+        
+        if not family_json_path.exists():
+            print(f"⚠️  No family info JSON found: {family_json_path}")
+            return None
+        
+        try:
+            with open(family_json_path, 'r', encoding='utf-8') as f:
+                family_data = json.load(f)
+            
+            # Find the family with matching table_id
+            for family in family_data.get('families', []):
+                if family.get('table_id') == table_number:
+                    family_code = family.get('family_code')
+                    family_name = family.get('name')
+                    
+                    # Get the database ID for this family
+                    # IMPORTANT: Query by page_number which stores the FOOTER page number
+                    conn = self.db_manager.get_connection()
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('''
+                        SELECT id FROM product_families 
+                        WHERE family_code = ? AND page_number = ?
+                    ''', (family_code, footer_page_number))
+                    
+                    result = cursor.fetchone()
+                    conn.close()
+                    
+                    if result:
+                        family_db_id = result[0]
+                        print(f"📎 Linking table {table_number} to family: {family_code} - {family_name} (DB ID: {family_db_id}, Page: {footer_page_number})")
+                        return family_db_id
+                    else:
+                        print(f"⚠️  Family {family_code} not found in database for footer page {footer_page_number}")
+                        return None
+            
+            print(f"⚠️  No family found for table {table_number} on footer page {footer_page_number}")
+            return None
+            
+        except Exception as e:
+            print(f"❌ Error reading family info JSON: {e}")
+            return None
+    
+    def parse_specifications_from_table(self, rows, family_id):
+        """
+        Parse table rows into product specifications.
+        Returns list of product dictionaries ready for database insertion.
+        Handles Unicode properly to avoid control characters.
+        """
+        if not rows or len(rows) < 2:
+            return []
+        
+        # First row is typically headers
+        headers = [str(cell).strip() for cell in rows[0]]
+        
+        products = []
+        
+        # Process each data row
+        for row_idx, row in enumerate(rows[1:], start=1):
+            if not row or all(not cell or str(cell).strip() == '' for cell in row):
+                continue  # Skip empty rows
+            
+            # Build specifications dictionary from row data
+            specs = {}
+            for col_idx, cell in enumerate(row):
+                if col_idx < len(headers) and headers[col_idx]:
+                    header = headers[col_idx]
+                    # Clean the value - remove control characters and ensure proper Unicode
+                    value = str(cell).strip() if cell else ""
+                    
+                    # Remove common control characters that PyMuPDF might insert
+                    value = value.replace('\x00', '').replace('\x01', '').replace('\x02', '')
+                    value = value.replace('\x03', '').replace('\x04', '').replace('\x05', '')
+                    value = value.replace('\x15', '').replace('\x12', '').replace('\u0010', '')
+                    
+                    if value:  # Only add non-empty values
+                        specs[header] = value
+            
+            if not specs:
+                continue
+            
+            # Try to extract product code (usually first column)
+            product_code = str(row[0]).strip() if row else ""
+            
+            # Clean product code from control characters
+            product_code = product_code.replace('\x00', '').replace('\x01', '').replace('\x02', '')
+            product_code = product_code.replace('\x03', '').replace('\x04', '').replace('\x05', '')
+            product_code = product_code.replace('\x15', '').replace('\x12', '').replace('\u0010', '')
+            
+            if not product_code:
+                print(f"⚠️  Row {row_idx} has no product code, skipping")
+                continue
+            
+            # Create product dictionary
+            product = {
+                'family_id': family_id,
+                'product_code': product_code,
+                'specifications': json.dumps(specs, ensure_ascii=False),
+                'configuration_type': 'STANDARD',
+                'page_number': None  # Will be set by caller
+            }
+            
+            products.append(product)
+        
+        return products
+    
+    def save_products_to_database(self, products, page_number):
+        """Save extracted products to the database."""
+        if not products:
+            return 0
+        
+        conn = self.db_manager.get_connection()
+        cursor = conn.cursor()
+        
+        inserted_count = 0
+        
+        for product in products:
+            try:
+                # Set page number
+                product['page_number'] = page_number
+                
+                cursor.execute('''
+                    INSERT OR REPLACE INTO products 
+                    (family_id, product_code, configuration_type, specifications, page_number)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (
+                    product['family_id'],
+                    product['product_code'],
+                    product.get('configuration_type', 'STANDARD'),
+                    product['specifications'],
+                    product['page_number']
+                ))
+                
+                product_db_id = cursor.lastrowid
+                print(f"      ✅ Inserted product {product['product_code']} (ID: {product_db_id})")
+                inserted_count += 1
+                
+            except Exception as e:
+                print(f"      ⚠️  Error inserting product {product.get('product_code')}: {e}")
+        
+        conn.commit()
+        conn.close()
+        
+        return inserted_count
+    
+    def save_table_data(self, table_data, pdf_name, pdf_page_number, footer_page_number, table_number):
+        """Save table data to JSON file and extract products to database.
+        
+        Args:
+            table_data: Dictionary containing table extraction data
+            pdf_name: Name of the PDF file
+            pdf_page_number: Sequential page index in the PDF (for filenames)
+            footer_page_number: Actual page number from document footer (for database queries)
+            table_number: Table index on the page
+        """
         # Determine which data to save (prefer VLM if available)
-        rows_to_save = table_data.get('vlm_rows', table_data.get('rows', []))
+        vlm_rows = table_data.get('vlm_rows', [])
+        pymupdf_rows = table_data.get('rows', [])
+        
+        # Use VLM data if it has content, otherwise fall back to PyMuPDF
+        if vlm_rows:
+            rows_to_save = vlm_rows
+            extraction_method = 'vlm'
+        else:
+            rows_to_save = pymupdf_rows
+            extraction_method = 'pymupdf'
         
         if not rows_to_save:
             print(f"No data to save for table {table_number}")
@@ -584,26 +820,67 @@ class VLMTableDetector:
         num_rows = len(rows_to_save)
         num_cols = max(len(row) for row in rows_to_save) if rows_to_save else 0
         
-        # Create output filename
-        output_file = self.tables_dir / f"{pdf_name}_page_{page_number:03d}_table_{table_number}_{num_rows}x{num_cols}.json"
+        # Create output filename for tables directory (uses PDF page index for file naming)
+        table_output_file = self.tables_dir / f"{pdf_name}_page_{pdf_page_number:03d}_table_{table_number}_{num_rows}x{num_cols}.json"
         
-        # Prepare data structure
-        save_data = {
-            'page_number': page_number,
+        # Prepare table data structure (store both page numbers for reference)
+        table_save_data = {
+            'pdf_page_number': pdf_page_number,
+            'footer_page_number': footer_page_number,
             'table_number': table_number,
             'bbox': table_data['bbox'],
             'dimensions': f"{num_rows}x{num_cols}",
-            'extraction_method': 'vlm' if table_data.get('vlm_rows') else 'pymupdf',
+            'extraction_method': extraction_method,
             'rows': rows_to_save,
             'merged_from': table_data.get('merged_from', 1)
         }
         
-        # Save to file
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(save_data, f, indent=2, ensure_ascii=False)
+        # Save to tables directory
+        with open(table_output_file, 'w', encoding='utf-8') as f:
+            json.dump(table_save_data, f, indent=2, ensure_ascii=False)
         
-        print(f"Saved table {table_number} to {output_file}")
-        return output_file
+        print(f"Saved table {table_number} to {table_output_file}")
+        
+        # === Extract products to database ===
+        print(f"🔄 Extracting products from table {table_number}...")
+        
+        # Get family for this table using the footer page number (which matches database page_number)
+        family_id = self.get_family_for_table(footer_page_number, table_number)
+        
+        if family_id:
+            # Parse products from table (using VLM data)
+            products = self.parse_specifications_from_table(rows_to_save, family_id)
+            
+            if products:
+                print(f"📦 Found {len(products)} products in table")
+                
+                # Save products JSON to products directory (use footer page number for consistency)
+                products_output_file = self.products_dir / f"{pdf_name}_page_{footer_page_number:03d}_table_{table_number}_products.json"
+                
+                products_save_data = {
+                    'pdf_page_number': pdf_page_number,
+                    'footer_page_number': footer_page_number,
+                    'table_number': table_number,
+                    'family_id': family_id,
+                    'extraction_method': extraction_method,
+                    'product_count': len(products),
+                    'products': products
+                }
+                
+                with open(products_output_file, 'w', encoding='utf-8') as f:
+                    json.dump(products_save_data, f, indent=2, ensure_ascii=False)
+                
+                print(f"💾 Saved products JSON to {products_output_file}")
+                
+                # Save to database (use footer page number which matches database page_number column)
+                inserted = self.save_products_to_database(products, footer_page_number)
+                print(f"✅ Inserted {inserted}/{len(products)} products to database")
+            else:
+                print(f"⚠️  No valid products extracted from table")
+        else:
+            print(f"⚠️  Could not determine family for table, skipping product extraction")
+        
+        return table_output_file
     
     def create_visualization(self, pdf_path, page_number, tables):
         """Create annotated PNG with table bounding boxes."""
@@ -695,22 +972,23 @@ def main():
     successful_extractions = 0
     
     for page_num in pages:
-        print(f"\n=== Processing page {page_num} ===")
+        print(f"\n=== Processing PDF page {page_num} ===")
         
-        # Detect tables (now optimized to only send cropped table images to VLM)
-        tables = detector.detect_tables_in_page(pdf_path, page_num, use_vlm=not args.no_vlm)
+        # Detect tables (returns tuple: tables_list, footer_page_number)
+        result = detector.detect_tables_in_page(pdf_path, page_num, use_vlm=not args.no_vlm)
         
-        if not tables:
+        if not result or not result[0]:
             print(f"No tables found on page {page_num}")
             continue
         
-        print(f"Found {len(tables)} tables on page {page_num}")
+        tables, footer_page_num = result
+        print(f"Found {len(tables)} tables on PDF page {page_num} (Footer page: {footer_page_num})")
         total_tables += len(tables)
         
         # Save table data
         for table in tables:
             table_num = table.get('final_index', table.get('table_index', 1))
-            saved_file = detector.save_table_data(table, Path(pdf_path).stem, page_num, table_num)
+            saved_file = detector.save_table_data(table, Path(pdf_path).stem, page_num, footer_page_num, table_num)
             if saved_file:
                 successful_extractions += 1
         

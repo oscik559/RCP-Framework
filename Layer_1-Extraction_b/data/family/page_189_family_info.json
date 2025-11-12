@@ -1,0 +1,126 @@
+{
+  "page_number": 189,
+  "total_families": 8,
+  "families": [
+    {
+      "family_code": "4224-2",
+      "name": "Fransk typ",
+      "description": "",
+      "construction_details": "M-gänga IR",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.22915349687848,
+        61.72282409667969,
+        294.9809341430664,
+        118.52701568603516
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "3C14 710",
+      "name": "Plug-in koppling",
+      "description": "",
+      "construction_details": "Rak R1/R2-slang",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        301.4248046875,
+        62.43632507324219,
+        529.9282571543818,
+        119.24051666259766
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4298",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "Rak inv.\nPlantätning",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.22915349687848,
+        201.4708709716797,
+        294.9809341430664,
+        258.2750549316406
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "3C14 712",
+      "name": "Plug-in koppling 45°",
+      "description": "",
+      "construction_details": "R1/R2-slang",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        301.4248046875,
+        272.69677734375,
+        529.9282571543818,
+        329.5009460449219
+      ],
+      "table_id": 4,
+      "family_id": 4
+    },
+    {
+      "family_code": "4373",
+      "name": "DKSO special",
+      "description": "",
+      "construction_details": "Högtryckstvätt",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.22915349687848,
+        346.9383544921875,
+        294.9809341430664,
+        403.7425231933594
+      ],
+      "table_id": 5,
+      "family_id": 5
+    },
+    {
+      "family_code": "3C14 714",
+      "name": "Plug-in koppling 90°",
+      "description": "",
+      "construction_details": "R1/R2-slang",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        301.4248046875,
+        463.3276062011719,
+        529.9282571543818,
+        520.1317749023438
+      ],
+      "table_id": 6,
+      "family_id": 6
+    },
+    {
+      "family_code": "4374",
+      "name": "Handtagskoppling",
+      "description": "",
+      "construction_details": "Högtryckstvätt",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.22915349687848,
+        469.16217041015625,
+        294.9809341430664,
+        525.9663391113281
+      ],
+      "table_id": 7,
+      "family_id": 7
+    },
+    {
+      "family_code": "4374-11",
+      "name": "Högtryckstvättkoppling",
+      "description": "",
+      "construction_details": "Med lager och bricka",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.22915349687848,
+        595.8251953125,
+        294.9809341430664,
+        652.62939453125
+      ],
+      "table_id": 8,
+      "family_id": 8
+    }
+  ]
+}

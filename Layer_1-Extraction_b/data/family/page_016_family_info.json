@@ -1,0 +1,66 @@
+{
+  "page_number": 16,
+  "total_families": 4,
+  "families": [
+    {
+      "family_code": "KAPITEL 4:2 PRESSKOPPLINGAR",
+      "name": "",
+      "description": "",
+      "construction_details": "",
+      "subtitle": "",
+      "bbox": [
+        66.03490221500397,
+        19.105596368963063,
+        294.01173522949216,
+        61.10559636896306
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4271~2",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "90° böj. Inv. 24°\ntätningskona med O-ring",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.893798828125,
+        61.27104187011719,
+        527.4519586736506,
+        118.07523345947266
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4270~2",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "Rak inv.\n24° tätningskona med O-ring",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.03490221500397,
+        385.37445068359375,
+        294.01173522949216,
+        442.1786193847656
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "4272~2",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "45° böj inv.\n24° tätningskona med O-ring",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.893798828125,
+        388.37127685546875,
+        527.4519586736506,
+        445.1754455566406
+      ],
+      "table_id": 4,
+      "family_id": 4
+    }
+  ]
+}

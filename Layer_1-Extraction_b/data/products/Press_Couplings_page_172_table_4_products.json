@@ -1,0 +1,59 @@
+{
+  "pdf_page_number": 7,
+  "footer_page_number": 172,
+  "table_number": 4,
+  "family_id": 92,
+  "extraction_method": "vlm",
+  "product_count": 7,
+  "products": [
+    {
+      "family_id": 92,
+      "product_code": "4311-12-12-1",
+      "specifications": "{\"Artikelnr.\": \"4311-12-12-1\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"O IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 92,
+      "product_code": "4311-16-12-1",
+      "specifications": "{\"Artikelnr.\": \"4311-16-12-1\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"O IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 92,
+      "product_code": "4311-20-16-1",
+      "specifications": "{\"Artikelnr.\": \"4311-20-16-1\", \"Gänga\": \"G 1 1/4\\\"\", \"Typ\": \"O IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 92,
+      "product_code": "4311-20-20-1",
+      "specifications": "{\"Artikelnr.\": \"4311-20-20-1\", \"Gänga\": \"G 1 1/4\\\"\", \"Typ\": \"O IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 92,
+      "product_code": "4311-24-20-1",
+      "specifications": "{\"Artikelnr.\": \"4311-24-20-1\", \"Gänga\": \"G 1 1/2\\\"\", \"Typ\": \"O IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 92,
+      "product_code": "4311-24-24-1",
+      "specifications": "{\"Artikelnr.\": \"4311-24-24-1\", \"Gänga\": \"G 1 1/2\\\"\", \"Typ\": \"O IR\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 92,
+      "product_code": "4311-32-32-1",
+      "specifications": "{\"Artikelnr.\": \"4311-32-32-1\", \"Gänga\": \"G 2\\\"\", \"Typ\": \"O IR\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

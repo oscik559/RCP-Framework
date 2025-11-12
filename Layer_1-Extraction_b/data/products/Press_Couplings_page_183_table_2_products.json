@@ -1,0 +1,255 @@
+{
+  "pdf_page_number": 18,
+  "footer_page_number": 183,
+  "table_number": 2,
+  "family_id": 140,
+  "extraction_method": "vlm",
+  "product_count": 35,
+  "products": [
+    {
+      "family_id": 140,
+      "product_code": "4226-06-02",
+      "specifications": "{\"Artikelnr.\": \"4226-06-02\", \"Studs Ø\": \"6 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-06-03",
+      "specifications": "{\"Artikelnr.\": \"4226-06-03\", \"Studs Ø\": \"6 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-06-04",
+      "specifications": "{\"Artikelnr.\": \"4226-06-04\", \"Studs Ø\": \"6 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-08-03",
+      "specifications": "{\"Artikelnr.\": \"4226-08-03\", \"Studs Ø\": \"8 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-08-04",
+      "specifications": "{\"Artikelnr.\": \"4226-08-04\", \"Studs Ø\": \"8 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-10-04",
+      "specifications": "{\"Artikelnr.\": \"4226-10-04\", \"Studs Ø\": \"10 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-10-05",
+      "specifications": "{\"Artikelnr.\": \"4226-10-05\", \"Studs Ø\": \"10 mm\", \"Typ\": \"ST\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-10-06",
+      "specifications": "{\"Artikelnr.\": \"4226-10-06\", \"Studs Ø\": \"10 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-12-04",
+      "specifications": "{\"Artikelnr.\": \"4226-12-04\", \"Studs Ø\": \"12 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-12-05",
+      "specifications": "{\"Artikelnr.\": \"4226-12-05\", \"Studs Ø\": \"12 mm\", \"Typ\": \"ST\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-12-06",
+      "specifications": "{\"Artikelnr.\": \"4226-12-06\", \"Studs Ø\": \"12 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-12-08",
+      "specifications": "{\"Artikelnr.\": \"4226-12-08\", \"Studs Ø\": \"12 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-14-06",
+      "specifications": "{\"Artikelnr.\": \"4226-14-06\", \"Studs Ø\": \"14 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-14-08",
+      "specifications": "{\"Artikelnr.\": \"4226-14-08\", \"Studs Ø\": \"14 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-15-06",
+      "specifications": "{\"Artikelnr.\": \"4226-15-06\", \"Studs Ø\": \"15 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-15-08",
+      "specifications": "{\"Artikelnr.\": \"4226-15-08\", \"Studs Ø\": \"15 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-15-10",
+      "specifications": "{\"Artikelnr.\": \"4226-15-10\", \"Studs Ø\": \"15 mm\", \"Typ\": \"ST\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-16-06",
+      "specifications": "{\"Artikelnr.\": \"4226-16-06\", \"Studs Ø\": \"16 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-16-08",
+      "specifications": "{\"Artikelnr.\": \"4226-16-08\", \"Studs Ø\": \"16 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-18-08",
+      "specifications": "{\"Artikelnr.\": \"4226-18-08\", \"Studs Ø\": \"18 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-18-10",
+      "specifications": "{\"Artikelnr.\": \"4226-18-10\", \"Studs Ø\": \"18 mm\", \"Typ\": \"ST\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-18-12",
+      "specifications": "{\"Artikelnr.\": \"4226-18-12\", \"Studs Ø\": \"18 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-20-10",
+      "specifications": "{\"Artikelnr.\": \"4226-20-10\", \"Studs Ø\": \"20 mm\", \"Typ\": \"ST\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-20-12",
+      "specifications": "{\"Artikelnr.\": \"4226-20-12\", \"Studs Ø\": \"20 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-22-10",
+      "specifications": "{\"Artikelnr.\": \"4226-22-10\", \"Studs Ø\": \"22 mm\", \"Typ\": \"ST\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-22-12",
+      "specifications": "{\"Artikelnr.\": \"4226-22-12\", \"Studs Ø\": \"22 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-25-12",
+      "specifications": "{\"Artikelnr.\": \"4226-25-12\", \"Studs Ø\": \"25 mm\", \"Typ\": \"ST\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-25-16",
+      "specifications": "{\"Artikelnr.\": \"4226-25-16\", \"Studs Ø\": \"25 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-28-16",
+      "specifications": "{\"Artikelnr.\": \"4226-28-16\", \"Studs Ø\": \"28 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-30-16",
+      "specifications": "{\"Artikelnr.\": \"4226-30-16\", \"Studs Ø\": \"30 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-30-20",
+      "specifications": "{\"Artikelnr.\": \"4226-30-20\", \"Studs Ø\": \"30 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-35-20",
+      "specifications": "{\"Artikelnr.\": \"4226-35-20\", \"Studs Ø\": \"35 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-38-20",
+      "specifications": "{\"Artikelnr.\": \"4226-38-20\", \"Studs Ø\": \"38 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-38-24",
+      "specifications": "{\"Artikelnr.\": \"4226-38-24\", \"Studs Ø\": \"38 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 140,
+      "product_code": "4226-42-24",
+      "specifications": "{\"Artikelnr.\": \"4226-42-24\", \"Studs Ø\": \"42 mm\", \"Typ\": \"ST\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

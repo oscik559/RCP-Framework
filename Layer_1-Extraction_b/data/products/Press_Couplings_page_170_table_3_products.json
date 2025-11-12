@@ -1,0 +1,87 @@
+{
+  "pdf_page_number": 5,
+  "footer_page_number": 170,
+  "table_number": 3,
+  "family_id": 78,
+  "extraction_method": "vlm",
+  "product_count": 11,
+  "products": [
+    {
+      "family_id": 78,
+      "product_code": "4200-12-03",
+      "specifications": "{\"Artikelnr.\": \"4200-12-03\", \"Används med\": \"EN2SN\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-04",
+      "specifications": "{\"Artikelnr.\": \"4200-12-04\", \"Används med\": \"EN2SN\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-05",
+      "specifications": "{\"Artikelnr.\": \"4200-12-05\", \"Används med\": \"EN2SN\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-06",
+      "specifications": "{\"Artikelnr.\": \"4200-12-06\", \"Används med\": \"EN2SN\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-08",
+      "specifications": "{\"Artikelnr.\": \"4200-12-08\", \"Används med\": \"EN2SN\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-10",
+      "specifications": "{\"Artikelnr.\": \"4200-12-10\", \"Används med\": \"EN2SN\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-12",
+      "specifications": "{\"Artikelnr.\": \"4200-12-12\", \"Används med\": \"EN2SN\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-16",
+      "specifications": "{\"Artikelnr.\": \"4200-12-16\", \"Används med\": \"EN2SN\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-20",
+      "specifications": "{\"Artikelnr.\": \"4200-12-20\", \"Används med\": \"EN2SN\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-24",
+      "specifications": "{\"Artikelnr.\": \"4200-12-24\", \"Används med\": \"EN2SN\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 78,
+      "product_code": "4200-12-32",
+      "specifications": "{\"Artikelnr.\": \"4200-12-32\", \"Används med\": \"EN2SN\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

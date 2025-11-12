@@ -1,0 +1,31 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 3,
+  "family_id": 167,
+  "extraction_method": "vlm",
+  "product_count": 3,
+  "products": [
+    {
+      "family_id": 167,
+      "product_code": "4373-14-04",
+      "specifications": "{\"Artikelnr.\": \"4373-14-04\", \"Gänga\": \"M 22 x 1.5\", \"Typ\": \"DKSO IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 167,
+      "product_code": "4373-14-05",
+      "specifications": "{\"Artikelnr.\": \"4373-14-05\", \"Gänga\": \"M 22 x 1.5\", \"Typ\": \"DKSO IR\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 167,
+      "product_code": "4373-14-06",
+      "specifications": "{\"Artikelnr.\": \"4373-14-06\", \"Gänga\": \"M 22 x 1.5\", \"Typ\": \"DKSO IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

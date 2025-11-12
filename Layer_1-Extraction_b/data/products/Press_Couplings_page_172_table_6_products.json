@@ -1,0 +1,129 @@
+{
+  "pdf_page_number": 7,
+  "footer_page_number": 172,
+  "table_number": 6,
+  "family_id": 94,
+  "extraction_method": "vlm",
+  "product_count": 17,
+  "products": [
+    {
+      "family_id": 94,
+      "product_code": "4239-02-03",
+      "specifications": "{\"Artikelnr.\": \"4239-02-03\", \"Gänga\": \"R 1/8\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-02-04",
+      "specifications": "{\"Artikelnr.\": \"4239-02-04\", \"Gänga\": \"R 1/8\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-04-03",
+      "specifications": "{\"Artikelnr.\": \"4239-04-03\", \"Gänga\": \"R 1/4\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-04-04",
+      "specifications": "{\"Artikelnr.\": \"4239-04-04\", \"Gänga\": \"R 1/4\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-04-06",
+      "specifications": "{\"Artikelnr.\": \"4239-04-06\", \"Gänga\": \"R 1/4\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-06-04",
+      "specifications": "{\"Artikelnr.\": \"4239-06-04\", \"Gänga\": \"R 3/8\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-06-05",
+      "specifications": "{\"Artikelnr.\": \"4239-06-05\", \"Gänga\": \"R 3/8\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-06-06",
+      "specifications": "{\"Artikelnr.\": \"4239-06-06\", \"Gänga\": \"R 3/8\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-06-08",
+      "specifications": "{\"Artikelnr.\": \"4239-06-08\", \"Gänga\": \"R 3/8\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-08-06",
+      "specifications": "{\"Artikelnr.\": \"4239-08-06\", \"Gänga\": \"R 1/2\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-08-08",
+      "specifications": "{\"Artikelnr.\": \"4239-08-08\", \"Gänga\": \"R 1/2\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-12-10",
+      "specifications": "{\"Artikelnr.\": \"4239-12-10\", \"Gänga\": \"R 3/4\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-12-12",
+      "specifications": "{\"Artikelnr.\": \"4239-12-12\", \"Gänga\": \"R 3/4\", \"Typ\": \"UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-16-16",
+      "specifications": "{\"Artikelnr.\": \"4239-16-16\", \"Gänga\": \"R 1\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-20-20",
+      "specifications": "{\"Artikelnr.\": \"4239-20-20\", \"Gänga\": \"R 1 1/4\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-24-24",
+      "specifications": "{\"Artikelnr.\": \"4239-24-24\", \"Gänga\": \"R 1 1/2\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 94,
+      "product_code": "4239-32-32",
+      "specifications": "{\"Artikelnr.\": \"4239-32-32\", \"Gänga\": \"R 2\\\"\", \"Typ\": \"UF\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "pdf_page_number": 20,
+  "footer_page_number": 185,
+  "table_number": 2,
+  "family_id": 144,
+  "extraction_method": "vlm",
+  "product_count": 7,
+  "products": [
+    {
+      "family_id": 144,
+      "product_code": "4280-01-02",
+      "specifications": "{\"Artikelnr.\": \"4280-01-02\", \"Gänga\": \"G 1/8\\\"\", \"Typ\": \"Banjobult\", \"Längd\": \"21,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 144,
+      "product_code": "4280-01-04",
+      "specifications": "{\"Artikelnr.\": \"4280-01-04\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"Banjobult\", \"Längd\": \"29,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 144,
+      "product_code": "4280-01-06",
+      "specifications": "{\"Artikelnr.\": \"4280-01-06\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"Banjobult\", \"Längd\": \"34,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 144,
+      "product_code": "4280-01-08",
+      "specifications": "{\"Artikelnr.\": \"4280-01-08\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"Banjobult\", \"Längd\": \"36,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 144,
+      "product_code": "4280-01-10",
+      "specifications": "{\"Artikelnr.\": \"4280-01-10\", \"Gänga\": \"G 5/8\\\"\", \"Typ\": \"Banjobult\", \"Längd\": \"45,5 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 144,
+      "product_code": "4280-01-12",
+      "specifications": "{\"Artikelnr.\": \"4280-01-12\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"Banjobult\", \"Längd\": \"48,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 144,
+      "product_code": "4280-01-16",
+      "specifications": "{\"Artikelnr.\": \"4280-01-16\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"Banjobult\", \"Längd\": \"59,0 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

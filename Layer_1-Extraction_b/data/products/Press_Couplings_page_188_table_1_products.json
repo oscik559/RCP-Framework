@@ -1,0 +1,94 @@
+{
+  "pdf_page_number": 23,
+  "footer_page_number": 188,
+  "table_number": 1,
+  "family_id": 158,
+  "extraction_method": "vlm",
+  "product_count": 12,
+  "products": [
+    {
+      "family_id": 158,
+      "product_code": "4284-14-04",
+      "specifications": "{\"Artikelnr.\": \"4284-14-04\", \"Gänga\": \"M 14 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-14-06",
+      "specifications": "{\"Artikelnr.\": \"4284-14-06\", \"Gänga\": \"M 14 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-16-05",
+      "specifications": "{\"Artikelnr.\": \"4284-16-05\", \"Gänga\": \"M 16 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-16-06",
+      "specifications": "{\"Artikelnr.\": \"4284-16-06\", \"Gänga\": \"M 16 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-18-06",
+      "specifications": "{\"Artikelnr.\": \"4284-18-06\", \"Gänga\": \"M 18 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-22-08",
+      "specifications": "{\"Artikelnr.\": \"4284-22-08\", \"Gänga\": \"M 22 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-24-08",
+      "specifications": "{\"Artikelnr.\": \"4284-24-08\", \"Gänga\": \"M 24 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-24-10",
+      "specifications": "{\"Artikelnr.\": \"4284-24-10\", \"Gänga\": \"M 24 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-30-12",
+      "specifications": "{\"Artikelnr.\": \"4284-30-12\", \"Gänga\": \"M 30 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-33-16",
+      "specifications": "{\"Artikelnr.\": \"4284-33-16\", \"Gänga\": \"M 33 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-36-20",
+      "specifications": "{\"Artikelnr.\": \"4284-36-20\", \"Gänga\": \"M 36 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 158,
+      "product_code": "4284-42-24",
+      "specifications": "{\"Artikelnr.\": \"4284-42-24\", \"Gänga\": \"M 42 x 1.5\", \"Typ\": \"M JI\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

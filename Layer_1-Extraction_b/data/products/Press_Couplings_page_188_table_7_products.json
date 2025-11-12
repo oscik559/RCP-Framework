@@ -1,0 +1,52 @@
+{
+  "pdf_page_number": 23,
+  "footer_page_number": 188,
+  "table_number": 7,
+  "family_id": 164,
+  "extraction_method": "vlm",
+  "product_count": 6,
+  "products": [
+    {
+      "family_id": 164,
+      "product_code": "4221-20-06",
+      "specifications": "{\"Artikelnr.\": \"4221-20-06\", \"Gänga\": \"M 20 x 1.5\", \"Rör\": \"13.25 mm\", \"Typ\": \"UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 164,
+      "product_code": "4221-24-08",
+      "specifications": "{\"Artikelnr.\": \"4221-24-08\", \"Gänga\": \"M 24 x 1,5\", \"Rör\": \"16,75 mm\", \"Typ\": \"UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 164,
+      "product_code": "4221-30-10",
+      "specifications": "{\"Artikelnr.\": \"4221-30-10\", \"Gänga\": \"M 30 x 1.5\", \"Rör\": \"21.25 mm\", \"Typ\": \"UF\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 164,
+      "product_code": "4221-30-12",
+      "specifications": "{\"Artikelnr.\": \"4221-30-12\", \"Gänga\": \"M 30 x 1.5\", \"Rör\": \"21.25 mm\", \"Typ\": \"UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 164,
+      "product_code": "4221-36-12",
+      "specifications": "{\"Artikelnr.\": \"4221-36-12\", \"Gänga\": \"M 36 x 1.5\", \"Rör\": \"26,75 mm\", \"Typ\": \"UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 164,
+      "product_code": "4221-45-16",
+      "specifications": "{\"Artikelnr.\": \"4221-45-16\", \"Gänga\": \"M 45 x 1.5\", \"Rör\": \"33.70 mm\", \"Typ\": \"UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

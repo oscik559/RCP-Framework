@@ -1,0 +1,66 @@
+{
+  "pdf_page_number": 10,
+  "footer_page_number": 175,
+  "table_number": 2,
+  "family_id": 106,
+  "extraction_method": "vlm",
+  "product_count": 8,
+  "products": [
+    {
+      "family_id": 106,
+      "product_code": "4314-04-04",
+      "specifications": "{\"Artikelnr.\": \"4314-04-04\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 106,
+      "product_code": "4314-06-06",
+      "specifications": "{\"Artikelnr.\": \"4314-06-06\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 106,
+      "product_code": "4314-08-08",
+      "specifications": "{\"Artikelnr.\": \"4314-08-08\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 106,
+      "product_code": "4314-12-12",
+      "specifications": "{\"Artikelnr.\": \"4314-12-12\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 106,
+      "product_code": "4314-16-16",
+      "specifications": "{\"Artikelnr.\": \"4314-16-16\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 106,
+      "product_code": "4314-20-20",
+      "specifications": "{\"Artikelnr.\": \"4314-20-20\", \"Gänga\": \"G 1 1/4\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 106,
+      "product_code": "4314-24-24",
+      "specifications": "{\"Artikelnr.\": \"4314-24-24\", \"Gänga\": \"G 1 1/2\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 106,
+      "product_code": "4314-32-32",
+      "specifications": "{\"Artikelnr.\": \"4314-32-32\", \"Gänga\": \"G 2\\\"\", \"Typ\": \"O 45° IR\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

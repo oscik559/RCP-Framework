@@ -1,0 +1,59 @@
+{
+  "pdf_page_number": 10,
+  "footer_page_number": 175,
+  "table_number": 4,
+  "family_id": 108,
+  "extraction_method": "vlm",
+  "product_count": 7,
+  "products": [
+    {
+      "family_id": 108,
+      "product_code": "4206-04-04-1",
+      "specifications": "{\"Artikelnr.\": \"4206-04-04-1\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"K 45° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 108,
+      "product_code": "4206-06-06-1",
+      "specifications": "{\"Artikelnr.\": \"4206-06-06-1\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"K 45° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 108,
+      "product_code": "4206-08-06-1",
+      "specifications": "{\"Artikelnr.\": \"4206-08-06-1\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"K 45° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 108,
+      "product_code": "4206-08-08-1",
+      "specifications": "{\"Artikelnr.\": \"4206-08-08-1\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"K 45° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 108,
+      "product_code": "4206-10-10-1",
+      "specifications": "{\"Artikelnr.\": \"4206-10-10-1\", \"Gänga\": \"G 5/8\\\"\", \"Typ\": \"K 45° IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 108,
+      "product_code": "4206-12-12-1",
+      "specifications": "{\"Artikelnr.\": \"4206-12-12-1\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"K 45° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 108,
+      "product_code": "4206-16-16-1",
+      "specifications": "{\"Artikelnr.\": \"4206-16-16-1\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"K 45° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

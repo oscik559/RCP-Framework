@@ -1,0 +1,73 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 7,
+  "family_id": 171,
+  "extraction_method": "vlm",
+  "product_count": 9,
+  "products": [
+    {
+      "family_id": 171,
+      "product_code": "3C147120404",
+      "specifications": "{\"Artikelnr.\": \"3C147120404\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"10 mm\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147120604",
+      "specifications": "{\"Artikelnr.\": \"3C147120604\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"13 mm\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147120605",
+      "specifications": "{\"Artikelnr.\": \"3C147120605\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"13 mm\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147120606",
+      "specifications": "{\"Artikelnr.\": \"3C147120606\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"13 mm\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147120806",
+      "specifications": "{\"Artikelnr.\": \"3C147120806\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"16 mm\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147120808",
+      "specifications": "{\"Artikelnr.\": \"3C147120808\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"16 mm\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147121208",
+      "specifications": "{\"Artikelnr.\": \"3C147121208\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"23 mm\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147121210",
+      "specifications": "{\"Artikelnr.\": \"3C147121210\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"23 mm\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 171,
+      "product_code": "3C147121212",
+      "specifications": "{\"Artikelnr.\": \"3C147121212\", \"Typ\": \"Plug-in 45°\", \"WEO\": \"23 mm\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

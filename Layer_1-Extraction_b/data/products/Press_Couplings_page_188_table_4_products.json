@@ -1,0 +1,87 @@
+{
+  "pdf_page_number": 23,
+  "footer_page_number": 188,
+  "table_number": 4,
+  "family_id": 161,
+  "extraction_method": "vlm",
+  "product_count": 11,
+  "products": [
+    {
+      "family_id": 161,
+      "product_code": "4233-06-03-2",
+      "specifications": "{\"Artikelnr.\": \"4233-06-03-2\", \"Gänga\": \"M 12 x 1.5\", \"Rör\": \"6 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-06-04-2",
+      "specifications": "{\"Artikelnr.\": \"4233-06-04-2\", \"Gänga\": \"M 12 x 1.5\", \"Rör\": \"6 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-08-04-2",
+      "specifications": "{\"Artikelnr.\": \"4233-08-04-2\", \"Gänga\": \"M 14 x 1.5\", \"Rör\": \"8 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-10-04-2",
+      "specifications": "{\"Artikelnr.\": \"4233-10-04-2\", \"Gänga\": \"M 16 x 1.5\", \"Rör\": \"10 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-10-05-2",
+      "specifications": "{\"Artikelnr.\": \"4233-10-05-2\", \"Gänga\": \"M 16 x 1.5\", \"Rör\": \"10 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-10-06-2",
+      "specifications": "{\"Artikelnr.\": \"4233-10-06-2\", \"Gänga\": \"M 16 x 1.5\", \"Rör\": \"10 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-12-05-2",
+      "specifications": "{\"Artikelnr.\": \"4233-12-05-2\", \"Gänga\": \"M 18 x 1.5\", \"Rör\": \"12 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-12-06-2",
+      "specifications": "{\"Artikelnr.\": \"4233-12-06-2\", \"Gänga\": \"M 18 x 1.5\", \"Rör\": \"12 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-15-06-2",
+      "specifications": "{\"Artikelnr.\": \"4233-15-06-2\", \"Gänga\": \"M 22 x 1.5\", \"Rör\": \"15 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-15-08-2",
+      "specifications": "{\"Artikelnr.\": \"4233-15-08-2\", \"Gänga\": \"M 22 x 1.5\", \"Rör\": \"15 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 161,
+      "product_code": "4233-18-10-2",
+      "specifications": "{\"Artikelnr.\": \"4233-18-10-2\", \"Gänga\": \"M 26 x 1.5\", \"Rör\": \"18 mm\", \"Typ\": \"DKL\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "pdf_page_number": 21,
+  "footer_page_number": 186,
+  "table_number": 4,
+  "family_id": 151,
+  "extraction_method": "vlm",
+  "product_count": 15,
+  "products": [
+    {
+      "family_id": 151,
+      "product_code": "4291-04-04-2",
+      "specifications": "{\"Artikelnr.\": \"4291-04-04-2\", \"Gänga\": \"9/16\\\"-18 UNF\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-06-04-2",
+      "specifications": "{\"Artikelnr.\": \"4291-06-04-2\", \"Gänga\": \"11/16\\\"-16 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-06-05-2",
+      "specifications": "{\"Artikelnr.\": \"4291-06-05-2\", \"Gänga\": \"11/16\\\"-16 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-06-06-2",
+      "specifications": "{\"Artikelnr.\": \"4291-06-06-2\", \"Gänga\": \"11/16\\\"-16 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-08-06-2",
+      "specifications": "{\"Artikelnr.\": \"4291-08-06-2\", \"Gänga\": \"13/16\\\"-16 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-08-08-2",
+      "specifications": "{\"Artikelnr.\": \"4291-08-08-2\", \"Gänga\": \"13/16\\\"-16 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-10-08-2",
+      "specifications": "{\"Artikelnr.\": \"4291-10-08-2\", \"Gänga\": \"1\\\"-14 UNS\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-10-10-2",
+      "specifications": "{\"Artikelnr.\": \"4291-10-10-2\", \"Gänga\": \"1\\\"-14 UNS\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-12-08-2",
+      "specifications": "{\"Artikelnr.\": \"4291-12-08-2\", \"Gänga\": \"1 3/16\\\"-12 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-12-10-2",
+      "specifications": "{\"Artikelnr.\": \"4291-12-10-2\", \"Gänga\": \"1 3/16\\\"-12 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-12-12-2",
+      "specifications": "{\"Artikelnr.\": \"4291-12-12-2\", \"Gänga\": \"1 3/16\\\"-12 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-16-12-2",
+      "specifications": "{\"Artikelnr.\": \"4291-16-12-2\", \"Gänga\": \"1 7/16\\\"-12 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-16-16-2",
+      "specifications": "{\"Artikelnr.\": \"4291-16-16-2\", \"Gänga\": \"1 7/16\\\"-12 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-20-20-2",
+      "specifications": "{\"Artikelnr.\": \"4291-20-20-2\", \"Gänga\": \"1 11/16\\\"-12 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 151,
+      "product_code": "4291-24-24-2",
+      "specifications": "{\"Artikelnr.\": \"4291-24-24-2\", \"Gänga\": \"2\\\"-12 UN\", \"Typ\": \"ORFS 90° IR\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

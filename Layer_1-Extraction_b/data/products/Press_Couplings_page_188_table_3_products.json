@@ -1,0 +1,38 @@
+{
+  "pdf_page_number": 23,
+  "footer_page_number": 188,
+  "table_number": 3,
+  "family_id": 160,
+  "extraction_method": "vlm",
+  "product_count": 4,
+  "products": [
+    {
+      "family_id": 160,
+      "product_code": "4231-30-10",
+      "specifications": "{\"Artikelnr.\": \"4231-30-10\", \"Gänga\": \"M 30 x 1.5\", \"Rör\": \"22 mm\", \"Typ\": \"Kobelco\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 160,
+      "product_code": "4231-36-12",
+      "specifications": "{\"Artikelnr.\": \"4231-36-12\", \"Gänga\": \"M 36 x 1.5\", \"Rör\": \"28 mm\", \"Typ\": \"Kobelco\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 160,
+      "product_code": "4231-36-16",
+      "specifications": "{\"Artikelnr.\": \"4231-36-16\", \"Gänga\": \"M 36 x 1.5\", \"Rör\": \"28 mm\", \"Typ\": \"Kobelco\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 160,
+      "product_code": "4231-45-16",
+      "specifications": "{\"Artikelnr.\": \"4231-45-16\", \"Gänga\": \"M 45 x 1.5\", \"Rör\": \"35 mm\", \"Typ\": \"Kobelco\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

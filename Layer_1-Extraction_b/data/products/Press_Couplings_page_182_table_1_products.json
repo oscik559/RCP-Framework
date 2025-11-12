@@ -1,0 +1,150 @@
+{
+  "pdf_page_number": 17,
+  "footer_page_number": 182,
+  "table_number": 1,
+  "family_id": 135,
+  "extraction_method": "vlm",
+  "product_count": 20,
+  "products": [
+    {
+      "family_id": 135,
+      "product_code": "4220-12-03",
+      "specifications": "{\"Artikelnr.\": \"4220-12-03\", \"Gänga\": \"M 12 x 1,5\", \"Rör\": \"6 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-12-04",
+      "specifications": "{\"Artikelnr.\": \"4220-12-04\", \"Gänga\": \"M 12 x 1,5\", \"Rör\": \"6 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-14-03",
+      "specifications": "{\"Artikelnr.\": \"4220-14-03\", \"Gänga\": \"M 14 x 1,5\", \"Rör\": \"8 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-14-04",
+      "specifications": "{\"Artikelnr.\": \"4220-14-04\", \"Gänga\": \"M 14 x 1,5\", \"Rör\": \"8 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-16-04",
+      "specifications": "{\"Artikelnr.\": \"4220-16-04\", \"Gänga\": \"M 16 x 1,5\", \"Rör\": \"10 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-16-05",
+      "specifications": "{\"Artikelnr.\": \"4220-16-05\", \"Gänga\": \"M 16 x 1,5\", \"Rör\": \"10 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-16-06",
+      "specifications": "{\"Artikelnr.\": \"4220-16-06\", \"Gänga\": \"M 16 x 1,5\", \"Rör\": \"10 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-18-04",
+      "specifications": "{\"Artikelnr.\": \"4220-18-04\", \"Gänga\": \"M 18 x 1,5\", \"Rör\": \"12 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-18-05",
+      "specifications": "{\"Artikelnr.\": \"4220-18-05\", \"Gänga\": \"M 18 x 1,5\", \"Rör\": \"12 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-18-06",
+      "specifications": "{\"Artikelnr.\": \"4220-18-06\", \"Gänga\": \"M 18 x 1,5\", \"Rör\": \"12 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-22-06",
+      "specifications": "{\"Artikelnr.\": \"4220-22-06\", \"Gänga\": \"M 22 x 1,5\", \"Rör\": \"15 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-22-08",
+      "specifications": "{\"Artikelnr.\": \"4220-22-08\", \"Gänga\": \"M 22 x 1,5\", \"Rör\": \"15 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-26-08",
+      "specifications": "{\"Artikelnr.\": \"4220-26-08\", \"Gänga\": \"M 26 x 1,5\", \"Rör\": \"18 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-26-10",
+      "specifications": "{\"Artikelnr.\": \"4220-26-10\", \"Gänga\": \"M 26 x 1,5\", \"Rör\": \"18 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-26-12",
+      "specifications": "{\"Artikelnr.\": \"4220-26-12\", \"Gänga\": \"M 26 x 1,5\", \"Rör\": \"18 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-30-10",
+      "specifications": "{\"Artikelnr.\": \"4220-30-10\", \"Gänga\": \"M 30 x 2,0\", \"Rör\": \"22 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-30-12",
+      "specifications": "{\"Artikelnr.\": \"4220-30-12\", \"Gänga\": \"M 30 x 2,0\", \"Rör\": \"22 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-36-16",
+      "specifications": "{\"Artikelnr.\": \"4220-36-16\", \"Gänga\": \"M 36 x 2,0\", \"Rör\": \"28 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-45-20",
+      "specifications": "{\"Artikelnr.\": \"4220-45-20\", \"Gänga\": \"M 45 x 2,0\", \"Rör\": \"35 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 135,
+      "product_code": "4220-52-24",
+      "specifications": "{\"Artikelnr.\": \"4220-52-24\", \"Gänga\": \"M 52 x 2,0\", \"Rör\": \"42 mm\", \"Typ\": \"SKL\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

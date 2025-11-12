@@ -1,0 +1,45 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 1,
+  "family_id": 165,
+  "extraction_method": "vlm",
+  "product_count": 5,
+  "products": [
+    {
+      "family_id": 165,
+      "product_code": "4224-20-06-2",
+      "specifications": "{\"Artikelnr.\": \"4224-20-06-2\", \"Gänga\": \"M 20 x 1.5\", \"Rör\": \"13.25 mm\", \"Typ\": \"IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 165,
+      "product_code": "4224-24-08-2",
+      "specifications": "{\"Artikelnr.\": \"4224-24-08-2\", \"Gänga\": \"M 24 x 1.5\", \"Rör\": \"16.75 mm\", \"Typ\": \"IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 165,
+      "product_code": "4224-30-12-2",
+      "specifications": "{\"Artikelnr.\": \"4224-30-12-2\", \"Gänga\": \"M 30 x 1.5\", \"Rör\": \"21.25 mm\", \"Typ\": \"IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 165,
+      "product_code": "4224-36-12-2",
+      "specifications": "{\"Artikelnr.\": \"4224-36-12-2\", \"Gänga\": \"M 36 x 1.5\", \"Rör\": \"26,75 mm\", \"Typ\": \"IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 165,
+      "product_code": "4224-45-16-2",
+      "specifications": "{\"Artikelnr.\": \"4224-45-16-2\", \"Gänga\": \"M 45 x 1.5\", \"Rör\": \"33.70 mm\", \"Typ\": \"IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

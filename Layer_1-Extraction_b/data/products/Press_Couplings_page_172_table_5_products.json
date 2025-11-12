@@ -1,0 +1,87 @@
+{
+  "pdf_page_number": 7,
+  "footer_page_number": 172,
+  "table_number": 5,
+  "family_id": 93,
+  "extraction_method": "vlm",
+  "product_count": 11,
+  "products": [
+    {
+      "family_id": 93,
+      "product_code": "4209-04-04-1",
+      "specifications": "{\"Artikelnr.\": \"4209-04-04-1\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-06-04-1",
+      "specifications": "{\"Artikelnr.\": \"4209-06-04-1\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-06-06-1",
+      "specifications": "{\"Artikelnr.\": \"4209-06-06-1\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-08-05-1",
+      "specifications": "{\"Artikelnr.\": \"4209-08-05-1\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-08-06-1",
+      "specifications": "{\"Artikelnr.\": \"4209-08-06-1\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-08-08-1",
+      "specifications": "{\"Artikelnr.\": \"4209-08-08-1\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-12-08-1",
+      "specifications": "{\"Artikelnr.\": \"4209-12-08-1\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-12-12-1",
+      "specifications": "{\"Artikelnr.\": \"4209-12-12-1\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-16-12-1",
+      "specifications": "{\"Artikelnr.\": \"4209-16-12-1\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-16-16-1",
+      "specifications": "{\"Artikelnr.\": \"4209-16-16-1\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 93,
+      "product_code": "4209-20-20-1",
+      "specifications": "{\"Artikelnr.\": \"4209-20-20-1\", \"Gänga\": \"G 1 1/4\\\"\", \"Typ\": \"PL IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

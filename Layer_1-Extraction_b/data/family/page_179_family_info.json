@@ -1,0 +1,66 @@
+{
+  "page_number": 179,
+  "total_families": 4,
+  "families": [
+    {
+      "family_code": "4243",
+      "name": "Rak SAE J518 fläns",
+      "description": "",
+      "construction_details": "Kod 61\nFlänsstorlek 5/8\" komatsu",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.2381362915039,
+        61.15715026855469,
+        294.6085968017578,
+        117.96134185791016
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4244-6",
+      "name": "90° SAE J518 fläns",
+      "description": "",
+      "construction_details": "Kod 61\nKort lödd",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.2341003417969,
+        61.94096374511719,
+        527.6616431702959,
+        118.74515533447266
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4248",
+      "name": "45° SAE J518 fläns",
+      "description": "",
+      "construction_details": "Kod 61",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.2341003417969,
+        295.9645080566406,
+        527.6616431702959,
+        352.7686767578125
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "4244",
+      "name": "90° SAE J518 fläns",
+      "description": "",
+      "construction_details": "Kod 61",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.2381362915039,
+        397.3721618652344,
+        294.6085968017578,
+        454.17633056640625
+      ],
+      "table_id": 4,
+      "family_id": 4
+    }
+  ]
+}

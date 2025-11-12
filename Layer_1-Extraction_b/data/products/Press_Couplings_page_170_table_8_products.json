@@ -1,0 +1,24 @@
+{
+  "pdf_page_number": 5,
+  "footer_page_number": 170,
+  "table_number": 8,
+  "family_id": 83,
+  "extraction_method": "vlm",
+  "product_count": 2,
+  "products": [
+    {
+      "family_id": 83,
+      "product_code": "4200-20-20",
+      "specifications": "{\"Artikelnr.\": \"4200-20-20\", \"Används med\": \"EN4SH/Deltaflex /IsoBar 350\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 83,
+      "product_code": "4200-20-24",
+      "specifications": "{\"Artikelnr.\": \"4200-20-24\", \"Används med\": \"EN4SH/Deltaflex\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

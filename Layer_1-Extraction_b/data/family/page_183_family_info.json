@@ -1,0 +1,36 @@
+{
+  "page_number": 183,
+  "total_families": 2,
+  "families": [
+    {
+      "family_code": "4223",
+      "name": "M-gängad",
+      "description": "",
+      "construction_details": "Rak utv. SKS\n24° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.00337219238281,
+        61.43626403808594,
+        294.5141906738281,
+        118.2404556274414
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4226",
+      "name": "Rörstuds rak ST",
+      "description": "",
+      "construction_details": "",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.4858093261719,
+        61.04814147949219,
+        528.220017751058,
+        117.85233306884766
+      ],
+      "table_id": 2,
+      "family_id": 2
+    }
+  ]
+}

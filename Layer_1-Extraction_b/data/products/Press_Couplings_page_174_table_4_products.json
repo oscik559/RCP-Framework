@@ -1,0 +1,66 @@
+{
+  "pdf_page_number": 9,
+  "footer_page_number": 174,
+  "table_number": 4,
+  "family_id": 101,
+  "extraction_method": "vlm",
+  "product_count": 8,
+  "products": [
+    {
+      "family_id": 101,
+      "product_code": "4207-04-04-1",
+      "specifications": "{\"Artikelnr.\": \"4207-04-04-1\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 101,
+      "product_code": "4207-06-04-1",
+      "specifications": "{\"Artikelnr.\": \"4207-06-04-1\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 101,
+      "product_code": "4207-06-06-1",
+      "specifications": "{\"Artikelnr.\": \"4207-06-06-1\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 101,
+      "product_code": "4207-08-06-1",
+      "specifications": "{\"Artikelnr.\": \"4207-08-06-1\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 101,
+      "product_code": "4207-08-08-1",
+      "specifications": "{\"Artikelnr.\": \"4207-08-08-1\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 101,
+      "product_code": "4207-08-08-15",
+      "specifications": "{\"Artikelnr.\": \"4207-08-08-15\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"1/2\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 101,
+      "product_code": "4207-12-12-1",
+      "specifications": "{\"Artikelnr.\": \"4207-12-12-1\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 101,
+      "product_code": "4207-16-16-1",
+      "specifications": "{\"Artikelnr.\": \"4207-16-16-1\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"Smidd 90° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

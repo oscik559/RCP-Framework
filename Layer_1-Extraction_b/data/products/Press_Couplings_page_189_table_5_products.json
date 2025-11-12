@@ -1,0 +1,24 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 5,
+  "family_id": 169,
+  "extraction_method": "vlm",
+  "product_count": 2,
+  "products": [
+    {
+      "family_id": 169,
+      "product_code": "4374-11-04S",
+      "specifications": "{\"Artikelnr.\": \"4374-11-04S\", \"A\": \"11 mm\", \"B\": \"6 mm\", \"C\": \"12 mm\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 169,
+      "product_code": "4374-11-05S",
+      "specifications": "{\"Artikelnr.\": \"4374-11-05S\", \"A\": \"11 mm\", \"B\": \"6 mm\", \"C\": \"12 mm\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "pdf_page_number": 20,
+  "footer_page_number": 185,
+  "table_number": 3,
+  "family_id": 145,
+  "extraction_method": "vlm",
+  "product_count": 3,
+  "products": [
+    {
+      "family_id": 145,
+      "product_code": "4281-01-04",
+      "specifications": "{\"Artikelnr.\": \"4281-01-04\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"Banjo, dubbel\", \"Längd\": \"43 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 145,
+      "product_code": "4281-01-06",
+      "specifications": "{\"Artikelnr.\": \"4281-01-06\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"Banjo, dubbel\", \"Längd\": \"49 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 145,
+      "product_code": "4281-01-08",
+      "specifications": "{\"Artikelnr.\": \"4281-01-08\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"Banjo, dubbel\", \"Längd\": \"62 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

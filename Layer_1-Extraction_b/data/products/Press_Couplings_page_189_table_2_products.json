@@ -1,0 +1,45 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 2,
+  "family_id": 166,
+  "extraction_method": "vlm",
+  "product_count": 5,
+  "products": [
+    {
+      "family_id": 166,
+      "product_code": "4298-14-04",
+      "specifications": "{\"Artikelnr.\": \"4298-14-04\", \"Gänga\": \"M 14 x 1,5\", \"Typ\": \"PL IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 166,
+      "product_code": "4298-16-06",
+      "specifications": "{\"Artikelnr.\": \"4298-16-06\", \"Gänga\": \"M 16 x 1,5\", \"Typ\": \"PL IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 166,
+      "product_code": "4298-18-06",
+      "specifications": "{\"Artikelnr.\": \"4298-18-06\", \"Gänga\": \"M 18 x 1,5\", \"Typ\": \"PL IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 166,
+      "product_code": "4298-22-06",
+      "specifications": "{\"Artikelnr.\": \"4298-22-06\", \"Gänga\": \"M 22 x 1,5\", \"Typ\": \"PL IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 166,
+      "product_code": "4298-22-08",
+      "specifications": "{\"Artikelnr.\": \"4298-22-08\", \"Gänga\": \"M 22 x 1,5\", \"Typ\": \"PL IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

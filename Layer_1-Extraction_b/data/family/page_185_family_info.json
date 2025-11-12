@@ -1,0 +1,81 @@
+{
+  "page_number": 185,
+  "total_families": 5,
+  "families": [
+    {
+      "family_code": "4280",
+      "name": "Banjokropp",
+      "description": "",
+      "construction_details": "För BSP-bult",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.16770935058594,
+        62.20042419433594,
+        294.6785522460938,
+        119.0046157836914
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4282",
+      "name": "Banjokropp",
+      "description": "",
+      "construction_details": "för metrisk bult",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.68375046188766,
+        61.72325134277344,
+        528.3726043701172,
+        118.5274429321289
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4280-01",
+      "name": "G-gängad bult",
+      "description": "",
+      "construction_details": "för BSP-banjo",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.16770935058594,
+        359.74383544921875,
+        294.6785522460938,
+        416.5480041503906
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "4282-01",
+      "name": "M-gängad bult",
+      "description": "",
+      "construction_details": "För metrisk banjo",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.68375046188766,
+        421.32843017578125,
+        528.3726043701172,
+        478.1325988769531
+      ],
+      "table_id": 4,
+      "family_id": 4
+    },
+    {
+      "family_code": "4281-01",
+      "name": "G-gängad bult dubbel",
+      "description": "",
+      "construction_details": "för BSP-banjo",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.16770935058594,
+        523.930908203125,
+        294.6785522460938,
+        580.735107421875
+      ],
+      "table_id": 5,
+      "family_id": 5
+    }
+  ]
+}

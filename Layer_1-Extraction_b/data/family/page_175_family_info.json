@@ -1,0 +1,81 @@
+{
+  "page_number": 175,
+  "total_families": 5,
+  "families": [
+    {
+      "family_code": "4204-7",
+      "name": "G-gängad kort",
+      "description": "",
+      "construction_details": "45° böj, inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.62815241659841,
+        62.90769958496094,
+        295.1390174127394,
+        119.7118911743164
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4213",
+      "name": "JIC",
+      "description": "",
+      "construction_details": "Unified-gängad\nRak inv. 74° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        299.96270751953125,
+        61.41966247558594,
+        528.2485656738281,
+        118.2238540649414
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4314",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "45° böj, inv.\n60° tätningskona med O-ring",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.62815241659841,
+        208.95750427246094,
+        295.1390174127394,
+        265.7616882324219
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "4314-1",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "45° böj, inv.\n60° tätningskona med O-ring",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.62815241659841,
+        389.49920654296875,
+        295.1390174127394,
+        446.3033752441406
+      ],
+      "table_id": 4,
+      "family_id": 4
+    },
+    {
+      "family_code": "4206-1",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "45° kompakt inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.62815241659841,
+        511.6016845703125,
+        295.1390174127394,
+        568.4058837890625
+      ],
+      "table_id": 5,
+      "family_id": 5
+    }
+  ]
+}

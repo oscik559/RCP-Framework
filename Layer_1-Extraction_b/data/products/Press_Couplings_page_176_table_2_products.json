@@ -1,0 +1,185 @@
+{
+  "pdf_page_number": 11,
+  "footer_page_number": 176,
+  "table_number": 2,
+  "family_id": 111,
+  "extraction_method": "vlm",
+  "product_count": 25,
+  "products": [
+    {
+      "family_id": 111,
+      "product_code": "4214-07-03",
+      "specifications": "{\"Artikelnr.\": \"4214-07-03\", \"Gänga\": \"7/16\\\"–20 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-07-04",
+      "specifications": "{\"Artikelnr.\": \"4214-07-04\", \"Gänga\": \"7/16\\\"–20 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-08-04",
+      "specifications": "{\"Artikelnr.\": \"4214-08-04\", \"Gänga\": \"1/2\\\"–20 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-08-06",
+      "specifications": "{\"Artikelnr.\": \"4214-08-06\", \"Gänga\": \"1/2\\\"–20 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-09-04",
+      "specifications": "{\"Artikelnr.\": \"4214-09-04\", \"Gänga\": \"9/16\\\"–18 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-09-05",
+      "specifications": "{\"Artikelnr.\": \"4214-09-05\", \"Gänga\": \"9/16\\\"–18 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-09-06",
+      "specifications": "{\"Artikelnr.\": \"4214-09-06\", \"Gänga\": \"9-16\\\"–18 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-12-05",
+      "specifications": "{\"Artikelnr.\": \"4214-12-05\", \"Gänga\": \"3/4\\\"–16 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-12-06",
+      "specifications": "{\"Artikelnr.\": \"4214-12-06\", \"Gänga\": \"3/4\\\"–16 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-12-08",
+      "specifications": "{\"Artikelnr.\": \"4214-12-08\", \"Gänga\": \"3/4\\\"–16 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-14-06",
+      "specifications": "{\"Artikelnr.\": \"4214-14-06\", \"Gänga\": \"7/8\\\"–14 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-14-08",
+      "specifications": "{\"Artikelnr.\": \"4214-14-08\", \"Gänga\": \"7/8\\\"–14 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-14-10",
+      "specifications": "{\"Artikelnr.\": \"4214-14-10\", \"Gänga\": \"7/8\\\"–14 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-14-12",
+      "specifications": "{\"Artikelnr.\": \"4214-14-12\", \"Gänga\": \"7/8\\\"–14 UNF\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-17-08",
+      "specifications": "{\"Artikelnr.\": \"4214-17-08\", \"Gänga\": \"1 1/16\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-17-10",
+      "specifications": "{\"Artikelnr.\": \"4214-17-10\", \"Gänga\": \"1 1/16\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-17-12",
+      "specifications": "{\"Artikelnr.\": \"4214-17-12\", \"Gänga\": \"1 1/16\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-17-16",
+      "specifications": "{\"Artikelnr.\": \"4214-17-16\", \"Gänga\": \"1 1/16\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-19-12",
+      "specifications": "{\"Artikelnr.\": \"4214-19-12\", \"Gänga\": \"1 3/16\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-21-12",
+      "specifications": "{\"Artikelnr.\": \"4214-21-12\", \"Gänga\": \"1 5/16\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-21-16",
+      "specifications": "{\"Artikelnr.\": \"4214-21-16\", \"Gänga\": \"1 5/16\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-26-16",
+      "specifications": "{\"Artikelnr.\": \"4214-26-16\", \"Gänga\": \"1 5/8\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-26-20",
+      "specifications": "{\"Artikelnr.\": \"4214-26-20\", \"Gänga\": \"1 5/8\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-30-24",
+      "specifications": "{\"Artikelnr.\": \"4214-30-24\", \"Gänga\": \"1 7/8\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 111,
+      "product_code": "4214-40-32",
+      "specifications": "{\"Artikelnr.\": \"4214-40-32\", \"Gänga\": \"2 1/2\\\"–12 UN\", \"Typ\": \"JIC UF\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

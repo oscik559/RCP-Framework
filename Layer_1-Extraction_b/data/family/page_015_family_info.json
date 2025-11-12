@@ -1,0 +1,96 @@
+{
+  "page_number": 15,
+  "total_families": 6,
+  "families": [
+    {
+      "family_code": "4253",
+      "name": "Rak SAE J518 fläns",
+      "description": "",
+      "construction_details": "Kod 62",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.30965985749897,
+        61.08897399902344,
+        294.809370640346,
+        117.8931655883789
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4258",
+      "name": "45 SAE J518 fläns",
+      "description": "",
+      "construction_details": "Kod 62",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.376570892334,
+        62.48057556152344,
+        528.8875198364258,
+        119.2847671508789
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4254",
+      "name": "90 SAE J518 fläns",
+      "description": "",
+      "construction_details": "Kod 62",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.30965985749897,
+        325.4552917480469,
+        294.809370640346,
+        382.25946044921875
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "4263",
+      "name": "STpercat fläns",
+      "description": "",
+      "construction_details": "Rak",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.376570892334,
+        328.1571350097656,
+        528.8875198364258,
+        384.9613037109375
+      ],
+      "table_id": 4,
+      "family_id": 4
+    },
+    {
+      "family_code": "4264",
+      "name": "STpercat fläns",
+      "description": "",
+      "construction_details": "90°",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.376570892334,
+        479.42535400390625,
+        528.8875198364258,
+        536.2295227050781
+      ],
+      "table_id": 5,
+      "family_id": 5
+    },
+    {
+      "family_code": "4268",
+      "name": "STpercat fläns",
+      "description": "",
+      "construction_details": "45°",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.376570892334,
+        632.2827758789062,
+        528.8875198364258,
+        689.0869750976562
+      ],
+      "table_id": 6,
+      "family_id": 6
+    }
+  ]
+}

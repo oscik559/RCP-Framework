@@ -1,0 +1,111 @@
+{
+  "page_number": 174,
+  "total_families": 7,
+  "families": [
+    {
+      "family_code": "4203-2",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "90° böj, inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.25352191925049,
+        62.82823181152344,
+        294.89418713799836,
+        119.6324234008789
+      ],
+      "table_id": 1,
+      "family_id": 1
+    },
+    {
+      "family_code": "4204",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "45° böj inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.4858093261719,
+        61.88914489746094,
+        529.0863227844238,
+        118.6933364868164
+      ],
+      "table_id": 2,
+      "family_id": 2
+    },
+    {
+      "family_code": "4313-1",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "90° böj, inv.\n60° tätningskona med O-ring",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.25352191925049,
+        206.5709686279297,
+        294.89418713799836,
+        263.3751525878906
+      ],
+      "table_id": 3,
+      "family_id": 3
+    },
+    {
+      "family_code": "4207",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "90° smidd inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.25352191925049,
+        354.28546142578125,
+        294.89418713799836,
+        411.0896301269531
+      ],
+      "table_id": 4,
+      "family_id": 4
+    },
+    {
+      "family_code": "4204-1",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "45° böj, inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.4858093261719,
+        365.35333251953125,
+        529.0863227844238,
+        422.1575012207031
+      ],
+      "table_id": 5,
+      "family_id": 5
+    },
+    {
+      "family_code": "4207-1",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "90° smidd inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        66.25352191925049,
+        501.88787841796875,
+        294.89418713799836,
+        558.6920776367188
+      ],
+      "table_id": 6,
+      "family_id": 6
+    },
+    {
+      "family_code": "4204-2",
+      "name": "G-gängad",
+      "description": "",
+      "construction_details": "45° böj, inv.\n60° tätningskona",
+      "subtitle": "PRODUKTGRUPP 300",
+      "bbox": [
+        300.4858093261719,
+        635.7013549804688,
+        529.0863227844238,
+        692.5055541992188
+      ],
+      "table_id": 7,
+      "family_id": 7
+    }
+  ]
+}

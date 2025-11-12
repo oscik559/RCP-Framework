@@ -1,0 +1,52 @@
+{
+  "pdf_page_number": 15,
+  "footer_page_number": 180,
+  "table_number": 5,
+  "family_id": 129,
+  "extraction_method": "vlm",
+  "product_count": 6,
+  "products": [
+    {
+      "family_id": 129,
+      "product_code": "4264-12-12",
+      "specifications": "{\"Artikelnr.\": \"4264-12-12\", \"Flänsstorlek\": \"3/4\\\"\", \"Typ\": \"SC 90°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 129,
+      "product_code": "4264-16-12",
+      "specifications": "{\"Artikelnr.\": \"4264-16-12\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SC 90°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 129,
+      "product_code": "4264-16-16",
+      "specifications": "{\"Artikelnr.\": \"4264-16-16\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SC 90°\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 129,
+      "product_code": "4264-20-16",
+      "specifications": "{\"Artikelnr.\": \"4264-20-16\", \"Flänsstorlek\": \"1 1/4\\\"\", \"Typ\": \"SC 90°\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 129,
+      "product_code": "4264-20-20",
+      "specifications": "{\"Artikelnr.\": \"4264-20-20\", \"Flänsstorlek\": \"1 1/4\\\"\", \"Typ\": \"SC 90°\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 129,
+      "product_code": "4264-24-24",
+      "specifications": "{\"Artikelnr.\": \"4264-24-24\", \"Flänsstorlek\": \"1 1/2\\\"\", \"Typ\": \"SC 90°\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

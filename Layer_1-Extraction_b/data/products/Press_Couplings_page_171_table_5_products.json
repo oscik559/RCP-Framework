@@ -1,0 +1,213 @@
+{
+  "pdf_page_number": 6,
+  "footer_page_number": 171,
+  "table_number": 5,
+  "family_id": 88,
+  "extraction_method": "vlm",
+  "product_count": 29,
+  "products": [
+    {
+      "family_id": 88,
+      "product_code": "4201-02-03",
+      "specifications": "{\"Artikelnr.\": \"4201-02-03\", \"Gänga\": \"G 1/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-02-04",
+      "specifications": "{\"Artikelnr.\": \"4201-02-04\", \"Gänga\": \"G 1/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-04-03",
+      "specifications": "{\"Artikelnr.\": \"4201-04-03\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-04-04",
+      "specifications": "{\"Artikelnr.\": \"4201-04-04\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-04-05",
+      "specifications": "{\"Artikelnr.\": \"4201-04-05\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-04-06",
+      "specifications": "{\"Artikelnr.\": \"4201-04-06\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-06-04",
+      "specifications": "{\"Artikelnr.\": \"4201-06-04\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-06-05",
+      "specifications": "{\"Artikelnr.\": \"4201-06-05\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-06-06",
+      "specifications": "{\"Artikelnr.\": \"4201-06-06\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-06-08",
+      "specifications": "{\"Artikelnr.\": \"4201-06-08\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-08-04",
+      "specifications": "{\"Artikelnr.\": \"4201-08-04\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-08-06",
+      "specifications": "{\"Artikelnr.\": \"4201-08-06\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-08-065",
+      "specifications": "{\"Artikelnr.\": \"4201-08-065\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/8\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-08-08",
+      "specifications": "{\"Artikelnr.\": \"4201-08-08\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-08-085",
+      "specifications": "{\"Artikelnr.\": \"4201-08-085\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/2\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-08-10",
+      "specifications": "{\"Artikelnr.\": \"4201-08-10\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-08-12",
+      "specifications": "{\"Artikelnr.\": \"4201-08-12\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-10-08",
+      "specifications": "{\"Artikelnr.\": \"4201-10-08\", \"Gänga\": \"G 5/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-10-10",
+      "specifications": "{\"Artikelnr.\": \"4201-10-10\", \"Gänga\": \"G 5/8\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-12-08",
+      "specifications": "{\"Artikelnr.\": \"4201-12-08\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-12-10",
+      "specifications": "{\"Artikelnr.\": \"4201-12-10\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-12-12",
+      "specifications": "{\"Artikelnr.\": \"4201-12-12\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-12-16",
+      "specifications": "{\"Artikelnr.\": \"4201-12-16\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-16-12",
+      "specifications": "{\"Artikelnr.\": \"4201-16-12\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-16-16",
+      "specifications": "{\"Artikelnr.\": \"4201-16-16\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-20-20",
+      "specifications": "{\"Artikelnr.\": \"4201-20-20\", \"Gänga\": \"G 1 1/4\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-24-24",
+      "specifications": "{\"Artikelnr.\": \"4201-24-24\", \"Gänga\": \"G 1 1/2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-32-32",
+      "specifications": "{\"Artikelnr.\": \"4201-32-32\", \"Gänga\": \"G 2\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 88,
+      "product_code": "4201-48-48",
+      "specifications": "{\"Artikelnr.\": \"4201-48-48\", \"Gänga\": \"G 3\\\"\", \"Typ\": \"IR\", \"Slang ID\": \"3\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

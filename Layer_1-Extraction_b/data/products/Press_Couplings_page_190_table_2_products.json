@@ -1,0 +1,45 @@
+{
+  "pdf_page_number": 25,
+  "footer_page_number": 190,
+  "table_number": 2,
+  "family_id": 174,
+  "extraction_method": "vlm",
+  "product_count": 5,
+  "products": [
+    {
+      "family_id": 174,
+      "product_code": "3C147490400",
+      "specifications": "{\"Artikelnr.\": \"3C147490400\", \"Typ\": \"1/4\\\"\", \"WEO\": \"Monteringsstopp\", \"Ant/förp\": \"10 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 174,
+      "product_code": "3C147490600",
+      "specifications": "{\"Artikelnr.\": \"3C147490600\", \"Typ\": \"3/8\\\"\", \"WEO\": \"Monteringsstopp\", \"Ant/förp\": \"13 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 174,
+      "product_code": "3C147490801",
+      "specifications": "{\"Artikelnr.\": \"3C147490801\", \"Typ\": \"1/2\\\"\", \"WEO\": \"Monteringsstopp\", \"Ant/förp\": \"16 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 174,
+      "product_code": "3C147491200",
+      "specifications": "{\"Artikelnr.\": \"3C147491200\", \"Typ\": \"3/4\\\"\", \"WEO\": \"Monteringsstopp\", \"Ant/förp\": \"23 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 174,
+      "product_code": "3C147491600",
+      "specifications": "{\"Artikelnr.\": \"3C147491600\", \"Typ\": \"1\\\"\", \"WEO\": \"Monteringsstopp\", \"Ant/förp\": \"30 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

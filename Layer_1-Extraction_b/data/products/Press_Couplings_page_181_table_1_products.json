@@ -1,0 +1,94 @@
+{
+  "pdf_page_number": 16,
+  "footer_page_number": 181,
+  "table_number": 1,
+  "family_id": 131,
+  "extraction_method": "vlm",
+  "product_count": 12,
+  "products": [
+    {
+      "family_id": 131,
+      "product_code": "Fläns",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"Fläns\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "WP MPa",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"WP MPa\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "PSI",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"PSI\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "DIA",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"DIA\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "TEKNISK INFORMATION SUPERCAT",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"TEKNISK INFORMATION SUPERCAT\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "Fläns",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"Fläns\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "WP MPa",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"WP MPa\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "DIA",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"DIA\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "TEKNISK INFORMATION KOMATSU",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"TEKNISK INFORMATION KOMATSU\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "Fläns",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"Fläns\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "WP MPa",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"WP MPa\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 131,
+      "product_code": "DIA",
+      "specifications": "{\"TEKNISK INFORMATION ENLIGT SAE J518 CODE 62\": \"DIA\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

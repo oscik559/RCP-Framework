@@ -1,0 +1,51 @@
+{
+  "pdf_page_number": 23,
+  "footer_page_number": 188,
+  "table_number": 3,
+  "bbox": [
+    71.06832565799836,
+    520.969482421875,
+    289.83687264578685,
+    579.5011291503906
+  ],
+  "dimensions": "5x5",
+  "extraction_method": "vlm",
+  "rows": [
+    [
+      "Artikelnr.",
+      "Gänga",
+      "Rör",
+      "Typ",
+      "Slang ID"
+    ],
+    [
+      "4231-30-10",
+      "M 30 x 1.5",
+      "22 mm",
+      "Kobelco",
+      "5/8\""
+    ],
+    [
+      "4231-36-12",
+      "M 36 x 1.5",
+      "28 mm",
+      "Kobelco",
+      "3/4\""
+    ],
+    [
+      "4231-36-16",
+      "M 36 x 1.5",
+      "28 mm",
+      "Kobelco",
+      "1\""
+    ],
+    [
+      "4231-45-16",
+      "M 45 x 1.5",
+      "35 mm",
+      "Kobelco",
+      "1\""
+    ]
+  ],
+  "merged_from": 1
+}

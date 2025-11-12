@@ -1,0 +1,31 @@
+{
+  "pdf_page_number": 5,
+  "footer_page_number": 170,
+  "table_number": 4,
+  "family_id": 79,
+  "extraction_method": "vlm",
+  "product_count": 3,
+  "products": [
+    {
+      "family_id": 79,
+      "product_code": "4200-21-20",
+      "specifications": "{\"Artikelnr.\": \"4200-21-20\", \"Används med\": \"EN1SN\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 79,
+      "product_code": "4200-21-24",
+      "specifications": "{\"Artikelnr.\": \"4200-21-24\", \"Används med\": \"EN1SN\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 79,
+      "product_code": "4200-21-32",
+      "specifications": "{\"Artikelnr.\": \"4200-21-32\", \"Används med\": \"EN1SN\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

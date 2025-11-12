@@ -1,0 +1,31 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 4,
+  "family_id": 168,
+  "extraction_method": "vlm",
+  "product_count": 3,
+  "products": [
+    {
+      "family_id": 168,
+      "product_code": "4374-00-04",
+      "specifications": "{\"Artikelnr.\": \"4374-00-04\", \"Typ\": \"Handtagsnippel\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 168,
+      "product_code": "4374-00-05",
+      "specifications": "{\"Artikelnr.\": \"4374-00-05\", \"Typ\": \"Handtagsnippel\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 168,
+      "product_code": "SE5999-01-36",
+      "specifications": "{\"Artikelnr.\": \"SE5999-01-36\", \"Typ\": \"Bricka M10\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

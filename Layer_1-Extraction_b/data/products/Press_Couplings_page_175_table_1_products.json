@@ -1,0 +1,45 @@
+{
+  "pdf_page_number": 10,
+  "footer_page_number": 175,
+  "table_number": 1,
+  "family_id": 105,
+  "extraction_method": "vlm",
+  "product_count": 5,
+  "products": [
+    {
+      "family_id": 105,
+      "product_code": "4204-04-04-7",
+      "specifications": "{\"Artikelnr.\": \"4204-04-04-7\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"Kort 45° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 105,
+      "product_code": "4204-06-06-7",
+      "specifications": "{\"Artikelnr.\": \"4204-06-06-7\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"Kort 45° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 105,
+      "product_code": "4204-08-08-7",
+      "specifications": "{\"Artikelnr.\": \"4204-08-08-7\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"Kort 45° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 105,
+      "product_code": "4204-12-12-7",
+      "specifications": "{\"Artikelnr.\": \"4204-12-12-7\", \"Gänga\": \"G 3/4\\\"\", \"Typ\": \"Kort 45° IR\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 105,
+      "product_code": "4204-16-16-7",
+      "specifications": "{\"Artikelnr.\": \"4204-16-16-7\", \"Gänga\": \"G 1\\\"\", \"Typ\": \"Kort 45° IR\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "pdf_page_number": 9,
+  "footer_page_number": 174,
+  "table_number": 7,
+  "family_id": 104,
+  "extraction_method": "vlm",
+  "product_count": 5,
+  "products": [
+    {
+      "family_id": 104,
+      "product_code": "4204-04-04-2",
+      "specifications": "{\"Artikelnr.\": \"4204-04-04-2\", \"Gänga\": \"G 1/4\\\"\", \"Typ\": \"45° IR\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 104,
+      "product_code": "4204-06-05-2",
+      "specifications": "{\"Artikelnr.\": \"4204-06-05-2\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"45° IR\", \"Slang ID\": \"5/16\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 104,
+      "product_code": "4204-06-06-2",
+      "specifications": "{\"Artikelnr.\": \"4204-06-06-2\", \"Gänga\": \"G 3/8\\\"\", \"Typ\": \"45° IR\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 104,
+      "product_code": "4204-08-08-2",
+      "specifications": "{\"Artikelnr.\": \"4204-08-08-2\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"45° IR\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 104,
+      "product_code": "4204-08-08-25",
+      "specifications": "{\"Artikelnr.\": \"4204-08-08-25\", \"Gänga\": \"G 1/2\\\"\", \"Typ\": \"45° IR\", \"Slang ID\": \"1/2\\\"\", \"Nyckelvidd\": \"25 mm\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

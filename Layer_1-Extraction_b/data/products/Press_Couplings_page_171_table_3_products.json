@@ -1,0 +1,73 @@
+{
+  "pdf_page_number": 6,
+  "footer_page_number": 171,
+  "table_number": 3,
+  "family_id": 86,
+  "extraction_method": "vlm",
+  "product_count": 9,
+  "products": [
+    {
+      "family_id": 86,
+      "product_code": "4200-30-04",
+      "specifications": "{\"Artikelnr.\": \"4200-30-04\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-06",
+      "specifications": "{\"Artikelnr.\": \"4200-30-06\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"3/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-08",
+      "specifications": "{\"Artikelnr.\": \"4200-30-08\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-10",
+      "specifications": "{\"Artikelnr.\": \"4200-30-10\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"5/8\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-12",
+      "specifications": "{\"Artikelnr.\": \"4200-30-12\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-16",
+      "specifications": "{\"Artikelnr.\": \"4200-30-16\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-20",
+      "specifications": "{\"Artikelnr.\": \"4200-30-20\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-24",
+      "specifications": "{\"Artikelnr.\": \"4200-30-24\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 86,
+      "product_code": "4200-30-32",
+      "specifications": "{\"Artikelnr.\": \"4200-30-32\", \"Används med\": \"P.T.F.E. veckad\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "pdf_page_number": 14,
+  "footer_page_number": 179,
+  "table_number": 3,
+  "family_id": 123,
+  "extraction_method": "vlm",
+  "product_count": 13,
+  "products": [
+    {
+      "family_id": 123,
+      "product_code": "4244-12-08-6",
+      "specifications": "{\"Artikelnr.\": \"4244-12-08-6\", \"Flänsstorlek\": \"3/4\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-12-12-6",
+      "specifications": "{\"Artikelnr.\": \"4244-12-12-6\", \"Flänsstorlek\": \"3/4\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-16-12-6",
+      "specifications": "{\"Artikelnr.\": \"4244-16-12-6\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"3/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-16-16-6",
+      "specifications": "{\"Artikelnr.\": \"4244-16-16-6\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-16-20-6",
+      "specifications": "{\"Artikelnr.\": \"4244-16-20-6\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-16-24-6",
+      "specifications": "{\"Artikelnr.\": \"4244-16-24-6\", \"Flänsstorlek\": \"1\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-20-16-6",
+      "specifications": "{\"Artikelnr.\": \"4244-20-16-6\", \"Flänsstorlek\": \"1 1/4\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-20-20-6",
+      "specifications": "{\"Artikelnr.\": \"4244-20-20-6\", \"Flänsstorlek\": \"1 1/4\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-20-24-6",
+      "specifications": "{\"Artikelnr.\": \"4244-20-24-6\", \"Flänsstorlek\": \"1 1/4\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-24-20-6",
+      "specifications": "{\"Artikelnr.\": \"4244-24-20-6\", \"Flänsstorlek\": \"1 1/2\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1 1/4\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-24-24-6",
+      "specifications": "{\"Artikelnr.\": \"4244-24-24-6\", \"Flänsstorlek\": \"1 1/2\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-32-24-6",
+      "specifications": "{\"Artikelnr.\": \"4244-32-24-6\", \"Flänsstorlek\": \"2\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"1 1/2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    },
+    {
+      "family_id": 123,
+      "product_code": "4244-32-32-6",
+      "specifications": "{\"Artikelnr.\": \"4244-32-32-6\", \"Flänsstorlek\": \"2\\\"\", \"Typ\": \"SAE3 90°\", \"Slang ID\": \"2\\\"\"}",
+      "configuration_type": "STANDARD",
+      "page_number": null
+    }
+  ]
+}
