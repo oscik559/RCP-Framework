@@ -38,6 +38,13 @@ Usage:
 Designed for LangGraph workflow engine with SessionState coordination
 between nodes for multi-agent reasoning and execution.
 """
+# Enable direct script execution with proper imports
+if __name__ == "__main__":
+    import sys
+    from pathlib import Path
+    layer2_root = Path(__file__).parent.parent
+    if str(layer2_root) not in sys.path:
+        sys.path.insert(0, str(layer2_root))
 
 
 import concurrent.futures
@@ -60,7 +67,7 @@ from logic.workflow_helpers import (
     parse_json_response,
     safe_json_parse,
 )
-from logic.types import SessionState
+from logic.workflow_types import SessionState
 from logic.exceptions import (
     WorkflowError,
     StrategyError,

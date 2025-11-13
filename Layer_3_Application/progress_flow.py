@@ -5,11 +5,18 @@ This module provides a wrapper around the main workflow that can emit
 progress updates at each step, allowing the web interface to show
 real-time progress to users.
 """
+# Enable direct script execution with proper imports
+if __name__ == "__main__":
+    import sys
+    from pathlib import Path
+    layer2_root = Path(__file__).parent.parent / "Layer_2_Agentic"
+    if str(layer2_root) not in sys.path:
+        sys.path.insert(0, str(layer2_root))
 
 import time
 import threading
 from typing import Dict, Any, Callable, Optional
-from logic.types import SessionState
+from logic.workflow_types import SessionState
 from logic.state_graph import get_graph
 from config.debug_config import debug
 

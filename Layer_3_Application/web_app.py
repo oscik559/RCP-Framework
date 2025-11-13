@@ -24,7 +24,7 @@ if layer2_path not in sys.path:
 
 # Import the existing agentic reasoning system
 from logic.state_graph import get_graph  # type: ignore
-from logic.types import SessionState  # type: ignore
+from logic.workflow_types import SessionState  # type: ignore
 from config.debug_config import debug  # type: ignore
 from config.session_config import generate_session_id  # type: ignore
 from config.config_loader import CONFIG  # type: ignore
