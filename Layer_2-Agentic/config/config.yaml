@@ -16,7 +16,7 @@ model_path: models/
 
 # Databases
 agentic_db: data/database/agentic.db      # Workflow database
-harvested_db: data/database/harvested.db # Product database 
+harvested_db: data/database/harvested.db # Product database (335 products, 69 families)
 temp_db: data/database/temp.db           # Temporary processing database
 
 # Data Directories
@@ -28,13 +28,13 @@ exports_dir: ../data/exports/
 # LLM Models - Three-tier architecture
 llms:
   basic:
-    model: llama3.2:latest
+    model: gemma3:latest
     temperature: 0.0
   
   reasoning:
-    model: llama3.2:latest  # Using llama3.2 (available in ollama list)
+    model: gemma3:latest  # Switched from llama3.2 for stability
     temperature: 0.0
   
   multimodal:
-    model: llama3.2-vision:11b
+    model: llava:latest
     temperature: 0.0

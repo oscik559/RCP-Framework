@@ -1,0 +1,56 @@
+{
+  "pdf_page_number": 5,
+  "footer_page_number": 170,
+  "table_number": 7,
+  "bbox": [
+    305.22354012948495,
+    440.4751892089844,
+    524.0152728740985,
+    530.580810546875
+  ],
+  "dimensions": "8x3",
+  "extraction_method": "vlm",
+  "rows": [
+    [
+      "Artikelnr.",
+      "Används med",
+      "Slang ID"
+    ],
+    [
+      "4200-19-04",
+      "EN4SP/Deltaflex",
+      "1/4\""
+    ],
+    [
+      "4200-19-06",
+      "EN4SP/Deltaflex/IsoBar 350",
+      "3/8\""
+    ],
+    [
+      "4200-19-08",
+      "EN4SP/Deltaflex /IsoBar 350",
+      "1/2\""
+    ],
+    [
+      "4200-19-10",
+      "EN4SP/Deltaflex",
+      "5/8\""
+    ],
+    [
+      "4200-19-12",
+      "EN4SP/4SH/Deltaflex./IsoBar 350",
+      "3/4\""
+    ],
+    [
+      "4200-19-16",
+      "EN 4SP/ 4SH/ Deltaflex /Isobar350",
+      "1\""
+    ],
+    [
+      "4200-19-20",
+      "EN4SP",
+      "1 1/4\""
+    ]
+  ],
+  "merged_from": 1
+}

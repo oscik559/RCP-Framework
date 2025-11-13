@@ -44,12 +44,7 @@ Usage:
 
 import logging
 import sqlite3
-import sys
 from pathlib import Path
-
-# Add parent directory to path when running as script
-if __name__ == "__main__":
-    sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from db.connection import get_agentic_connection
 

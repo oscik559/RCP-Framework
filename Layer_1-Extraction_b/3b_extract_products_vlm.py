@@ -380,24 +380,11 @@ class VLMTableDetector:
     def extract_table_with_vlm(self, table_image, table_bbox):
         """
         Extract table content using Vision Language Model.
-        
-        This method sends ONLY the cropped table image (not the full page) to the VLM
-        for improved accuracy. The VLM analyzes the table structure and returns
-        structured data as a JSON array of rows.
-        
-        Workflow:
-        1. Receives a cropped PIL Image containing just the table region
-        2. Sends to local Ollama VLM (qwen3-vl:235b-instruct-cloud)
-        3. Falls back to remote VLM endpoints if local fails
-        4. Parses JSON response to extract table rows
+        ONLY processes the cropped table image, not the full page.
         
         Args:
-            table_image: PIL Image of the CROPPED table region only (not full page)
+            table_image: PIL Image of the CROPPED table region only
             table_bbox: Bounding box coordinates (for debugging/logging)
-            
-        Returns:
-            list: Nested list structure [[header_row], [data_row_1], [data_row_2], ...]
-                  or None if extraction fails
         """
         print(f"🎯 VLM processing cropped table: {table_image.size} pixels")
         print(f"📦 Table bbox: {[int(x) for x in table_bbox]}")
@@ -539,20 +526,8 @@ class VLMTableDetector:
     def detect_tables_in_page(self, pdf_path, page_number, use_vlm=True):
         """Detect and extract tables from a specific page.
         
-        This is the main table detection pipeline:
-        1. Opens PDF and loads corresponding PNG image
-        2. Gets exclusion regions (headers/footers) from database
-        3. Extracts actual page number from document footer
-        4. Uses PyMuPDF to detect table boundaries
-        5. Filters tables that overlap with headers/footers
-        6. Extracts table content using PyMuPDF
-        7. Optionally enhances with VLM for better accuracy
-        8. Applies column-aware merging for split tables
-        
         Returns:
-            tuple: (tables_list, footer_page_number) where:
-                   - tables_list: List of detected tables with bbox and content
-                   - footer_page_number: The actual page number from document footer
+            tuple: (tables_list, footer_page_number) where footer_page_number is the actual page number from the document footer
         """
         pdf_name = Path(pdf_path).stem
         
@@ -575,8 +550,7 @@ class VLMTableDetector:
         # Get exclusion regions
         exclusion_regions = self.get_exclusion_regions(pdf_name, page_number)
         
-        # Extract actual page number from footer (e.g., printed "27" instead of PDF index 26)
-        # This is critical because database queries use footer page numbers, not PDF indices
+        # Extract actual page number from footer
         footer_page_number = None
         if exclusion_regions.get('footer'):
             footer_page_number = self.extract_page_number_from_footer(page, exclusion_regions['footer'])
@@ -590,15 +564,13 @@ class VLMTableDetector:
             footer_page_number = page_number
         
         # Detect tables using PyMuPDF
-        # PyMuPDF finds table boundaries based on line detection and text alignment
         tables = page.find_tables()
         
         detected_tables = []
         for i, table in enumerate(tables):
             table_bbox = table.bbox
             
-            # Check if table intersects with exclusion regions (headers/footers)
-            # Skip tables that overlap with page headers or footers to avoid junk data
+            # Check if table intersects with exclusion regions
             skip_table = False
             for region_name, region_bbox in exclusion_regions.items():
                 if region_bbox and self.bbox_intersects(table_bbox, region_bbox):
@@ -613,12 +585,10 @@ class VLMTableDetector:
             try:
                 table_data = table.extract()
                 
-                # Extract ONLY the table region from PNG (not full page)
-                # This crops just the table area for better VLM accuracy
+                # Extract ONLY the table region (not full page) - no small crop
                 table_image = self.extract_table_image(pdf_doc, page_number, table_bbox, png_img)
                 
                 # Try VLM extraction if enabled (processes only the cropped table)
-                # VLM provides better accuracy for complex tables with formatting
                 vlm_data = None
                 if use_vlm:
                     try:
@@ -664,22 +634,16 @@ class VLMTableDetector:
     def get_family_for_table(self, footer_page_number, table_number):
         """
         Get the family_id for a table based on the family info JSON file.
-        
-        This method links tables to product families by:
-        1. Loading the family info JSON that contains headers extracted above each table
-           (e.g., "4200-14", "Hylsa R7/R8", "Slangen skales ej", "PRODUKTGRUPP 300")
-        2. Matching the table_number to the family that owns it
-        3. Querying the database for the family's ID using family_code and page_number
+        Uses the table_id from the family JSON to match with the current table.
         
         Args:
             footer_page_number: The actual page number from the document footer (stored in database)
-            table_number: The table index on the page (1-based)
+            table_number: The table index on the page
             
         Returns:
             int: Database ID of the family, or None if not found
         """
         # Load family info JSON for this page (uses footer page number for filename)
-        # This JSON was created by extract_family script and contains family headers
         family_json_path = self.family_dir / f"page_{footer_page_number:03d}_family_info.json"
         
         if not family_json_path.exists():
@@ -691,15 +655,6 @@ class VLMTableDetector:
                 family_data = json.load(f)
             
             # Find the family with matching table_id
-            # Each family in the JSON has a table_id indicating which table it owns
-            # Example family structure:
-            # {
-            #   "family_code": "4200-14",
-            #   "name": "Hylsa R7/R8",
-            #   "description": "Slangen skales ej",
-            #   "product_group": "300",
-            #   "table_id": 1
-            # }
             for family in family_data.get('families', []):
                 if family.get('table_id') == table_number:
                     family_code = family.get('family_code')
@@ -735,58 +690,29 @@ class VLMTableDetector:
     
     def parse_specifications_from_table(self, rows, family_id):
         """
-        Parse table rows into product specifications, extracting each product variant.
-        
-        This is the core table-to-database extraction method. It:
-        1. Uses the first row as column headers (e.g., "Artikelnr", "Gänga", "Typ", "Slang ID")
-        2. Iterates through each data row to extract individual products
-        3. Maps each cell value to its corresponding header name
-        4. Creates a specifications JSON with all product details
-        5. Cleans Unicode control characters from PyMuPDF output
-        
-        Example table processing:
-        Headers: ["Artikelnr", "Gänga", "Typ", "Slang ID"]
-        Row:     ["4209-04-04-1", "G 1/4\"", "PL IR", "1/4\""]
-        
-        Result: Product with specifications:
-        {
-            "Artikelnr": "4209-04-04-1",
-            "Gänga": "G 1/4\"",
-            "Typ": "PL IR",
-            "Slang ID": "1/4\""
-        }
-        
-        Args:
-            rows: List of table rows where rows[0] is headers and rows[1:] are data
-            family_id: Database ID of the parent product family
-            
-        Returns:
-            list: List of product dictionaries ready for database insertion
+        Parse table rows into product specifications.
+        Returns list of product dictionaries ready for database insertion.
+        Handles Unicode properly to avoid control characters.
         """
         if not rows or len(rows) < 2:
             return []
         
-        # First row is typically headers (column names from the table)
-        # Example: ["Artikelnr", "Gänga", "Typ", "Slang ID"]
+        # First row is typically headers
         headers = [str(cell).strip() for cell in rows[0]]
         
         products = []
         
-        # Process each data row (skip header row at index 0)
-        # Each row represents one product variant with its specifications
+        # Process each data row
         for row_idx, row in enumerate(rows[1:], start=1):
             if not row or all(not cell or str(cell).strip() == '' for cell in row):
                 continue  # Skip empty rows
             
             # Build specifications dictionary from row data
-            # Maps each header to its corresponding cell value
-            # Example: {"Artikelnr": "4209-04-04-1", "Gänga": "G 1/4\"", ...}
             specs = {}
             for col_idx, cell in enumerate(row):
                 if col_idx < len(headers) and headers[col_idx]:
                     header = headers[col_idx]
                     # Clean the value - remove control characters and ensure proper Unicode
-                    # PyMuPDF sometimes inserts invisible control characters
                     value = str(cell).strip() if cell else ""
                     
                     # Remove common control characters that PyMuPDF might insert
@@ -800,8 +726,7 @@ class VLMTableDetector:
             if not specs:
                 continue
             
-            # Try to extract product code (usually first column - "Artikelnr")
-            # This is the unique identifier like "4209-04-04-1" or "4200-14-04"
+            # Try to extract product code (usually first column)
             product_code = str(row[0]).strip() if row else ""
             
             # Clean product code from control characters
@@ -813,8 +738,7 @@ class VLMTableDetector:
                 print(f"⚠️  Row {row_idx} has no product code, skipping")
                 continue
             
-            # Create product dictionary for database insertion
-            # Links this product variant to its parent family and stores all specs as JSON
+            # Create product dictionary
             product = {
                 'family_id': family_id,
                 'product_code': product_code,
@@ -869,26 +793,14 @@ class VLMTableDetector:
     def save_table_data(self, table_data, pdf_name, pdf_page_number, footer_page_number, table_number):
         """Save table data to JSON file and extract products to database.
         
-        This is the main orchestration method that:
-        1. Saves raw table data (VLM or PyMuPDF) to JSON files for reference
-        2. Links the table to its product family using family info JSON
-        3. Parses table rows into individual product records
-        4. Saves products to both JSON (for debugging) and database (for querying)
-        
-        The method handles two page numbers:
-        - pdf_page_number: Sequential index in PDF file (for file naming)
-        - footer_page_number: Actual page number from document footer (for database queries)
-        
         Args:
-            table_data: Dictionary containing table extraction data (bbox, rows, vlm_rows)
-            pdf_name: Name of the PDF file (e.g., "Press_Couplings")
+            table_data: Dictionary containing table extraction data
+            pdf_name: Name of the PDF file
             pdf_page_number: Sequential page index in the PDF (for filenames)
             footer_page_number: Actual page number from document footer (for database queries)
-            table_number: Table index on the page (1-based)
+            table_number: Table index on the page
         """
         # Determine which data to save (prefer VLM if available)
-        # VLM (Vision Language Model) provides better accuracy than PyMuPDF
-        # for complex tables with merged cells or formatting
         vlm_rows = table_data.get('vlm_rows', [])
         pymupdf_rows = table_data.get('rows', [])
         
@@ -930,24 +842,19 @@ class VLMTableDetector:
         print(f"Saved table {table_number} to {table_output_file}")
         
         # === Extract products to database ===
-        # This section links table rows to product families and creates product records
         print(f"🔄 Extracting products from table {table_number}...")
         
         # Get family for this table using the footer page number (which matches database page_number)
-        # This queries the family info JSON to find which family owns this table
-        # Example: Table 1 on page 27 might belong to family "4200-14 Hylsa R7/R8"
         family_id = self.get_family_for_table(footer_page_number, table_number)
         
         if family_id:
-            # Parse products from table (using VLM data for best accuracy)
-            # This converts each table row into a product record with specifications
+            # Parse products from table (using VLM data)
             products = self.parse_specifications_from_table(rows_to_save, family_id)
             
             if products:
                 print(f"📦 Found {len(products)} products in table")
                 
                 # Save products JSON to products directory (use footer page number for consistency)
-                # This creates a JSON file for debugging and verification
                 products_output_file = self.products_dir / f"{pdf_name}_page_{footer_page_number:03d}_table_{table_number}_products.json"
                 
                 products_save_data = {
@@ -966,14 +873,12 @@ class VLMTableDetector:
                 print(f"💾 Saved products JSON to {products_output_file}")
                 
                 # Save to database (use footer page number which matches database page_number column)
-                # This populates the products table with all extracted product variants
                 inserted = self.save_products_to_database(products, footer_page_number)
                 print(f"✅ Inserted {inserted}/{len(products)} products to database")
             else:
                 print(f"⚠️  No valid products extracted from table")
         else:
             print(f"⚠️  Could not determine family for table, skipping product extraction")
-            print(f"    Make sure family info JSON exists and has correct table_id mapping")
         
         return table_output_file
     

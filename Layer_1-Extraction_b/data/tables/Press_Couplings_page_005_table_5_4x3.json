@@ -1,0 +1,36 @@
+{
+  "pdf_page_number": 5,
+  "footer_page_number": 170,
+  "table_number": 5,
+  "bbox": [
+    305.22354012948495,
+    132.88548278808594,
+    524.0152728740985,
+    178.30364990234375
+  ],
+  "dimensions": "4x3",
+  "extraction_method": "vlm",
+  "rows": [
+    [
+      "Artikelnr.",
+      "Används med",
+      "Slang ID"
+    ],
+    [
+      "4200-22-20",
+      "EN2SN",
+      "1 1/4\""
+    ],
+    [
+      "4200-22-24",
+      "EN2SN",
+      "1 1/2\""
+    ],
+    [
+      "4200-22-32",
+      "EN2SN",
+      "2\""
+    ]
+  ],
+  "merged_from": 1
+}

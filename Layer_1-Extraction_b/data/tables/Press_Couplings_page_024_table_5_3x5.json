@@ -1,0 +1,37 @@
+{
+  "pdf_page_number": 24,
+  "footer_page_number": 189,
+  "table_number": 5,
+  "bbox": [
+    71.22915349687848,
+    665.6458129882812,
+    289.9809341430664,
+    700.5855102539062
+  ],
+  "dimensions": "3x5",
+  "extraction_method": "vlm",
+  "rows": [
+    [
+      "Artikelnr.",
+      "A",
+      "B",
+      "C",
+      "Slang ID"
+    ],
+    [
+      "4374-11-04S",
+      "11 mm",
+      "6 mm",
+      "12 mm",
+      "1/4\""
+    ],
+    [
+      "4374-11-05S",
+      "11 mm",
+      "6 mm",
+      "12 mm",
+      "5/16\""
+    ]
+  ],
+  "merged_from": 1
+}
