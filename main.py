@@ -89,7 +89,17 @@ def main():
 
         # Execute
         print("\n[AI] Running workflow...\n")
-        final_state = get_graph().invoke(init_state, config=workflow_config)
+        from typing import Any
+        graph: Any = get_graph()
+        if hasattr(graph, "invoke"):
+            final_state = graph.invoke(init_state, config=workflow_config)
+        else:
+            for method_name in ("run", "execute", "start", "process"):
+                if hasattr(graph, method_name):
+                    final_state = getattr(graph, method_name)(init_state, config=workflow_config)
+                    break
+            else:
+                raise AttributeError("StateGraph object has no callable 'invoke', 'run', 'execute' or 'start' methods")
 
         # Results
         print("\n" + "=" * 60)
