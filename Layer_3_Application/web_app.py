@@ -17,17 +17,19 @@ import time
 import json
 from typing import Optional, Dict, Any, List
 
-# Add Layer_2-Agentic to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
+# Add Layer_2_Agentic to path for imports
+layer2_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
+if layer2_path not in sys.path:
+    sys.path.insert(0, layer2_path)
 
 # Import the existing agentic reasoning system
-from logic.state_graph import get_graph
-from logic.types import SessionState
-from config.debug_config import debug
-from config.session_config import generate_session_id
-from config.config_loader import CONFIG
-from config.domain_config import DOMAIN_NAME, DOMAIN_DESCRIPTION
-from db.connection import (
+from logic.state_graph import get_graph  # type: ignore
+from logic.types import SessionState  # type: ignore
+from config.debug_config import debug  # type: ignore
+from config.session_config import generate_session_id  # type: ignore
+from config.config_loader import CONFIG  # type: ignore
+from config.domain_config import DOMAIN_NAME, DOMAIN_DESCRIPTION  # type: ignore
+from db.connection import (  # type: ignore
     get_agentic_connection,
     get_output_connection,
 )
@@ -312,7 +314,7 @@ def execute_workflow_with_progress(init_state, tracker):
                 print("❌ No session ID provided to monitor_real_progress")
                 return
 
-            from db.connection import get_agentic_connection
+            from db.connection import get_agentic_connection  # type: ignore
 
             # Set goal information immediately
             tracker.set_goal(
@@ -377,7 +379,7 @@ def execute_workflow_with_progress(init_state, tracker):
             # Fallback if no strategy found in database
             if not strategy_found:
                 # Use the strategy that's actually enabled in testing configuration
-                from config.strategy_testing import get_enabled_strategies
+                from config.strategy_testing import get_enabled_strategies  # type: ignore
                 enabled_strategies = get_enabled_strategies()
                 fallback_strategy = enabled_strategies[0] if enabled_strategies else "SIMPLE LOOKUP"
                 
@@ -499,7 +501,7 @@ def process_query():
         session_id = generate_session_id()  # Use the same logic as main.py
 
         # Clear any old session data to ensure fresh start
-        from logic.database_manager import DatabaseManager
+        from logic.database_manager import DatabaseManager  # type: ignore
         db = DatabaseManager()
         db.clear_session_data(session_id)
         print(f"✅ Cleared old session data for session {session_id}")
@@ -736,11 +738,11 @@ def run_pipeline():
             
             # Map pipeline IDs to Layer 1 extraction scripts
             layer1_scripts = {
-                "pdf-to-png": "../Layer_1a-Extraction/1_pdf_to_png.py",
-                "detect-headers": "../Layer_1a-Extraction/2_detect_headers_footers.py",
-                "detect-tables": "../Layer_1a-Extraction/3_detect_tables.py",
-                "extract-product": "../Layer_1a-Extraction/4_extract_product.py",
-                "extract-images": "../Layer_1a-Extraction/5_extract_images.py",
+                "pdf-to-png": "../Layer_1a_Extraction/1_pdf_to_png.py",
+                "detect-headers": "../Layer_1a_Extraction/2_detect_headers_footers.py",
+                "detect-tables": "../Layer_1a_Extraction/3_detect_tables.py",
+                "extract-product": "../Layer_1a_Extraction/4_extract_product.py",
+                "extract-images": "../Layer_1a_Extraction/5_extract_images.py",
             }
             
             python_path = sys.executable  # Use same Python interpreter

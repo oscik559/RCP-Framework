@@ -9,8 +9,8 @@ import sys
 import os
 import sqlite3
 
-# Add Layer_2-Agentic to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
+# Add Layer_2_Agentic to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
 
 from logic.function_library import (
     func_search_products,

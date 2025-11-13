@@ -285,7 +285,7 @@ class RegionManager:
 
 def main():
     parser = argparse.ArgumentParser(description="Define header/footer exclusion regions")
-    parser.add_argument("--pdf-path", default="Layer_1a-Extraction/High-Pressure_Hose.pdf", help="Path to PDF file")
+    parser.add_argument("--pdf-path", default="Layer_1a_Extraction/High-Pressure_Hose.pdf", help="Path to PDF file")
     parser.add_argument("--page", type=int, help="Specific page number to process")
     parser.add_argument("--all-pages", action="store_true", help="Process all pages")
     parser.add_argument("--show-regions", action="store_true", help="Show existing regions")

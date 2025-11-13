@@ -44,7 +44,7 @@ class TableVisualizer:
         self.pages_dir = self.script_dir / "data/png_pages"
         self.tables_dir = self.script_dir / "data/tables"
         self.family_dir = self.script_dir / "data/family"  # For family information
-        # Use local database in Layer_1b-Extraction/data/database/
+        # Use local database in Layer_1b_Extraction/data/database/
         db_path = self.script_dir / "data" / "database" / "harvested.db"
         self.db_manager = DatabaseManager(str(db_path))
         self.merge_threshold = merge_threshold

@@ -10,7 +10,7 @@ Main Components:
 - agentic_schema.sql: SQL schema definition
 
 Usage:
-    from db import init_db, get_agentic_connection
+    from Layer_2_Agentic.db import init_db, get_agentic_connection
     
     # Initialize database
     init_db(drop_and_recreate=True)
@@ -21,12 +21,12 @@ Usage:
         # ... execute queries
 """
 
-from db.connection import (
+from .connection import (
     get_agentic_connection,
     get_output_connection,
     get_temp_connection,
 )
-from db.schema_manager import init_db, get_schema_info
+from .schema_manager import init_db, get_schema_info
 
 __all__ = [
     'get_agentic_connection',

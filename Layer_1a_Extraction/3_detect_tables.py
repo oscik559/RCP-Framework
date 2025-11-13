@@ -670,7 +670,7 @@ Return ONLY the JSON array with the actual table content."""
 
 def main():
     parser = argparse.ArgumentParser(description="Detect tables in PDF pages and visualize on PNG images")
-    parser.add_argument("--pdf-path", default="Layer_1a-Extraction/High-Pressure_Hose.pdf", help="Path to PDF file (default: Layer_1a-Extraction/High-Pressure_Hose.pdf)")
+    parser.add_argument("--pdf-path", default="Layer_1a_Extraction/High-Pressure_Hose.pdf", help="Path to PDF file (default: Layer_1a_Extraction/High-Pressure_Hose.pdf)")
     parser.add_argument("--page", type=int, help="Specific page number to process (omit to process all pages)")
     parser.add_argument("--png-path", help="Optional path to specific PNG file (only works with --page)")
     parser.add_argument("--all-pages", action="store_true", help="Process all pages in the PDF")

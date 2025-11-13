@@ -127,8 +127,8 @@ def main():
     # Get PDF file path - look in multiple locations
     pdf_path = None
     search_paths = [
-        script_dir / args.pdf,                    # Layer_1b-Extraction/Press_Couplings.pdf
-        script_dir / "PDF" / args.pdf,            # Layer_1b-Extraction/PDF/Press_Couplings.pdf
+        script_dir / args.pdf,                    # Layer_1b_Extraction/Press_Couplings.pdf
+        script_dir / "PDF" / args.pdf,            # Layer_1b_Extraction/PDF/Press_Couplings.pdf
         script_dir.parent / "PDF" / args.pdf,     # Project_Hydroscand-Hoses/PDF/Press_Couplings.pdf
         Path(args.pdf),                           # Current working directory
     ]

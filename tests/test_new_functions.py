@@ -13,8 +13,8 @@ import sys
 import sys
 from pathlib import Path
 
-# Add Layer_2-Agentic to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "Layer_2-Agentic"))
+# Add Layer_2_Agentic to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "Layer_2_Agentic"))
 
 from logic.function_library import (
     func_search_products,

@@ -1,9 +1,15 @@
 # /db/connection.py
-
+import sys
 import logging
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
+
+# Add Layer_2_Agentic to path when running as script
+if __name__ == "__main__":
+    layer2_root = str(Path(__file__).parent.parent)
+    if layer2_root not in sys.path:
+        sys.path.insert(0, layer2_root)
 
 from config.config_loader import CONFIG
 

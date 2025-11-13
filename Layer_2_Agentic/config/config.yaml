@@ -28,11 +28,11 @@ exports_dir: ../data/exports/
 # LLM Models - Three-tier architecture
 llms:
   basic:
-    model: gemma3:latest
+    model: llama3.2:latest
     temperature: 0.0
   
   reasoning:
-    model: gemma3:latest  # Switched from llama3.2 for stability
+    model: llama3.2:latest # Switched from llama3.2 for stability
     temperature: 0.0
   
   multimodal:

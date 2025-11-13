@@ -187,7 +187,7 @@ HÖGTRYCKSSLANG (Category)
 
 ```
 Project_Hydroscand-Hoses/
-├── Layer_1a-Extraction/                    # Data extraction pipeline
+├── Layer_1a_Extraction/                    # Data extraction pipeline
 │   ├── 1_pdf_to_png.py
 │   ├── 3_detect_tables.py
 │   ├── 4_extract_product.py

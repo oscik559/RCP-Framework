@@ -14,8 +14,8 @@ Tests all components of the agentic reasoning system:
 import sys
 import os
 
-# Add Layer_2-Agentic to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
+# Add Layer_2_Agentic to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
 
 def test_1_configuration():
     """Test 1: Configuration Loading"""

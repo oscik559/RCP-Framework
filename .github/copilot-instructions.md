@@ -16,9 +16,9 @@ This project is a three-layer intelligent system for extracting, reasoning about
 ## Developer Workflows
 - **Extract Data**: Run Layer 1 scripts to convert PDF pages to PNG, detect tables, and extract products. Example:
   ```pwsh
-  python Layer_1a-Extraction/1_pdf_to_png.py Layer_1a-Extraction/High-Pressure_Hose.pdf
-  python Layer_1a-Extraction/3_detect_tables.py
-  python Layer_1a-Extraction/4_extract_product.py Layer_1a-Extraction/High-Pressure_Hose.pdf --page 31
+  python Layer_1a_Extraction/1_pdf_to_png.py Layer_1a_Extraction/High-Pressure_Hose.pdf
+  python Layer_1a_Extraction/3_detect_tables.py
+  python Layer_1a_Extraction/4_extract_product.py Layer_1a_Extraction/High-Pressure_Hose.pdf --page 31
   ```
 - **Query Data**: Use Layer 2 (main.py) for CLI queries, or Layer 3 (web_app.py) for web UI. Example:
   ```pwsh
@@ -46,7 +46,7 @@ This project is a three-layer intelligent system for extracting, reasoning about
 - **Flask**: Web UI in Layer 3.
 
 ## Example File References
-- `Layer_1a-Extraction/4_extract_product.py`: Product extraction logic
+- `Layer_1a_Extraction/4_extract_product.py`: Product extraction logic
 - `Layer_2-Agentic/agentic_reasoning/logic/function_library.py`: Core function library
 - `Layer_3-Application/web_app.py`: Web interface
 - `data/database/db_utils.py`: Database utilities

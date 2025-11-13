@@ -13,14 +13,14 @@ Project_Hydroscand-Hoses/
 │       ├── harvested.db       # Production database
 │       └── harvested_test.db  # Test database
 │
-├── Layer_1a-Extraction/        # Hose extraction
+├── Layer_1a_Extraction/        # Hose extraction
 │   ├── 1_pdf_to_png.py
 │   ├── 2_detect_headers_footers.py  # imports from data/database/
 │   ├── 3_detect_tables.py           # imports from data/database/
 │   ├── 4_extract_product.py         # imports from data/database/
 │   └── 5_extract_images.py
 │
-└── Layer_1b-Extraction/      # Coupling extraction
+└── Layer_1b_Extraction/      # Coupling extraction
     ├── Press_Couplings.pdf
     ├── 0_extract_knowledge.py       # imports from data/database/
     ├── 1_pdf_to_png.py
@@ -82,13 +82,13 @@ Now that the structure is clean, you can:
 
 1. **Run table detection** on coupling pages
    ```bash
-   cd Layer_1b-Extraction
+   cd Layer_1b_Extraction
    uv run python 3_detect_tables.py --pdf-path Press_Couplings.pdf --page 2
    ```
 
 2. **Extract products** using the test database
    ```bash
-   cd Layer_1b-Extraction
+   cd Layer_1b_Extraction
    uv run python 4_extract_product.py --page 2 --test
    ```
 

@@ -146,7 +146,7 @@ PRESSKOPPLINGAR (Chapter 4:2)
 
 Check database status:
 ```bash
-python ../Layer_1a-Extraction/db_utils.py --verify
+python ../Layer_1a_Extraction/db_utils.py --verify
 ```
 
 Expected output:
@@ -191,11 +191,11 @@ python ../Layer_1a-Extraction/3_detect_tables.py \
 ```bash
 # Ensure you're in the project root directory
 cd /Users/worktime/Desktop/Project_Hydroscand-Hoses
-python Layer_1b-Extraction/1_extract_knowledge.py --help
+python Layer_1b_Extraction/1_extract_knowledge.py --help
 ```
 
 **Database not found:**
 ```bash
 # Initialize database
-python Layer_1a-Extraction/db_utils.py --init
+python Layer_1a_Extraction/db_utils.py --init
 ```

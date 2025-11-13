@@ -14,8 +14,8 @@ Usage:
 import sys
 import os
 
-# Add Layer_2-Agentic to path so we can import modules
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Layer_2-Agentic'))
+# Add Layer_2_Agentic to path so internal imports work
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Layer_2_Agentic'))
 
 # Ensure UTF-8 encoding for Windows
 if sys.platform.startswith("win"):
@@ -27,7 +27,7 @@ from config.session_config import (
     get_workflow_config,
 )
 from logic.state_graph import get_graph
-from logic.templates import populate_template_libraries
+from db.templates import populate_template_libraries
 
 
 def main():

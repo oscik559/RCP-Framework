@@ -12,7 +12,7 @@ import sys
 import os
 
 # Add Layer_2 to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
 
 from logic.function_library import func_analyze_with_llm
 
