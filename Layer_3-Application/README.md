@@ -45,12 +45,13 @@ Layer_3-Application (UI)
     ↓ uses
 Layer_2-Agentic (Framework)
     ↓ uses
-Layer_1-Extraction (Data)
+Layer_1a-Extraction (Hose Data)
+Layer_1b-Extraction (Coupling Data)
 ```
 
 ### Separation of Concerns
 
-- **Layer_1-Extraction**: Data extraction and storage (PDF → Database)
+- **Layer_1a-Extraction / Layer_1b-Extraction**: Data extraction and storage (PDF → Database)
 - **Layer_2-Agentic**: Core reasoning framework (Goal → Strategy → Function)
 - **Layer_3-Application**: User interfaces and applications (Web UI, APIs)
 

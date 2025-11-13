@@ -1449,7 +1449,7 @@ EXAMPLES:
   Single page:  python 4_extract_product.py data/pdf_pages/Produktbok_page_031.pdf --page 31
   Batch mode:   python 4_extract_product.py data/pdf_pages/ --all-pages
   Page range:   python 4_extract_product.py data/pdf_pages/ --all-pages --start-page 28 --end-page 40
-  Full PDF:     python 4_extract_product.py Produktbok.pdf --all-pages
+  Full PDF:     python 4_extract_product.py High-Pressure_Hose.pdf --all-pages
 
 PROCESSING MODES:
   - Text-first extraction for searchable PDFs (fastest, most accurate)

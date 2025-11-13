@@ -736,11 +736,11 @@ def run_pipeline():
             
             # Map pipeline IDs to Layer 1 extraction scripts
             layer1_scripts = {
-                "pdf-to-png": "../Layer_1-Extraction/1_pdf_to_png.py",
-                "detect-headers": "../Layer_1-Extraction/2_detect_headers_footers.py",
-                "detect-tables": "../Layer_1-Extraction/3_detect_tables.py",
-                "extract-product": "../Layer_1-Extraction/4_extract_product.py",
-                "extract-images": "../Layer_1-Extraction/5_extract_images.py",
+                "pdf-to-png": "../Layer_1a-Extraction/1_pdf_to_png.py",
+                "detect-headers": "../Layer_1a-Extraction/2_detect_headers_footers.py",
+                "detect-tables": "../Layer_1a-Extraction/3_detect_tables.py",
+                "extract-product": "../Layer_1a-Extraction/4_extract_product.py",
+                "extract-images": "../Layer_1a-Extraction/5_extract_images.py",
             }
             
             python_path = sys.executable  # Use same Python interpreter

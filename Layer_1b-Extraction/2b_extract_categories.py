@@ -33,7 +33,7 @@ from db_utils import DatabaseManager
 class CategoryExtractor:
     def __init__(self):
         self.script_dir = Path(__file__).parent
-        # Use local database in Layer_1-Extraction_b/data/database/
+        # Use local database in Layer_1b-Extraction/data/database/
         db_path = self.script_dir / "data" / "database" / "harvested.db"
         self.db_manager = DatabaseManager(str(db_path))
         self.db_manager.init_database()
@@ -284,8 +284,8 @@ def main():
     else:
         # Default to Press_Couplings.pdf - check multiple locations
         possible_paths = [
-            script_dir / "Press_Couplings.pdf",              # Layer_1-Extraction_b/Press_Couplings.pdf
-            script_dir / "PDF" / "Press_Couplings.pdf",      # Layer_1-Extraction_b/PDF/Press_Couplings.pdf
+            script_dir / "Press_Couplings.pdf",              # Layer_1b-Extraction/Press_Couplings.pdf
+            script_dir / "PDF" / "Press_Couplings.pdf",      # Layer_1b-Extraction/PDF/Press_Couplings.pdf
             script_dir.parent / "PDF" / "Press_Couplings.pdf" # Project_Hydroscand-Hoses/PDF/Press_Couplings.pdf
         ]
         

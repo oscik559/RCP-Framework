@@ -94,7 +94,7 @@ cd Project_Hydroscand-Hoses
 pip install -r requirements.txt
 
 # Initialize database (Layer 1)
-sqlite3 data/products.db < Layer_1-Extraction/schema.sql
+sqlite3 data/products.db < Layer_1a-Extraction/schema.sql
 ```
 
 ## 📋 Usage
@@ -103,13 +103,13 @@ sqlite3 data/products.db < Layer_1-Extraction/schema.sql
 
 ```bash
 # Convert PDF pages to PNG
-python Layer_1-Extraction/1_pdf_to_png.py PDF/Produktbok.pdf
+python Layer_1a-Extraction/1_pdf_to_png.py Layer_1a-Extraction/High-Pressure_Hose.pdf
 
 # Detect and extract tables
-python Layer_1-Extraction/3_detect_tables.py
+python Layer_1a-Extraction/3_detect_tables.py
 
 # Extract product data
-python Layer_1-Extraction/4_extract_product.py PDF/Produktbok.pdf --page 31
+python Layer_1a-Extraction/4_extract_product.py Layer_1a-Extraction/High-Pressure_Hose.pdf --page 31
 ```
 
 **Options:**
@@ -187,7 +187,7 @@ HÖGTRYCKSSLANG (Category)
 
 ```
 Project_Hydroscand-Hoses/
-├── Layer_1-Extraction/                    # Data extraction pipeline
+├── Layer_1a-Extraction/                    # Data extraction pipeline
 │   ├── 1_pdf_to_png.py
 │   ├── 3_detect_tables.py
 │   ├── 4_extract_product.py

@@ -1,7 +1,9 @@
 # Layer Renaming & Flattening - Complete ✅
 
+> **UPDATE (Current):** `Layer_1-Extraction` has been further renamed to `Layer_1a-Extraction` (for high-pressure hoses) to distinguish it from `Layer_1b-Extraction` (for press couplings). This document reflects the historical `Layer_1 → Layer_1-Extraction` change. See updated references in README.md and .github/copilot-instructions.md for current naming.
+
 **Date:** November 2, 2024  
-**Status:** COMPLETE  
+**Status:** COMPLETE (Later updated: Layer_1-Extraction → Layer_1a-Extraction)  
 **Summary:** Successfully renamed layers with descriptive names and flattened directory structure
 
 ---
@@ -9,7 +11,7 @@
 ## 🎯 Objectives Completed
 
 ### 1. Renamed Layers with Descriptive Names ✅
-- **Layer_1** → **Layer_1-Extraction**
+- **Layer_1** → **Layer_1-Extraction** (later: → **Layer_1a-Extraction**)
 - **Layer_2** → **Layer_2-Agentic**
 - **Layer_3** → **Layer_3-Application**
 
@@ -197,9 +199,9 @@ Project_Hydroscand-Hoses/
 ### Layer_1-Extraction (Data Pipeline)
 ```bash
 cd Layer_1-Extraction
-python 1_pdf_to_png.py PDF/Produktbok.pdf
+python 1_pdf_to_png.py High-Pressure_Hose.pdf
 python 3_detect_tables.py
-python 4_extract_product.py PDF/Produktbok.pdf --page 31
+python 4_extract_product.py High-Pressure_Hose.pdf --page 31
 ```
 
 ### Layer_2-Agentic (Command Line)

@@ -25,7 +25,7 @@ from pathlib import Path
 import fitz  # PyMuPDF
 
 # Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent / "Layer_1-Extraction"))
+sys.path.append(str(Path(__file__).parent.parent / "data" / "database"))
 from db_utils import DatabaseManager
 
 

@@ -73,15 +73,15 @@ python 1_extract_knowledge.py \
 
 ```bash
 # Convert PDF to PNGs (for VLM fallback)
-python ../Layer_1-Extraction/1_pdf_to_png.py \
+python ../Layer_1a-Extraction/1_pdf_to_png.py \
   --pdf Produktbok_2020_Coupling.pdf
 
 # Detect headers/footers
-python ../Layer_1-Extraction/2_detect_headers_footers.py \
+python ../Layer_1a-Extraction/2_detect_headers_footers.py \
   --pdf Produktbok_2020_Coupling.pdf
 
 # Extract tables
-python ../Layer_1-Extraction/3_detect_tables.py \
+python ../Layer_1a-Extraction/3_detect_tables.py \
   --pdf Produktbok_2020_Coupling.pdf \
   --page 170
 ```
@@ -146,7 +146,7 @@ PRESSKOPPLINGAR (Chapter 4:2)
 
 Check database status:
 ```bash
-python ../Layer_1-Extraction/db_utils.py --verify
+python ../Layer_1a-Extraction/db_utils.py --verify
 ```
 
 Expected output:
@@ -182,7 +182,7 @@ product_knowledge ✅ EXISTS  (X rows)  ← New table
 **No tables found:**
 ```bash
 # Run table detection first
-python ../Layer_1-Extraction/3_detect_tables.py \
+python ../Layer_1a-Extraction/3_detect_tables.py \
   --pdf Produktbok_2020_Coupling.pdf \
   --page <PAGE_NUMBER>
 ```
@@ -191,11 +191,11 @@ python ../Layer_1-Extraction/3_detect_tables.py \
 ```bash
 # Ensure you're in the project root directory
 cd /Users/worktime/Desktop/Project_Hydroscand-Hoses
-python Layer_1-Extraction_b/1_extract_knowledge.py --help
+python Layer_1b-Extraction/1_extract_knowledge.py --help
 ```
 
 **Database not found:**
 ```bash
 # Initialize database
-python Layer_1-Extraction/db_utils.py --init
+python Layer_1a-Extraction/db_utils.py --init
 ```

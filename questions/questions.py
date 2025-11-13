@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Questions Analysis: Produktbok.pdf vs harvested.db
+Questions Analysis: High-Pressure_Hose.pdf vs harvested.db
 
 This file contains an analysis of which test questions from test_questions_en.xlsx 
-can be answered using the structured data extracted from Produktbok.pdf and 
+can be answered using the structured data extracted from High-Pressure_Hose.pdf and 
 stored in harvested.db.
 
 Database Structure Available:
