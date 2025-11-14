@@ -410,7 +410,9 @@ params = {
         ("start_node", "", "string"),
         ("direction", "children", "string"),
         ("hierarchy_type", "product_family", "string"),
-        ("database_path", "data/database/harvested.db", "string"),
+        # Note: Default path used for template initialization only
+        # Runtime uses CONFIG["harvested_db"] in function_library.py
+        ("database_path", "database/harvested.db", "string"),
     ],
     "Discover Items": [
         ("pattern", "", "string"),

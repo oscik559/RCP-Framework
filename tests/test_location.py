@@ -6,8 +6,8 @@ Tests the new PRODUCT LOCATION strategy.
 import sys
 import os
 
-# Add Layer_2 to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Layer_2'))
+# Add Layer_2_Agentic to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
 
 from agentic_reasoning.config.session_config import get_default_session_state, get_workflow_config
 from agentic_reasoning.logic.state_graph import get_graph

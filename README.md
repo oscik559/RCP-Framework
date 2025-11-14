@@ -1,4 +1,4 @@
-# Project_Hydroscand-Hoses
+# Hydroscand Produktbok
 
 A three-layer intelligent system for extracting and querying industrial product information from PDF catalogs.
 
@@ -92,24 +92,39 @@ cd Project_Hydroscand-Hoses
 
 # Install dependencies
 pip install -r requirements.txt
+# OR install in editable mode (recommended for development)
+pip install -e .
 
 # Initialize database (Layer 1)
-sqlite3 data/products.db < Layer_1a-Extraction/schema.sql
+python database/db_utils.py --init
+
+# Configure environment (optional for production)
+# A .env file with secure defaults is already created
+# Customize if needed: SECRET_KEY, FLASK_DEBUG
 ```
 
 ## 📋 Usage
 
 ### Layer 1: Extract Products from PDF
 
+**Layer 1a** (Basic extraction - legacy scripts):
 ```bash
 # Convert PDF pages to PNG
-python Layer_1a-Extraction/1_pdf_to_png.py Layer_1a-Extraction/High-Pressure_Hose.pdf
+python Layer_1a_Extraction/1_pdf_to_png.py Layer_1a_Extraction/High-Pressure_Hose.pdf
 
 # Detect and extract tables
-python Layer_1a-Extraction/3_detect_tables.py
+python Layer_1a_Extraction/3_detect_tables.py
 
 # Extract product data
-python Layer_1a-Extraction/4_extract_product.py Layer_1a-Extraction/High-Pressure_Hose.pdf --page 31
+python Layer_1a_Extraction/4_extract_product.py Layer_1a_Extraction/High-Pressure_Hose.pdf --page 31
+```
+
+**Layer 1b** (Advanced extraction - current production scripts):
+```bash
+# See Layer_1b_Extraction/README.md for complete pipeline documentation
+python Layer_1b_Extraction/0_extract_knowledge.py
+python Layer_1b_Extraction/2b_extract_categories.py
+python Layer_1b_Extraction/3a_extract_families.py
 ```
 
 **Options:**
@@ -118,9 +133,9 @@ python Layer_1a-Extraction/4_extract_product.py Layer_1a-Extraction/High-Pressur
 - `--model NAME`: VLM model name (default: qwen3-vl:235b-cloud)
 
 **Output:**
-- **Database**: `data/products.db` - Hierarchical product database
-- **Tables**: `data/tables/` - Extracted table data (JSON)
-- **Visualizations**: `output/` - Images with bounding boxes
+- **Database**: `database/harvested.db` - Hierarchical product database
+- **Tables**: `Layer_1a_Extraction/data/tables/` - Extracted table data (JSON)
+- **Visualizations**: `Layer_1a_Extraction/data/output/` - Images with bounding boxes
 
 ### Layer 2 & 3: Query Products
 
@@ -186,47 +201,58 @@ HÖGTRYCKSSLANG (Category)
 ## 📁 Project Structure
 
 ```
-Project_Hydroscand-Hoses/
+Hydroscand_Produktbok/
 ├── Layer_1a_Extraction/                    # Data extraction pipeline
 │   ├── 1_pdf_to_png.py
 │   ├── 3_detect_tables.py
 │   ├── 4_extract_product.py
 │   └── schema.sql
 │
-├── Layer_2-Agentic/                    # Agentic reasoning framework (CORE)
-│   └── agentic_reasoning/
-│       ├── config/             # Configuration files
-│       │   ├── constants.py
-│       │   ├── config.yaml
-│       │   ├── prompts.yaml
-│       │   ├── debug_config.py
-│       │   ├── session_config.py
-│       │   └── domain_config.py
-│       ├── db/                 # Database connection & schemas
-│       │   ├── connection.py
-│       │   ├── database_manager.py
-│       │   └── migrations/
-│       ├── logic/              # Core reasoning logic
-│       │   ├── state_graph.py          # LangGraph workflow
-│       │   ├── workflow_nodes.py       # Goal/Strategy/Function nodes
-│       │   ├── function_library.py     # 30 generic functions
-│       │   ├── templates.py            # Strategy templates
-│       │   ├── llm_helpers.py          # LLM integration
-│       │   └── vector_helpers.py       # Vector search
-│       └── pipelines/          # Pre-built reasoning pipelines
+├── Layer_2_Agentic/                    # Agentic reasoning framework (CORE)
+│   ├── config/             # Configuration files
+│   │   ├── constants.py
+│   │   ├── config.yaml
+│   │   ├── prompts.yaml
+│   │   ├── debug_config.py
+│   │   ├── session_config.py
+│   │   └── domain_config.py
+│   ├── db/                 # Database connection & schemas
+│   │   ├── connection.py
+│   │   ├── database_manager.py
+│   │   └── templates.py
+│   └── logic/              # Core reasoning logic
+│       ├── state_graph.py          # LangGraph workflow
+│       ├── workflow_nodes.py       # Goal/Strategy/Function nodes
+│       ├── function_library.py     # Generic functions
+│       ├── llm_helpers.py          # LLM integration
+│       └── async_helpers.py        # Async execution support
 │
-├── Layer_3-Application/                    # Application layer (UI/APIs)
+├── Layer_3_Application/                    # Application layer (UI/APIs)
 │   ├── README.md              # Layer 3 documentation
-│   └── app/
-│       ├── web_app.py         # Flask web interface
-│       ├── progress_flow.py   # Progress tracking
-│       └── templates/         # HTML templates
-│           └── index.html
+│   ├── web_app.py             # Flask web interface
+│   ├── progress_flow.py       # Progress tracking
+│   └── templates/             # HTML templates
+│       └── index.html
 │
-├── data/                       # Data storage
-│   ├── products.db            # Product database
-│   ├── tables/                # Extracted table data
-│   └── exports/               # CSV exports
+├── database/                  # SQLite databases
+│   ├── harvested.db          # Product database
+│   ├── agentic.db            # Workflow state database
+│   ├── db_utils.py           # Database utilities
+│   ├── harvested_schema.sql
+│   └── README.md
+│
+├── vector_index/             # Vector embeddings (ChromaDB)
+│
+├── data/                     # Temporary data (will be deprecated)
+│
+├── Layer_1a_Extraction/      # Legacy extraction scripts
+│   ├── data/                 # Layer 1a outputs
+│   │   ├── exports/          # CSV/Excel exports
+│   │   ├── output/           # Visualizations
+│   │   ├── pdf_pages/        # PDF page images
+│   │   ├── png_pages/        # PNG conversions
+│   │   └── tables/           # Extracted table data (JSON)
+│   └── README.md
 │
 ├── docs/                       # Documentation
 │   ├── graph.md               # Workflow diagram
@@ -252,10 +278,10 @@ The Layer 2 framework is **domain-agnostic** and can be adapted for any use case
 
 ### Key Integration Steps:
 
-1. **Define domain-specific functions** in `Layer_2-Agentic/agentic_reasoning/logic/function_library.py`
-2. **Create strategy templates** in `Layer_2-Agentic/agentic_reasoning/logic/templates.py`
-3. **Configure your database** in `Layer_2-Agentic/agentic_reasoning/config/domain_config.py`
-4. **Set up LLM provider** in `Layer_2-Agentic/agentic_reasoning/logic/llm_helpers.py`
+1. **Define domain-specific functions** in `Layer_2_Agentic/logic/function_library.py`
+2. **Create strategy templates** in `Layer_2_Agentic/db/templates.py`
+3. **Configure your database** in `Layer_2_Agentic/config/domain_config.py`
+4. **Set up LLM provider** in `Layer_2_Agentic/config/config.yaml`
 5. **Test with queries** by running `main.py`
 
 ### Example Workflows
@@ -296,6 +322,26 @@ python -m pytest tests/test_workflow.py
 - **[QUICK_START.md](QUICK_START.md)** - Integration guide for Layer 2 framework
 - **[docs/](docs/)** - Detailed documentation and architecture diagrams
 - **[docs/graph.md](docs/graph.md)** - Visual workflow architecture
+
+## 🔒 Security & Configuration
+
+### Environment Variables
+
+The project includes a `.env` file with secure defaults:
+
+```bash
+SECRET_KEY=<auto-generated-secure-key>
+FLASK_DEBUG=false
+```
+
+**For production deployment:**
+- Keep `FLASK_DEBUG=false` (security)
+- Regenerate `SECRET_KEY` for production environments
+- Never commit `.env` to version control (already in .gitignore)
+
+**For development:**
+- Set `FLASK_DEBUG=true` if you need Flask auto-reload
+- Default secure settings work out of the box
 
 ## 🔍 Troubleshooting
 

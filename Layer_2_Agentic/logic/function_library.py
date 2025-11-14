@@ -2220,7 +2220,7 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
     import json
     import re
     
-    db_path = params.get("database_path", "data/database/harvested.db")
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
     category = params.get("category", "").strip()
     keywords_raw = params.get("keywords", "").strip()
     
@@ -2387,7 +2387,7 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
     import json
     import re
     
-    db_path = params.get("database_path", "data/database/harvested.db")
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
     query_type = params.get("query_type", "select").lower()
     
     # Smart Mode: If we receive a natural language query in filters or custom_sql,
@@ -2953,7 +2953,7 @@ def func_get_related_items(params: dict) -> tuple[bool, dict | str]:
     
     item_id = params.get("item_id", "").strip()
     relationship_type = params.get("relationship_type", "compatible").lower()
-    db_path = params.get("database_path", "data/database/harvested.db")
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
     
     if not item_id:
         return (False, "Missing required parameter: item_id")
@@ -3952,7 +3952,7 @@ def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
     start_node = params.get("start_node", "")
     direction = params.get("direction", "children").lower()
     hierarchy_type = params.get("hierarchy_type", "product_family")
-    db_path = params.get("database_path", "data/database/harvested.db")
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
     
     if not start_node:
         return (False, "Missing start_node parameter")
@@ -4043,7 +4043,7 @@ def func_discover_items(params: dict) -> tuple[bool, dict | str]:
     pattern = params.get("pattern", "")
     field = params.get("field", "product_code")
     fuzzy = params.get("fuzzy", False)
-    db_path = params.get("database_path", "data/database/harvested.db")
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
     
     if not pattern:
         return (False, "Missing pattern parameter")
@@ -4103,7 +4103,7 @@ def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
     import sqlite3
     
     metadata_type = params.get("metadata_type", "").lower()
-    db_path = params.get("database_path", "data/database/harvested.db")
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
     
     if not metadata_type:
         return (False, "Missing metadata_type parameter")

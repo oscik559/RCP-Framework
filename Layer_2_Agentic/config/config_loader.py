@@ -71,15 +71,11 @@ def _normalize_paths(config: dict) -> dict:
     """Normalize well-known path entries to absolute paths."""
     path_keys = {
         # Note: log_dir is NOT included here because it's handled specially
-        # in the logger setup section to ensure it's always relative to Layer_2-Agentic
+        # in the logger setup section to ensure it's always relative to Layer_2_Agentic
         "model_path",
         "agentic_db",
         "harvested_db",
         "temp_db",
-        "data_dir",
-        "pdf_dir",
-        "extracted_image_dir",
-        "exports_dir",
         "config_file",
     }
 

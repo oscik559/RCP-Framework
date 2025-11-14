@@ -7,9 +7,9 @@ This project is a three-layer intelligent system for extracting, reasoning about
 - **Layer 3: Application** (Web UI, APIs, progress tracking)
 
 ## Key Architectural Patterns
-- **Centralized Database**: All product, family, and knowledge data is stored in `data/database/harvested.db` (see `db_utils.py` and `harvested_schema.sql`).
-- **Layer Separation**: Extraction, reasoning, and UI logic are strictly separated. Cross-layer imports use explicit path manipulation (see `sys.path.insert` in Layer 3).
-- **Agentic Reasoning**: Layer 2 uses a Goal → Strategy → Function pattern, with reusable function libraries and strategy templates. See `Layer_2-Agentic/agentic_reasoning/logic/function_library.py` and `templates.py`.
+- **Centralized Database**: All product, family, and knowledge data is stored in `database/harvested.db` (see `database/db_utils.py` and `database/harvested_schema.sql`).
+- **Layer Separation**: Extraction, reasoning, and UI logic are strictly separated. Package installed via `pip install -e .` for clean imports.
+- **Agentic Reasoning**: Layer 2 uses a Goal → Strategy → Function pattern, with reusable function libraries and strategy templates. See `Layer_2_Agentic/logic/function_library.py` and `Layer_2_Agentic/db/templates.py`.
 - **VLM Integration**: Vision Language Models (Ollama + Qwen) are used for table and product extraction in Layer 1. Model and API configuration is passed via CLI args.
 - **Testing**: All tests are in `tests/`, organized by unit, integration, performance, and utilities. Use `pytest tests/` for full suite.
 
@@ -23,12 +23,12 @@ This project is a three-layer intelligent system for extracting, reasoning about
 - **Query Data**: Use Layer 2 (main.py) for CLI queries, or Layer 3 (web_app.py) for web UI. Example:
   ```pwsh
   python main.py
-  cd Layer_3-Application
+  cd Layer_3_Application
   python web_app.py
   ```
-- **Database Access**: Use `db_utils.py` for verification and schema management. Example:
+- **Database Access**: Use `database/db_utils.py` for verification and schema management. Example:
   ```pwsh
-  python data/database/db_utils.py --verify
+  python database/db_utils.py --verify
   ```
 - **Testing**: Run `pytest tests/` or individual test files for diagnostics.
 
@@ -38,7 +38,11 @@ This project is a three-layer intelligent system for extracting, reasoning about
 - **Swedish Language**: All catalog content is preserved in Swedish.
 - **Thread Standards**: Coupling extraction focuses on thread compatibility (G, JIC, ORFS, NPTF, BSP).
 - **Debug Levels**: Set in `main.py` (0=SILENT, 4=VERBOSE).
-- **Output Locations**: Extracted tables in `data/tables/`, visualizations in `output/`, exports in `data/exports/`.
+- **Output Locations**: 
+  - Layer 1a outputs: `Layer_1a_Extraction/data/` (tables, png_pages, output, exports)
+  - Layer 1b outputs: `Layer_1b_Extraction/data/` (png_pages, tables, etc.)
+  - Core databases: `database/` (harvested.db, agentic.db)
+  - Vector index: `vector_index/`
 
 ## Integration Points
 - **Ollama**: Required for VLM extraction. Start with `ollama serve` and pull the correct model.
@@ -47,9 +51,9 @@ This project is a three-layer intelligent system for extracting, reasoning about
 
 ## Example File References
 - `Layer_1a_Extraction/4_extract_product.py`: Product extraction logic
-- `Layer_2-Agentic/agentic_reasoning/logic/function_library.py`: Core function library
-- `Layer_3-Application/web_app.py`: Web interface
-- `data/database/db_utils.py`: Database utilities
+- `Layer_2_Agentic/logic/function_library.py`: Core function library
+- `Layer_3_Application/web_app.py`: Web interface
+- `database/db_utils.py`: Database utilities
 - `tests/`: All test scripts
 
 ## Troubleshooting

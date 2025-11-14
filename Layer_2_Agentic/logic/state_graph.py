@@ -45,8 +45,8 @@ DEBUG = False
 # macOS/Linux: MMDC_PATH = "mmdc" (if installed globally)
 MMDC_PATH = "mmdc"  # Update this path based on your installation
 PNG_CONFIG = {"width": 1200, "height": 800, "timeout": 30}
-# Graph files now stored in root docs/ folder (moved from Layer_2/docs/)
-DIAGRAM_FILES = {"mermaid": "../docs/graph.mmd", "png": "../docs/graph.png"}
+# Graph files stored in Layer_2_Agentic/outputs/ folder
+DIAGRAM_FILES = {"mermaid": "Layer_2_Agentic/outputs/graph.mmd", "png": "Layer_2_Agentic/outputs/graph.png"}
 
 
 def _get_next_strategy_node(state: SessionState) -> str:
@@ -124,7 +124,7 @@ def _generate_png_diagram() -> None:
         )
 
         if result.returncode == 0:
-            debug.print_system("PNG diagram auto-generated: check ../docs/graph.png", "✅")
+            debug.print_system("PNG diagram auto-generated: check Layer_2_Agentic/outputs/graph.png", "✅")
         else:
             debug.print_system(f"PNG generation failed: {result.stderr}", "🟡")
     except Exception as e:

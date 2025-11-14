@@ -209,45 +209,52 @@ __marimo__/
 # Output directories
 
 # ═══════════════════════════════════════════════════════════════════════
-# PROJECT-SPECIFIC ADDITIONS (from Layer_2/.gitignore)
+# PROJECT-SPECIFIC ADDITIONS
 # ═══════════════════════════════════════════════════════════════════════
 
 # Logs
 *.log
 logs/
-Layer_2/agentic_reasoning/config/logs/
-config/logs/  # Prevent root config/logs from being created
+Layer_2_Agentic/config/logs/
+config/logs/
 
-# Database files (domain-specific databases)
-# *.db
+# Database files
+*.db
+*.db-journal
 *.sqlite
 *.sqlite3
+database/*.db
+database/backups/
 
-# Data exports (domain-specific)
-data/exports/
+# Data directories
+data/vector_index/
 data/*.csv
 data/*.json
+
+# Layer 1a data outputs
+Layer_1a_Extraction/data/png_pages/
+Layer_1a_Extraction/data/output/
+Layer_1a_Extraction/data/exports/
+Layer_1a_Extraction/data/tables/
 
 # Temporary files
 *.tmp
 *.temp
 
-# Domain-specific configuration notes
-# Each domain has its own config file - both tracked in git
-# Use domain_config_HYDROSCAND.py for Hydroscand project
-# Use domain_config_SAAB.py for SAAB project
-
-# Documentation builds
-docs/_build/
-docs/graph.png  # Auto-generated workflow diagram
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
 
 # Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# Documentation builds
+docs/_build/
+docs/graph.png
 
-
-# Database backups
-# data/database/backups/
-# data/database/*_backup_*.db
+# IDE-specific
+.vscode/
+.idea/

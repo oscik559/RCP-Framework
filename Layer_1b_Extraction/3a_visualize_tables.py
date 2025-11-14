@@ -18,7 +18,8 @@ from pathlib import Path
 import fitz  # PyMuPDF
 from PIL import Image, ImageDraw, ImageFont
 import json
-sys.path.append(str(Path(__file__).parent.parent / "data" / "database"))
+# Import database utilities from root database/ folder
+sys.path.append(str(Path(__file__).parent.parent / "database"))
 from db_utils import DatabaseManager
 
 

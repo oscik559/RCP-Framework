@@ -33,7 +33,7 @@ from db_utils import DatabaseManager
 class CategoryExtractor:
     def __init__(self):
         self.script_dir = Path(__file__).parent
-        # Use local database in Layer_1b_Extraction/data/database/
+        # Use database at root level
         db_path = self.script_dir / "data" / "database" / "harvested.db"
         self.db_manager = DatabaseManager(str(db_path))
         self.db_manager.init_database()

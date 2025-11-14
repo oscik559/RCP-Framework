@@ -64,7 +64,7 @@ def check_workflow_data() -> Dict:
     }
 
     try:
-        conn = sqlite3.connect("../data/database/agentic.db")
+        conn = sqlite3.connect("../database/agentic.db")
         cursor = conn.cursor()
 
         # Count records
@@ -108,7 +108,7 @@ def check_extracted_data() -> Dict:
     results = {"documents": 0, "tables": 0, "images": 0, "status": "unknown"}
 
     try:
-        conn = sqlite3.connect("../data/database/harvested.db")
+        conn = sqlite3.connect("../database/harvested.db")
         cursor = conn.cursor()
 
         # Count extracted data
@@ -136,7 +136,7 @@ def check_temp_database() -> Dict:
     """Check temporary database status"""
     results = {"exists": False, "tables": 0, "records": 0, "status": "unknown"}
 
-    temp_db_path = "../data/database/temp.db"
+    temp_db_path = "../database/temp.db"
 
     try:
         if Path(temp_db_path).exists():
@@ -174,7 +174,7 @@ def check_system_health() -> Dict:
     print("\n📊 Database Status:")
 
     # Agentic database
-    agentic_results = check_database_schema("../data/database/agentic.db")
+    agentic_results = check_database_schema("../database/agentic.db")
     workflow_data = check_workflow_data()
     print(f"  ✅ Agentic DB: {len(agentic_results['tables'])} tables")
     print(f"     • Goals: {workflow_data['goals']}")
@@ -182,7 +182,7 @@ def check_system_health() -> Dict:
     print(f"     • Functions: {workflow_data['functions']}")
 
     # Harvested database
-    harvested_results = check_database_schema("../data/database/harvested.db")
+    harvested_results = check_database_schema("../database/harvested.db")
     extracted_data = check_extracted_data()
     print(f"  ✅ Harvested DB: {len(harvested_results['tables'])} tables")
     print(f"     • Documents: {extracted_data['documents']}")

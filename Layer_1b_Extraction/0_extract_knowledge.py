@@ -54,7 +54,7 @@ class KnowledgeExtractor:
         self.pdf_name = self.pdf_path.name
         
         # Use test database if requested
-        db_path = "data/database/harvested_test.db" if use_test_db else "data/database/harvested.db"
+        db_path = "database/harvested.db"
         self.db_manager = DatabaseManager(db_path)
         
         if not self.db_manager.init_database():

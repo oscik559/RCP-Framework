@@ -32,7 +32,7 @@ def test_search_products():
     print("="*80)
     
     params = {
-        "database_path": "../../data/database/harvested.db",
+        "database_path": "../../database/harvested.db",
         "keywords": "hydraulic hose",
         "specs": {
             "min_temp": 100  # Boiling water temperature

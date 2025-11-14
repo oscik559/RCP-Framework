@@ -4,7 +4,7 @@ The application layer provides user interfaces and interaction points for the ag
 
 ## 🎯 Purpose
 
-Layer_3-Application sits on top of Layer_2-Agentic (the core framework) and provides:
+Layer_3_Application sits on top of Layer_2_Agentic (the core framework) and provides:
 - Web interfaces
 - API endpoints
 - User interaction flows
@@ -34,16 +34,16 @@ Then open your browser to: `http://localhost:5001`
 ## 🔌 Dependencies
 
 Layer_3-Application depends on:
-- **Layer_2-Agentic** for core reasoning capabilities
+- **Layer_2_Agentic** for core reasoning capabilities
 - **Flask** for web server
 - **LangGraph** for workflow execution
 
 ## 📊 Architecture
 
 ```
-Layer_3-Application (UI)
+Layer_3_Application (UI)
     ↓ uses
-Layer_2-Agentic (Framework)
+Layer_2_Agentic (Framework)
     ↓ uses
 Layer_1a_Extraction (Hose Data)
 Layer_1b_Extraction (Coupling Data)
@@ -52,15 +52,15 @@ Layer_1b_Extraction (Coupling Data)
 ### Separation of Concerns
 
 - **Layer_1a_Extraction / Layer_1b_Extraction**: Data extraction and storage (PDF → Database)
-- **Layer_2-Agentic**: Core reasoning framework (Goal → Strategy → Function)
+- **Layer_2_Agentic**: Core reasoning framework (Goal → Strategy → Function)
 - **Layer_3-Application**: User interfaces and applications (Web UI, APIs)
 
 ## 🔧 Configuration
 
-The web app automatically configures paths to access Layer_2-Agentic:
+The web app automatically configures paths to access Layer_2_Agentic:
 
 ```python
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2-Agentic'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
 ```
 
 ## 📝 Features
@@ -110,7 +110,7 @@ kill -9 <PID>
 ```
 
 **Import errors:**
-- Ensure Layer_2-Agentic exists at `../Layer_2-Agentic/`
+- Ensure Layer_2_Agentic exists at `../Layer_2_Agentic/`
 - Check Python path configuration in web_app.py
 
 **Flask not found:**
@@ -121,7 +121,7 @@ pip install flask
 ## 🤝 Contributing
 
 When adding new applications to Layer_3-Application:
-1. Keep business logic in Layer_2-Agentic
+1. Keep business logic in Layer_2_Agentic
 2. Only handle UI/UX concerns in Layer_3-Application
 3. Use progress_flow.py for execution tracking
 4. Follow Flask best practices
@@ -130,5 +130,5 @@ When adding new applications to Layer_3-Application:
 ---
 
 **Layer_3-Application Status: ACTIVE** ✅  
-**Dependencies: Layer_2-Agentic** ✅  
+**Dependencies: Layer_2_Agentic** ✅  
 **Web Interface: Flask** ✅

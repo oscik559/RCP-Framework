@@ -1,34 +1,71 @@
-# Layer 1-Extraction_b: Coupling Catalog Extraction
+# Layer 1b: Production Extraction Pipeline
 
-This folder contains specialized extraction scripts for the **Produktbok_2020_Coupling.pdf** catalog.
+**Status**: ✅ **Production** - Actively maintained extraction system  
+**Database**: `database/harvested.db`  
+**Legacy Alternative**: See `Layer_1a_Extraction` for basic/reference scripts
 
 ## Overview
 
-The coupling catalog (Chapter 4:2 - PRESSKOPPLINGAR) has a different structure than the hose catalog and requires specialized extraction:
+This directory contains the **production-grade** extraction pipeline for processing industrial product catalogs. It extracts hierarchical product data (Categories → Families → Products) into a structured SQLite database.
 
-- **Knowledge-heavy intro pages** (167-169) with assembly instructions, standards, and descriptions
-- **Different product hierarchy** - organized by thread type and hose compatibility
-- **Different table structures** - no dimension columns, focus on compatibility
+### Key Features
+✅ Hierarchical extraction with proper relationships  
+✅ Swedish language support (UTF-8)  
+✅ Vision Language Model (VLM) integration  
+✅ Full-text search (FTS5) enabled  
+✅ Comprehensive product knowledge extraction  
+✅ Thread compatibility and standards tracking
+
+## Architecture
+
+```
+PDF Catalog
+    ↓
+┌─────────────────────────────────────────┐
+│  0. Extract Knowledge (intro pages)     │  → product_knowledge table
+├─────────────────────────────────────────┤
+│  1. PDF to PNG (page rendering)         │  → Layer_1b_Extraction/data/png_pages/
+├─────────────────────────────────────────┤
+│  2. Detect Headers/Footers              │  → page_regions table
+├─────────────────────────────────────────┤
+│  2b. Extract Categories                 │  → categories table
+├─────────────────────────────────────────┤
+│  3a. Extract Families                   │  → product_families table
+├─────────────────────────────────────────┤
+│  3b. Extract Products (VLM)             │  → products table
+└─────────────────────────────────────────┘
+    ↓
+Hierarchical Database (harvested.db)
+```
+
+## Sample Data
+- `Press_Couplings.pdf` - Swedish coupling catalog (production)
+- `Press_Couplings_en.pdf` - English coupling catalog (reference)
 
 ## Files
 
 ### Extraction Scripts
 
-1. **`1_extract_knowledge.py`** - Extract product knowledge from intro pages
+1. **`0_extract_knowledge.py`** - Extract product knowledge from intro pages
    - Assembly instructions (MONTERINGSANVISNING)
-   - Product descriptions (PRODUKTGRUPP 420)
-   - Standards and specifications
-   - Table of contents (INNEHÅLL)
+   - Product descriptions and standards
+   - Table of contents and specifications
 
-2. **`2_extract_couplings.py`** - Extract coupling products from catalog pages
-   - Product families (Hylsa EN15C, G-gängade, JIC-gängade, etc.)
-   - Individual coupling products with specifications
-   - Thread types and compatibility
+2. **`1_pdf_to_png.py`** - Convert PDF pages to high-resolution PNG images
 
-### Supporting Files
+3. **`2_detect_headers_footers.py`** - Identify page structure and regions
 
-- **`EXTRACTION_PLAN.md`** - Detailed extraction strategy and planning
-- **`Produktbok_2020_Coupling.pdf`** - Source catalog (Chapter 4:2)
+4. **`2b_extract_categories.py`** - Extract top-level product categories using VLM
+
+5. **`3a_extract_families.py`** - Extract product families with specifications using VLM
+
+6. **`3a_visualize_tables.py`** - Visualize detected tables (diagnostic tool)
+
+7. **`3b_extract_products_vlm.py`** - Extract individual products using VLM
+
+### Database Utilities
+- Imports from canonical location: `database/db_utils.py`
+- See `database/README.md` for database documentation
 
 ## Database Schema
 
@@ -51,96 +88,59 @@ The extraction uses the shared `harvested.db` database with an extended schema:
 - `products` - Individual coupling products
 - Full-text search enabled via FTS5
 
-## Usage
+## Prerequisites
 
-### Step 1: Extract Knowledge (Intro Pages)
+### 1. Ollama with Vision Model
+```bash
+# Start Ollama server
+ollama serve
+
+# Pull a vision model
+ollama pull qwen2-vl
+```
+
+### 2. Database Initialization
+```bash
+# Initialize database with schema
+python database/db_utils.py --init
+
+# Verify database status
+python database/db_utils.py --verify
+```
+
+## Recommended Workflow
 
 ```bash
-# Extract knowledge from intro pages 167-169
-python 1_extract_knowledge.py \
-  --pdf Produktbok_2020_Coupling.pdf \
-  --pages 167-169 \
-  --category "PRESSKOPPLINGAR"
+# 1. Initialize database
+python database/db_utils.py --init
 
-# Or extract from all pages
-python 1_extract_knowledge.py \
-  --pdf Produktbok_2020_Coupling.pdf \
-  --pages all \
-  --category "PRESSKOPPLINGAR"
+# 2. Extract knowledge (optional but recommended)
+python Layer_1b_Extraction/0_extract_knowledge.py --pdf Press_Couplings.pdf --all
+
+# 3. Convert PDF to images
+python Layer_1b_Extraction/1_pdf_to_png.py Press_Couplings.pdf
+
+# 4. Detect page structure
+python Layer_1b_Extraction/2_detect_headers_footers.py
+
+# 5. Extract categories
+python Layer_1b_Extraction/2b_extract_categories.py --pdf Press_Couplings.pdf
+
+# 6. Extract families
+python Layer_1b_Extraction/3a_extract_families.py --pdf Press_Couplings.pdf
+
+# 7. Extract products
+python Layer_1b_Extraction/3b_extract_products_vlm.py --pdf Press_Couplings.pdf
+
+# 8. Verify database
+python database/db_utils.py --verify
 ```
 
-### Step 2: Run Preprocessing (If Not Done)
-
-```bash
-# Convert PDF to PNGs (for VLM fallback)
-python ../Layer_1a-Extraction/1_pdf_to_png.py \
-  --pdf Produktbok_2020_Coupling.pdf
-
-# Detect headers/footers
-python ../Layer_1a-Extraction/2_detect_headers_footers.py \
-  --pdf Produktbok_2020_Coupling.pdf
-
-# Extract tables
-python ../Layer_1a-Extraction/3_detect_tables.py \
-  --pdf Produktbok_2020_Coupling.pdf \
-  --page 170
-```
-
-### Step 3: Extract Coupling Products
-
-```bash
-# Extract from single page
-python 2_extract_couplings.py \
-  --pdf Produktbok_2020_Coupling.pdf \
-  --page 170
-
-# Extract from page range
-python 2_extract_couplings.py \
-  --pdf Produktbok_2020_Coupling.pdf \
-  --pages 170-180
-```
-
-## Product Structure
-
-### Category
-```
-PRESSKOPPLINGAR (Chapter 4:2)
-```
-
-### Product Families (Examples)
-```
-├── Hylsa EN15C (4200-07)
-├── Hylsa R1AT/DIN EN13N, 2SC (4200-11)
-├── Hylsa EN2SN (4200-12)
-├── Hylsa 15N/25N/25C (4200-22)
-├── Hylsa EN4SP/4SH (4200-19)
-├── G-gängade kopplingar (4201-x series)
-├── JIC-gängade kopplingar (4213-x series)
-├── Metriskt gängade (4279-x series)
-├── ORFS-kopplingar (4290-x series)
-└── etc.
-```
-
-### Product Specifications (JSON)
-```json
-{
-  "type": "COUPLING",
-  "artikelnr": "4200-07-04",
-  "used_with": "EN15C",
-  "hose_id": "1/4\"",
-  "thread_type": null,
-  "thread_size": null,
-  "page": 170
-}
-```
-
-## Key Differences from Hose Extraction
-
-1. **No dimension tables** - Couplings don't have ID/OD/pressure tables
-2. **Thread specifications** - Critical: G-thread, JIC, SAE, ORFS, NPTF
-3. **Hose compatibility** - Each coupling lists compatible hoses
-4. **Assembly knowledge** - Important to capture separately
-5. **Product grouping** - By thread type, not construction
+## Output Locations
+- **Database**: `database/harvested.db` (project root)
+- **Images**: `Layer_1b_Extraction/data/png_pages/`
+- **Visualizations**: `Layer_1b_Extraction/data/output/`
+- **Tables**: `Layer_1b_Extraction/data/tables/` (JSON format)
 
 ## Validation
 
@@ -151,7 +151,7 @@ python ../Layer_1a_Extraction/db_utils.py --verify
 
 Expected output:
 ```
-📊 Database Status: data/database/harvested.db
+📊 Database Status: database/harvested.db
 ==================================================
 page_regions    ✅ EXISTS   (X rows)
 categories      ✅ EXISTS   (X rows)
@@ -179,23 +179,35 @@ product_knowledge ✅ EXISTS  (X rows)  ← New table
 
 ## Troubleshooting
 
-**No tables found:**
+### Ollama Connection Errors
 ```bash
-# Run table detection first
-python ../Layer_1a-Extraction/3_detect_tables.py \
-  --pdf Produktbok_2020_Coupling.pdf \
-  --page <PAGE_NUMBER>
+# Ensure Ollama is running
+ollama serve
+
+# Test connection
+curl http://localhost:11434/api/tags
 ```
 
-**Import errors:**
+### Database Errors
 ```bash
-# Ensure you're in the project root directory
-cd /Users/worktime/Desktop/Project_Hydroscand-Hoses
-python Layer_1b_Extraction/1_extract_knowledge.py --help
+# Reinitialize database
+python database/db_utils.py --init
+
+# Check database status
+python database/db_utils.py --verify
 ```
 
-**Database not found:**
-```bash
-# Initialize database
-python Layer_1a_Extraction/db_utils.py --init
-```
+### Import Errors
+- Ensure scripts run from project root
+- Database utilities imported from `database/db_utils.py`
+- Package should be installed: `pip install -e .`
+
+## Migration from Layer 1a
+Layer 1b provides:
+- ✅ Standardized database schema
+- ✅ Hierarchical data model
+- ✅ Full-text search
+- ✅ Better VLM integration
+- ✅ Production-ready pipeline
+
+To migrate, follow the recommended workflow above with your PDF.

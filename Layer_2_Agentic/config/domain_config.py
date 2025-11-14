@@ -1,17 +1,17 @@
 """
-Domain Configuration - Hydroscand Hoses
+Domain Configuration - Hydroscand Produktbok
 
 Active domain configuration for the Hydroscand product catalog project.
 Uses the product database from Layer_1 extraction.
 
-Database: ../data/database/harvested.db (335 products, 69 families)
+Database: ../database/harvested.db (335 products, 69 families)
 """
 
 # =============================================================================
 # DOMAIN INFORMATION
 # =============================================================================
 
-DOMAIN_NAME = "Hydroscand Hoses Product Catalog"
+DOMAIN_NAME = "Hydroscand Produktbok"
 DOMAIN_DESCRIPTION = "Query system for Hydroscand hydraulic hose products, families, and specifications"
 
 # =============================================================================
@@ -19,7 +19,7 @@ DOMAIN_DESCRIPTION = "Query system for Hydroscand hydraulic hose products, famil
 # =============================================================================
 
 # Path to Hydroscand product database
-DATABASE_PATH = "../data/database/harvested.db"
+DATABASE_PATH = "../database/harvested.db"
 
 # Hydroscand-specific database tables for product catalog
 DOMAIN_TABLES = {

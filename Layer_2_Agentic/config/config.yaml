@@ -15,15 +15,9 @@ log_level: info
 model_path: models/
 
 # Databases
-agentic_db: data/database/agentic.db      # Workflow database
-harvested_db: data/database/harvested.db # Product database (335 products, 69 families)
-temp_db: data/database/temp.db           # Temporary processing database
-
-# Data Directories
-data_dir: ../data/
-pdf_dir: ../data/pdfs/
-extracted_image_dir: ../data/images/
-exports_dir: ../data/exports/
+agentic_db: database/agentic.db      # Workflow database
+harvested_db: database/harvested.db  # Product database (from Layer 1 extraction)
+temp_db: database/temp.db            # Temporary processing database
 
 # LLM Models - Three-tier architecture
 llms:

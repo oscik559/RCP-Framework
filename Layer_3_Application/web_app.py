@@ -4,11 +4,16 @@ Simple web interface for the agentic reasoning system.
 
 This Flask web app provides a user-friendly interface to submit queries
 and receive answers from the multi-agent LLM system.
+
+Note:
+    Package should be installed with: pip install -e .
+    This enables clean imports without sys.path manipulation.
 """
 
 import os
 import sys
 import logging
+import secrets
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 import traceback
@@ -17,26 +22,22 @@ import time
 import json
 from typing import Optional, Dict, Any, List
 
-# Add Layer_2_Agentic to path for imports
-layer2_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
-if layer2_path not in sys.path:
-    sys.path.insert(0, layer2_path)
-
 # Import the existing agentic reasoning system
-from logic.state_graph import get_graph  # type: ignore
-from logic.workflow_types import SessionState  # type: ignore
-from config.debug_config import debug  # type: ignore
-from config.session_config import generate_session_id  # type: ignore
-from config.config_loader import CONFIG  # type: ignore
-from config.domain_config import DOMAIN_NAME, DOMAIN_DESCRIPTION  # type: ignore
-from db.connection import (  # type: ignore
+from Layer_2_Agentic.logic.state_graph import get_graph
+from Layer_2_Agentic.logic.workflow_types import SessionState
+from Layer_2_Agentic.config.debug_config import debug
+from Layer_2_Agentic.config.session_config import generate_session_id
+from Layer_2_Agentic.config.config_loader import CONFIG
+from Layer_2_Agentic.config.domain_config import DOMAIN_NAME, DOMAIN_DESCRIPTION
+from Layer_2_Agentic.db.connection import (
     get_agentic_connection,
     get_output_connection,
 )
 from progress_flow import create_progress_workflow
 
 app = Flask(__name__)
-app.secret_key = "your-secret-key-change-this-in-production"
+# Use environment variable for secret key, or generate a secure random key
+app.secret_key = os.getenv("SECRET_KEY", secrets.token_hex(32))
 
 # Reduce Flask logging verbosity (hide routine progress polling)
 log = logging.getLogger('werkzeug')
@@ -307,16 +308,14 @@ def execute_workflow_with_progress(init_state, tracker):
     try:
         session_id = init_state.get("sessionID")
 
-        # Monitor database for real strategy and goal information
-        def monitor_real_progress():
-            print(f"🔄 Starting progress monitoring for session {session_id}")
-            if not session_id:
-                print("❌ No session ID provided to monitor_real_progress")
-                return
+            # Monitor database for real strategy and goal information
+            def monitor_real_progress():
+                print(f"🔄 Starting progress monitoring for session {session_id}")
+                if not session_id:
+                    print("❌ No session ID provided to monitor_real_progress")
+                    return
 
-            from db.connection import get_agentic_connection  # type: ignore
-
-            # Set goal information immediately
+                from Layer_2_Agentic.db.connection import get_agentic_connection            # Set goal information immediately
             tracker.set_goal(
                 init_state.get("query", "Processing query..."),
                 f"Session ID: {tracker.session_id}",
@@ -379,7 +378,7 @@ def execute_workflow_with_progress(init_state, tracker):
             # Fallback if no strategy found in database
             if not strategy_found:
                 # Use the strategy that's actually enabled in testing configuration
-                from config.strategy_testing import get_enabled_strategies  # type: ignore
+                from Layer_2_Agentic.config.strategy_testing import get_enabled_strategies
                 enabled_strategies = get_enabled_strategies()
                 fallback_strategy = enabled_strategies[0] if enabled_strategies else "SIMPLE LOOKUP"
                 
@@ -501,7 +500,7 @@ def process_query():
         session_id = generate_session_id()  # Use the same logic as main.py
 
         # Clear any old session data to ensure fresh start
-        from logic.database_manager import DatabaseManager  # type: ignore
+        from Layer_2_Agentic.logic.database_manager import DatabaseManager
         db = DatabaseManager()
         db.clear_session_data(session_id)
         print(f"✅ Cleared old session data for session {session_id}")
@@ -665,7 +664,7 @@ def get_pipeline_status():
                 )
 
         # Query harvested database for actual product data
-        harvested_db_path = CONFIG.get("harvested_db", "data/database/harvested.db")
+        harvested_db_path = CONFIG.get("harvested_db", "database/harvested.db")
         database_status = {}
         
         try:
@@ -901,9 +900,11 @@ if __name__ == "__main__":
     print("📍 Access the app at: http://localhost:5001")
 
     # Run the Flask app
+    # Use environment variable for debug mode (default: False for security)
+    debug_mode = os.getenv("FLASK_DEBUG", "false").lower() == "true"
     app.run(
         host="0.0.0.0",
         port=5001,
-        debug=True,
+        debug=debug_mode,
         use_reloader=False,  # Disable reloader to prevent double initialization
     )

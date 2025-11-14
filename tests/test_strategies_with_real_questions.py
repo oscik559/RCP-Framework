@@ -44,7 +44,7 @@ def print_result(test_name, success, result, error=None):
 def get_sample_products():
     """Get sample products from database for testing."""
     try:
-        conn = sqlite3.connect('data/database/harvested.db')
+        conn = sqlite3.connect('database/harvested.db')
         cursor = conn.cursor()
         
         # Get a few sample products with specifications

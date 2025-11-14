@@ -9,25 +9,26 @@ hierarchical Goal → Strategy → Function workflow.
 
 Usage:
     python main.py
+
+Note:
+    Package should be installed with: pip install -e .
+    This enables clean imports without sys.path manipulation.
 """
 
 import sys
 import os
 
-# Add Layer_2_Agentic to path so internal imports work
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Layer_2_Agentic'))
-
 # Ensure UTF-8 encoding for Windows
 if sys.platform.startswith("win"):
     os.environ["PYTHONIOENCODING"] = "utf-8"
 
-from config.constants import ANSWER_FIELDS
-from config.session_config import (
+from Layer_2_Agentic.config.constants import ANSWER_FIELDS
+from Layer_2_Agentic.config.session_config import (
     get_default_session_state,
     get_workflow_config,
 )
-from logic.state_graph import get_graph
-from db.templates import populate_template_libraries
+from Layer_2_Agentic.logic.state_graph import get_graph
+from Layer_2_Agentic.db.templates import populate_template_libraries
 
 
 def main():
@@ -48,9 +49,9 @@ def main():
         #   3 = DETAILED   - Include function parameters and outputs
         #   4 = VERBOSE    - All debug information including merging details
         # Can also be set via environment variable: DEBUG_LEVEL
-        from config.debug_config import set_debug_level
+        from Layer_2_Agentic.config import debug_config
 
-        set_debug_level(0)  # Change this to adjust verbosity
+        debug_config.set_debug_level(0)  # Change this to adjust verbosity
 
         # =================================================================
         # QUERY SELECTION - Configure your query here
@@ -83,7 +84,7 @@ def main():
         
         # Clear any old session data to ensure fresh start
         print(f"[SETUP] Clearing old session data for session {init_state['sessionID']}...")
-        from logic.database_manager import DatabaseManager
+        from Layer_2_Agentic.logic.database_manager import DatabaseManager
         db = DatabaseManager()
         db.clear_session_data(init_state['sessionID'])
 

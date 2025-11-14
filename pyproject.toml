@@ -1,7 +1,7 @@
 [project]
-name = "project-hydroscand-hoses"
+name = "hydroscand-produktbok"
 version = "0.0.0"
-description = "Temporary pyproject for uv lock generation"
+description = "Hydroscand Product Catalog - Agentic reasoning system for technical product data"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "requests==2.32.5",

@@ -30,7 +30,7 @@ def analyze_query_patterns() -> Dict:
     }
 
     try:
-        conn = sqlite3.connect("../data/database/agentic.db")
+        conn = sqlite3.connect("../database/agentic.db")
         cursor = conn.cursor()
 
         # Basic success metrics
@@ -97,7 +97,7 @@ def analyze_function_performance() -> Dict:
     results = {"function_stats": {}, "execution_times": {}, "failure_analysis": {}}
 
     try:
-        conn = sqlite3.connect("../data/database/agentic.db")
+        conn = sqlite3.connect("../database/agentic.db")
         cursor = conn.cursor()
 
         # Function execution statistics
@@ -154,7 +154,7 @@ def get_failed_queries() -> List[Dict]:
     failed_queries = []
 
     try:
-        conn = sqlite3.connect("../data/database/agentic.db")
+        conn = sqlite3.connect("../database/agentic.db")
         cursor = conn.cursor()
 
         cursor.execute(
@@ -191,7 +191,7 @@ def analyze_llm_context_usage() -> Dict:
     results = {"context_patterns": {}, "prompt_analysis": {}, "model_usage": {}}
 
     try:
-        conn = sqlite3.connect("../data/database/agentic.db")
+        conn = sqlite3.connect("../database/agentic.db")
         cursor = conn.cursor()
 
         # Analyze strategy selection patterns
