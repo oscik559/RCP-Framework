@@ -1058,7 +1058,7 @@ class DatabaseManager:
 
     def get_available_strategies(self) -> List[str]:
         """Get all available strategy names from the library, filtered by testing configuration."""
-        from config.strategy_testing import get_enabled_strategies
+        from ..config.strategy_testing import get_enabled_strategies
 
         with get_agentic_connection() as conn:
             cur = conn.cursor()

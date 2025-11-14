@@ -93,8 +93,8 @@ def _create_goal_with_llm_definition(db, session_id: int, query: str) -> int:
     Returns:
         Goal ID of the created goal
     """
-    from config.prompt_loader import get_prompt_loader
-    from logic.llm_helpers import get_basic_llm
+    from ..config.prompt_loader import get_prompt_loader
+    from .llm_helpers import get_basic_llm
 
     import json
     import re
@@ -104,7 +104,7 @@ def _create_goal_with_llm_definition(db, session_id: int, query: str) -> int:
     prompt = prompt_loader.format_prompt("goal_definition", query=query)
 
     try:
-        from logic.llm_helpers import invoke_llm_with_retry
+        from .llm_helpers import invoke_llm_with_retry
         
         llm = get_basic_llm()
         response = invoke_llm_with_retry(
@@ -282,7 +282,7 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
             return session_state
 
     # ─── LLM Strategy Selection ─────────────────────────
-    from config.prompt_loader import get_prompt_loader
+    from ..config.prompt_loader import get_prompt_loader
 
     prompt_loader = get_prompt_loader()
 
@@ -303,7 +303,7 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
 
     # Show testing configuration on first strategy selection
     if not tried_strategies:
-        from config.strategy_testing import print_testing_status
+        from ..config.strategy_testing import print_testing_status
 
         print_testing_status()
 
@@ -407,7 +407,7 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
     )
 
     # Import retry helper
-    from logic.llm_helpers import invoke_llm_with_retry
+    from .llm_helpers import invoke_llm_with_retry
     
     # Use retry logic for LLM invocation
     try:
@@ -1464,7 +1464,7 @@ def node_goal_validate(session_state: SessionState) -> SessionState:
             full_evidence=output_text,
         )
 
-        from logic.llm_helpers import invoke_llm_with_retry
+        from .llm_helpers import invoke_llm_with_retry
         
         llm = get_reasoning_llm()
         response = invoke_llm_with_retry(

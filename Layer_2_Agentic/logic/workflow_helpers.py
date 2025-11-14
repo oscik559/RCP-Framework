@@ -271,7 +271,7 @@ def handler_from_name(fname: str):
     Returns:
         Callable function from function_library
     """
-    from logic.function_library import FUNCTION_MAP
+    from .function_library import FUNCTION_MAP
 
     if fname in FUNCTION_MAP:
         return FUNCTION_MAP[fname]

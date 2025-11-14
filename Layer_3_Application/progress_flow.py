@@ -178,7 +178,7 @@ class ProgressAwareWorkflow:
 
     def _monitor_database_progress(self, session_id: int):
         """Monitor database for progress updates"""
-        from db.connection import get_agentic_connection
+        from Layer_2_Agentic.db.connection import get_agentic_connection
         import time
 
         last_goal_count = 0

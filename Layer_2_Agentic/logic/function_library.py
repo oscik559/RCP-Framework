@@ -84,7 +84,7 @@ def _build_llm_processing_chain(
     """
     # Create a fresh LLM instance to avoid context contamination
     if llm_type == "basic":
-        from config.config_loader import CONFIG
+        from ..config.config_loader import CONFIG
         from langchain_ollama import ChatOllama
         import time
 
@@ -97,7 +97,7 @@ def _build_llm_processing_chain(
             system=None,  # Reset system context
         )
     else:
-        from config.config_loader import CONFIG
+        from ..config.config_loader import CONFIG
         from langchain_ollama import ChatOllama
         import time
 
@@ -713,7 +713,7 @@ def func_table_search_on_document(params: dict) -> tuple[bool, dict | str]:
     # Try vector-enhanced search for semantic matching
     vector_results = []
     try:
-        from logic.vector_helpers import VectorTableSearch
+        from .vector_helpers import VectorTableSearch
 
         vector_search = VectorTableSearch()
 
@@ -987,7 +987,7 @@ def func_filter_table_by_field(params: dict) -> tuple[bool, dict | str]:
 
 def func_assemble_table(params: dict) -> tuple[bool, dict | str]:
     """Assemble filtered table data into temporary database with dynamic schema."""
-    from db.connection import get_temp_connection
+    from ..db.connection import get_temp_connection
 
     # ── Parameter validation following standard conventions ──
     filtered_data = params.get("Filtered Data", "")
@@ -1560,7 +1560,7 @@ def func_analyze_data(params: dict) -> tuple[bool, dict | str]:
         (True, {"Answer": final_response_text})
         or (False, error_message)
     """
-    from db.connection import get_temp_connection
+    from ..db.connection import get_temp_connection
 
     # 1 ── validate params ---------------------------------------------------
     assembled_data = params.get("Assembled Data", "").strip()
@@ -3123,7 +3123,7 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
             - records_inserted (int): Number of records inserted
             - fields_discovered (int): Number of unique fields
     """
-    from db.connection import get_temp_connection
+    from ..db.connection import get_temp_connection
     
     # Parse parameters - extracted_data may come from Extract Attributes
     extracted_raw = params.get("extracted_data", [])
@@ -3485,7 +3485,7 @@ def _filter_assembled_data(question: str, max_products: int = 50) -> tuple[list,
         tuple: (filtered_products_list, total_products_in_db)
     """
     try:
-        from db.connection import get_temp_connection
+        from ..db.connection import get_temp_connection
         
         debug.print_function(f"🔍 Filtering assembled data for: {question[:50]}...")
         
@@ -3602,7 +3602,7 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
             - products_analyzed (int): Number of products analyzed
             - context_truncated (bool): Whether context was truncated
     """
-    from db.connection import get_temp_connection
+    from ..db.connection import get_temp_connection
     
     task = params.get("task", "").lower()
     extracted_data_param = params.get("extracted_data", [])

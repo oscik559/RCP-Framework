@@ -442,8 +442,8 @@ class EnhancedKeywordSuggester:
                 logger.info("ℹ️ Vector search not available, using LLM-only approach")
 
             # Step 2: Get LLM-based keywords (existing functionality)
-            from logic.llm_helpers import get_basic_llm
-            from config.prompt_loader import get_prompt_loader
+            from .llm_helpers import get_basic_llm
+            from ..config.prompt_loader import get_prompt_loader
 
             prompt_loader = get_prompt_loader()
             try:

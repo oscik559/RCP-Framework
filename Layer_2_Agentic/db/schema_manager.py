@@ -33,7 +33,7 @@ Key Features:
 
 Usage:
 ======
-    from db.schema_manager import init_db
+    from Layer_2_Agentic.db.schema_manager import init_db
 
     # Initialize database with fresh schema
     init_db(drop_and_recreate=True)
