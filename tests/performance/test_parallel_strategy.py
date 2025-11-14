@@ -6,20 +6,15 @@ Tests the parallel strategy with different queries and analyzes performance.
 """
 
 import sqlite3
-import sys
 import time
 from pathlib import Path
 
-# Add project root to path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
-
-from agentic_reasoning.config.strategy_testing import STRATEGY_TEST_CONFIG, TESTING_MODE
+from Layer_2_Agentic.config.strategy_testing import STRATEGY_TEST_CONFIG, TESTING_MODE
 
 
 def get_successful_test_queries(limit=10):
     """Get successful queries from harvested.db test_results table."""
-    db_path = project_root / "data" / "database" / "harvested.db"
+    db_path = Path("database/harvested.db")
 
     if not db_path.exists():
         print(f"❌ Database not found: {db_path}")

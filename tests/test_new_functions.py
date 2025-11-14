@@ -9,14 +9,9 @@ Tests the 5 priority functions:
 - func_convert_units
 """
 
-import sys
-import sys
 from pathlib import Path
 
-# Add Layer_2_Agentic to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "Layer_2_Agentic"))
-
-from logic.function_library import (
+from Layer_2_Agentic.logic.function_library import (
     func_search_products,
     func_filter_items,
     func_compare_items,
@@ -32,7 +27,7 @@ def test_search_products():
     print("="*80)
     
     params = {
-        "database_path": "../../database/harvested.db",
+        "database_path": "database/harvested.db",
         "keywords": "hydraulic hose",
         "specs": {
             "min_temp": 100  # Boiling water temperature

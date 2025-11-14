@@ -19,7 +19,7 @@ import sqlite3
 import threading
 import logging
 
-from db.connection import get_agentic_connection
+from ..db.connection import get_agentic_connection
 
 logger = logging.getLogger("DATABASE_MANAGER")
 

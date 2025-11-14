@@ -13,18 +13,10 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Any
 from tabulate import tabulate
 
-import sys
-import os
-
-# Add project root to Python path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-from agentic_reasoning.logic.state_graph import get_graph
-from agentic_reasoning.logic.types import SessionState
-from agentic_reasoning.db.connection import get_agentic_connection
-from agentic_reasoning.config.debug_config import debug
+from Layer_2_Agentic.logic.state_graph import get_graph
+from Layer_2_Agentic.logic.workflow_types import SessionState
+from Layer_2_Agentic.db.connection import get_agentic_connection
+from Layer_2_Agentic.config.debug_config import debug
 
 
 class StrategyComparator:

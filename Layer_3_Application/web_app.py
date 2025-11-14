@@ -33,7 +33,7 @@ from Layer_2_Agentic.db.connection import (
     get_agentic_connection,
     get_output_connection,
 )
-from progress_flow import create_progress_workflow
+from .progress_flow import create_progress_workflow
 
 app = Flask(__name__)
 # Use environment variable for secret key, or generate a secure random key
@@ -308,160 +308,162 @@ def execute_workflow_with_progress(init_state, tracker):
     try:
         session_id = init_state.get("sessionID")
 
-            # Monitor database for real strategy and goal information
-            def monitor_real_progress():
-                print(f"🔄 Starting progress monitoring for session {session_id}")
-                if not session_id:
-                    print("❌ No session ID provided to monitor_real_progress")
-                    return
+        # Monitor database for real strategy and goal information
+        def monitor_real_progress():
+            print(f"🔄 Starting progress monitoring for session {session_id}")
+            if not session_id:
+                print("❌ No session ID provided to monitor_real_progress")
+                return
 
-                from Layer_2_Agentic.db.connection import get_agentic_connection            # Set goal information immediately
-            tracker.set_goal(
-                init_state.get("query", "Processing query..."),
-                f"Session ID: {tracker.session_id}",
-            )
+            from Layer_2_Agentic.db.connection import get_agentic_connection
+            
+        # Set goal information immediately
+        tracker.set_goal(
+            init_state.get("query", "Processing query..."),
+            f"Session ID: {tracker.session_id}",
+        )
 
-            # Initial progress
-            tracker.emit_progress("goal_define", "running", "Analyzing your query")
-            tracker.emit_progress(
-                "goal_define", "completed", "Goal successfully defined"
-            )
+        # Initial progress
+        tracker.emit_progress("goal_define", "running", "Analyzing your query")
+        tracker.emit_progress(
+            "goal_define", "completed", "Goal successfully defined"
+        )
 
-            tracker.emit_progress(
-                "strategy_plan", "running", "Searching strategy library"
-            )
+        tracker.emit_progress(
+            "strategy_plan", "running", "Searching strategy library"
+        )
 
-            # Monitor for actual strategy selection
-            strategy_found = False
-            start_time = time.time()
+        # Monitor for actual strategy selection
+        strategy_found = False
+        start_time = time.time()
 
-            while (
-                not strategy_found and (time.time() - start_time) < 15
-            ):  # Max 15 seconds wait
-                try:
-                    with get_agentic_connection() as conn:
-                        cursor = conn.cursor()
-
-                        # Check for strategy selection in database (join through GoalInSession)
-                        cursor.execute(
-                            """
-                            SELECT s.StrategyName, s.StrategyDescription
-                            FROM StrategyInSession s
-                            JOIN GoalInSession g ON s.GoalID = g.GoalID
-                            WHERE g.SessionID = ?
-                            ORDER BY s.StrategyID DESC
-                            LIMIT 1
-                        """,
-                            (session_id,),
-                        )
-                        strategy_row = cursor.fetchone()
-
-                        if strategy_row:
-                            strategy_name, strategy_description = strategy_row
-                            tracker.set_strategy(
-                                strategy_name,
-                                strategy_description or "Executing selected strategy",
-                            )
-                            tracker.emit_progress(
-                                "strategy_plan",
-                                "completed",
-                                f"Strategy selected: {strategy_name}",
-                            )
-                            strategy_found = True
-                            break
-
-                except Exception as e:
-                    print(f"❌ Error monitoring strategy: {e}")
-
-                time.sleep(0.1)  # Check every 100ms for faster response
-
-            # Fallback if no strategy found in database
-            if not strategy_found:
-                # Use the strategy that's actually enabled in testing configuration
-                from Layer_2_Agentic.config.strategy_testing import get_enabled_strategies
-                enabled_strategies = get_enabled_strategies()
-                fallback_strategy = enabled_strategies[0] if enabled_strategies else "SIMPLE LOOKUP"
-                
-                tracker.set_strategy(
-                    fallback_strategy,
-                    f"Enabled strategy from configuration - {fallback_strategy.lower().replace('_', ' ')}",
-                )
-                tracker.emit_progress(
-                    "strategy_plan", "completed", f"Strategy selected: {fallback_strategy}"
-                )
-
-            # Function execution monitoring
-            tracker.emit_progress("function_execute", "running", "Executing functions")
-
-            # Wait for actual workflow execution to populate database
-            time.sleep(1)  # Minimal wait for workflow to execute functions
-
-            # Check if functions were executed and mark as completed
+        while (
+            not strategy_found and (time.time() - start_time) < 15
+        ):  # Max 15 seconds wait
             try:
                 with get_agentic_connection() as conn:
                     cursor = conn.cursor()
+
+                    # Check for strategy selection in database (join through GoalInSession)
                     cursor.execute(
                         """
-                        SELECT COUNT(*) as total_functions
-                        FROM FunctionInSession f
-                        JOIN StrategyInSession s ON f.StrategyID = s.StrategyID
+                        SELECT s.StrategyName, s.StrategyDescription
+                        FROM StrategyInSession s
                         JOIN GoalInSession g ON s.GoalID = g.GoalID
                         WHERE g.SessionID = ?
+                        ORDER BY s.StrategyID DESC
+                        LIMIT 1
                     """,
                         (session_id,),
                     )
-                    result = cursor.fetchone()
-                    total_count = result[0] if result else 0
+                    strategy_row = cursor.fetchone()
 
-                    if total_count > 0:
-                        print(
-                            f"� Found {total_count} functions - marking Function Execution as completed"
+                    if strategy_row:
+                        strategy_name, strategy_description = strategy_row
+                        tracker.set_strategy(
+                            strategy_name,
+                            strategy_description or "Executing selected strategy",
                         )
                         tracker.emit_progress(
-                            "function_execute",
+                            "strategy_plan",
                             "completed",
-                            f"Function execution completed ({total_count} functions)",
+                            f"Strategy selected: {strategy_name}",
                         )
-                    else:
-                        print("⚠️ No functions found in database")
-                        tracker.emit_progress(
-                            "function_execute",
-                            "completed",
-                            "Function execution completed",
-                        )
+                        strategy_found = True
+                        break
+
             except Exception as e:
-                print(f"❌ Error checking functions: {e}")
-                tracker.emit_progress(
-                    "function_execute", "completed", "Function execution completed"
+                print(f"❌ Error monitoring strategy: {e}")
+
+            time.sleep(0.1)  # Check every 100ms for faster response
+
+        # Fallback if no strategy found in database
+        if not strategy_found:
+            # Use the strategy that's actually enabled in testing configuration
+            from Layer_2_Agentic.config.strategy_testing import get_enabled_strategies
+            enabled_strategies = get_enabled_strategies()
+            fallback_strategy = enabled_strategies[0] if enabled_strategies else "SIMPLE LOOKUP"
+            
+            tracker.set_strategy(
+                fallback_strategy,
+                f"Enabled strategy from configuration - {fallback_strategy.lower().replace('_', ' ')}",
+            )
+            tracker.emit_progress(
+                "strategy_plan", "completed", f"Strategy selected: {fallback_strategy}"
+            )
+
+        # Function execution monitoring
+        tracker.emit_progress("function_execute", "running", "Executing functions")
+
+        # Wait for actual workflow execution to populate database
+        time.sleep(1)  # Minimal wait for workflow to execute functions
+
+        # Check if functions were executed and mark as completed
+        try:
+            with get_agentic_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) as total_functions
+                    FROM FunctionInSession f
+                    JOIN StrategyInSession s ON f.StrategyID = s.StrategyID
+                    JOIN GoalInSession g ON s.GoalID = g.GoalID
+                    WHERE g.SessionID = ?
+                """,
+                    (session_id,),
                 )
+                result = cursor.fetchone()
+                total_count = result[0] if result else 0
 
-            # Complete remaining validation steps
-
-            # Ensure Function Execution is marked as completed before validation
+                if total_count > 0:
+                    print(
+                        f"� Found {total_count} functions - marking Function Execution as completed"
+                    )
+                    tracker.emit_progress(
+                        "function_execute",
+                        "completed",
+                        f"Function execution completed ({total_count} functions)",
+                    )
+                else:
+                    print("⚠️ No functions found in database")
+                    tracker.emit_progress(
+                        "function_execute",
+                        "completed",
+                        "Function execution completed",
+                    )
+        except Exception as e:
+            print(f"❌ Error checking functions: {e}")
             tracker.emit_progress(
-                "function_execute", "completed", "All functions executed successfully"
+                "function_execute", "completed", "Function execution completed"
             )
 
-            tracker.emit_progress(
-                "function_validate", "running", "Validating function outputs"
-            )
-            tracker.emit_progress(
-                "function_validate", "completed", "Function validation successful"
-            )
+        # Complete remaining validation steps
 
-            tracker.emit_progress(
-                "strategy_validate", "running", "Checking strategy completion"
-            )
-            tracker.emit_progress(
-                "strategy_validate", "completed", "Strategy objectives met"
-            )
+        # Ensure Function Execution is marked as completed before validation
+        tracker.emit_progress(
+            "function_execute", "completed", "All functions executed successfully"
+        )
 
-            tracker.emit_progress(
-                "goal_validate", "running", "Performing final validation"
-            )
-            tracker.emit_progress(
-                "goal_validate", "completed", "Goal validation successful"
-            )
+        tracker.emit_progress(
+            "function_validate", "running", "Validating function outputs"
+        )
+        tracker.emit_progress(
+            "function_validate", "completed", "Function validation successful"
+        )
+
+        tracker.emit_progress(
+            "strategy_validate", "running", "Checking strategy completion"
+        )
+        tracker.emit_progress(
+            "strategy_validate", "completed", "Strategy objectives met"
+        )
+
+        tracker.emit_progress(
+            "goal_validate", "running", "Performing final validation"
+        )
+        tracker.emit_progress(
+            "goal_validate", "completed", "Goal validation successful"
+        )
 
         # Start real progress monitoring thread
         print(f"🚀 Starting progress monitoring thread for session {session_id}")

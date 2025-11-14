@@ -50,8 +50,8 @@ import json
 import re
 from typing import Any, Dict, List, Optional
 
-from logic.database_manager import DatabaseManager
-from config.debug_config import debug
+from .database_manager import DatabaseManager
+from ..config.debug_config import debug
 
 
 def infer_sql_type(value: str) -> str:

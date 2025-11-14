@@ -7,17 +7,15 @@ Performs naming conventions review, database analysis, and system testing.
 
 import sqlite3
 import os
-import sys
 from pathlib import Path
 
-# Add project root to path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
+# Project root for relative paths
+project_root = Path(__file__).parent.parent.parent
 
 
 def check_harvested_database():
     """Check harvested.db structure and content."""
-    db_path = project_root / "data" / "database" / "harvested.db"
+    db_path = project_root / "database" / "harvested.db"
 
     if not db_path.exists():
         print(f"❌ Database not found: {db_path}")

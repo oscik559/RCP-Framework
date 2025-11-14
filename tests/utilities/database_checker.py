@@ -7,13 +7,11 @@ comprehensive tool for system validation and debugging.
 """
 
 import sqlite3
-import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-# Add project root to path
+# Project root for relative paths
 project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
 
 
 def check_database_schema(db_path: str) -> Dict:
@@ -64,7 +62,7 @@ def check_workflow_data() -> Dict:
     }
 
     try:
-        conn = sqlite3.connect("../database/agentic.db")
+        conn = sqlite3.connect("database/agentic.db")
         cursor = conn.cursor()
 
         # Count records
@@ -108,7 +106,7 @@ def check_extracted_data() -> Dict:
     results = {"documents": 0, "tables": 0, "images": 0, "status": "unknown"}
 
     try:
-        conn = sqlite3.connect("../database/harvested.db")
+        conn = sqlite3.connect("database/harvested.db")
         cursor = conn.cursor()
 
         # Count extracted data

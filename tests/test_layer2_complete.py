@@ -11,12 +11,6 @@ Tests all components of the agentic reasoning system:
 6. End-to-end query execution (if implemented)
 """
 
-import sys
-import os
-
-# Add Layer_2_Agentic to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
-
 def test_1_configuration():
     """Test 1: Configuration Loading"""
     print("\n" + "="*70)

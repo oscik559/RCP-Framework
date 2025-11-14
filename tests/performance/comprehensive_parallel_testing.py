@@ -17,7 +17,7 @@ from pathlib import Path
 
 def get_test_queries_from_db(limit=10):
     """Extract successful test queries from harvested.db"""
-    db_path = "../database/harvested.db"
+    db_path = "database/harvested.db"
 
     if not os.path.exists(db_path):
         print(f"❌ Database not found: {db_path}")

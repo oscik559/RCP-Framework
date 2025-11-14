@@ -28,21 +28,21 @@ from typing import Any, Dict, Tuple
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
-from config.config_loader import CONFIG
-from config.debug_config import debug
-from config.prompt_loader import get_prompt_loader
-from db.connection import (
+from ..config.config_loader import CONFIG
+from ..config.debug_config import debug
+from ..config.prompt_loader import get_prompt_loader
+from ..db.connection import (
     get_agentic_connection,
     get_output_connection,
 )
-from logic.llm_helpers import get_basic_llm, get_reasoning_llm
+from .llm_helpers import get_basic_llm, get_reasoning_llm
 
 logger = logging.getLogger("FUNCTION_LIBRARY")
 DB_PATH_OUTPUT = CONFIG["harvested_db"]
 
 # Import async helpers for performance improvements
 try:
-    from logic.async_helpers import (
+    from .async_helpers import (
         run_async_table_search,
         run_async_multiple_llm_calls,
     )

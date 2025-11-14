@@ -58,7 +58,7 @@ class StrategyPerformanceAnalyzer:
         
     def load_test_queries(self, limit=6) -> List[Dict]:
         """Load diverse test queries from harvested.db"""
-        db_path = "../database/harvested.db"
+        db_path = "database/harvested.db"
         
         if not os.path.exists(db_path):
             print(f"❌ Database not found: {db_path}")

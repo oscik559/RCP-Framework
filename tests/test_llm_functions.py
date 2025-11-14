@@ -11,13 +11,7 @@ Tests the 6 functions that use LLM:
 6. func_compare_items
 """
 
-import sys
-import os
-
-# Add Layer_2_Agentic to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
-
-from agentic_reasoning.logic.function_library import (
+from Layer_2_Agentic.logic.function_library import (
     func_convert_units,
     func_calculate,
     func_lookup_standard,

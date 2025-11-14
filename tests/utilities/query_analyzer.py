@@ -8,14 +8,12 @@ and examining failed test results.
 
 import json
 import sqlite3
-import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 from collections import defaultdict
 
-# Add project root to path
+# Project root for relative paths
 project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
 
 
 def analyze_query_patterns() -> Dict:
@@ -30,7 +28,7 @@ def analyze_query_patterns() -> Dict:
     }
 
     try:
-        conn = sqlite3.connect("../database/agentic.db")
+        conn = sqlite3.connect("database/agentic.db")
         cursor = conn.cursor()
 
         # Basic success metrics

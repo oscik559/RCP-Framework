@@ -5,14 +5,10 @@ Tests the 6 new strategies with realistic queries that would be found in
 Chapter 1 of the Hydroscand product catalogue (hydraulic hoses).
 """
 
-import sys
 import os
 import sqlite3
 
-# Add Layer_2_Agentic to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
-
-from logic.function_library import (
+from Layer_2_Agentic.logic.function_library import (
     func_search_products,
     func_compare_items,
     func_calculate,
@@ -429,10 +425,10 @@ def main():
     print("All questions are representative of Chapter 1 (Hydraulic Hoses)\n")
     
     # Check database
-    if not os.path.exists('data/database/harvested.db'):
+    if not os.path.exists('database/harvested.db'):
         print("⚠️  Warning: harvested.db not found. Using synthetic test data.")
     else:
-        print("✅ Database found: data/database/harvested.db")
+        print("✅ Database found: database/harvested.db")
     
     # Run tests
     results = []

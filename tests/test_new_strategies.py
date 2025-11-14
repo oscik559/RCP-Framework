@@ -5,13 +5,7 @@ This demonstrates how the 6 new strategies utilize the 15 generic functions
 to handle various Hydroscand product queries.
 """
 
-import sys
-import os
-
-# Add Layer_2_Agentic to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
-
-from agentic_reasoning.logic.function_library import (
+from Layer_2_Agentic.logic.function_library import (
     func_search_products,
     func_compare_items,
     func_calculate,

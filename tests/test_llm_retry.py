@@ -8,15 +8,10 @@ Tests the new invoke_llm_with_retry() function to ensure:
 4. Proper error messages are logged
 """
 
-import sys
 import time
 from pathlib import Path
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
-from agentic_reasoning.logic.llm_helpers import get_basic_llm, invoke_llm_with_retry
+from Layer_2_Agentic.logic.llm_helpers import get_basic_llm, invoke_llm_with_retry
 
 
 def test_successful_invocation():

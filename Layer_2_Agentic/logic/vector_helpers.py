@@ -47,9 +47,9 @@ except (ImportError, ModuleNotFoundError):
     # Fallback to Chroma if FAISS is not available
     FAISS_AVAILABLE = False
 
-from config.config_loader import CONFIG
-from db.connection import get_output_connection
-from logic.llm_helpers import get_embedding_model
+from ..config.config_loader import CONFIG
+from ..db.connection import get_output_connection
+from .llm_helpers import get_embedding_model
 
 logger = logging.getLogger("VECTOR_DB")
 

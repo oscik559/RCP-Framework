@@ -17,7 +17,7 @@ import logging
 import time
 from typing import Any, List, Dict
 
-from config.config_loader import CONFIG
+from ..config.config_loader import CONFIG
 
 logger = logging.getLogger("LLM_HELPER")
 # Note: RetrievalQA and Chroma imports for LangChain 1.x

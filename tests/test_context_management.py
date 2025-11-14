@@ -8,13 +8,7 @@ Tests:
 4. Flexible query types (not just specifications)
 """
 
-import sys
-import os
-
-# Add Layer_2 to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic'))
-
-from logic.function_library import func_analyze_with_llm
+from Layer_2_Agentic.logic.function_library import func_analyze_with_llm
 
 def print_section(title):
     print(f"\n{'='*80}")

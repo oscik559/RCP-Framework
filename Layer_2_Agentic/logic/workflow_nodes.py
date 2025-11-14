@@ -38,14 +38,6 @@ Usage:
 Designed for LangGraph workflow engine with SessionState coordination
 between nodes for multi-agent reasoning and execution.
 """
-# Enable direct script execution with proper imports
-if __name__ == "__main__":
-    import sys
-    from pathlib import Path
-    layer2_root = Path(__file__).parent.parent
-    if str(layer2_root) not in sys.path:
-        sys.path.insert(0, str(layer2_root))
-
 
 import concurrent.futures
 import json
@@ -54,12 +46,12 @@ import re
 import sqlite3
 from typing import Any, Dict, List, Optional
 
-from config.debug_config import debug
-from config.prompt_loader import get_prompt_loader
-from logic.function_library import FUNCTION_MAP
-from logic.llm_helpers import get_basic_llm, get_reasoning_llm
-from logic.database_manager import DatabaseManager
-from logic.workflow_helpers import (
+from ..config.debug_config import debug
+from ..config.prompt_loader import get_prompt_loader
+from .function_library import FUNCTION_MAP
+from .llm_helpers import get_basic_llm, get_reasoning_llm
+from .database_manager import DatabaseManager
+from .workflow_helpers import (
     collect_outputs,
     handler_from_name,
     infer_sql_type,
@@ -67,8 +59,8 @@ from logic.workflow_helpers import (
     parse_json_response,
     safe_json_parse,
 )
-from logic.workflow_types import SessionState
-from logic.exceptions import (
+from .workflow_types import SessionState
+from .exceptions import (
     WorkflowError,
     StrategyError,
     FunctionError,

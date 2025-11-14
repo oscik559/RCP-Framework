@@ -26,9 +26,9 @@ from pathlib import Path
 
 from langgraph.graph import END, StateGraph
 
-from config.debug_config import debug
-from logic.workflow_types import SessionState
-from logic.workflow_nodes import (
+from ..config.debug_config import debug
+from .workflow_types import SessionState
+from .workflow_nodes import (
     node_done,
     node_function_execute,
     node_function_validate,
