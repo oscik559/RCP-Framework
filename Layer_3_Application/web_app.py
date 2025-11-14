@@ -46,6 +46,20 @@ log.setLevel(logging.WARNING)  # Only show warnings and errors, not INFO request
 # Global workflow instance
 workflow: Optional[Any] = None
 
+# Initialize workflow on module import
+def _init_workflow_on_import():
+    """Initialize workflow when module is imported"""
+    global workflow
+    try:
+        workflow = get_graph()
+        print("✅ Workflow initialized on import")
+        return True
+    except Exception as e:
+        print(f"⚠️ Workflow will be initialized on first request: {e}")
+        return False
+
+_init_workflow_on_import()
+
 
 class ProgressTracker:
     """Tracks and emits progress updates for workflow execution"""
