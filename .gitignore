@@ -135,7 +135,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# .env
 .envrc
 .venv
 env/
@@ -219,12 +219,12 @@ Layer_2_Agentic/config/logs/
 config/logs/
 
 # Database files
-*.db
-*.db-journal
-*.sqlite
-*.sqlite3
-database/*.db
-database/backups/
+# *.db
+# *.db-journal
+# *.sqlite
+# *.sqlite3
+# database/*.db
+# database/backups/
 
 # Data directories
 data/vector_index/
