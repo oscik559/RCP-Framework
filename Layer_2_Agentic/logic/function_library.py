@@ -3179,6 +3179,7 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
                     product_code TEXT,
                     family_id INTEGER,
                     family_name TEXT,
+                    category TEXT,
                     family_construction_details TEXT,
                     page_number INTEGER,
                     specifications TEXT,
@@ -3187,12 +3188,8 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
             """)
             debug.print_function("✅ temp.db cleaned and ready for fresh data")
             
-            # Discover all unique specification fields
+            # Track all unique specification fields (will be populated during insertion)
             all_spec_fields = set()
-            for item in extracted_data:
-                for key in item.keys():
-                    if key.startswith("spec_"):
-                        all_spec_fields.add(key)
             
             # Insert records with family context (already included from Extract Attributes)
             records_inserted = 0
@@ -3202,23 +3199,29 @@ def func_assemble_product_data(params: dict) -> tuple[bool, dict | str]:
                 product_code = item.get("product_code", "")
                 family_id = item.get("family_id")
                 family_name = item.get("family_name", "")
+                category = item.get("category", "")
                 page_number = item.get("page_number")
                 
                 # Family construction details already extracted by Extract Attributes
                 family_construction_dict = item.get("family_construction_details", {})
                 family_construction = json.dumps(family_construction_dict) if family_construction_dict else "{}"
                 
-                # Bundle all spec fields into JSON for flexible querying
-                specs = {k: v for k, v in item.items() if k.startswith("spec_")}
-                specs_json = json.dumps(specs)
+                # Get nested specifications JSON (already in correct format from Extract Attributes)
+                specs_dict = item.get("specifications", {})
+                specs_json = json.dumps(specs_dict) if specs_dict else "{}"
                 
                 cursor.execute("""
                     INSERT INTO temp_product_specs 
-                    (product_id, product_code, family_id, family_name, family_construction_details, page_number, specifications, source_type)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (product_id, product_code, family_id, family_name, family_construction, page_number, specs_json, source_type))
+                    (product_id, product_code, family_id, family_name, category, family_construction_details, page_number, specifications, source_type)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (product_id, product_code, family_id, family_name, category, family_construction, page_number, specs_json, source_type))
                 
                 records_inserted += 1
+                
+                # Track all specification fields for reporting
+                if specs_dict:
+                    for spec_key in specs_dict.keys():
+                        all_spec_fields.add(spec_key)
             
             conn.commit()
             
@@ -3332,9 +3335,17 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
                 
                 # Fetch family metadata with category reference and family_code
                 output_cursor.execute(f"""
+<<<<<<< HEAD
                     SELECT id, family_code, name, construction_details, applications, subtitle, description, category_id
                     FROM product_families
                     WHERE id IN ({family_ids_str})
+=======
+                    SELECT pf.id, pf.name, pf.construction_details, pf.applications, pf.subtitle, pf.description,
+                           c.name as category_name, c.chapter as category_chapter
+                    FROM product_families pf
+                    LEFT JOIN categories c ON pf.category_id = c.id
+                    WHERE pf.id IN ({family_ids_str})
+>>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
                 """)
                 
                 category_ids_to_fetch = set()
@@ -3362,9 +3373,16 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
                         "family_name": row[2],
                         "construction_details": construction_details,
                         "applications": applications,
+<<<<<<< HEAD
                         "subtitle": row[5],
                         "description": row[6],
                         "category_id": category_id
+=======
+                        "subtitle": row[4],
+                        "description": row[5],
+                        "category_name": row[6],
+                        "category_chapter": row[7]
+>>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
                     }
                 
                 # Batch fetch all categories
@@ -3397,9 +3415,25 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             family_id = item.get("family_id")
             family_context = family_context_cache.get(family_id, {})
             
+<<<<<<< HEAD
             # Get category context if available
             category_id = family_context.get("category_id")
             category_context = category_context_cache.get(category_id, {}) if category_id else {}
+=======
+            # Create extracted item with FULL hierarchical context
+            extracted_item = {
+                "product_code": item.get("product_code"),
+                "family_name": family_context.get("family_name") or item.get("family_name"),
+                "category": family_context.get("category_name"),
+                "page_number": item.get("page_number"),
+                
+                # HIERARCHICAL CONTEXT: Include family-level attributes (for deeper analysis if needed)
+                "family_construction_details": family_context.get("construction_details", {}),
+                "family_applications": family_context.get("applications", {}),
+                "family_subtitle": family_context.get("subtitle"),
+                "family_description": family_context.get("description")
+            }
+>>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
             
             # Create extracted item with FULL hierarchical context (organized: product → family → category → page)
             
@@ -3413,6 +3447,7 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             else:
                 specs = specs_raw if isinstance(specs_raw, dict) else {}
             
+<<<<<<< HEAD
             extracted_item = {
                 # LEVEL 3: PRODUCT
                 "product_code": item.get("product_code"),
@@ -3440,6 +3475,17 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             
             # Mode 1: AUTO - Extract with full hierarchical context (no flattened spec_* fields)
             if extraction_type == "auto":
+=======
+            # Mode 1: AUTO - Extract all specification fields with family context
+            if extraction_type == "auto":
+                # Keep specifications as nested JSON for consistency
+                extracted_item["specifications"] = specs
+                
+                # Track all specification fields found
+                for spec_key in specs.keys():
+                    all_fields.add(spec_key)
+                
+>>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
                 extracted_data.append(extracted_item)
             
             # Mode 2: SPECIFIC - Extract only requested fields
@@ -3570,7 +3616,7 @@ def _filter_assembled_data(question: str, max_products: int = 50) -> tuple[list,
                 
                 where_clause = " OR ".join(conditions)
                 query = f"""
-                    SELECT product_code, family_name, family_construction_details, specifications, page_number
+                    SELECT product_code, family_name, category, family_construction_details, specifications, page_number
                     FROM temp_product_specs
                     WHERE {where_clause}
                     LIMIT {max_products}
@@ -3578,7 +3624,7 @@ def _filter_assembled_data(question: str, max_products: int = 50) -> tuple[list,
             else:
                 # No clear keywords - return first N products
                 query = f"""
-                    SELECT product_code, family_name, family_construction_details, specifications, page_number
+                    SELECT product_code, family_name, category, family_construction_details, specifications, page_number
                     FROM temp_product_specs
                     LIMIT {max_products}
                 """
@@ -3595,9 +3641,10 @@ def _filter_assembled_data(question: str, max_products: int = 50) -> tuple[list,
             product = {
                 'product_code': row[0],
                 'family_name': row[1],
-                'family_construction': json.loads(row[2]) if row[2] else {},
-                'specifications': json.loads(row[3]) if row[3] else {},
-                'page_number': row[4]
+                'category': row[2],
+                'family_construction': json.loads(row[3]) if row[3] else {},
+                'specifications': json.loads(row[4]) if row[4] else {},
+                'page_number': row[5]
             }
             filtered_products.append(product)
         
@@ -3711,23 +3758,24 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
                 
                 for product in filtered_products:
                     family_name = product['family_name']
+                    category = product.get('category', '')
                     
                     # Show family construction details (once per family)
                     if family_name and family_name not in families_shown:
                         families_shown.add(family_name)
-                        context_parts.append(f"\n=== {family_name} Family Details ===")
+                        context_parts.append(f"\n=== {family_name} Family ({category}) ===")
                         family_construction = product.get('family_construction', {})
                         if family_construction:
                             for key, value in family_construction.items():
                                 context_parts.append(f"  {key}: {value}")
                         context_parts.append("")  # Blank line
                     
-                    # Show individual product
-                    context_parts.append(f"\nProduct: {product['product_code']} (Family: {family_name}, Page: {product['page_number']})")
+                    # Show individual product with category
+                    context_parts.append(f"\nProduct: {product['product_code']} (Category: {category}, Family: {family_name}, Page: {product['page_number']})")
                     specs = product['specifications']
                     for spec_key, spec_value in specs.items():
-                        display_key = spec_key.replace("spec_", "").replace("_", " ").title()
-                        context_parts.append(f"  {display_key}: {spec_value}")
+                        # Don't modify the key - use it as-is from the nested JSON
+                        context_parts.append(f"  {spec_key}: {spec_value}")
                 
                 context_str = "\n".join(context_parts)
                 

@@ -12,7 +12,7 @@ Database: database/harvested.db (335 products, 69 families)
 # =============================================================================
 
 DOMAIN_NAME = "Hydroscand Produktbok"
-DOMAIN_DESCRIPTION = "Query system for Hydroscand hydraulic hose products, families, and specifications"
+DOMAIN_DESCRIPTION = "Query system for Hydroscand industrial products (hoses, couplings, fittings, accessories), product families, and technical specifications"
 
 # =============================================================================
 # DATABASE CONFIGURATION
@@ -47,13 +47,15 @@ def get_table_name(table_key: str) -> str:
 # Example queries for Hydroscand system
 EXAMPLE_QUERIES = [
     "Find product 1059-0101",
-    "Show me all hydraulic hoses in the catalog",
+    "Show me all products in the catalog",
     "Compare products 1059-0101 and 1059-0401",
     "What products have a pressure rating above 350 bar?",
     "List all products in family 1059-01",
     "Show me products similar to 1059-0101",
     "What categories are available?",
-    "Find hoses suitable for high temperature applications",
+    "Find products suitable for high temperature applications",
+    "What is the Slang ID of coupling 4201-16-16?",
+    "What thread type does 4201-16-16 have?",
 ]
 
 # =============================================================================
@@ -70,7 +72,7 @@ LLM_CONFIG = {
 
 # Hydroscand-specific prompts
 DOMAIN_PROMPTS = {
-    "system": """You are an AI assistant specialized in Hydroscand hydraulic hose products.
+    "system": """You are an AI assistant specialized in Hydroscand industrial products including hydraulic hoses, press couplings, fittings, and accessories.
 Your role is to help users find products, compare specifications, and navigate the
 product catalog. Always provide accurate product codes, specifications, and technical
 details based on the database.""",

@@ -251,10 +251,6 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# Documentation builds
-docs/_build/
-docs/graph.png
-
 # IDE-specific
 # .vscode/
 .idea/

@@ -372,7 +372,7 @@ function_execution:
   # Main intelligent analysis function
   analyze_with_llm:
     system: |
-      You are an expert technical analyst specializing in hydraulic hoses and industrial components.
+      You are an expert technical analyst specializing in Hydroscand industrial products including hydraulic hoses, press couplings, fittings, clamps, and accessories.
       
       Your task is to provide CONCISE, PRECISE answers to ANY technical question based on the provided product data.
       
@@ -388,13 +388,21 @@ function_execution:
       - Calculations: Pressure drops, flow rates, sizing, conversions
       - General queries: Any product-related question requiring analysis
       
-      CRITICAL INSTRUCTIONS:
-      - Use ONLY the provided context data - never make assumptions beyond the data
-      - Reference SPECIFIC product codes, values, and specifications
-      - ALWAYS cite page numbers when referencing product information (e.g., "Product X on Page 5")
+      CRITICAL INSTRUCTIONS - READ NESTED JSON SPECIFICATIONS:
+      - Product data is structured with nested JSON objects (specifications, family_construction_details, etc.)
+      - When asked about a specification (like "Slang ID"), look inside the "specifications" object
+      - READ THE EXACT VALUE from the nested JSON - do not make assumptions
+      - Be EXTREMELY CONCISE - give direct answers without explanations or JSON examples
+      - For simple specification lookups, answer in ONE sentence (e.g., "The Slang ID is 1\"")
+      - Do NOT show JSON structure, do NOT explain where you found the data, just answer
+      - ALWAYS include the page number at the end if available in the data (e.g., "The Slang ID is 1\" (page 171)")
+      - NEVER HALLUCINATE OR INVENT DATA - if a specification is not in the provided data, say "This specification is not available in the data"
+      - ONLY answer with values that are EXPLICITLY present in the specifications JSON object
+      - Do NOT infer, calculate, or guess values based on product type or category
+      - Use ONLY the provided context data - NEVER reference non-existent pages or documentation
+      - The "category" field tells you what type of product it is (PRESSKOPPLINGAR = coupling, HÖGTRYCKSSLANG = hose)
+      - Reference SPECIFIC product codes and values from the provided data
       - When mentioning file locations, use ONLY relative paths (e.g., "data/output/image.png" NOT absolute paths)
-      - Be direct and concise - avoid verbose explanations unless complexity demands it
-      - If data is missing or insufficient, clearly state what's missing
       - Focus on directly answering the specific question asked
       - If context was truncated, work with the available data and note limitations
       
@@ -409,11 +417,24 @@ function_execution:
     user_template: |
       ANALYSIS TASK: {task}
       
-      PRODUCT DATA:
+      PRODUCT DATA (nested JSON with specifications, family details, etc.):
       {context}
       
       USER QUESTION:
       {question}
+      
+      INSTRUCTIONS: Product specifications are in the "specifications" JSON object. Answer DIRECTLY in one sentence without showing JSON structure or explaining your process. ALWAYS cite the page number at the end if page_number is present in the data (format: "Answer (page X)"). 
+      
+      CRITICAL - ANTI-HALLUCINATION RULES:
+      1. ONLY use data for products that are EXPLICITLY listed in the PRODUCT DATA above
+      2. If the specific product code asked about is NOT in the PRODUCT DATA above, answer: "Product [code] is not in the provided data"
+      3. DO NOT invent, calculate, or guess values
+      4. DO NOT use information from similar products or product families
+      5. If a specification field does not exist in the product's specifications object, answer: "[Field name] is not available for this product"
+      
+      Example: If asked "What is the Slang ID of 4201-16-16?" and the PRODUCT DATA contains product 4201-16-16 with specifications {"Slang ID": "1\""} and page_number 171, answer: "The Slang ID is 1\" (page 171)".
+      Example: If asked "What is the working pressure of 4201-16-16?" but product 4201-16-16 is NOT in the PRODUCT DATA above, answer: "Product 4201-16-16 is not in the provided data."
+      Example: If asked "What is the working pressure of 4201-16-16?" and product 4201-16-16 IS in the data but specifications does NOT contain a working pressure field, answer: "The working pressure is not available for this product."
       
       Provide your analysis:
 
