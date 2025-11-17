@@ -18,6 +18,8 @@ Note:
 import sys
 import os
 
+from sympy import product
+
 # Ensure UTF-8 encoding for Windows
 if sys.platform.startswith("win"):
     os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -57,7 +59,8 @@ def main():
         # QUERY SELECTION - Configure your query here
         # =================================================================
         # Example queries (domain-specific examples should be configured per application):
-        user_query = "What is the maximum working pressure for this hose KAPPAFLEX 1 at 100 °C?"
+        # user_query = "What is the Slang ID for the product 4221-24-08?"
+        user_query = "What do you know abou the product 1101-14-06?"
         
         # For testing, you can uncomment and modify these:
         # user_query = "What products are available in the Hydroscand catalog?"

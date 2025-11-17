@@ -1,0 +1,58 @@
+INFO - httpx - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+Query: What is the dimension of this 1101-14-06-30 product?
+================================================================================
+­ƒÜÇ [func_extract_product_number] Raw LLM output: '1101-14-06-30'
+­ƒÜÇ [func_extract_product_number] Final codes: ['1101-14-06-30']
+
+Ô£ô STEP 1 - Extract Product Number
+  Extracted: "1101-14-06-30"
+­ƒÜÇ Smart mode: Extracted product code '1101-14-06' from query
+­ƒÜÇ Generated smart query for product code: 1101-14-06
+­ƒÜÇ Custom SQL executed: 1 results
+
+Ô£ô STEP 2 - Query Database
+  Found: 1 items
+    - 1101-14-06
+­ƒÜÇ Fetching hierarchical context for 1 families and their categories...
+­ƒÜÇ Ô£à Loaded context for 1 families and 1 categories
+­ƒÜÇ Extracted 1 items with 0 unique fields from 1 families
+
+Ô£ô STEP 3 - Extract Attributes
+  Extracted: 1 items
+
+================================================================================
+FULL EXTRACTED DATA OUTPUT:
+================================================================================
+[
+  {
+    "product_code": "1101-14-06",
+    "specifications": {
+      "Artikelnr": "1101-14-06",
+      "ID mm": "10,0",
+      "ID tum": "3/8\"",
+      "YD mm": "17,4",
+      "Arb.tr. MPa": "18,0",
+      "B├Âjradie mm": "125",
+      "Vikt kg/m": "0,33"
+    },
+    "configuration_name": null,
+    "family_code": "1101-14",
+    "family_name": "EGEFLEX 1 CO P├à BOBIN",
+    "family_subtitle": null,
+    "family_description": null,
+    "family_construction_details": {
+      "Innertub": "Syntetiskt oljebest├ñndigt gummi",
+      "Yttertub": "V├ñder- och oljebest├ñndigt gummi",
+      "Armering": "Ett fl├ñtat st├Ñlwireinl├ñgg",
+      "S├ñkerhetsfaktor": "1:4",
+      "Temperatur": "-40┬░C ÔÇô +100┬░C",
+      "Utf├Ârande": "V├ñvvecklad, bl├Ñ m├ñrkning",
+      "Hylsa": "4200-11-xx",
+      "Produktgrupp": "100"
+    },
+    "family_applications": {},
+    "category_name": "H├ûGTRYCKSSLANG",
+    "chapter": "KAPITEL 1:1 H├ûGTRYCKSSLANG",
+    "page_number": 12
+  }
+]

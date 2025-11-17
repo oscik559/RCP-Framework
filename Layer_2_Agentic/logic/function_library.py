@@ -2391,31 +2391,52 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
     query_type = params.get("query_type", "select").lower()
     
     # Smart Mode: If we receive a natural language query in filters or custom_sql,
-    # try to extract product family name and build a smart query
+    # try to extract product code or family name and build a smart query
     filters_raw = params.get("filters", {})
     if isinstance(filters_raw, str) and filters_raw and not filters_raw.startswith("{"):
         # This looks like a natural language query, not a JSON filter
-        # Extract product family name (e.g., "KAPPAFLEX 1" from query)
-        product_pattern = r'\b([A-Z]{3,}(?:\s+\d+)?)\b'
-        matches = re.findall(product_pattern, filters_raw)
         
-        if matches:
-            # Build a custom query to find products in this family
-            family_name = matches[0]  # Take first match (e.g., "KAPPAFLEX 1")
-            debug.print_function(f"Smart mode: Extracted family name '{family_name}' from query")
+        # First, try to extract product code (e.g., "4221-24-08")
+        product_code_pattern = r'\b(\d{4}-\d{2}-\d{2})\b'
+        code_matches = re.findall(product_code_pattern, filters_raw)
+        
+        if code_matches:
+            # Build a custom query to find product by code
+            product_code = code_matches[0]
+            debug.print_function(f"Smart mode: Extracted product code '{product_code}' from query")
             
             # Override to custom query mode
             query_type = "custom"
             params["custom_sql"] = f"""
                 SELECT p.id as product_id, p.product_code, p.family_id, 
-                       pf.name as family_name, pf.description,
                        p.specifications, p.page_number
                 FROM products p
-                LEFT JOIN product_families pf ON p.family_id = pf.id
-                WHERE pf.name LIKE '%{family_name}%'
+                WHERE p.product_code = '{product_code}'
                 LIMIT 100
             """
-            debug.print_function(f"Generated smart query for family: {family_name}")
+            debug.print_function(f"Generated smart query for product code: {product_code}")
+        else:
+            # Otherwise, try to extract product family name (e.g., "KAPPAFLEX 1" from query)
+            product_pattern = r'\b([A-Z]{3,}(?:\s+\d+)?)\b'
+            matches = re.findall(product_pattern, filters_raw)
+            
+            if matches:
+                # Build a custom query to find products in this family
+                family_name = matches[0]  # Take first match (e.g., "KAPPAFLEX 1")
+                debug.print_function(f"Smart mode: Extracted family name '{family_name}' from query")
+                
+                # Override to custom query mode
+                query_type = "custom"
+                params["custom_sql"] = f"""
+                    SELECT p.id as product_id, p.product_code, p.family_id, 
+                           pf.name as family_name, pf.description,
+                           p.specifications, p.page_number
+                    FROM products p
+                    LEFT JOIN product_families pf ON p.family_id = pf.id
+                    WHERE pf.name LIKE '%{family_name}%'
+                    LIMIT 100
+                """
+                debug.print_function(f"Generated smart query for family: {family_name}")
     
     try:
         conn = sqlite3.connect(db_path)
@@ -3293,49 +3314,79 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
     all_fields = set()
     families_included = set()
     
-    # STEP 1: Fetch family context for all products (respect DB hierarchy)
+    # STEP 1: Fetch family AND category context for all products (full hierarchy)
     unique_family_ids = set()
     for item in items:
         if isinstance(item, dict) and item.get("family_id"):
             unique_family_ids.add(item.get("family_id"))
     
     family_context_cache = {}
+    category_context_cache = {}
+    
     if unique_family_ids:
         try:
-            debug.print_function(f"Fetching hierarchical context for {len(unique_family_ids)} families...")
+            debug.print_function(f"Fetching hierarchical context for {len(unique_family_ids)} families and their categories...")
             with get_output_connection() as output_conn:
                 output_cursor = output_conn.cursor()
                 family_ids_str = ",".join(str(fid) for fid in unique_family_ids)
+                
+                # Fetch family metadata with category reference and family_code
                 output_cursor.execute(f"""
-                    SELECT id, name, construction_details, applications, subtitle, description
+                    SELECT id, family_code, name, construction_details, applications, subtitle, description, category_id
                     FROM product_families
                     WHERE id IN ({family_ids_str})
                 """)
+                
+                category_ids_to_fetch = set()
                 for row in output_cursor.fetchall():
                     family_id = row[0]
+                    category_id = row[7]
+                    
+                    # Track categories for batch fetch
+                    if category_id:
+                        category_ids_to_fetch.add(category_id)
                     
                     # Safely parse JSON fields
                     try:
-                        construction_details = json.loads(row[2]) if row[2] else {}
+                        construction_details = json.loads(row[3]) if row[3] else {}
                     except (json.JSONDecodeError, TypeError):
                         construction_details = {}
                     
                     try:
-                        applications = json.loads(row[3]) if row[3] else {}
+                        applications = json.loads(row[4]) if row[4] else {}
                     except (json.JSONDecodeError, TypeError):
                         applications = {}
                     
                     family_context_cache[family_id] = {
-                        "family_name": row[1],
+                        "family_code": row[1],
+                        "family_name": row[2],
                         "construction_details": construction_details,
                         "applications": applications,
-                        "subtitle": row[4],
-                        "description": row[5]
+                        "subtitle": row[5],
+                        "description": row[6],
+                        "category_id": category_id
                     }
-            debug.print_function(f"✅ Loaded context for {len(family_context_cache)} families")
+                
+                # Batch fetch all categories
+                if category_ids_to_fetch:
+                    category_ids_str = ",".join(str(cid) for cid in category_ids_to_fetch)
+                    output_cursor.execute(f"""
+                        SELECT id, name, chapter
+                        FROM categories
+                        WHERE id IN ({category_ids_str})
+                    """)
+                    
+                    for row in output_cursor.fetchall():
+                        category_id = row[0]
+                        category_context_cache[category_id] = {
+                            "category_name": row[1],
+                            "chapter": row[2]
+                        }
+                
+            debug.print_function(f"✅ Loaded context for {len(family_context_cache)} families and {len(category_context_cache)} categories")
         except Exception as e:
-            debug.print_warning(f"Could not fetch family context: {e}")
-            # Continue without family context rather than failing
+            debug.print_warning(f"Could not fetch family/category context: {e}")
+            # Continue without full context rather than failing
     
     try:
         # STEP 2: Extract product data with inherited family context
@@ -3346,23 +3397,11 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             family_id = item.get("family_id")
             family_context = family_context_cache.get(family_id, {})
             
-            # Create extracted item with FULL hierarchical context
-            extracted_item = {
-                "product_id": item.get("product_id"),
-                "product_code": item.get("product_code"),
-                "family_id": family_id,
-                "family_name": item.get("family_name"),
-                "page_number": item.get("page_number"),
-                
-                # HIERARCHICAL CONTEXT: Include family-level attributes
-                "family_construction_details": family_context.get("construction_details", {}),
-                "family_applications": family_context.get("applications", {}),
-                "family_subtitle": family_context.get("subtitle"),
-                "family_description": family_context.get("description")
-            }
+            # Get category context if available
+            category_id = family_context.get("category_id")
+            category_context = category_context_cache.get(category_id, {}) if category_id else {}
             
-            if family_context:
-                families_included.add(item.get("family_name"))
+            # Create extracted item with FULL hierarchical context (organized: product → family → category → page)
             
             # Parse specifications JSON if present
             specs_raw = item.get("specifications", "{}")
@@ -3374,17 +3413,33 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             else:
                 specs = specs_raw if isinstance(specs_raw, dict) else {}
             
-            # Mode 1: AUTO - Extract all specification fields with family context
-            if extraction_type == "auto":
-                # Flatten all specification fields into the extracted item
-                for spec_key, spec_value in specs.items():
-                    # Normalize field names (e.g., "Arb.tr. MPa" -> "working_pressure_mpa")
-                    normalized_key = spec_key.lower().replace(".", "_").replace(" ", "_")
-                    extracted_item[f"spec_{normalized_key}"] = spec_value
-                    all_fields.add(spec_key)
+            extracted_item = {
+                # LEVEL 3: PRODUCT
+                "product_code": item.get("product_code"),
+                "specifications": specs,  # Moved here, right after product_code
+                "configuration_name": item.get("configuration_name"),  # Added metadata
                 
-                # Also keep raw specs for reference
-                extracted_item["specifications"] = specs
+                # LEVEL 2: FAMILY
+                "family_code": family_context.get("family_code"),
+                "family_name": family_context.get("family_name"),
+                "family_subtitle": family_context.get("subtitle"),
+                "family_description": family_context.get("description"),
+                "family_construction_details": family_context.get("construction_details", {}),
+                "family_applications": family_context.get("applications", {}),
+                
+                # LEVEL 1: CATEGORY
+                "category_name": category_context.get("category_name"),
+                "chapter": category_context.get("chapter"),
+                
+                # LEVEL 0: PAGE
+                "page_number": item.get("page_number")
+            }
+            
+            if family_context:
+                families_included.add(family_context.get("family_name"))  # Use from family_context_cache
+            
+            # Mode 1: AUTO - Extract with full hierarchical context (no flattened spec_* fields)
+            if extraction_type == "auto":
                 extracted_data.append(extracted_item)
             
             # Mode 2: SPECIFIC - Extract only requested fields

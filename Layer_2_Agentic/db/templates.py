@@ -95,8 +95,8 @@ strategies = [
     (
         "DIRECT SPECIFICATION LOOKUP",  # Fast path for small datasets (< 20 products)
         "lookup",
-        "Direct database lookup for specific product specifications with direct LLM analysis: query database → extract attributes → analyze with LLM (direct mode).",
-        "Query Database, Extract Attributes, Analyze With LLM",
+        "Direct database lookup for specific product specifications with direct LLM analysis: extract product code → query database → extract attributes → analyze with LLM (direct mode).",
+        "Extract Product Number, Query Database, Extract Attributes, Analyze With LLM",
     ),
     (
         "ASSEMBLED SPECIFICATION LOOKUP",  # Scalable path for large datasets (20+ products)

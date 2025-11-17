@@ -24,106 +24,21 @@ DATABASE_PATH = "database/harvested.db"
 # Hydroscand-specific database tables for product catalog
 DOMAIN_TABLES = {
     # Main product catalog tables
+    "page_regions": "page_regions",          # PDF page regions and layout
     "categories": "categories",              # Product categories (top level)
     "product_families": "product_families",  # Product family groupings
     "products": "products",                  # Individual product items
+    "product_knowledge": "product_knowledge",  # Product knowledge and documentation
     
-    # Full-text search table
-    "product_families_fts": "product_families_fts",  # FTS5 search index
+    # Full-text search tables
+    "product_families_fts": "product_families_fts",  # Product families FTS5 index
+    "product_knowledge_fts": "product_knowledge_fts",  # Product knowledge FTS5 index
 }
 
 # Helper function for accessing table names
 def get_table_name(table_key: str) -> str:
     """Get table name by key with fallback."""
     return DOMAIN_TABLES.get(table_key, table_key)
-
-# =============================================================================
-# FUNCTION LIBRARY
-# =============================================================================
-
-# Hydroscand-specific functions to implement
-DOMAIN_FUNCTIONS = [
-    {
-        "name": "find_product_by_code",
-        "description": "Find product details by product code",
-        "parameters": ["product_code"],
-        "returns": "product_details"
-    },
-    {
-        "name": "search_products_by_category",
-        "description": "Find all products in a category",
-        "parameters": ["category_name"],
-        "returns": "product_list"
-    },
-    {
-        "name": "get_product_family_details",
-        "description": "Get family specifications and all products in family",
-        "parameters": ["family_code"],
-        "returns": "family_data"
-    },
-    {
-        "name": "compare_products",
-        "description": "Compare technical specifications of two products",
-        "parameters": ["product_code1", "product_code2"],
-        "returns": "comparison_table"
-    },
-    {
-        "name": "search_products_by_specs",
-        "description": "Full-text search across product specifications",
-        "parameters": ["spec_query"],
-        "returns": "matching_products"
-    },
-    {
-        "name": "list_all_categories",
-        "description": "Return all available product categories",
-        "parameters": [],
-        "returns": "category_list"
-    },
-    {
-        "name": "get_products_in_family",
-        "description": "Get all products belonging to a family",
-        "parameters": ["family_id"],
-        "returns": "product_list"
-    },
-    {
-        "name": "search_similar_products",
-        "description": "Find products with similar specifications",
-        "parameters": ["product_code"],
-        "returns": "similar_products"
-    },
-]
-
-# =============================================================================
-# STRATEGY TEMPLATES
-# =============================================================================
-
-# Common query patterns for Hydroscand product catalog
-DOMAIN_STRATEGIES = [
-    {
-        "name": "ProductLookup",
-        "description": "Direct product lookup by code or ID",
-        "applicable_when": "User asks for specific product by code",
-        "functions": ["find_product_by_code", "get_product_family_details"]
-    },
-    {
-        "name": "CategoryBrowse",
-        "description": "Explore products by category",
-        "applicable_when": "User wants to browse products in a category",
-        "functions": ["list_all_categories", "search_products_by_category", "get_products_in_family"]
-    },
-    {
-        "name": "ProductComparison",
-        "description": "Compare specifications of multiple products",
-        "applicable_when": "User wants to compare two or more products",
-        "functions": ["find_product_by_code", "compare_products"]
-    },
-    {
-        "name": "SpecificationSearch",
-        "description": "Search products by technical specifications",
-        "applicable_when": "User searches by specs (pressure, temperature, size, etc.)",
-        "functions": ["search_products_by_specs", "search_similar_products"]
-    },
-]
 
 # =============================================================================
 # QUERY EXAMPLES
@@ -148,7 +63,7 @@ EXAMPLE_QUERIES = [
 # LLM settings optimized for product catalog queries
 LLM_CONFIG = {
     "provider": "ollama",  # Using local Ollama
-    "model": "qwen3-vl:235b-cloud",  # Or gpt-oss:20b-cloud
+    "model": "llama3.2:latest",  # Or gpt-oss:20b-cloud
     "temperature": 0.0,  # Deterministic for product accuracy
     "max_tokens": 2000,
 }
@@ -246,36 +161,102 @@ LOGGING_CONFIG = {
 
 # Database schema for reference (from Layer_1/schema.sql)
 SCHEMA_INFO = """
+-- Page Regions (PDF page layout)
+CREATE TABLE page_regions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    page_number INTEGER NOT NULL,
+    pdf_name TEXT NOT NULL,
+    page_width REAL NOT NULL,
+    page_height REAL NOT NULL,
+    header_x0 REAL NOT NULL,
+    header_y0 REAL NOT NULL,
+    header_x1 REAL NOT NULL,
+    header_y1 REAL NOT NULL,
+    footer_x0 REAL NOT NULL,
+    footer_y0 REAL NOT NULL,
+    footer_x1 REAL NOT NULL,
+    footer_y1 REAL NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(pdf_name, page_number)
+);
+
 -- Categories (top level)
 CREATE TABLE categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    description TEXT
+    name TEXT NOT NULL,                    -- "HÖGTRYCKSSLANG", "OLJESLANG", etc.
+    chapter TEXT,                          -- "KAPITEL 1:1", "KAPITEL 1:2", etc.
+    description TEXT,                      -- Category description
+    page_number INTEGER,                   -- First page where category appears
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(name, chapter)
 );
 
 -- Product Families (grouped by category)
 CREATE TABLE product_families (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    family_code TEXT NOT NULL,
-    family_name TEXT,
-    category_id INTEGER,
-    specifications TEXT,
-    FOREIGN KEY (category_id) REFERENCES categories(id)
+    category_id INTEGER NOT NULL,
+    -- Basic identification
+    family_code TEXT NOT NULL,             -- "1059-01", "1105-43", etc.
+    name TEXT NOT NULL,                    -- "HYDROSCAND T8081", etc.
+    subtitle TEXT,                         -- "NON CONDUCTIVE", etc.
+    description TEXT,                      -- Additional product line description
+    -- Construction details (JSON for flexibility)
+    construction_details TEXT,             -- JSON object with material specs, properties, etc.
+    -- Usage and applications
+    applications TEXT,                     -- Free-form usage description
+    -- Location information
+    page_number INTEGER,                   -- Page where family is introduced
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+    UNIQUE(family_code, name)
 );
 
 -- Products (individual items)
 CREATE TABLE products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_code TEXT NOT NULL,
-    family_id INTEGER,
-    description TEXT,
-    technical_specs TEXT,
-    FOREIGN KEY (family_id) REFERENCES product_families(id)
+    family_id INTEGER NOT NULL,
+    -- Product identification
+    product_code TEXT NOT NULL UNIQUE,     -- Full code: "1059-01-04"
+    variant_suffix TEXT,                   -- "-04", etc.
+    configuration_type TEXT DEFAULT 'STANDARD',  -- "STANDARD", etc.
+    configuration_name TEXT,               -- "PÅ BOBIN", etc.
+    specifications TEXT,                   -- JSON object with all technical specs
+    bounding_box TEXT,                     -- JSON: [x0, y0, x1, y1]
+    page_number INTEGER,                   -- Page where product appears
+    notes TEXT,                            -- Additional notes
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (family_id) REFERENCES product_families(id) ON DELETE CASCADE
 );
 
--- Full-text search
+-- Product Families Full-text Search
 CREATE VIRTUAL TABLE product_families_fts USING fts5(
-    family_code, family_name, specifications,
-    content=product_families, content_rowid=id
+    family_code,
+    name,
+    applications,
+    content=product_families,
+    content_rowid=id
+);
+
+-- Product Knowledge
+CREATE TABLE product_knowledge (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pdf_name TEXT NOT NULL,                -- PDF filename
+    page_number INTEGER,                   -- Page where knowledge appears
+    category TEXT,                         -- "PRESSKOPPLINGAR", etc.
+    knowledge_type TEXT NOT NULL,          -- "DESCRIPTION", etc.
+    section_title TEXT,                    -- Section heading
+    content TEXT NOT NULL,                 -- Full extracted text
+    content_language TEXT DEFAULT 'sv',    -- Language code
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CHECK(knowledge_type IN ('DESCRIPTION', 'ASSEMBLY', 'STANDARDS', 'TOC', 'INTRO', 'TECHNICAL', 'SAFETY', 'OTHER'))
+);
+
+-- Product Knowledge Full-text Search
+CREATE VIRTUAL TABLE product_knowledge_fts USING fts5(
+    section_title,
+    content,
+    category,
+    content=product_knowledge,
+    content_rowid=id
 );
 """

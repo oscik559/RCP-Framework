@@ -256,5 +256,5 @@ docs/_build/
 docs/graph.png
 
 # IDE-specific
-.vscode/
+# .vscode/
 .idea/
