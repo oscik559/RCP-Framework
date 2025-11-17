@@ -515,11 +515,11 @@ def process_query():
         # Create session state for the query
         session_id = generate_session_id()  # Use the same logic as main.py
 
-        # Clear any old session data to ensure fresh start
+        # Clear ALL old session data on startup (not just for this session)
         from Layer_2_Agentic.logic.database_manager import DatabaseManager
         db = DatabaseManager()
-        db.clear_session_data(session_id)
-        print(f"✅ Cleared old session data for session {session_id}")
+        db.clear_all_sessions()  # Fresh slate for every query
+        print(f"✅ Cleared ALL old sessions; starting fresh with session {session_id}")
 
         # Create progress tracker
         tracker = ProgressTracker(session_id)

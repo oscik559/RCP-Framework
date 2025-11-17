@@ -88,10 +88,10 @@ def main():
         populate_template_libraries()
         
         # Clear any old session data to ensure fresh start
-        print(f"[SETUP] Clearing old session data for session {init_state['sessionID']}...")
+        print(f"[SETUP] Clearing all old session data...")
         from Layer_2_Agentic.logic.database_manager import DatabaseManager
         db = DatabaseManager()
-        db.clear_session_data(init_state['sessionID'])
+        db.clear_all_sessions()
 
         # Execute
         print("\n[AI] Running workflow...\n")
