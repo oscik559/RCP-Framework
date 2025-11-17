@@ -59,15 +59,11 @@ def main():
         # QUERY SELECTION - Configure your query here
         # =================================================================
         # Example queries (domain-specific examples should be configured per application):
-<<<<<<< HEAD
-        # user_query = "What is the Slang ID for the product 4221-24-08?"
-        user_query = "What do you know abou the product 1101-14-06?"
-=======
-        user_query = "What is the working pressure of a 4201-16-16?"
->>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
+        user_query = "What do you know about the product 1101-14-06?"
         
         # For testing, you can uncomment and modify these:
-        # user_query = "What is the Slang ID of a 4201-16-16?"
+        # user_query = "What is the Slang ID for the product 4221-24-08?"
+        # user_query = "What is the working pressure of a 4201-16-16?"
         # user_query = "What is the maximum working pressure for this hose KAPPAFLEX 1 at 100 °C?"
         # user_query = "What products are available in the Hydroscand catalog?"
         # user_query = "Find product by code 1103-03-04"

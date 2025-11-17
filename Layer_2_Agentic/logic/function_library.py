@@ -3335,17 +3335,9 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
                 
                 # Fetch family metadata with category reference and family_code
                 output_cursor.execute(f"""
-<<<<<<< HEAD
                     SELECT id, family_code, name, construction_details, applications, subtitle, description, category_id
                     FROM product_families
                     WHERE id IN ({family_ids_str})
-=======
-                    SELECT pf.id, pf.name, pf.construction_details, pf.applications, pf.subtitle, pf.description,
-                           c.name as category_name, c.chapter as category_chapter
-                    FROM product_families pf
-                    LEFT JOIN categories c ON pf.category_id = c.id
-                    WHERE pf.id IN ({family_ids_str})
->>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
                 """)
                 
                 category_ids_to_fetch = set()
@@ -3373,16 +3365,9 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
                         "family_name": row[2],
                         "construction_details": construction_details,
                         "applications": applications,
-<<<<<<< HEAD
                         "subtitle": row[5],
                         "description": row[6],
                         "category_id": category_id
-=======
-                        "subtitle": row[4],
-                        "description": row[5],
-                        "category_name": row[6],
-                        "category_chapter": row[7]
->>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
                     }
                 
                 # Batch fetch all categories
@@ -3415,25 +3400,9 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             family_id = item.get("family_id")
             family_context = family_context_cache.get(family_id, {})
             
-<<<<<<< HEAD
             # Get category context if available
             category_id = family_context.get("category_id")
             category_context = category_context_cache.get(category_id, {}) if category_id else {}
-=======
-            # Create extracted item with FULL hierarchical context
-            extracted_item = {
-                "product_code": item.get("product_code"),
-                "family_name": family_context.get("family_name") or item.get("family_name"),
-                "category": family_context.get("category_name"),
-                "page_number": item.get("page_number"),
-                
-                # HIERARCHICAL CONTEXT: Include family-level attributes (for deeper analysis if needed)
-                "family_construction_details": family_context.get("construction_details", {}),
-                "family_applications": family_context.get("applications", {}),
-                "family_subtitle": family_context.get("subtitle"),
-                "family_description": family_context.get("description")
-            }
->>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
             
             # Create extracted item with FULL hierarchical context (organized: product → family → category → page)
             
@@ -3447,7 +3416,6 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             else:
                 specs = specs_raw if isinstance(specs_raw, dict) else {}
             
-<<<<<<< HEAD
             extracted_item = {
                 # LEVEL 3: PRODUCT
                 "product_code": item.get("product_code"),
@@ -3475,17 +3443,6 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
             
             # Mode 1: AUTO - Extract with full hierarchical context (no flattened spec_* fields)
             if extraction_type == "auto":
-=======
-            # Mode 1: AUTO - Extract all specification fields with family context
-            if extraction_type == "auto":
-                # Keep specifications as nested JSON for consistency
-                extracted_item["specifications"] = specs
-                
-                # Track all specification fields found
-                for spec_key in specs.keys():
-                    all_fields.add(spec_key)
-                
->>>>>>> 3cb2ab885cc8c17e76341833fd282c4b15e607b2
                 extracted_data.append(extracted_item)
             
             # Mode 2: SPECIFIC - Extract only requested fields
