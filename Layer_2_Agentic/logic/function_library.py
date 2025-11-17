@@ -94,7 +94,7 @@ def _build_llm_processing_chain(
             model=cfg["model"],
             temperature=cfg["temperature"],
             num_ctx=4096,  # Limit context window
-            system=None,  # Reset system context
+            # Removed invalid system parameter
         )
     else:
         from ..config.config_loader import CONFIG
@@ -105,8 +105,8 @@ def _build_llm_processing_chain(
         llm = ChatOllama(
             model=cfg["model"],
             temperature=cfg["temperature"],
-            num_ctx=4096,  # Limit context window
-            system=None,  # Reset system context
+            num_ctx=8192,  # Context window for input + output
+            num_predict=-1,  # -1 = unlimited output (let model decide when to stop)
         )
 
     # Add explicit conversation reset to system message
@@ -311,11 +311,11 @@ def func_image_search(params: dict) -> tuple[bool, dict]:
     debug.print_function(f"[func_image_search] Received keywords: {repr(kw_raw)}")
 
     if not kw_raw:
-        return (False, "Keyword Output parameter missing")
+        return (False, {})
 
     keywords = _parse_keywords_from_string(kw_raw, "func_image_search")
     if not keywords:
-        return (False, "no valid keywords")
+        return (False, {})
 
     try:
         with get_output_connection() as conn:
@@ -532,7 +532,7 @@ def func_image_search(params: dict) -> tuple[bool, dict]:
 
     except Exception as e:
         logger.error(f"[func_image_search] Database error: {e}")
-        return (False, f"Image search error: {e}")
+        return (False, {"error": f"Image search error: {e}"})
 
 
 def func_display_images(params: dict) -> tuple[bool, dict]:
@@ -675,7 +675,7 @@ def func_display_images(params: dict) -> tuple[bool, dict]:
 
     except Exception as e:
         logger.error(f"[func_display_images] Error displaying images: {e}")
-        return (False, f"Error displaying images: {e}")
+        return (False, {"error": f"Error displaying images: {e}"})
 
 
 def func_table_search_on_document(params: dict) -> tuple[bool, dict | str]:
@@ -1104,7 +1104,7 @@ def func_assemble_table(params: dict) -> tuple[bool, dict | str]:
         content = _parse_json_safely(
             tbl.get("tablecontent", "[]"), default=[], context="assemble_table_content"
         )
-        if len(content) >= 2:  # Header + at least one data row
+        if content is not None and hasattr(content, '__len__') and len(content) >= 2:  # Header + at least one data row
             headers = [str(h).strip() for h in content[0]]
             # Filter out empty headers and provide default names for empty fields
             cleaned_headers = []
@@ -1114,7 +1114,7 @@ def func_assemble_table(params: dict) -> tuple[bool, dict | str]:
                 else:  # Empty header, provide default name
                     cleaned_headers.append(f"column_{i}")
             discovered_fields.update(cleaned_headers)
-            row_count = len(content) - 1  # Exclude header from count
+            row_count = len(content) - 1 if content is not None and hasattr(content, '__len__') else 0  # Exclude header from count
 
             # Categorize this table with row count information
             category, priority = categorize_table(tbl, cleaned_headers, row_count)
@@ -1123,7 +1123,7 @@ def func_assemble_table(params: dict) -> tuple[bool, dict | str]:
                 {
                     "table_info": tbl,
                     "headers": cleaned_headers,
-                    "rows": content[1:],
+                    "rows": content[1:] if content is not None else [],
                     "category": category,
                     "priority": priority,
                     "row_count": row_count,
@@ -1742,9 +1742,11 @@ def func_analyze_data(params: dict) -> tuple[bool, dict | str]:
     last_exception = None
     for attempt in range(1, max_attempts + 1):
         try:
-            raw_answer = _llm_call(llm, system_msg, user_prompt).strip()
+            raw_answer = _llm_call(llm, system_msg, user_prompt)
+            if isinstance(raw_answer, str):
+                raw_answer = raw_answer.strip()
             # Clean up response formatting
-            if raw_answer.startswith("<") and ">" in raw_answer.split("\n", 1)[0]:
+            if isinstance(raw_answer, str) and raw_answer.startswith("<") and ">" in raw_answer.split("\n", 1)[0]:
                 pass
             answer = raw_answer or "No relevant data found in the assembled context."
             debug.print_function(f"[func_analyze_data] {repr(answer)}")
@@ -1915,11 +1917,21 @@ Current Status: Image located and ready for analysis at {image_path}
 
 def func_extract_product_number(params: dict) -> tuple[bool, dict]:
     """
-    Extract product codes or part numbers from user queries using LLM.
+    Extract exact product codes or part numbers from user queries using LLM.
 
-    Uses LLM to identify technical product identifiers from natural language queries.
-    Supports various formats (RPT2354313/350, C0000268-11105, etc.) and automatically
-    generates format variations for improved search matching.
+    This function parses natural language questions to identify technical product identifiers
+    (e.g., '1101-14-06-30', 'RPT2354313/350', 'C0000268-11105'). It leverages an LLM prompt
+    to extract all candidate codes, then normalizes and expands them to include common format
+    variations for robust downstream database matching.
+
+    Typical workflow:
+      1. Receives a user query (e.g., "What do you know about the product 1101-14-06-30?")
+      2. Uses LLM to extract product codes from the query text.
+      3. Normalizes codes (removes extra spaces, standardizes separators).
+      4. Returns a comma-separated string of codes for use as exact filters in database queries.
+
+    This ensures that subsequent database queries use the correct product code(s), preventing
+    fuzzy or substring matches and improving result accuracy.
 
     Args:
         params: {"Input": user_query_text}
@@ -2142,7 +2154,7 @@ def func_generate_visual_layout(params: dict) -> tuple[bool, dict]:
     debug.print_function(f"[func_generate_visual_layout] Product: {product_code}")
     
     if not filtered_data and not product_code:
-        return (False, "No product information available for layout generation")
+        return (False, {})
     
     try:
         # Basic layout info
@@ -2179,7 +2191,7 @@ def func_generate_visual_layout(params: dict) -> tuple[bool, dict]:
     
     except Exception as e:
         logger.error(f"[func_generate_visual_layout] Error: {e}")
-        return (False, f"Error generating visual layout: {str(e)}")
+        return (False, {"error": f"Error generating visual layout: {str(e)}"})
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -2255,7 +2267,10 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
     limit = params.get("limit", 50)
     
     try:
-        conn = sqlite3.connect(db_path)
+        if db_path is not None:
+            conn = sqlite3.connect(db_path)
+        else:
+            raise ValueError("db_path cannot be None")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -2390,56 +2405,37 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
     db_path = params.get("database_path", CONFIG.get("harvested_db"))
     query_type = params.get("query_type", "select").lower()
     
-    # Smart Mode: If we receive a natural language query in filters or custom_sql,
-    # try to extract product code or family name and build a smart query
-    filters_raw = params.get("filters", {})
-    if isinstance(filters_raw, str) and filters_raw and not filters_raw.startswith("{"):
-        # This looks like a natural language query, not a JSON filter
-        
-        # First, try to extract product code (e.g., "4221-24-08")
-        product_code_pattern = r'\b(\d{4}-\d{2}-\d{2})\b'
-        code_matches = re.findall(product_code_pattern, filters_raw)
-        
-        if code_matches:
-            # Build a custom query to find product by code
-            product_code = code_matches[0]
-            debug.print_function(f"Smart mode: Extracted product code '{product_code}' from query")
-            
-            # Override to custom query mode
-            query_type = "custom"
-            params["custom_sql"] = f"""
-                SELECT p.id as product_id, p.product_code, p.family_id, 
-                       p.specifications, p.page_number
-                FROM products p
-                WHERE p.product_code = '{product_code}'
-                LIMIT 100
-            """
-            debug.print_function(f"Generated smart query for product code: {product_code}")
-        else:
-            # Otherwise, try to extract product family name (e.g., "KAPPAFLEX 1" from query)
-            product_pattern = r'\b([A-Z]{3,}(?:\s+\d+)?)\b'
-            matches = re.findall(product_pattern, filters_raw)
-            
-            if matches:
-                # Build a custom query to find products in this family
-                family_name = matches[0]  # Take first match (e.g., "KAPPAFLEX 1")
-                debug.print_function(f"Smart mode: Extracted family name '{family_name}' from query")
-                
-                # Override to custom query mode
-                query_type = "custom"
-                params["custom_sql"] = f"""
-                    SELECT p.id as product_id, p.product_code, p.family_id, 
-                           pf.name as family_name, pf.description,
-                           p.specifications, p.page_number
-                    FROM products p
-                    LEFT JOIN product_families pf ON p.family_id = pf.id
-                    WHERE pf.name LIKE '%{family_name}%'
-                    LIMIT 100
-                """
-                debug.print_function(f"Generated smart query for family: {family_name}")
+    # Use Keyword Output for exact product code filtering
+    # Check both direct parameter and common parameter names
+    keyword_output = (
+        params.get("Keyword Output", "") or 
+        params.get("keyword_output", "") or
+        params.get("KeywordOutput", "")
+    ).strip()
+    
+    debug.print_function(f"[func_query_database] All params: {list(params.keys())}")
+    debug.print_function(f"[func_query_database] Keyword Output value: {repr(keyword_output)}")
+
+    if not keyword_output:
+        return (False, "Keyword Output parameter required for product code filtering. Make sure Extract Product Number function output is passed to this function.")
+
+    # Build filters from Keyword Output
+    product_codes = [code.strip() for code in keyword_output.split(",") if code.strip()]
+    debug.print_function(f"[func_query_database] Using Keyword Output for exact match: {product_codes}")
+
+    # Handle single vs multiple product codes
+    if len(product_codes) == 1:
+        filters = {"product_code": product_codes[0]}
+    else:
+        # For multiple codes, use list for IN clause
+        filters = {"product_code": product_codes}
+    debug.print_function(f"[func_query_database] Filters set to: {filters}")
     
     try:
-        conn = sqlite3.connect(db_path)
+        if db_path is not None:
+            conn = sqlite3.connect(db_path)
+        else:
+            raise ValueError("db_path cannot be None")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -2456,19 +2452,16 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
             cursor.execute(custom_sql)
             rows = cursor.fetchall()
             
-            results = [dict(row) for row in rows]
-            field_names = list(rows[0].keys()) if rows else []
+            items = [dict(row) for row in rows]
             
             conn.close()
             
-            debug.print_function(f"Custom SQL executed: {len(results)} results")
+            debug.print_function(f"Custom SQL executed: {len(items)} results")
             
             return (True, {
-                "results": results,
-                "count": len(results),
-                "fields": field_names,
-                "query_type": "custom",
-                "items": results  # For compatibility with Extract Attributes
+                "items": items,
+                "count": len(items),
+                "query_type": "custom"
             })
         
         # Mode 2: STRUCTURED QUERY - Build from parameters
@@ -2513,14 +2506,21 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
                     query += f" {join_type} {join_table} ON {join_on}"
         
         # Build WHERE clause from filters
-        filters_raw = params.get("filters", {})
-        if isinstance(filters_raw, str):
+        # Merge additional filters with Keyword Output filters (don't overwrite!)
+        additional_filters_raw = params.get("filters", {})
+        if isinstance(additional_filters_raw, str):
             try:
-                filters = json.loads(filters_raw) if filters_raw else {}
+                additional_filters = json.loads(additional_filters_raw) if additional_filters_raw else {}
             except json.JSONDecodeError:
-                filters = {}
+                additional_filters = {}
         else:
-            filters = filters_raw
+            additional_filters = additional_filters_raw
+        
+        # Merge: Keyword Output filters take precedence (already set above)
+        if additional_filters:
+            for key, value in additional_filters.items():
+                if key not in filters:  # Don't overwrite product_code from Keyword Output
+                    filters[key] = value
         
         if filters:
             where_conditions = []
@@ -2531,6 +2531,17 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
                     filter_value = value.get("value")
                     where_conditions.append(f"{field} {operator} ?")
                     query_params.append(filter_value)
+                elif isinstance(value, list):
+                    # Handle list of values (IN clause)
+                    if len(value) == 1:
+                        # Single value - use simple equality
+                        where_conditions.append(f"{field} = ?")
+                        query_params.append(value[0])
+                    else:
+                        # Multiple values - use IN clause
+                        placeholders = ", ".join(["?"] * len(value))
+                        where_conditions.append(f"{field} IN ({placeholders})")
+                        query_params.extend(value)
                 else:
                     # Simple equality
                     where_conditions.append(f"{field} = ?")
@@ -2554,19 +2565,16 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
         cursor.execute(query, query_params)
         rows = cursor.fetchall()
         
-        results = [dict(row) for row in rows]
-        field_names = list(rows[0].keys()) if rows else []
+        items = [dict(row) for row in rows]
         
         conn.close()
         
-        debug.print_function(f"Query executed on {table}: {len(results)} results")
+        debug.print_function(f"Query executed on {table}: {len(items)} results")
         
         return (True, {
-            "results": results,
-            "count": len(results),
-            "fields": field_names,
-            "query_type": query_type,
-            "items": results  # For compatibility with other functions
+            "items": items,
+            "count": len(items),
+            "query_type": query_type
         })
         
     except Exception as e:
@@ -2980,7 +2988,10 @@ def func_get_related_items(params: dict) -> tuple[bool, dict | str]:
         return (False, "Missing required parameter: item_id")
     
     try:
-        conn = sqlite3.connect(db_path)
+        if db_path is not None:
+            conn = sqlite3.connect(db_path)
+        else:
+            raise ValueError("db_path cannot be None")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -3479,7 +3490,12 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
                         # Range filter: {"min": 10, "max": 50}
                         if "min" in filter_value:
                             try:
-                                if float(item_value) < float(filter_value["min"]):
+                                try:
+                                    if item_value is not None and filter_value["min"] is not None:
+                                        if float(item_value) < float(filter_value["min"]):
+                                            continue
+                                except (ValueError, TypeError):
+                                    continue
                                     matches = False
                                     break
                             except (ValueError, TypeError):
@@ -3487,7 +3503,12 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
                                 break
                         if "max" in filter_value:
                             try:
-                                if float(item_value) > float(filter_value["max"]):
+                                try:
+                                    if item_value is not None and filter_value["max"] is not None:
+                                        if float(item_value) > float(filter_value["max"]):
+                                            continue
+                                except (ValueError, TypeError):
+                                    continue
                                     matches = False
                                     break
                             except (ValueError, TypeError):
@@ -3507,13 +3528,67 @@ def func_extract_attributes(params: dict) -> tuple[bool, dict | str]:
         
         debug.print_function(f"Extracted {len(extracted_data)} items with {len(all_fields)} unique fields from {len(families_included)} families")
         
+        # STEP 3: Store assembled metadata in temp database for reuse
+        try:
+            from ..db.connection import get_temp_connection
+            
+            with get_temp_connection() as temp_conn:
+                # Create temp table for assembled product metadata if not exists
+                temp_conn.execute("""
+                    CREATE TABLE IF NOT EXISTS temp_assembled_products (
+                        product_code TEXT PRIMARY KEY,
+                        specifications TEXT,
+                        configuration_name TEXT,
+                        family_code TEXT,
+                        family_name TEXT,
+                        family_subtitle TEXT,
+                        family_description TEXT,
+                        family_construction_details TEXT,
+                        family_applications TEXT,
+                        category_name TEXT,
+                        chapter TEXT,
+                        page_number INTEGER,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                
+                # Clear existing data for fresh assembly
+                temp_conn.execute("DELETE FROM temp_assembled_products")
+                
+                # Insert all assembled products
+                for item in extracted_data:
+                    temp_conn.execute("""
+                        INSERT OR REPLACE INTO temp_assembled_products (
+                            product_code, specifications, configuration_name,
+                            family_code, family_name, family_subtitle, family_description,
+                            family_construction_details, family_applications,
+                            category_name, chapter, page_number
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        item.get("product_code"),
+                        json.dumps(item.get("specifications", {})),
+                        item.get("configuration_name"),
+                        item.get("family_code"),
+                        item.get("family_name"),
+                        item.get("family_subtitle"),
+                        item.get("family_description"),
+                        json.dumps(item.get("family_construction_details", {})),
+                        json.dumps(item.get("family_applications", {})),
+                        item.get("category_name"),
+                        item.get("chapter"),
+                        item.get("page_number")
+                    ))
+                
+                temp_conn.commit()
+                debug.print_function(f"✅ Stored {len(extracted_data)} assembled products in temp database")
+        except Exception as e:
+            debug.print_warning(f"Could not store assembled data in temp database: {e}")
+            # Continue without failing - temp storage is optional optimization
+        
         return (True, {
             "extracted_data": extracted_data,
             "extraction_type": extraction_type,
-            "count": len(extracted_data),
-            "fields_found": sorted(list(all_fields)),
-            "families_included": sorted(list(families_included)),
-            "extraction_mode": extraction_type  # Keep for backward compatibility
+            "count": len(extracted_data)
         })
         
     except Exception as e:
@@ -3614,6 +3689,76 @@ def _filter_assembled_data(question: str, max_products: int = 50) -> tuple[list,
         debug.print_error(f"Error filtering assembled data: {e}")
         debug.print_error(f"Traceback: {traceback.format_exc()}")
         raise
+
+
+def _format_extracted_data_for_llm(extracted_item: dict) -> str:
+    """
+    Format extracted product data into clean, readable text for LLM consumption.
+    
+    Converts nested JSON structures into labeled, human-readable format so the LLM
+    doesn't need cryptic instructions about navigating JSON objects.
+    
+    Example output:
+    PRODUCT: 1101-14-06
+    Configuration: PÅ BOBIN
+    Specifications:
+      - ID mm: 10.0
+      - ID tum: 3/8"
+      - YD mm: 17.4
+    Family: EGEFLEX 1 CO PÅ BOBIN
+    Category: HÖGTRYCKSSLANG
+    """
+    lines = []
+    
+    # LEVEL 3: PRODUCT INFO
+    if extracted_item.get("product_code"):
+        lines.append(f"PRODUCT: {extracted_item['product_code']}")
+    
+    if extracted_item.get("configuration_name"):
+        lines.append(f"Configuration: {extracted_item['configuration_name']}")
+    
+    # SPECIFICATIONS - formatted as readable list with labels
+    specs = extracted_item.get("specifications", {})
+    if specs and isinstance(specs, dict):
+        lines.append("Specifications:")
+        for spec_name, spec_value in specs.items():
+            lines.append(f"  - {spec_name}: {spec_value}")
+    
+    # LEVEL 2: FAMILY INFO
+    if extracted_item.get("family_name"):
+        lines.append(f"Family: {extracted_item['family_name']}")
+    
+    if extracted_item.get("family_code"):
+        lines.append(f"Family Code: {extracted_item['family_code']}")
+    
+    family_construction = extracted_item.get("family_construction_details", {})
+    if family_construction and isinstance(family_construction, dict):
+        construction_text = ", ".join(
+            f"{k}: {v}" for k, v in family_construction.items() if v
+        )
+        if construction_text:
+            lines.append(f"Construction: {construction_text}")
+    
+    family_applications = extracted_item.get("family_applications", {})
+    if family_applications and isinstance(family_applications, dict):
+        app_text = ", ".join(
+            f"{k}: {v}" for k, v in family_applications.items() if v
+        )
+        if app_text:
+            lines.append(f"Applications: {app_text}")
+    
+    # LEVEL 1: CATEGORY INFO
+    if extracted_item.get("category_name"):
+        lines.append(f"Category: {extracted_item['category_name']}")
+    
+    if extracted_item.get("chapter"):
+        lines.append(f"Chapter: {extracted_item['chapter']}")
+    
+    # LEVEL 0: PAGE INFO
+    if extracted_item.get("page_number"):
+        lines.append(f"Page: {extracted_item['page_number']}")
+    
+    return "\n".join(lines)
 
 
 def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
@@ -3753,7 +3898,7 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
                 # The helper function already did keyword-based filtering
                 # Continue to Step 3 below
                     
-            except Exception as e:
+            # Removed unreachable except block
                 debug.print_warning(f"LangChain SQL Agent not available: {e}")
                 debug.print_warning("Falling back to direct query mode...")
                 
@@ -3848,17 +3993,12 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
                 
                 # Build context with chunking strategy
                 for i, item in enumerate(items_to_include, 1):
-                    product_code = item.get('product_code', 'Unknown')
-                    page_num = item.get('page_number', 'N/A')
-                    item_text = f"\n{i}. Product: {product_code} (Page {page_num})"
-                    # Show all fields (not just specs)
-                    for key, value in item.items():
-                        if key not in ['product_code', 'page_number']:  # Already shown
-                            display_key = key.replace("spec_", "").replace("_", " ").title()
-                            item_text += f"\n   {display_key}: {value}"
+                    # Use the new formatter to create clean, readable text
+                    # instead of raw JSON that requires LLM instructions
+                    item_text = _format_extracted_data_for_llm(item)
                     
                     # Check if adding this item would exceed limit
-                    test_context = "\n".join(context_parts) + item_text
+                    test_context = "\n".join(context_parts) + "\n" + item_text
                     if len(test_context) > max_context_chars:
                         debug.print_function(f"[func_analyze_with_llm] Context limit reached at item {i}/{products_analyzed}")
                         context_parts.append(f"\n... and {products_analyzed - i + 1} more products (truncated due to context limits)")
@@ -4018,7 +4158,10 @@ def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
         return (False, "Missing start_node parameter")
     
     try:
-        conn = sqlite3.connect(db_path)
+        if db_path is not None:
+            conn = sqlite3.connect(db_path)
+        else:
+            raise ValueError("db_path cannot be None")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -4109,7 +4252,10 @@ def func_discover_items(params: dict) -> tuple[bool, dict | str]:
         return (False, "Missing pattern parameter")
     
     try:
-        conn = sqlite3.connect(db_path)
+        if db_path is not None:
+            conn = sqlite3.connect(db_path)
+        else:
+            raise ValueError("db_path cannot be None")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -4169,7 +4315,10 @@ def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
         return (False, "Missing metadata_type parameter")
     
     try:
-        conn = sqlite3.connect(db_path)
+        if db_path is not None:
+            conn = sqlite3.connect(db_path)
+        else:
+            raise ValueError("db_path cannot be None")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         

@@ -974,12 +974,17 @@
             <div class="example-query" onclick="setQuery('What temperature range is used for the EGEFLEX 1 hoses')">
                 What temperature range is used for the EGEFLEX 1 hoses
             </div>
-            <div class="example-query" onclick="setQuery('What are the construction details for the ISOBAR 350 X-HP hoses (english please)')">
+            <div class="example-query" onclick="setQuery('What are the construction details for the ISOBAR 350 X-HP hoses')">
                 What are the construction details for the ISOBAR 350 X-HP hoses?
             </div>
             <div class="example-query" onclick="setQuery('What is the Slang ID for the product 4221-24-08?')">
                 What is the Slang ID for the product 4221-24-08?
             </div>
+            <div class="example-query" onclick="setQuery('Tell me the specifications of this hose; 1110-00-06?')">
+                Tell me the specifications of this hose; 1110-00-06?
+            </div>
+
+            
         </div>
 
         <!-- Data Pipeline Management Section -->
@@ -1287,17 +1292,66 @@
 
                         // Check if workflow is complete
                         const latestUpdate = data.progress_log[data.progress_log.length - 1];
-                        if (latestUpdate && (latestUpdate.step_id === 'done' || latestUpdate.status === 'error')) {
-                            // Get final result
-                            setTimeout(() => {
-                                fetchFinalResult(sessionId);
-                            }, 500);
+                        if (latestUpdate && (latestUpdate.step_id === 'done' && latestUpdate.status === 'completed')) {
+                            // Stop polling for progress - switch to polling for result
+                            clearInterval(progressInterval);
+                            progressInterval = null;
+                            console.log('[Frontend] Workflow complete, polling for result...');
+                            // Start polling for the actual result
+                            pollFinalResult(sessionId);
+                        } else if (latestUpdate && latestUpdate.status === 'error') {
+                            // Error occurred
+                            clearInterval(progressInterval);
+                            progressInterval = null;
+                            showResult({ error: latestUpdate.details || 'Workflow failed' }, true);
+                            hideLoading();
                         }
                     }
                 } catch (error) {
                     console.error('Error polling progress:', error);
                 }
-            }, 800); // Poll every 800ms to match backend timing
+            }, 800); // Poll every 800ms
+        }
+
+        function pollFinalResult(sessionId) {
+            let resultAttempts = 0;
+            const maxAttempts = 30; // Try for up to 24 seconds
+            
+            const resultInterval = setInterval(async () => {
+                resultAttempts++;
+                console.log(`[Frontend] Fetching result attempt ${resultAttempts}/${maxAttempts}`);
+                
+                try {
+                    const response = await fetch(`/result/${sessionId}`);
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        console.log('[Frontend] Got result successfully');
+                        clearInterval(resultInterval);
+                        showResult(data, false);
+                        hideLoading();
+                    } else if (response.status === 202) {
+                        // Still processing
+                        console.log(`[Frontend] Result still processing (${resultAttempts}/${maxAttempts})...`);
+                        if (resultAttempts >= maxAttempts) {
+                            clearInterval(resultInterval);
+                            showResult({ error: 'Timeout waiting for result. Workflow may still be processing.' }, true);
+                            hideLoading();
+                        }
+                    } else {
+                        clearInterval(resultInterval);
+                        showResult(data, true);
+                        hideLoading();
+                    }
+                } catch (error) {
+                    console.error('Error fetching result:', error);
+                    if (resultAttempts >= maxAttempts) {
+                        clearInterval(resultInterval);
+                        showResult({ error: `Network error: ${error.message}` }, true);
+                        hideLoading();
+                    }
+                }
+            }, 800); // Poll every 800ms (same as progress polling)
         }
 
         async function fetchFinalResult(sessionId) {

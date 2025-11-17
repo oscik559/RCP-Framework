@@ -772,14 +772,12 @@ def _execute_sequential_function(session_state: SessionState) -> SessionState:
             session_state["finalAnswer"] = result["analysis"]
         elif "Assembled Data" in result:
             session_state["finalAnswer"] = (
-                f"Data assembled: {result['Assembled Data'][:200]}..."
+                f"Data assembled: {result['Assembled Data']}"
             )
         else:
             # Default final answer from first output
             first_output = next(iter(result.values())) if result else str(result)
-            session_state["finalAnswer"] = str(first_output)[:500] + (
-                "..." if len(str(first_output)) > 500 else ""
-            )
+            session_state["finalAnswer"] = str(first_output)
 
     else:
         # Function failed - don't store any outputs
@@ -980,7 +978,7 @@ def node_parallel_execute(session_state: SessionState) -> SessionState:
             session_state["finalAnswer"] = successful_outputs["Analyze Output"]
         elif "Table Output" in successful_outputs:
             session_state["finalAnswer"] = (
-                f"Data gathered: {str(successful_outputs['Table Output'])[:200]}..."
+                f"Data gathered: {str(successful_outputs['Table Output'])}"
             )
         else:
             # Combine all outputs

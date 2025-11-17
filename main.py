@@ -59,7 +59,7 @@ def main():
         # QUERY SELECTION - Configure your query here
         # =================================================================
         # Example queries (domain-specific examples should be configured per application):
-        user_query = "What do you know about the product 1101-14-06?"
+        user_query = "What do you know about the product 1110-00-06?"
         
         # For testing, you can uncomment and modify these:
         # user_query = "What is the Slang ID for the product 4221-24-08?"

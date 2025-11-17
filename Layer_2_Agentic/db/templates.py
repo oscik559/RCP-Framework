@@ -330,7 +330,7 @@ params = {
     "Query Database": [
         ("query_type", "select", "string"),  # "select", "count", "distinct", "custom"
         ("table", "products", "string"),
-        ("filters", "Input", "string"),  # Smart mode: Can accept natural language query to extract product names
+        ("Keyword Output", "", "string"),  # Product codes from Extract Product Number
         ("fields", "[]", "json"),
         ("joins", "[]", "json"),
         ("order_by", "", "string"),
@@ -456,10 +456,8 @@ outputs = {
         ("items", "[]", "json"),  # For compatibility with downstream functions like Extract Attributes
     ],
     "Query Database": [
-        ("results", "[]", "json"),
+        ("items", "[]", "json"),
         ("count", "0", "integer"),
-        ("fields", "[]", "json"),
-        ("items", "[]", "json"),  # For compatibility with Extract Attributes
     ],
     "Get Related Items": [
         ("related_items", "[]", "json"),
@@ -495,7 +493,7 @@ outputs = {
     ],
     "Extract Attributes": [
         ("extracted_data", "[]", "json"),
-        ("extraction_type", "", "string"),
+        ("extraction_type", "auto", "string"),
         ("count", "0", "integer"),
     ],
     "Assemble Product Data": [
