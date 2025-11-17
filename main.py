@@ -57,9 +57,11 @@ def main():
         # QUERY SELECTION - Configure your query here
         # =================================================================
         # Example queries (domain-specific examples should be configured per application):
-        user_query = "What is the maximum working pressure for this hose KAPPAFLEX 1 at 100 °C?"
+        user_query = "What is the working pressure of a 4201-16-16?"
         
         # For testing, you can uncomment and modify these:
+        # user_query = "What is the Slang ID of a 4201-16-16?"
+        # user_query = "What is the maximum working pressure for this hose KAPPAFLEX 1 at 100 °C?"
         # user_query = "What products are available in the Hydroscand catalog?"
         # user_query = "Find product by code 1103-03-04"
         # user_query = "Compare different hose products"

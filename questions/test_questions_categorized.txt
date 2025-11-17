@@ -263,7 +263,7 @@ Question 12:
 
 Question 16:
   Column 1: What is the recommended tightening torque for this coupling?
-  Column 2: In order to give you the recommended tightening torque for a particular coupling, I need to know exactly which coupling (product name or part number) you are referring to. The tightening torque varies depending on the coupling type, size and material. Always check the product's technical documentation or contact the supplier for the correct value. Please specify the coupling name or part number for an accurate answer.
+  Column 2: In order to give you the recommended tightening torque for a particular coupling, I need to know exactly which coupling (product number) you are referring to. The tightening torque varies depending on the coupling type, size and material. Always check the product's technical documentation or contact the supplier for the correct value. Please specify the coupling name or part number for an accurate answer.
 
 Question 26:
   Column 1: Which sleeve should I use to crimp a multi-head hose?
