@@ -30,7 +30,7 @@ from Layer_2_Agentic.config.session_config import (
     get_workflow_config,
 )
 from Layer_2_Agentic.logic.state_graph import get_graph
-from Layer_2_Agentic.db.templates import populate_template_libraries
+from Layer_2_Agentic.logic.templates import populate_template_libraries
 
 
 def main():

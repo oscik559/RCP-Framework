@@ -43,23 +43,17 @@ Integration with Testing Frameworks:
 
 # Individual strategy control - set True to enable, False to disable
 STRATEGY_TEST_CONFIG = {
-    # ── OLD GENERIC STRATEGIES (DISABLED) ──
-    "SIMPLE LOOKUP": False,  # Fast path for direct queries
-    "ENHANCED LOOKUP": False,  # Multi-step comprehensive analysis
-    "VISUAL LAYOUT": False,  # Image processing (experimental)
-    "PARALLEL ENHANCED LOOKUP": False,  # Concurrent processing optimization
+    # ── CORE PRODUCTION STRATEGIES (5 total) ──────────────────────────────
+    "DIRECT SPECIFICATION LOOKUP": True,         # Fast product ID → specs (working)
+    "CONTEXTUAL PRODUCT SEARCH": True,           # Semantic + LLM (needs semantic search)
+    "TECHNICAL CALCULATION": False,              # Hydraulic math (ready to implement)
+    "STANDARD & COMPLIANCE LOOKUP": False,       # Standards/certifications (ready to implement)
+    "KNOWLEDGE BASE & RAG": False,               # Procedural knowledge (ready in Phase 3)
     
-    # ── NEW HYDROSCAND-SPECIFIC STRATEGIES ──
-    "PRODUCT COMPARISON": False,  # Compare multiple products side-by-side
-    "TECHNICAL CALCULATION": False,  # Perform technical calculations (flow rate, pressure, etc.)
-    "STANDARD COMPLIANCE": False,  # Check standards and certifications compliance
-    "SMART RECOMMENDATION": False,  # Provide product recommendations based on requirements
-    "HIERARCHICAL NAVIGATION": False,  # Navigate product hierarchy and categories
-    "SPECIFICATION ANALYSIS": False,  # Analyze and extract detailed specifications (complex multi-step)
-    "DIRECT SPECIFICATION LOOKUP": True,  # Fast path for small datasets (direct mode)
-    "ASSEMBLED SPECIFICATION LOOKUP": False,  # ← TESTING THIS - Scalable path for large datasets (assembly mode with temp.db)
-    "PRODUCT LOCATION": False,  # Locate products in catalogue (page numbers, chapters)
+    # ── OPTIMIZATION PATTERNS (Future) ────────────────────────────────────
+    "PARALLEL ENHANCED LOOKUP": False,           # Performance optimization (Phase 2+)
 }
+
 
 # Testing execution modes
 TESTING_MODE = "SINGLE_STRATEGY"  # Options: "ALL_ENABLED", "SINGLE_STRATEGY", "DISABLED_STRATEGIES"
@@ -95,12 +89,12 @@ def print_testing_status():
     summary for development and testing visibility.
     """
     enabled = get_enabled_strategies()
-    print("🧪 Strategy Testing Configuration")
+    print("[TEST] Strategy Testing Configuration")
     print("=" * 40)
     print(f"Mode: {TESTING_MODE}")
     print(f"Enabled Strategies ({len(enabled)}):")
     for strategy in enabled:
-        print(f"  ✅ {strategy}")
+        print(f"  [OK] {strategy}")
 
     if TESTING_MODE == "SINGLE_STRATEGY":
         disabled = [
@@ -109,5 +103,5 @@ def print_testing_status():
         if disabled:
             print(f"Disabled Strategies ({len(disabled)}):")
             for strategy in disabled:
-                print(f"  ❌ {strategy}")
+                print(f"  [SKIP] {strategy}")
     print("=" * 40)

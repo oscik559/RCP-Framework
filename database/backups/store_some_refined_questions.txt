@@ -1,0 +1,12 @@
+
+Q8: "What hoses can be used for boiling water?" ✅
+Q14: "Which products are approved for food use?" ✅
+Q22: "Do you have hoses that can withstand both high pressure and vibrations?" ✅
+Q24 (refined): "What hoses are suitable for transporting industrial chemicals (aggressive oils, solvents)?"
+Q34 (refined): "I need a water hose in 3/4" diameter for general purpose use"
+Q47 (refined): "What hose recommendations do you have for chemical/solvent applications?"
+Q48 (refined): "Which hoses are suitable for alkaline degreasing solutions and cleaning applications?"
+Q82: "Which hoses are FDA approved for food use?" ✅
+Q10 (refined): "Which hydraulic hose and sleeve are recommended for a 25-ton excavator operating at 280 bar?"
+Q12 (refined): "What couplings are compatible with a hose having a 19mm outer diameter?"
+Q30 (refined): "Which hoses are compatible with the SAE 42 flange series?"

@@ -32,16 +32,16 @@ class DatabaseManager:
         try:
             # Check if database needs initialization
             if not self._is_database_initialized():
-                print(f"🔧 Initializing database: {self.db_path}")
+                print(f"[SETUP] Initializing database: {self.db_path}")
                 self._load_schema()
-                print("✅ Database initialized successfully")
+                print("[OK] Database initialized successfully")
             else:
-                print(f"✅ Database already initialized: {self.db_path}")
+                print(f"[OK] Database already initialized: {self.db_path}")
             
             return True
             
         except Exception as e:
-            print(f"❌ Database initialization failed: {e}")
+            print(f"[FAIL] Database initialization failed: {e}")
             return False
     
     def _is_database_initialized(self):
@@ -138,11 +138,11 @@ class DatabaseManager:
                 
                 table_info.append((table_name, exists, count))
             
-            print(f"\n📊 Database Status: {self.db_path}")
+            print(f"\n[DATA] Database Status: {self.db_path}")
             print("=" * 50)
             
             for table_name, exists, count in table_info:
-                status = "✅ EXISTS" if exists else "❌ MISSING"
+                status = "[OK] EXISTS" if exists else "[MISSING]"
                 
                 if exists:
                     print(f"{table_name:15} {status:10} ({count:,} rows)")
@@ -153,7 +153,7 @@ class DatabaseManager:
             return True
             
         except Exception as e:
-            print(f"❌ Database verification failed: {e}")
+            print(f"[FAIL] Database verification failed: {e}")
             return False
 
 

@@ -365,9 +365,93 @@ function_execution:
       Question: {question}
       Extract field names:
 
-  # ══════════════════════════════════════════════════════════════════════
-  # ─── LLM-Powered Analysis Prompts (Generic Functions) ─────────────────
-  # ══════════════════════════════════════════════════════════════════════
+  # Extract structured requirements from natural language queries
+  extract_requirements:
+    system: |
+      You are a technical requirements extractor for industrial hose and coupling products.
+      Extract structured requirements from user queries in JSON format.
+
+      CORE SPECIFICATIONS (basic product parameters):
+      - application: Primary use (hydraulic/pneumatic/water/cooling/thermal/chemical/suction/return/food/steam/air/waste)
+      - temperature_min: Minimum operating temperature (°C)
+      - temperature_max: Maximum operating temperature (°C)
+      - pressure_min: Minimum working pressure (bar)
+      - pressure_max: Maximum working pressure (bar)
+      - diameter_min: Minimum inner diameter (mm or inches)
+      - diameter_max: Maximum inner diameter (mm or inches)
+
+      MATERIAL & CONSTRUCTION:
+      - material: Inner/outer tube materials (rubber/synthetic/PTFE/EPDM/NBR/XLPE/UPE/NR/silicone/polypropylene/stainless steel)
+      - inner_tube_type: Specific inner tube material
+      - outer_tube_type: Specific outer tube material (smooth/textured/braided/spiral)
+      - reinforcement: Type (steel wire braided/spiral wound/4-spiral/6-spiral/thermoplastic)
+      - hose_standard: EN 853 1SN/2SN/2SC/EN 856 4SP/4SH/etc.
+
+      CONNECTIVITY & THREADING:
+      - thread_type: Connection threads (G/JIC/ORFS/NPTF/BSP/SAE J518/ISO 7241)
+      - connection_style: Press coupling/quick-disconnect/flange/camlock/cutting ring
+      - seal_type: O-ring/ED seal/PTFE/FKM seal material
+      - flange_code: SAE code (Code 61/62) or ISO standard
+
+      PERFORMANCE CHARACTERISTICS:
+      - pressure_impulse_rating: High impulse/high cycle applications
+      - vibration_resistance: Vibration/dynamic load tolerance
+      - abrasion_resistance: Textile cover abrasion rating
+      - flexibility: Flexibility requirements or bend radius constraints
+      - flow_rate: Target flow rate (L/min)
+      - velocity_range: Preferred velocity range (m/s)
+      - pressure_drop_limit: Maximum acceptable pressure drop (bar/meter or mbar)
+
+      FLUID COMPATIBILITY:
+      - fluid_type: Hydraulic oil/water/steam/chemicals/environmental oil/glycol-water mixture/food products
+      - chemical_resistance: Specific chemicals (acids/alkalis/degreasing agents)
+      - environmental_oil_compatible: Boolean - suitable for biodegradable oil
+      - oil_temperature_derating: Oil-specific temperature deration requirements
+
+      ENVIRONMENTAL & REGULATORY:
+      - temperature_resistance_quality: High temperature/low temperature/extreme range capability
+      - corrosive_environment: Corrosion resistance needed (acid-resistant AISI 316/stainless steel)
+      - marine_rating: DNV/MED certification for marine use
+      - atex_certified: Explosive atmosphere certification required
+      - food_approved: FDA/REACH food industry approval
+      - ozone_resistant: Ozone resistance requirements
+
+      ASSEMBLY & INSTALLATION:
+      - installation_type: Crimped/press-on/threaded/flanged
+      - stripping_required: Requires hose stripping before assembly
+      - tightening_torque_specified: Installation torque requirements
+      - sleeve_coupling_series: Specific sleeve series (4700/4200/5800)
+      - color_requirement: Specific color preference (blue/black/white)
+
+      PRODUCT SERIES & VARIANTS:
+      - series_compatibility: Specific series (42 series/47 series/quick coupling family)
+      - product_family: Specific family name (Kappaflex/Egeflex/IsoBar/Deltaflex)
+      - smooth_outer_casing: Smooth vs ribbed outer tube
+      - compact_design: Compact/space-saving requirement
+
+      SPECIAL REQUIREMENTS:
+      - size_reference: Standard reference size (1/2"/1"/3/4" etc.) for quick lookups
+      - replacement_product: Seeking alternative to discontinued product code
+      - multi_criteria_match: Combined requirements across multiple categories
+      - budget_constraint: Price sensitivity or cost optimization
+      - availability_priority: Quick availability vs performance trade-off
+
+      INSTRUCTIONS:
+      - Leave fields as null if not explicitly mentioned in the query
+      - For temperature/pressure/diameter: null if not specified, single value if range unclear
+      - For lists (certifications, special_features): Return as array when multiple items detected
+      - Return only valid JSON, no markdown formatting
+      - Include confidence score (0.0-1.0) for how well the query maps to a specific requirement set
+      - Add a summary field with the primary customer intent in 1 sentence
+
+    user_template: |
+      Extract all relevant requirements from this query:
+      "{query}"
+
+      Return ONLY valid JSON with all detected fields from the comprehensive requirements taxonomy.
+      Include confidence score and intent summary.
+
+  # LLM-Powered Analysis Prompts (Generic Functions)
   
   # Main intelligent analysis function
   analyze_with_llm:

@@ -1767,69 +1767,186 @@ def func_analyze_data(params: dict) -> tuple[bool, dict | str]:
     )
 
 
-def func_semantic_search(params: dict) -> tuple[bool, dict | str]:
+
+
+def func_extract_requirements(params: dict) -> tuple[bool, dict | str]:
     """
-    Semantic search using vector embeddings and natural language understanding.
+    Parse user queries to extract structured requirements for product search.
     
-    Enhanced semantic search that finds relevant products/data based on meaning,
-    not just keyword matching. Handles use cases, environments, industries, compatibility.
+    Analyzes natural language questions to identify:
+    - Application context (cooling, hydraulic, pneumatic, etc.)
+    - Environmental conditions (temperature range, pressure, humidity)
+    - Physical specifications (diameter, length, material)
+    - Compatibility requirements (thread types, standards)
+    - Performance metrics (flow rate, viscosity range)
+    
+    This function works in conjunction with func_semantic_search to constrain
+    and refine results by applying explicit requirements filtering.
     
     Parameters:
-        Input (str): Natural language query
-        search_scope (str, optional): Scope limitation ("products", "applications", "both")
-        similarity_threshold (float, optional): Minimum similarity score (default: 0.7)
-        max_results (int, optional): Maximum number of results (default: 20)
+        Input (str): Natural language user query
     
     Returns:
-        tuple[bool, dict]: Success status and results with semantic matches
+        tuple[bool, dict]: Success status and extracted requirements with:
+            - requirements (dict): Structured requirements with types
+            - original_query (str): Original question
+            - confidence (float): Extraction confidence (0-1)
     """
     query = params.get("Input", "").strip()
-    search_scope = params.get("search_scope", "both")
-    similarity_threshold = float(params.get("similarity_threshold", 0.7))
-    max_results = int(params.get("max_results", 20))
     
     if not query:
         return (False, "Input query parameter missing")
     
-    debug.print_function(f"[func_semantic_search] Query: {query}")
+    debug.print_function(f"[func_extract_requirements] Analyzing query: {query}")
     
     try:
-        # For now, implement a simple keyword-based search as fallback
-        # This can be enhanced with actual vector embeddings later
-        with get_output_connection() as conn:
-            cursor = conn.cursor()
-            
-            # Search across product families for semantic matches
-            cursor.execute("""
-                SELECT family_code, family_name, specifications
-                FROM product_families 
-                WHERE family_name LIKE ? OR specifications LIKE ?
-                LIMIT ?
-            """, (f"%{query}%", f"%{query}%", max_results))
-            
-            results = cursor.fetchall()
-            
-            semantic_results = []
-            for family_code, family_name, specs in results:
-                semantic_results.append({
-                    "product_family": family_name or family_code,
-                    "product_code": family_code,
-                    "similarity_score": 0.8,  # Placeholder score
-                    "match_reason": f"matches query terms in {family_name or 'specifications'}"
-                })
-            
-            debug.print_function(f"[func_semantic_search] Found {len(semantic_results)} matches")
-            
+        # Use LLM to extract structured requirements from natural language query
+        prompt_loader = get_prompt_loader()
+        prompts = prompt_loader.get_prompt("function_execution", "extract_requirements")
+        
+        system_msg = prompts["system"]
+        user_template = prompts["user_template"]
+        
+        chain = _build_llm_processing_chain(system_msg, user_template, "basic")
+        response = chain.invoke({"query": query}).strip()
+        
+        debug.print_function(f"[func_extract_requirements] LLM response: {response[:200]}...")
+        
+        # Parse JSON response - no fallback allowed
+        try:
+            # Try to extract JSON from the response (in case it has extra text)
+            import re
+            json_match = re.search(r'\{.*\}', response, re.DOTALL)
+            if json_match:
+                requirements = json.loads(json_match.group())
+            else:
+                requirements = json.loads(response)
+        except json.JSONDecodeError as e:
+            # Fail if JSON parsing fails - no fallback
+            logger.error(f"[func_extract_requirements] JSON parse error: {e}")
+            logger.error(f"[func_extract_requirements] LLM response was: {response}")
+            return (False, f"Failed to parse requirements from LLM response: {str(e)}")
+        
+        # Clean up requirements (remove None values for cleaner output)
+        cleaned_requirements = {k: v for k, v in requirements.items() if v is not None}
+        
+        # Calculate confidence based on number of extracted requirements
+        num_requirements = len(cleaned_requirements)
+        confidence = min(num_requirements / 5, 1.0)  # Confidence increases with more requirements
+        
+        debug.print_function(
+            f"[func_extract_requirements] Extracted {num_requirements} requirements, confidence: {confidence:.2f}"
+        )
+        debug.print_function(f"[func_extract_requirements] Requirements: {cleaned_requirements}")
+        
+        return (True, {
+            "requirements": cleaned_requirements,
+            "original_query": query,
+            "confidence": round(confidence, 2),
+            "extraction_method": "llm",
+            "items": [cleaned_requirements]  # For downstream compatibility
+        })
+        
+    except Exception as e:
+        logger.error(f"[func_extract_requirements] Error: {e}")
+        debug.print_function(f"[func_extract_requirements] Error details: {str(e)}")
+        
+        # Return basic structure on error
+        return (True, {
+            "requirements": {},
+            "original_query": query,
+            "confidence": 0.0,
+            "extraction_method": "error",
+            "items": []
+        })
+
+
+def func_semantic_search(params: dict) -> tuple[bool, dict | str]:
+    """
+    Semantic search using vector embeddings and natural language understanding.
+    
+    Uses Chroma vector database with qwen3-embedding:8b to find semantically similar
+    product families based on meaning, not just keyword matching. Handles use cases,
+    environments, industries, compatibility through semantic similarity.
+    
+    Parameters:
+        Input (str): Natural language query
+        search_scope (str, optional): Scope limitation ("products", "applications", "both")
+        similarity_threshold (float, optional): Minimum similarity score (default: 0.3)
+        max_results (int, optional): Maximum number of results (default: 5)
+    
+    Returns:
+        tuple[bool, dict]: Success status and results with semantic matches with similarity scores
+    """
+    query = params.get("Input", "").strip()
+    search_scope = params.get("search_scope", "both")
+    similarity_threshold = float(params.get("similarity_threshold", 0.3))
+    max_results = int(params.get("max_results", 5))
+    
+    if not query:
+        return (False, "Input query parameter missing")
+    
+    debug.print_function(f"[func_semantic_search] Query: {query}, Threshold: {similarity_threshold}, Max: {max_results}")
+    
+    try:
+        from .embeddings import EmbeddingManager
+        
+        # Initialize embedding manager for vector search
+        embedding_mgr = EmbeddingManager()
+        
+        # Perform semantic search using Chroma
+        results = embedding_mgr.semantic_search(
+            query_text=query,
+            top_k=max_results,
+            similarity_threshold=similarity_threshold
+        )
+        
+        if not results:
+            debug.print_function(f"[func_semantic_search] No semantic matches found above threshold {similarity_threshold}")
             return (True, {
-                "Semantic Results": semantic_results,
+                "Semantic Results": [],
                 "Search Query": query,
-                "Total Matches": len(semantic_results),
-                "items": semantic_results  # For compatibility with Extract Attributes
+                "Total Matches": 0,
+                "items": []
+            })
+        
+        # Format results for downstream functions
+        semantic_results = []
+        for result in results:
+            # Extract family metadata from Chroma document
+            metadata = result.get("metadata", {})
+            family_code = metadata.get("family_code", "")
+            family_name = metadata.get("family_name", "")
+            description = metadata.get("description", "")
+            
+            # Use similarity score (already computed in semantic_search)
+            similarity_score = result.get("similarity", 0.0)
+            
+            semantic_results.append({
+                "product_family": family_name or family_code,
+                "product_code": family_code,
+                "description": description,
+                "similarity_score": round(similarity_score, 4),
+                "match_reason": f"Semantic match for: {query}"
             })
             
+            debug.print_function(
+                f"[func_semantic_search] Match: {family_name} (code: {family_code}, similarity: {similarity_score:.4f})"
+            )
+        
+        debug.print_function(f"[func_semantic_search] Found {len(semantic_results)} semantic matches")
+        
+        return (True, {
+            "Semantic Results": semantic_results,
+            "Search Query": query,
+            "Total Matches": len(semantic_results),
+            "items": semantic_results  # For compatibility with Extract Attributes
+        })
+            
     except Exception as e:
-        logger.error(f"[func_semantic_search] Database error: {e}")
-        return (False, f"Semantic search error: {e}")
+        logger.error(f"[func_semantic_search] Vector search error: {e}")
+        debug.print_function(f"[func_semantic_search] Error details: {str(e)}")
+        return (False, f"Semantic search error: {str(e)}")
 
 
 def func_analyze_image(params: dict) -> tuple[bool, dict | str]:
@@ -4395,49 +4512,35 @@ def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
         return (False, f"Metadata error: {str(e)}")
 
 
+
 # ── Function Registry ────────────────────────────────────────────────
 
 # Maps function template names to Python implementations for dynamic dispatch
 # Used by execute_function_by_name() - must match FunctionTemplateLibrary entries
 
 FUNCTION_MAP = {
-    # Original SAAB-focused functions
-    "Table Search": func_table_search,
-    "Display Images": func_display_images,
-    "Table Search On Document": func_table_search_on_document,
-    "Filter Table": func_filter_table,
-    "Filter Table By Field": func_filter_table_by_field,
-    "Analyze Data": func_analyze_data,
-    "Extract Product Number": func_extract_product_number,
-    "Suggest Keywords": func_suggest_keywords,
-    "Normalize Product Number": func_normalize_product_number,
-    "Assemble Table": func_assemble_table,
-    "Find Latest Document": func_find_latest_document,
-    "Generate Visual Layout": func_generate_visual_layout,
+    # ── ACTIVE FUNCTIONS ONLY (9 total) ─────────────────────────────────────
+    # These are the only functions used by the 6 active strategies
     
-    # New generic Hydroscand functions (17 total)
-    # Category 1: Search & Discovery (4)
+    # Category 1: Query & Search (3)
+    "Query Database": func_query_database,
     "Search Products": func_search_products,
-    "Query Database": func_query_database,  # SQL Agent for flexible database queries
-    "Get Related Items": func_get_related_items,
-
     "Semantic Search": func_semantic_search,
-    # Category 2: Data Processing (3)
-    "Filter Items": func_filter_items,
-    "Transform Data": func_transform_data,
-    # Category 3: Comparison & Analysis (4)
-    "Compare Items": func_compare_items,
+    
+    # Category 2: Extract Operations (2)
+    "Extract Product Number": func_extract_product_number,
     "Extract Attributes": func_extract_attributes,
-    "Assemble Product Data": func_assemble_product_data,  # Universal assembler for temp.db
-    "Analyze With LLM": func_analyze_with_llm,
-    # Category 4: Calculations & Conversions (3)
+    
+    # Category 3: Data Processing (2)
+    "Filter Items": func_filter_items,
+    "Aggregate Results": func_filter_items,  # Use filter_items for now; implement aggregate_results later
+    
+    # Category 4: Calculations & Conversions (2)
     "Calculate": func_calculate,
     "Convert Units": func_convert_units,
-    "Lookup Standard": func_lookup_standard,
-    # Category 5: Navigation & Discovery (3)
-    "Navigate Hierarchy": func_navigate_hierarchy,
-    "Discover Items": func_discover_items,
-    "Get Metadata": func_get_metadata,
+    
+    # Category 5: Analysis (1)
+    "Analyze With LLM": func_analyze_with_llm,
 }
 
 

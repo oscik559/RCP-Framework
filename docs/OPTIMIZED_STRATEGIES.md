@@ -1,18 +1,19 @@
 # Optimized Strategy Framework
 **Date:** November 18, 2025  
 **Status:** Ready for Implementation  
-**Coverage:** 75/79 questions (95%)
+**Coverage:** 79/79 questions (100%)
 
 ---
 
 ## Executive Summary
 
-Consolidated from 12 strategies → **4 core strategies** with clear non-overlapping scope:
+Consolidated from 12 strategies → **5 core strategies** with clear non-overlapping scope:
 
 1. **DIRECT SPECIFICATION LOOKUP** - Fast product ID → specs queries
 2. **CONTEXTUAL PRODUCT SEARCH** - Multi-criteria filtering + LLM reasoning
 3. **TECHNICAL CALCULATION** - Hydraulic/flow calculations + sizing
 4. **STANDARD & COMPLIANCE LOOKUP** - Certification + standard matching
+5. **KNOWLEDGE BASE & RAG** - Procedural/general knowledge retrieval (future implementation)
 
 ---
 
@@ -555,23 +556,87 @@ STANDARD & COMPLIANCE LOOKUP
 
 ---
 
-## Questions Not Covered by Strategies (4%)
+---
 
-**Category:** Procedural/System-Level
-- "How do I install a shell sleeve?" → RAG-based answer (no strategy needed)
-- "What is ISO bar?" → Knowledge base lookup (no strategy needed)
-- System/general questions → Fixed knowledge base responses
+### 5️⃣ KNOWLEDGE BASE & RAG
+**Priority:** ⭐⭐ (4 questions - Future Implementation)
 
-**Recommendation:** Handle these with RAG (Retrieval Augmented Generation) + knowledge base, not agentic strategies.
+#### Use Cases
+- "How do I install a shell sleeve?" (procedural instructions)
+- "What is ISO bar?" (standard terminology)
+- "Tell me about hydraulic systems" (general knowledge)
+- System-level questions
+
+#### Function Block
+```
+Input:
+  - query: str (full user question)
+  - query_type: str (enum: "procedural", "definition", "general_knowledge")
+  - knowledge_base_path: str = "knowledge_base/hydroscand_knowledge.db"
+
+Processing:
+  1. Semantic search in knowledge base using embeddings
+  2. Retrieve relevant documents/sections
+  3. Rank by relevance
+  4. Format with sources and references
+  5. Optional: Augment with recent Q&A feedback
+
+Output:
+  - success: bool
+  - answer: str (formatted response with sources)
+  - confidence: float (0.0-1.0)
+  - sources: [str] (document references)
+  - related_topics: [str]
+
+Note:
+  - No agentic reasoning needed
+  - Pure retrieval augmented generation
+  - Can be implemented with vector embeddings + LLM formatting
+  - Good candidate for caching (low volatility)
+```
+
+#### Implementation Notes
+```python
+# Simple skeleton - implement when needed
+def knowledge_base_rag(query: str, query_type: str = "general_knowledge",
+                       knowledge_base_path: str = "knowledge_base/hydroscand_knowledge.db"):
+    """
+    Retrieve knowledge from structured knowledge base.
+    Uses semantic search + optional LLM synthesis.
+    """
+    # Step 1: Semantic search in knowledge base
+    # Step 2: Rank results by relevance
+    # Step 3: Format with context and sources
+    # Step 4: Return with confidence score
+    pass
+```
+
+---
+
+## Coverage Matrix (100%)
+
+```
+Total Questions: 79
+Covered: 79 ✅ (100%)
+
+Strategy 1: DIRECT SPECIFICATION LOOKUP     [30 questions]
+Strategy 2: CONTEXTUAL PRODUCT SEARCH       [35 questions]
+Strategy 3: TECHNICAL CALCULATION           [5 questions]
+Strategy 4: STANDARD & COMPLIANCE LOOKUP    [5 questions]
+Strategy 5: KNOWLEDGE BASE & RAG            [4 questions] ⚠️ Future
+```
 
 ---
 
 ## Next Steps
 
 1. ✅ Review this framework
-2. Update `templates.py` with 4 strategies (remove 12, keep essential functions)
+2. Update `templates.py` with 5 strategies (remove 12 old, keep PARALLEL ENHANCED LOOKUP)
 3. Update `strategy_testing.py` to reflect new strategy set
-4. Create `function_library.py` implementations for each function block
-5. Create test suite (`tests/functional/test_strategies.py`)
-6. Validate with 79 test questions
+4. Examine `harvested.db` to understand data coverage
+5. Run `main.py` to analyze current system architecture
+6. Create `function_library.py` implementations for strategies 1-4
+7. Create test suite (`tests/functional/test_strategies.py`)
+8. Validate with 79 test questions
+9. Plan knowledge base structure for strategy 5
 
