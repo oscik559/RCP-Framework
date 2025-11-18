@@ -5,11 +5,11 @@ Integration tests for workflow execution.
 import unittest
 from unittest.mock import patch, MagicMock
 
-from agentic_reasoning.config.session_config import (
+from Layer_2_Agentic.config.session_config import (
     get_default_session_state,
     get_workflow_config,
 )
-from agentic_reasoning.logic.workflow_nodes import (
+from Layer_2_Agentic.logic.workflow_nodes import (
     node_goal_define,
     node_strategy_plan,
     node_function_execute,
@@ -51,7 +51,7 @@ class TestWorkflowNodes(unittest.TestCase):
         state = self.test_state.copy()
         state["currentStrategyID"] = 1
 
-        with patch("project_saab.logic.workflow_nodes.get_agentic_connection"):
+        with patch("Layer_2_Agentic.logic.workflow_nodes.get_agentic_connection"):
             result_state = node_function_execute(state)
 
             # Should handle gracefully when no functions are ready
@@ -65,7 +65,7 @@ class TestWorkflowNodes(unittest.TestCase):
         state["currentStrategyID"] = 1
 
         with patch(
-            "project_saab.logic.workflow_nodes.get_agentic_connection"
+            "Layer_2_Agentic.logic.workflow_nodes.get_agentic_connection"
         ) as mock_conn:
             mock_cursor = MagicMock()
             mock_conn.return_value.__enter__.return_value.cursor.return_value = (

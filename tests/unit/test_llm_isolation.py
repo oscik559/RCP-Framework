@@ -2,7 +2,7 @@
 """Test LLM context persistence issue."""
 
 import logging
-from agentic_reasoning.logic.function_library import func_extract_product_number
+from Layer_2_Agentic.logic.function_library import func_extract_product_number
 
 logging.basicConfig(level=logging.DEBUG)
 

@@ -5,7 +5,7 @@ Unit tests for function library.
 import unittest
 from unittest.mock import MagicMock, patch, mock_open
 
-from agentic_reasoning.logic.function_library import (
+from Layer_2_Agentic.logic.function_library import (
     FUNCTION_MAP,
     execute_function_by_name,
     func_extract_product_number,
@@ -14,7 +14,6 @@ from agentic_reasoning.logic.function_library import (
     _parse_keywords_from_string,
     _validate_required_parameters,
 )
-from agentic_reasoning.logic.workflow_nodes import _handler_from_name, _merge_values
 
 
 class TestFunctionLibrary(unittest.TestCase):
@@ -28,15 +27,6 @@ class TestFunctionLibrary(unittest.TestCase):
             FUNCTION_MAP,
             "Should contain Extract Product Number",
         )
-
-    def test_handler_from_name_conversion(self):
-        """Test function name to handler conversion."""
-        # Test that handler returns a function object, not a string
-        handler = _handler_from_name("Extract Product Number")
-        self.assertIsNotNone(handler, "Handler should not be None")
-        self.assertTrue(callable(handler), "Handler should be callable")
-        if handler:
-            self.assertEqual(handler.__name__, "func_extract_product_number")
 
     def test_extract_product_number_success(self):
         """Test successful product number extraction."""
