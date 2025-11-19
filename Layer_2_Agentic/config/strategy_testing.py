@@ -45,7 +45,7 @@ Integration with Testing Frameworks:
 STRATEGY_TEST_CONFIG = {
     # ── CORE PRODUCTION STRATEGIES (5 total) ──────────────────────────────
     "DIRECT SPECIFICATION LOOKUP": True,         # Fast product ID → specs (working)
-    "CONTEXTUAL PRODUCT SEARCH": True,           # Semantic + LLM (needs semantic search)
+    "CONTEXTUAL PRODUCT SEARCH": False,           # Semantic + LLM (needs semantic search)
     "TECHNICAL CALCULATION": False,              # Hydraulic math (ready to implement)
     "STANDARD & COMPLIANCE LOOKUP": False,       # Standards/certifications (ready to implement)
     "KNOWLEDGE BASE & RAG": False,               # Procedural knowledge (ready in Phase 3)

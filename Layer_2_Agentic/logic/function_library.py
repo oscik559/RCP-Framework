@@ -4114,6 +4114,97 @@ def func_analyze_with_llm(params: dict) -> tuple[bool, dict | str]:
                     # instead of raw JSON that requires LLM instructions
                     item_text = _format_extracted_data_for_llm(item)
                     
+                    # ENHANCEMENT: Add glossary context if structured product data
+                    if isinstance(item, dict) and 'product_code' in item:
+                        try:
+                            # Extract all keys/values from product data
+                            extracted_attrs = {}
+                            for key, value in item.items():
+                                if isinstance(value, dict):
+                                    if key in ['specifications', 'family_construction_details', 'family_applications']:
+                                        for nested_key, nested_value in value.items():
+                                            extracted_attrs[nested_key] = {
+                                                'value': nested_value,
+                                                'parent_key': key
+                                            }
+                                else:
+                                    extracted_attrs[key] = {
+                                        'value': value,
+                                        'parent_key': None
+                                    }
+                            
+                            # Query glossary for descriptions
+                            conn = sqlite3.connect(DB_PATH_OUTPUT)
+                            conn.row_factory = sqlite3.Row
+                            cursor = conn.cursor()
+                            
+                            placeholders = ','.join('?' * len(extracted_attrs))
+                            cursor.execute(f"""
+                                SELECT attribute, description, unit, attribute_type
+                                FROM attribute_glossary
+                                WHERE attribute IN ({placeholders})
+                            """, list(extracted_attrs.keys()))
+                            
+                            glossary_info = {}
+                            for row in cursor.fetchall():
+                                glossary_info[row['attribute']] = {
+                                    'description': row['description'],
+                                    'unit': row['unit'],
+                                    'type': row['attribute_type']
+                                }
+                            conn.close()
+                            
+                            # Build annotated context with glossary meanings
+                            context_lines = []
+                            context_lines.append("=" * 80)
+                            context_lines.append("PRODUCT DATA WITH ATTRIBUTE MEANINGS")
+                            context_lines.append("=" * 80)
+                            context_lines.append("")
+                            
+                            # Group by parent key
+                            top_level = {}
+                            nested_by_parent = {}
+                            
+                            for attr_name, attr_info in extracted_attrs.items():
+                                parent = attr_info.get('parent_key')
+                                if parent is None:
+                                    top_level[attr_name] = attr_info['value']
+                                else:
+                                    if parent not in nested_by_parent:
+                                        nested_by_parent[parent] = {}
+                                    nested_by_parent[parent][attr_name] = attr_info['value']
+                            
+                            # Add top-level attributes with meanings
+                            if top_level:
+                                context_lines.append("TOP-LEVEL DATA:")
+                                for attr_name, value in top_level.items():
+                                    gloss = glossary_info.get(attr_name, {})
+                                    description = gloss.get('description', 'N/A')
+                                    unit = gloss.get('unit', '')
+                                    unit_str = f" ({unit})" if unit else ""
+                                    context_lines.append(f"  • {attr_name} = {value}{unit_str}")
+                                    context_lines.append(f"    Meaning: {description}")
+                            
+                            # Add nested attributes with meanings
+                            for parent_key, nested_attrs in nested_by_parent.items():
+                                context_lines.append(f"\n{parent_key.upper().replace('_', ' ')}:")
+                                for attr_name, value in nested_attrs.items():
+                                    gloss = glossary_info.get(attr_name, {})
+                                    description = gloss.get('description', 'N/A')
+                                    unit = gloss.get('unit', '')
+                                    unit_str = f" ({unit})" if unit else ""
+                                    context_lines.append(f"  • {attr_name} = {value}{unit_str}")
+                                    context_lines.append(f"    Meaning: {description}")
+                            
+                            context_lines.append("")
+                            context_lines.append("=" * 80)
+                            
+                            item_text = "\n".join(context_lines)
+                            debug.print_function(f"[func_analyze_with_llm] Added glossary context for {item.get('product_code', 'unknown')}")
+                        except Exception as e:
+                            debug.print_warning(f"Could not add glossary context: {e}")
+                            # Continue with regular item_text
+                    
                     # Check if adding this item would exceed limit
                     test_context = "\n".join(context_parts) + "\n" + item_text
                     if len(test_context) > max_context_chars:
@@ -4556,3 +4647,457 @@ def execute_function_by_name(fname: str, param_dict: dict) -> tuple[bool, dict |
         return (ok, out)
     except Exception as e:
         return (False, f"runtime error: {e}")
+
+
+# ════════════════════════════════════════════════════════════════════════════════
+# STRATEGY ORCHESTRATORS - Chain core functions into high-level workflows
+# ════════════════════════════════════════════════════════════════════════════════
+# These functions implement the 5 core strategies defined in templates.py.
+# Each strategy chains multiple functions to handle a specific query pattern.
+
+
+def strategy_direct_specification_lookup(params: dict) -> tuple[bool, dict | str]:
+    """
+    Strategy: DIRECT SPECIFICATION LOOKUP
+    
+    Direct database lookup for specific product specifications.
+    Fast deterministic path for product ID → specs queries.
+    
+    Function Chain:
+    1. Extract Product Number → Get product code
+    2. Query Database → Get specs from DB
+    3. Extract Attributes → Parse specs
+    4. Analyze With LLM → Explain results
+    
+    Input: {"query": "What are the specs for product 1110-00-06?"}
+    Output: {"Product": "1110-00-06", "Specifications": {...}, "Analysis": "..."}
+    """
+    try:
+        query = params.get("query", "")
+        if not query:
+            return (False, "Missing query parameter")
+        
+        debug.print_function(f"[STRATEGY] DIRECT_LOOKUP: Extracting product number from '{query}'")
+        
+        # Step 1: Extract product number
+        ok1, result1 = func_extract_product_number({"Input": query})
+        if not ok1:
+            debug.print_function(f"[STRATEGY] Failed to extract product number: {result1}")
+            return (False, f"Failed to extract product code: {result1}")
+        
+        product_code = result1 if isinstance(result1, str) else result1.get("Keyword Output", "")
+        if not product_code:
+            return (False, "Could not extract product code from query")
+        
+        debug.print_function(f"[STRATEGY] Extracted product: {product_code}")
+        
+        # Step 2: Query database for specifications
+        ok2, result2 = func_query_database({
+            "query_type": "select",
+            "table": "Products",
+            "Keyword Output": product_code,
+            "limit": "1"
+        })
+        if not ok2:
+            debug.print_function(f"[STRATEGY] Database query failed: {result2}")
+            return (False, f"Database query failed: {result2}")
+        
+        items = result2.get("items", []) if isinstance(result2, dict) else []
+        if not items:
+            return (False, f"Product {product_code} not found in database")
+        
+        debug.print_function(f"[STRATEGY] Found product in database")
+        
+        # Step 3: Extract attributes from results
+        ok3, result3 = func_extract_attributes({"items": json.dumps(items)})
+        if not ok3:
+            debug.print_function(f"[STRATEGY] Attribute extraction failed: {result3}")
+            return (False, f"Attribute extraction failed: {result3}")
+        
+        extracted = result3.get("extracted_data", items) if isinstance(result3, dict) else items
+        
+        debug.print_function(f"[STRATEGY] Extracted {len(extracted) if isinstance(extracted, list) else 1} items")
+        
+        # Step 4: Analyze with LLM for explanation
+        ok4, result4 = func_analyze_with_llm({
+            "question": query,
+            "extracted_data": json.dumps(extracted),
+            "task": "explain_specifications"
+        })
+        
+        analysis = result4.get("Analysis", "") if isinstance(result4, dict) else str(result4)
+        
+        return (True, {
+            "Strategy": "DIRECT SPECIFICATION LOOKUP",
+            "Product": product_code,
+            "Specifications": extracted,
+            "Analysis": analysis,
+            "Success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"[STRATEGY] DIRECT_LOOKUP error: {e}")
+        return (False, f"Strategy error: {str(e)}")
+
+
+def strategy_contextual_product_search(params: dict) -> tuple[bool, dict | str]:
+    """
+    Strategy: CONTEXTUAL PRODUCT SEARCH
+    
+    Multi-criteria product search with semantic understanding.
+    Handles application-based queries (e.g., 'hose for hot water + high pressure').
+    
+    Function Chain:
+    1. Extract Requirements → Parse query into structured requirements
+    2. Semantic Search → Find similar product families
+    3. Filter Items → Apply attribute-based filters
+    4. Extract Attributes → Parse specifications
+    5. Analyze With LLM → Rank and explain results
+    
+    Input: {"query": "What hoses for boiling water at 300 bar?"}
+    Output: {"Products": [...], "Analysis": "...", "Recommendations": [...]}
+    """
+    try:
+        query = params.get("query", "")
+        if not query:
+            return (False, "Missing query parameter")
+        
+        debug.print_function(f"[STRATEGY] CONTEXTUAL_SEARCH: Processing '{query}'")
+        
+        # Step 1: Extract requirements
+        ok1, result1 = func_extract_requirements({"Input": query})
+        if not ok1:
+            debug.print_function(f"[STRATEGY] Requirement extraction failed: {result1}")
+            return (False, f"Failed to extract requirements: {result1}")
+        
+        requirements = result1 if isinstance(result1, dict) else json.loads(result1)
+        debug.print_function(f"[STRATEGY] Extracted requirements: {json.dumps(requirements, ensure_ascii=False)}")
+        
+        # Step 2: Semantic search
+        ok2, result2 = func_semantic_search({
+            "Input": query,
+            "max_results": params.get("max_results", 10)
+        })
+        if not ok2:
+            debug.print_function(f"[STRATEGY] Semantic search failed: {result2}")
+            return (False, f"Semantic search failed: {result2}")
+        
+        search_results = result2.get("results", []) if isinstance(result2, dict) else []
+        if not search_results:
+            return (False, "No matching products found in semantic search")
+        
+        debug.print_function(f"[STRATEGY] Found {len(search_results)} products via semantic search")
+        
+        # Step 3: Filter items by requirements
+        ok3, result3 = func_filter_items({
+            "items": json.dumps(search_results),
+            "conditions": json.dumps([
+                {"field": "temperature", "operator": ">=", "value": requirements.get("temperature_max", 0)},
+                {"field": "pressure", "operator": ">=", "value": requirements.get("pressure_max", 0)},
+            ]) if requirements else "[]"
+        })
+        if not ok3:
+            debug.print_function(f"[STRATEGY] Filtering failed: {result3}")
+            # Continue with unfiltered results
+            filtered = search_results
+        else:
+            filtered = result3.get("filtered_items", search_results) if isinstance(result3, dict) else search_results
+        
+        debug.print_function(f"[STRATEGY] Filtered to {len(filtered) if isinstance(filtered, list) else 1} items")
+        
+        # Step 4: Extract attributes
+        ok4, result4 = func_extract_attributes({"items": json.dumps(filtered)})
+        if not ok4:
+            debug.print_function(f"[STRATEGY] Attribute extraction failed: {result4}")
+            extracted = filtered
+        else:
+            extracted = result4.get("extracted_data", filtered) if isinstance(result4, dict) else filtered
+        
+        # Step 5: Analyze with LLM
+        ok5, result5 = func_analyze_with_llm({
+            "question": query,
+            "extracted_data": json.dumps(extracted),
+            "Assembled Data": json.dumps({"requirements": requirements, "products": extracted}),
+            "task": "rank_and_recommend"
+        })
+        
+        analysis = result5.get("Analysis", "") if isinstance(result5, dict) else str(result5)
+        
+        return (True, {
+            "Strategy": "CONTEXTUAL PRODUCT SEARCH",
+            "Requirements": requirements,
+            "Products": extracted,
+            "Count": len(extracted) if isinstance(extracted, list) else 1,
+            "Analysis": analysis,
+            "Success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"[STRATEGY] CONTEXTUAL_SEARCH error: {e}")
+        return (False, f"Strategy error: {str(e)}")
+
+
+def strategy_technical_calculation(params: dict) -> tuple[bool, dict | str]:
+    """
+    Strategy: TECHNICAL CALCULATION
+    
+    Hydraulic engineering calculations (flow rate, pressure drop, hose sizing).
+    Pure mathematical computations with product recommendations.
+    
+    Function Chain:
+    1. Extract Calculation Inputs → Parse calculation parameters
+    2. Calculate → Perform calculations
+    3. Convert Units → Handle unit conversions
+    4. Search Products → Find matching products
+    5. Analyze With LLM → Explain results
+    
+    Input: {"query": "What hose for 150 L/min at 5 m/s pressure line?"}
+    Output: {"Calculation": {...}, "RecommendedProducts": [...], "Analysis": "..."}
+    """
+    try:
+        query = params.get("query", "")
+        if not query:
+            return (False, "Missing query parameter")
+        
+        debug.print_function(f"[STRATEGY] TECHNICAL_CALC: Processing '{query}'")
+        
+        # Step 1: Extract calculation inputs (using requirements as proxy)
+        ok1, result1 = func_extract_requirements({"Input": query})
+        if not ok1:
+            return (False, f"Failed to extract calculation parameters: {result1}")
+        
+        inputs = result1 if isinstance(result1, dict) else json.loads(result1)
+        debug.print_function(f"[STRATEGY] Extracted inputs: {json.dumps(inputs, ensure_ascii=False)}")
+        
+        # Step 2: Perform calculation
+        calc_type = "hose_sizing" if "flow" in query.lower() else "pressure_drop"
+        ok2, result2 = func_calculate({
+            "calculation_type": calc_type,
+            "inputs": json.dumps(inputs)
+        })
+        if not ok2:
+            debug.print_function(f"[STRATEGY] Calculation failed: {result2}")
+            return (False, f"Calculation failed: {result2}")
+        
+        calc_result = result2 if isinstance(result2, dict) else {"result": result2}
+        debug.print_function(f"[STRATEGY] Calculation complete: {calc_result}")
+        
+        # Step 3: Convert units if needed
+        ok3, result3 = func_convert_units({
+            "value": calc_result.get("result", 0),
+            "from_unit": calc_result.get("units", "mm"),
+            "to_unit": params.get("output_unit", "inches"),
+            "context": calc_type
+        })
+        conversion = result3 if isinstance(result3, dict) else {"converted_value": result3}
+        
+        # Step 4: Search for matching products
+        search_query = f"{calc_type} {conversion.get('converted_value', '')} {conversion.get('to_unit', '')}"
+        ok4, result4 = func_search_products({
+            "keywords": search_query,
+            "limit": params.get("product_limit", 5)
+        })
+        if not ok4:
+            products = []
+        else:
+            products = result4.get("items", []) if isinstance(result4, dict) else []
+        
+        debug.print_function(f"[STRATEGY] Found {len(products)} matching products")
+        
+        # Step 5: Analyze with LLM
+        ok5, result5 = func_analyze_with_llm({
+            "question": query,
+            "extracted_data": json.dumps({"calculation": calc_result, "conversion": conversion}),
+            "Assembled Data": json.dumps({"products": products}),
+            "task": "explain_calculation"
+        })
+        
+        analysis = result5.get("Analysis", "") if isinstance(result5, dict) else str(result5)
+        
+        return (True, {
+            "Strategy": "TECHNICAL CALCULATION",
+            "CalculationType": calc_type,
+            "Calculation": calc_result,
+            "ConvertedResult": conversion,
+            "RecommendedProducts": products,
+            "ProductCount": len(products),
+            "Analysis": analysis,
+            "Success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"[STRATEGY] TECHNICAL_CALCULATION error: {e}")
+        return (False, f"Strategy error: {str(e)}")
+
+
+def strategy_compliance_lookup(params: dict) -> tuple[bool, dict | str]:
+    """
+    Strategy: STANDARD & COMPLIANCE LOOKUP
+    
+    Search products by standards (EN, ISO, SAE) and certifications (FDA, DNV, MED).
+    Database-driven compliance checking.
+    
+    Function Chain:
+    1. Extract Standard Code → Parse standards from query
+    2. Query Database → Search by standards
+    3. Extract Attributes → Parse specifications
+    4. Analyze With LLM → Explain compliance
+    
+    Input: {"query": "Products certified to EN 857 2SC standard"}
+    Output: {"Standard": "EN 857 2SC", "CertifiedProducts": [...], "Analysis": "..."}
+    """
+    try:
+        query = params.get("query", "")
+        if not query:
+            return (False, "Missing query parameter")
+        
+        debug.print_function(f"[STRATEGY] COMPLIANCE_LOOKUP: Processing '{query}'")
+        
+        # Step 1: Extract standard code (use product extraction as proxy)
+        ok1, result1 = func_extract_product_number({"Input": query})
+        standard_code = result1 if isinstance(result1, str) else result1.get("Keyword Output", "")
+        
+        # Try to find standards in query text
+        standards = []
+        for std in ["EN 857", "EN 853", "EN 856", "ISO", "SAE", "FDA", "DNV", "MED"]:
+            if std in query.upper():
+                standards.append(std)
+        
+        if not standards and not standard_code:
+            return (False, "Could not extract standard code from query")
+        
+        debug.print_function(f"[STRATEGY] Extracted standards: {standards}")
+        
+        # Step 2: Query database for compliance
+        search_terms = " OR ".join(standards) if standards else standard_code
+        ok2, result2 = func_search_products({
+            "keywords": search_terms,
+            "limit": params.get("limit", 50)
+        })
+        
+        if not ok2:
+            return (False, f"Compliance search failed: {result2}")
+        
+        products = result2.get("items", []) if isinstance(result2, dict) else []
+        if not products:
+            return (False, f"No products found for standards: {', '.join(standards)}")
+        
+        debug.print_function(f"[STRATEGY] Found {len(products)} compliant products")
+        
+        # Step 3: Extract attributes
+        ok3, result3 = func_extract_attributes({"items": json.dumps(products)})
+        if not ok3:
+            extracted = products
+        else:
+            extracted = result3.get("extracted_data", products) if isinstance(result3, dict) else products
+        
+        # Step 4: Analyze with LLM
+        ok4, result4 = func_analyze_with_llm({
+            "question": query,
+            "extracted_data": json.dumps(extracted),
+            "task": "explain_compliance"
+        })
+        
+        analysis = result4.get("Analysis", "") if isinstance(result4, dict) else str(result4)
+        
+        return (True, {
+            "Strategy": "STANDARD & COMPLIANCE LOOKUP",
+            "Standards": standards,
+            "ProductCount": len(extracted),
+            "CertifiedProducts": extracted,
+            "Analysis": analysis,
+            "Success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"[STRATEGY] COMPLIANCE_LOOKUP error: {e}")
+        return (False, f"Strategy error: {str(e)}")
+
+
+def strategy_knowledge_base_rag(params: dict) -> tuple[bool, dict | str]:
+    """
+    Strategy: KNOWLEDGE BASE & RAG
+    
+    Retrieval Augmented Generation for procedural and general knowledge.
+    Handles assembly instructions, standards definitions, FAQ.
+    
+    Function Chain:
+    1. Semantic Search Knowledge Base → Retrieve relevant documents
+    2. Extract Attributes → Parse document content
+    3. Analyze With LLM → Generate response from knowledge
+    
+    Input: {"query": "How do I assemble cutting ring couplings?"}
+    Output: {"Topic": "Assembly", "Instructions": [...], "Analysis": "..."}
+    """
+    try:
+        query = params.get("query", "")
+        if not query:
+            return (False, "Missing query parameter")
+        
+        debug.print_function(f"[STRATEGY] KNOWLEDGE_BASE_RAG: Processing '{query}'")
+        
+        # Step 1: Semantic search in knowledge base
+        ok1, result1 = func_semantic_search({
+            "Input": query,
+            "top_k": params.get("top_k", 5),
+        })
+        
+        if not ok1:
+            return (False, f"Knowledge base search failed: {result1}")
+        
+        docs = result1.get("results", []) if isinstance(result1, dict) else []
+        if not docs:
+            return (False, "No relevant knowledge base entries found")
+        
+        debug.print_function(f"[STRATEGY] Found {len(docs)} knowledge base entries")
+        
+        # Step 2: Extract attributes from documents
+        ok2, result2 = func_extract_attributes({"items": json.dumps(docs)})
+        if not ok2:
+            extracted_docs = docs
+        else:
+            extracted_docs = result2.get("extracted_data", docs) if isinstance(result2, dict) else docs
+        
+        # Step 3: Analyze with LLM to generate response
+        ok3, result3 = func_analyze_with_llm({
+            "question": query,
+            "extracted_data": json.dumps(extracted_docs),
+            "task": "answer_from_knowledge"
+        })
+        
+        analysis = result3.get("Analysis", "") if isinstance(result3, dict) else str(result3)
+        
+        return (True, {
+            "Strategy": "KNOWLEDGE BASE & RAG",
+            "SourceDocuments": len(extracted_docs),
+            "KnowledgeBase": extracted_docs,
+            "Response": analysis,
+            "Success": True
+        })
+        
+    except Exception as e:
+        logger.error(f"[STRATEGY] KNOWLEDGE_BASE_RAG error: {e}")
+        return (False, f"Strategy error: {str(e)}")
+
+
+# ── Strategy Registry ────────────────────────────────────────────────────────
+STRATEGY_MAP = {
+    "DIRECT SPECIFICATION LOOKUP": strategy_direct_specification_lookup,
+    "CONTEXTUAL PRODUCT SEARCH": strategy_contextual_product_search,
+    "TECHNICAL CALCULATION": strategy_technical_calculation,
+    "STANDARD & COMPLIANCE LOOKUP": strategy_compliance_lookup,
+    "KNOWLEDGE BASE & RAG": strategy_knowledge_base_rag,
+}
+
+
+def execute_strategy_by_name(sname: str, param_dict: dict) -> tuple[bool, dict | str]:
+    """Execute strategy orchestrator by name with error handling."""
+    fn = STRATEGY_MAP.get(sname)
+    if not fn:
+        return (False, f"Unknown strategy '{sname}'")
+    try:
+        ok, out = fn(param_dict)
+        return (ok, out)
+    except Exception as e:
+        logger.error(f"[STRATEGY] Execution error for '{sname}': {e}")
+        return (False, f"Strategy execution error: {str(e)}")
