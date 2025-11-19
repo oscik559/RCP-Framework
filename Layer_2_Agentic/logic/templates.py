@@ -91,36 +91,46 @@ templates = [
     (
         "Query Database",
         "search",
-        "SQL Agent for executing custom database queries with joins, filters, aggregations, and complex conditions. Used by DIRECT SPECIFICATION LOOKUP and STANDARD & COMPLIANCE LOOKUP.",
+        "SQL Agent for executing custom database queries with joins, filters, aggregations, and complex conditions.",
     ),
     (
         "Search Products",
         "search",
-        "Multi-criteria product search with flexible filtering by category, keywords, specifications, and certifications. Used by TECHNICAL CALCULATION and PARALLEL ENHANCED LOOKUP.",
+        "Multi-criteria product search with flexible filtering by category, keywords, specifications, and certifications.",
+    ),
+    (
+        "Search Families",
+        "search",
+        "Search product families by family code, name, or description. Returns family-level details for family-focused queries.",
+    ),
+    (
+        "Search Categories",
+        "search",
+        "Search product categories by name, chapter, or description. Returns category-level classification data.",
     ),
     (
         "Semantic Search",
         "search",
-        "Natural language search with synonym expansion using embeddings. Used by CONTEXTUAL PRODUCT SEARCH and KNOWLEDGE BASE & RAG.",
+        "Natural language search with synonym expansion using embeddings.",
     ),
     
     # Category 2: Extract Operations
     (
         "Extract Product Number",
         "extract",
-        "Extract product codes from user queries using LLM. First function in DIRECT SPECIFICATION LOOKUP and PARALLEL ENHANCED LOOKUP.",
+        "Extract product codes from user queries using LLM.",
     ),
     (
         "Extract Attributes",
         "extract",
-        "Deterministic attribute extraction from product data with schema-aware parsing (no LLM, pure data extraction). Used by DIRECT SPECIFICATION LOOKUP, STANDARD & COMPLIANCE LOOKUP, CONTEXTUAL PRODUCT SEARCH, PARALLEL ENHANCED LOOKUP.",
+        "Deterministic attribute extraction from product data with schema-aware parsing (no LLM, pure data extraction).",
     ),
     
     # Category 3: Data Processing
     (
         "Filter Items",
         "filter",
-        "Generic filtering engine with complex conditions for any list of items. Used by CONTEXTUAL PRODUCT SEARCH and PARALLEL ENHANCED LOOKUP.",
+        "Generic filtering engine with complex conditions for any list of items.",
     ),
     (
         "Aggregate Results",
@@ -132,12 +142,12 @@ templates = [
     (
         "Calculate",
         "calculate",
-        "Technical calculations for hydraulic systems including hose dimensions, flow rates, and pressure. Core function of TECHNICAL CALCULATION strategy.",
+        "Technical calculations for hydraulic systems including hose dimensions, flow rates, and pressure.",
     ),
     (
         "Convert Units",
         "convert",
-        "Unit conversion with LLM assistance for complex or context-dependent conversions. Used by TECHNICAL CALCULATION and PARALLEL ENHANCED LOOKUP.",
+        "Unit conversion with LLM assistance for complex or context-dependent conversions.",
     ),
     
     # Category 5: Analysis
@@ -166,9 +176,16 @@ params = {
         ("custom_sql", "", "string"),
     ],
     "Search Products": [
-        ("category", "", "string"),
         ("keywords", "Input", "string"),
-        ("filters", "{}", "json"),
+        ("category", "", "string"),
+        ("limit", "50", "integer"),
+    ],
+    "Search Families": [
+        ("keywords", "Input", "string"),
+        ("limit", "50", "integer"),
+    ],
+    "Search Categories": [
+        ("keywords", "Input", "string"),
         ("limit", "50", "integer"),
     ],
     "Semantic Search": [
@@ -229,9 +246,20 @@ outputs = {
     "Query Database": [
         ("items", "[]", "json"),
         ("count", "0", "integer"),
+        ("result_source", "unknown", "string"),
     ],
     "Search Products": [
         ("Products", "[]", "json"),
+        ("Count", "0", "integer"),
+        ("items", "[]", "json"),
+    ],
+    "Search Families": [
+        ("Families", "[]", "json"),
+        ("Count", "0", "integer"),
+        ("items", "[]", "json"),
+    ],
+    "Search Categories": [
+        ("Categories", "[]", "json"),
         ("Count", "0", "integer"),
         ("items", "[]", "json"),
     ],

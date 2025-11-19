@@ -59,7 +59,8 @@ def main():
         # QUERY SELECTION - Configure your query here
         # =================================================================
         # Example queries (domain-specific examples should be configured per application):
-        user_query = "What is the working pressure for 1047-08-08?"
+        # user_query = "Tell me all you know about this product: 1047-08-08?"
+        user_query = "What is the maximum temperature for hose 1071-00-16?"
         
         # For testing, you can uncomment and modify these:
         # user_query = "What is the Slang ID for the product 4221-24-08?"

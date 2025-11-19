@@ -2412,12 +2412,12 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
             query += " AND (pf.name LIKE ? OR pf.description LIKE ?)"
             query_params.extend([f"%{category}%", f"%{category}%"])
         
-        # Filter by keywords (in product code or family description)
+        # Filter by keywords (in product code, family code, family name, or family description)
         if keywords:
             keyword_list = keywords.split()
             for kw in keyword_list:
-                query += " AND (p.product_code LIKE ? OR pf.name LIKE ? OR pf.description LIKE ?)"
-                query_params.extend([f"%{kw}%", f"%{kw}%", f"%{kw}%"])
+                query += " AND (p.product_code LIKE ? OR pf.family_code LIKE ? OR pf.name LIKE ? OR pf.description LIKE ?)"
+                query_params.extend([f"%{kw}%", f"%{kw}%", f"%{kw}%", f"%{kw}%"])
         
         query += f" LIMIT ?"
         query_params.append(limit)
@@ -2482,71 +2482,33 @@ def func_search_products(params: dict) -> tuple[bool, dict | str]:
         return (False, f"Search error: {str(e)}")
 
 
-def func_query_database(params: dict) -> tuple[bool, dict | str]:
+def func_search_families(params: dict) -> tuple[bool, dict | str]:
     """
-    SQL Agent: Execute custom SQL queries on the harvested database.
+    Search product families by family code, name, or description.
     
-    A powerful, flexible building block for any database operation:
-    - Custom SELECT queries with joins, filters, aggregations
-    - Access to all tables: products, product_families, categories
-    - Support for complex WHERE clauses, GROUP BY, ORDER BY
-    - Parameterized queries for safety
-    
-    Use Cases:
-    - Find all products in a specific family
-    - Aggregate specifications across product ranges
-    - Join products with family metadata
-    - Filter by complex specification criteria
-    - Get unique values (distinct families, categories, etc.)
+    Searches the product_families table for families matching keywords.
+    Designed to handle family-level queries like "1054-17" or "KAPPAFLEX".
     
     Parameters:
-        query_type (str): Type of query ("select", "count", "distinct", "custom")
-        table (str): Primary table to query ("products", "product_families", "categories")
-        filters (dict): Filter conditions (field: value pairs)
-        fields (list): Fields to select (default: all with *)
-        joins (list): Tables to join with their conditions
-        order_by (str): Sort order (e.g., "product_code ASC")
-        limit (int): Maximum results to return
-        custom_sql (str): For query_type="custom", provide full SQL query
+        keywords (str): Keywords to search (family code, name, or description)
+        limit (int, optional): Maximum number of results (default: 50)
+        database_path (str, optional): Path to harvested.db
         
     Returns:
         tuple[bool, dict]: Success status and results dict with:
-            - results (list): Query results as list of dicts
-            - count (int): Number of results
-            - fields (list): Field names returned
+            - Families (list): List of matching families with full details
+            - Count (int): Number of families found
+            - items (list): Same as Families (for compatibility)
     """
     import sqlite3
     import json
-    import re
     
     db_path = params.get("database_path", CONFIG.get("harvested_db"))
-    query_type = params.get("query_type", "select").lower()
+    keywords_raw = params.get("keywords", "").strip()
+    limit = params.get("limit", 50)
     
-    # Use Keyword Output for exact product code filtering
-    # Check both direct parameter and common parameter names
-    keyword_output = (
-        params.get("Keyword Output", "") or 
-        params.get("keyword_output", "") or
-        params.get("KeywordOutput", "")
-    ).strip()
-    
-    debug.print_function(f"[func_query_database] All params: {list(params.keys())}")
-    debug.print_function(f"[func_query_database] Keyword Output value: {repr(keyword_output)}")
-
-    if not keyword_output:
-        return (False, "Keyword Output parameter required for product code filtering. Make sure Extract Product Number function output is passed to this function.")
-
-    # Build filters from Keyword Output
-    product_codes = [code.strip() for code in keyword_output.split(",") if code.strip()]
-    debug.print_function(f"[func_query_database] Using Keyword Output for exact match: {product_codes}")
-
-    # Handle single vs multiple product codes
-    if len(product_codes) == 1:
-        filters = {"product_code": product_codes[0]}
-    else:
-        # For multiple codes, use list for IN clause
-        filters = {"product_code": product_codes}
-    debug.print_function(f"[func_query_database] Filters set to: {filters}")
+    if not keywords_raw:
+        return (False, "No keywords provided for family search")
     
     try:
         if db_path is not None:
@@ -2556,146 +2518,291 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
-        # Mode 1: CUSTOM SQL - User provides full query
-        if query_type == "custom":
-            custom_sql = params.get("custom_sql", "").strip()
-            if not custom_sql:
-                return (False, "custom_sql parameter required for query_type='custom'")
-            
-            # Safety check: only allow SELECT queries
-            if not custom_sql.upper().startswith("SELECT"):
-                return (False, "Only SELECT queries are allowed for safety")
-            
-            cursor.execute(custom_sql)
-            rows = cursor.fetchall()
-            
-            items = [dict(row) for row in rows]
-            
-            conn.close()
-            
-            debug.print_function(f"Custom SQL executed: {len(items)} results")
-            
-            return (True, {
-                "items": items,
-                "count": len(items),
-                "query_type": "custom"
-            })
-        
-        # Mode 2: STRUCTURED QUERY - Build from parameters
-        table = params.get("table", "products")
-        fields_raw = params.get("fields", [])
-        
-        # Parse fields parameter
-        if isinstance(fields_raw, str):
-            try:
-                fields = json.loads(fields_raw) if fields_raw else []
-            except json.JSONDecodeError:
-                fields = [f.strip() for f in fields_raw.split(",") if f.strip()]
-        else:
-            fields = fields_raw
-        
-        # Build SELECT clause
-        if fields:
-            select_clause = ", ".join(fields)
-        else:
-            select_clause = "*"
-        
-        # Build base query
-        query = f"SELECT {select_clause} FROM {table}"
+        # Build search query for product_families
+        query = """
+            SELECT 
+                id,
+                family_code,
+                name,
+                subtitle,
+                description,
+                construction_details,
+                applications,
+                category_id,
+                page_number
+            FROM product_families
+            WHERE 1=1
+        """
         query_params = []
         
-        # Handle JOINs
-        joins_raw = params.get("joins", [])
-        if isinstance(joins_raw, str):
-            try:
-                joins = json.loads(joins_raw) if joins_raw else []
-            except json.JSONDecodeError:
-                joins = []
-        else:
-            joins = joins_raw
+        # Search in family_code, name, and description
+        keyword_list = keywords_raw.split()
+        for kw in keyword_list:
+            query += " AND (family_code LIKE ? OR name LIKE ? OR description LIKE ?)"
+            query_params.extend([f"%{kw}%", f"%{kw}%", f"%{kw}%"])
         
-        for join in joins:
-            if isinstance(join, dict):
-                join_table = join.get("table")
-                join_on = join.get("on")
-                join_type = join.get("type", "LEFT JOIN")
-                if join_table and join_on:
-                    query += f" {join_type} {join_table} ON {join_on}"
+        query += f" LIMIT ?"
+        query_params.append(limit)
         
-        # Build WHERE clause from filters
-        # Merge additional filters with Keyword Output filters (don't overwrite!)
-        additional_filters_raw = params.get("filters", {})
-        if isinstance(additional_filters_raw, str):
-            try:
-                additional_filters = json.loads(additional_filters_raw) if additional_filters_raw else {}
-            except json.JSONDecodeError:
-                additional_filters = {}
-        else:
-            additional_filters = additional_filters_raw
-        
-        # Merge: Keyword Output filters take precedence (already set above)
-        if additional_filters:
-            for key, value in additional_filters.items():
-                if key not in filters:  # Don't overwrite product_code from Keyword Output
-                    filters[key] = value
-        
-        if filters:
-            where_conditions = []
-            for field, value in filters.items():
-                if isinstance(value, dict):
-                    # Handle operators: {"operator": "LIKE", "value": "%KAPPAFLEX%"}
-                    operator = value.get("operator", "=")
-                    filter_value = value.get("value")
-                    where_conditions.append(f"{field} {operator} ?")
-                    query_params.append(filter_value)
-                elif isinstance(value, list):
-                    # Handle list of values (IN clause)
-                    if len(value) == 1:
-                        # Single value - use simple equality
-                        where_conditions.append(f"{field} = ?")
-                        query_params.append(value[0])
-                    else:
-                        # Multiple values - use IN clause
-                        placeholders = ", ".join(["?"] * len(value))
-                        where_conditions.append(f"{field} IN ({placeholders})")
-                        query_params.extend(value)
-                else:
-                    # Simple equality
-                    where_conditions.append(f"{field} = ?")
-                    query_params.append(value)
-            
-            if where_conditions:
-                query += " WHERE " + " AND ".join(where_conditions)
-        
-        # Handle ORDER BY
-        order_by = params.get("order_by", "")
-        if order_by:
-            query += f" ORDER BY {order_by}"
-        
-        # Handle LIMIT
-        limit = params.get("limit", 100)
-        if limit:
-            query += f" LIMIT ?"
-            query_params.append(limit)
-        
-        # Execute query
         cursor.execute(query, query_params)
         rows = cursor.fetchall()
         
-        items = [dict(row) for row in rows]
+        # Convert rows to dictionaries
+        families = []
+        for row in rows:
+            family_dict = {
+                "family_id": row["id"],
+                "family_code": row["family_code"],
+                "family_name": row["name"],
+                "subtitle": row["subtitle"],
+                "description": row["description"],
+                "construction_details": row["construction_details"],
+                "applications": row["applications"],
+                "category_id": row["category_id"],
+                "page_number": row["page_number"],
+            }
+            
+            # Parse JSON fields if present
+            if row["construction_details"]:
+                try:
+                    family_dict["construction_details"] = json.loads(row["construction_details"])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            
+            if row["applications"]:
+                try:
+                    family_dict["applications"] = json.loads(row["applications"])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            
+            families.append(family_dict)
         
         conn.close()
         
-        debug.print_function(f"Query executed on {table}: {len(items)} results")
+        debug.print_function(f"[func_search_families] Found {len(families)} families matching '{keywords_raw}'")
         
         return (True, {
-            "items": items,
-            "count": len(items),
-            "query_type": query_type
+            "Families": families,
+            "Count": len(families),
+            "items": families  # For compatibility
         })
         
     except Exception as e:
-        debug.print_error(f"Database query error: {e}")
+        debug.print_warning(f"[func_search_families] Error: {str(e)}")
+        return (False, f"Family search error: {str(e)}")
+
+
+def func_search_categories(params: dict) -> tuple[bool, dict | str]:
+    """
+    Search categories by name, chapter, or description.
+    
+    Searches the categories table for categories matching keywords.
+    Designed to handle category-level queries like finding all product categories.
+    
+    Parameters:
+        keywords (str): Keywords to search (category name, chapter, or description)
+        limit (int, optional): Maximum number of results (default: 50)
+        database_path (str, optional): Path to harvested.db
+        
+    Returns:
+        tuple[bool, dict]: Success status and results dict with:
+            - Categories (list): List of matching categories with full details
+            - Count (int): Number of categories found
+            - items (list): Same as Categories (for compatibility)
+    """
+    import sqlite3
+    import json
+    
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
+    keywords_raw = params.get("keywords", "").strip()
+    limit = params.get("limit", 50)
+    
+    if not keywords_raw:
+        return (False, "No keywords provided for category search")
+    
+    try:
+        if db_path is not None:
+            conn = sqlite3.connect(db_path)
+        else:
+            raise ValueError("db_path cannot be None")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Build search query for categories
+        query = """
+            SELECT 
+                id,
+                name,
+                chapter,
+                description
+            FROM categories
+            WHERE 1=1
+        """
+        query_params = []
+        
+        # Search in name, chapter, and description
+        keyword_list = keywords_raw.split()
+        for kw in keyword_list:
+            query += " AND (name LIKE ? OR chapter LIKE ? OR description LIKE ?)"
+            query_params.extend([f"%{kw}%", f"%{kw}%", f"%{kw}%"])
+        
+        query += f" LIMIT ?"
+        query_params.append(limit)
+        
+        cursor.execute(query, query_params)
+        rows = cursor.fetchall()
+        
+        # Convert rows to dictionaries
+        categories = []
+        for row in rows:
+            category_dict = {
+                "category_id": row["id"],
+                "category_name": row["name"],
+                "chapter": row["chapter"],
+                "description": row["description"],
+            }
+            categories.append(category_dict)
+        
+        conn.close()
+        
+        debug.print_function(f"[func_search_categories] Found {len(categories)} categories matching '{keywords_raw}'")
+        
+        return (True, {
+            "Categories": categories,
+            "Count": len(categories),
+            "items": categories  # For compatibility
+        })
+        
+    except Exception as e:
+        debug.print_warning(f"[func_search_categories] Error: {str(e)}")
+        return (False, f"Category search error: {str(e)}")
+
+
+def func_query_database(params: dict) -> tuple[bool, dict | str]:
+    """
+    Intelligent Database Query with Automatic Fallback.
+    
+    Query the harvested database with intelligent fallback routing:
+    1. If Keyword Output is provided → Try Search Products first
+    2. If no products found → Try Search Families
+    3. If no families found → Try Search Categories
+    4. Returns results with result_source field indicating what was searched
+    
+    This function enables flexible query composition: the LLM can use Search Products,
+    Search Families, or Search Categories directly, OR use Query Database for
+    automatic multi-level fallback when the query intent is ambiguous.
+    
+    Parameters:
+        Keyword Output (str): Product/family/category codes or names to search
+        keywords (str, optional): Additional search keywords
+        limit (int, optional): Maximum results to return (default: 50)
+        database_path (str, optional): Path to harvested.db
+        
+    Returns:
+        tuple[bool, dict]: Success status and results dict with:
+            - items (list): Results from the query (products, families, or categories)
+            - count (int): Number of items found
+            - result_source (str): "products", "families", "categories", or "unknown"
+            - search_order (list): Order of searches attempted
+    """
+    import sqlite3
+    import json
+    
+    db_path = params.get("database_path", CONFIG.get("harvested_db"))
+    
+    # Get search keywords
+    keyword_output = (
+        params.get("Keyword Output", "") or 
+        params.get("keyword_output", "") or
+        params.get("KeywordOutput", "")
+    ).strip()
+    
+    keywords = params.get("keywords", "").strip()
+    
+    # Use either Keyword Output or keywords as search term
+    search_term = keyword_output or keywords
+    
+    if not search_term:
+        return (False, "No search term provided (Keyword Output or keywords required)")
+    
+    limit = params.get("limit", 50)
+    search_order = []
+    result_source = "unknown"
+    items = []
+    
+    try:
+        # STEP 1: Try Search Products
+        search_order.append("products")
+        debug.print_function(f"[func_query_database] Attempting Products search for '{search_term}'")
+        
+        ok1, result1 = func_search_products({
+            "keywords": search_term,
+            "limit": limit,
+            "database_path": db_path
+        })
+        
+        if ok1 and isinstance(result1, dict):
+            items = result1.get("items", []) or result1.get("Products", [])
+            if items:
+                result_source = "products"
+                debug.print_function(f"[func_query_database] Found {len(items)} products")
+                return (True, {
+                    "items": items,
+                    "count": len(items),
+                    "result_source": result_source,
+                    "search_order": search_order
+                })
+        
+        # STEP 2: Try Search Families (fallback)
+        search_order.append("families")
+        debug.print_function(f"[func_query_database] No products found, attempting Families search")
+        
+        ok2, result2 = func_search_families({
+            "keywords": search_term,
+            "limit": limit,
+            "database_path": db_path
+        })
+        
+        if ok2 and isinstance(result2, dict):
+            items = result2.get("items", []) or result2.get("Families", [])
+            if items:
+                result_source = "families"
+                debug.print_function(f"[func_query_database] Found {len(items)} families")
+                return (True, {
+                    "items": items,
+                    "count": len(items),
+                    "result_source": result_source,
+                    "search_order": search_order
+                })
+        
+        # STEP 3: Try Search Categories (fallback)
+        search_order.append("categories")
+        debug.print_function(f"[func_query_database] No families found, attempting Categories search")
+        
+        ok3, result3 = func_search_categories({
+            "keywords": search_term,
+            "limit": limit,
+            "database_path": db_path
+        })
+        
+        if ok3 and isinstance(result3, dict):
+            items = result3.get("items", []) or result3.get("Categories", [])
+            if items:
+                result_source = "categories"
+                debug.print_function(f"[func_query_database] Found {len(items)} categories")
+                return (True, {
+                    "items": items,
+                    "count": len(items),
+                    "result_source": result_source,
+                    "search_order": search_order
+                })
+        
+        # No results from any search
+        debug.print_function(f"[func_query_database] No results from any search level")
+        return (False, f"No results found for '{search_term}' in products, families, or categories")
+        
+    except Exception as e:
+        debug.print_error(f"Query database error: {e}")
         return (False, f"Query error: {str(e)}")
 
 
@@ -4610,12 +4717,14 @@ def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
 # Used by execute_function_by_name() - must match FunctionTemplateLibrary entries
 
 FUNCTION_MAP = {
-    # ── ACTIVE FUNCTIONS ONLY (9 total) ─────────────────────────────────────
+    # ── ACTIVE FUNCTIONS ONLY (10 total) ────────────────────────────────────
     # These are the only functions used by the 6 active strategies
     
-    # Category 1: Query & Search (3)
+    # Category 1: Query & Search (5)
     "Query Database": func_query_database,
     "Search Products": func_search_products,
+    "Search Families": func_search_families,
+    "Search Categories": func_search_categories,
     "Semantic Search": func_semantic_search,
     
     # Category 2: Extract Operations (2)
@@ -4656,448 +4765,17 @@ def execute_function_by_name(fname: str, param_dict: dict) -> tuple[bool, dict |
 # Each strategy chains multiple functions to handle a specific query pattern.
 
 
-def strategy_direct_specification_lookup(params: dict) -> tuple[bool, dict | str]:
-    """
-    Strategy: DIRECT SPECIFICATION LOOKUP
-    
-    Direct database lookup for specific product specifications.
-    Fast deterministic path for product ID → specs queries.
-    
-    Function Chain:
-    1. Extract Product Number → Get product code
-    2. Query Database → Get specs from DB
-    3. Extract Attributes → Parse specs
-    4. Analyze With LLM → Explain results
-    
-    Input: {"query": "What are the specs for product 1110-00-06?"}
-    Output: {"Product": "1110-00-06", "Specifications": {...}, "Analysis": "..."}
-    """
-    try:
-        query = params.get("query", "")
-        if not query:
-            return (False, "Missing query parameter")
-        
-        debug.print_function(f"[STRATEGY] DIRECT_LOOKUP: Extracting product number from '{query}'")
-        
-        # Step 1: Extract product number
-        ok1, result1 = func_extract_product_number({"Input": query})
-        if not ok1:
-            debug.print_function(f"[STRATEGY] Failed to extract product number: {result1}")
-            return (False, f"Failed to extract product code: {result1}")
-        
-        product_code = result1 if isinstance(result1, str) else result1.get("Keyword Output", "")
-        if not product_code:
-            return (False, "Could not extract product code from query")
-        
-        debug.print_function(f"[STRATEGY] Extracted product: {product_code}")
-        
-        # Step 2: Query database for specifications
-        ok2, result2 = func_query_database({
-            "query_type": "select",
-            "table": "Products",
-            "Keyword Output": product_code,
-            "limit": "1"
-        })
-        if not ok2:
-            debug.print_function(f"[STRATEGY] Database query failed: {result2}")
-            return (False, f"Database query failed: {result2}")
-        
-        items = result2.get("items", []) if isinstance(result2, dict) else []
-        if not items:
-            return (False, f"Product {product_code} not found in database")
-        
-        debug.print_function(f"[STRATEGY] Found product in database")
-        
-        # Step 3: Extract attributes from results
-        ok3, result3 = func_extract_attributes({"items": json.dumps(items)})
-        if not ok3:
-            debug.print_function(f"[STRATEGY] Attribute extraction failed: {result3}")
-            return (False, f"Attribute extraction failed: {result3}")
-        
-        extracted = result3.get("extracted_data", items) if isinstance(result3, dict) else items
-        
-        debug.print_function(f"[STRATEGY] Extracted {len(extracted) if isinstance(extracted, list) else 1} items")
-        
-        # Step 4: Analyze with LLM for explanation
-        ok4, result4 = func_analyze_with_llm({
-            "question": query,
-            "extracted_data": json.dumps(extracted),
-            "task": "explain_specifications"
-        })
-        
-        analysis = result4.get("Analysis", "") if isinstance(result4, dict) else str(result4)
-        
-        return (True, {
-            "Strategy": "DIRECT SPECIFICATION LOOKUP",
-            "Product": product_code,
-            "Specifications": extracted,
-            "Analysis": analysis,
-            "Success": True
-        })
-        
-    except Exception as e:
-        logger.error(f"[STRATEGY] DIRECT_LOOKUP error: {e}")
-        return (False, f"Strategy error: {str(e)}")
 
 
-def strategy_contextual_product_search(params: dict) -> tuple[bool, dict | str]:
-    """
-    Strategy: CONTEXTUAL PRODUCT SEARCH
-    
-    Multi-criteria product search with semantic understanding.
-    Handles application-based queries (e.g., 'hose for hot water + high pressure').
-    
-    Function Chain:
-    1. Extract Requirements → Parse query into structured requirements
-    2. Semantic Search → Find similar product families
-    3. Filter Items → Apply attribute-based filters
-    4. Extract Attributes → Parse specifications
-    5. Analyze With LLM → Rank and explain results
-    
-    Input: {"query": "What hoses for boiling water at 300 bar?"}
-    Output: {"Products": [...], "Analysis": "...", "Recommendations": [...]}
-    """
-    try:
-        query = params.get("query", "")
-        if not query:
-            return (False, "Missing query parameter")
-        
-        debug.print_function(f"[STRATEGY] CONTEXTUAL_SEARCH: Processing '{query}'")
-        
-        # Step 1: Extract requirements
-        ok1, result1 = func_extract_requirements({"Input": query})
-        if not ok1:
-            debug.print_function(f"[STRATEGY] Requirement extraction failed: {result1}")
-            return (False, f"Failed to extract requirements: {result1}")
-        
-        requirements = result1 if isinstance(result1, dict) else json.loads(result1)
-        debug.print_function(f"[STRATEGY] Extracted requirements: {json.dumps(requirements, ensure_ascii=False)}")
-        
-        # Step 2: Semantic search
-        ok2, result2 = func_semantic_search({
-            "Input": query,
-            "max_results": params.get("max_results", 10)
-        })
-        if not ok2:
-            debug.print_function(f"[STRATEGY] Semantic search failed: {result2}")
-            return (False, f"Semantic search failed: {result2}")
-        
-        search_results = result2.get("results", []) if isinstance(result2, dict) else []
-        if not search_results:
-            return (False, "No matching products found in semantic search")
-        
-        debug.print_function(f"[STRATEGY] Found {len(search_results)} products via semantic search")
-        
-        # Step 3: Filter items by requirements
-        ok3, result3 = func_filter_items({
-            "items": json.dumps(search_results),
-            "conditions": json.dumps([
-                {"field": "temperature", "operator": ">=", "value": requirements.get("temperature_max", 0)},
-                {"field": "pressure", "operator": ">=", "value": requirements.get("pressure_max", 0)},
-            ]) if requirements else "[]"
-        })
-        if not ok3:
-            debug.print_function(f"[STRATEGY] Filtering failed: {result3}")
-            # Continue with unfiltered results
-            filtered = search_results
-        else:
-            filtered = result3.get("filtered_items", search_results) if isinstance(result3, dict) else search_results
-        
-        debug.print_function(f"[STRATEGY] Filtered to {len(filtered) if isinstance(filtered, list) else 1} items")
-        
-        # Step 4: Extract attributes
-        ok4, result4 = func_extract_attributes({"items": json.dumps(filtered)})
-        if not ok4:
-            debug.print_function(f"[STRATEGY] Attribute extraction failed: {result4}")
-            extracted = filtered
-        else:
-            extracted = result4.get("extracted_data", filtered) if isinstance(result4, dict) else filtered
-        
-        # Step 5: Analyze with LLM
-        ok5, result5 = func_analyze_with_llm({
-            "question": query,
-            "extracted_data": json.dumps(extracted),
-            "Assembled Data": json.dumps({"requirements": requirements, "products": extracted}),
-            "task": "rank_and_recommend"
-        })
-        
-        analysis = result5.get("Analysis", "") if isinstance(result5, dict) else str(result5)
-        
-        return (True, {
-            "Strategy": "CONTEXTUAL PRODUCT SEARCH",
-            "Requirements": requirements,
-            "Products": extracted,
-            "Count": len(extracted) if isinstance(extracted, list) else 1,
-            "Analysis": analysis,
-            "Success": True
-        })
-        
-    except Exception as e:
-        logger.error(f"[STRATEGY] CONTEXTUAL_SEARCH error: {e}")
-        return (False, f"Strategy error: {str(e)}")
 
 
-def strategy_technical_calculation(params: dict) -> tuple[bool, dict | str]:
-    """
-    Strategy: TECHNICAL CALCULATION
-    
-    Hydraulic engineering calculations (flow rate, pressure drop, hose sizing).
-    Pure mathematical computations with product recommendations.
-    
-    Function Chain:
-    1. Extract Calculation Inputs → Parse calculation parameters
-    2. Calculate → Perform calculations
-    3. Convert Units → Handle unit conversions
-    4. Search Products → Find matching products
-    5. Analyze With LLM → Explain results
-    
-    Input: {"query": "What hose for 150 L/min at 5 m/s pressure line?"}
-    Output: {"Calculation": {...}, "RecommendedProducts": [...], "Analysis": "..."}
-    """
-    try:
-        query = params.get("query", "")
-        if not query:
-            return (False, "Missing query parameter")
-        
-        debug.print_function(f"[STRATEGY] TECHNICAL_CALC: Processing '{query}'")
-        
-        # Step 1: Extract calculation inputs (using requirements as proxy)
-        ok1, result1 = func_extract_requirements({"Input": query})
-        if not ok1:
-            return (False, f"Failed to extract calculation parameters: {result1}")
-        
-        inputs = result1 if isinstance(result1, dict) else json.loads(result1)
-        debug.print_function(f"[STRATEGY] Extracted inputs: {json.dumps(inputs, ensure_ascii=False)}")
-        
-        # Step 2: Perform calculation
-        calc_type = "hose_sizing" if "flow" in query.lower() else "pressure_drop"
-        ok2, result2 = func_calculate({
-            "calculation_type": calc_type,
-            "inputs": json.dumps(inputs)
-        })
-        if not ok2:
-            debug.print_function(f"[STRATEGY] Calculation failed: {result2}")
-            return (False, f"Calculation failed: {result2}")
-        
-        calc_result = result2 if isinstance(result2, dict) else {"result": result2}
-        debug.print_function(f"[STRATEGY] Calculation complete: {calc_result}")
-        
-        # Step 3: Convert units if needed
-        ok3, result3 = func_convert_units({
-            "value": calc_result.get("result", 0),
-            "from_unit": calc_result.get("units", "mm"),
-            "to_unit": params.get("output_unit", "inches"),
-            "context": calc_type
-        })
-        conversion = result3 if isinstance(result3, dict) else {"converted_value": result3}
-        
-        # Step 4: Search for matching products
-        search_query = f"{calc_type} {conversion.get('converted_value', '')} {conversion.get('to_unit', '')}"
-        ok4, result4 = func_search_products({
-            "keywords": search_query,
-            "limit": params.get("product_limit", 5)
-        })
-        if not ok4:
-            products = []
-        else:
-            products = result4.get("items", []) if isinstance(result4, dict) else []
-        
-        debug.print_function(f"[STRATEGY] Found {len(products)} matching products")
-        
-        # Step 5: Analyze with LLM
-        ok5, result5 = func_analyze_with_llm({
-            "question": query,
-            "extracted_data": json.dumps({"calculation": calc_result, "conversion": conversion}),
-            "Assembled Data": json.dumps({"products": products}),
-            "task": "explain_calculation"
-        })
-        
-        analysis = result5.get("Analysis", "") if isinstance(result5, dict) else str(result5)
-        
-        return (True, {
-            "Strategy": "TECHNICAL CALCULATION",
-            "CalculationType": calc_type,
-            "Calculation": calc_result,
-            "ConvertedResult": conversion,
-            "RecommendedProducts": products,
-            "ProductCount": len(products),
-            "Analysis": analysis,
-            "Success": True
-        })
-        
-    except Exception as e:
-        logger.error(f"[STRATEGY] TECHNICAL_CALCULATION error: {e}")
-        return (False, f"Strategy error: {str(e)}")
 
 
-def strategy_compliance_lookup(params: dict) -> tuple[bool, dict | str]:
-    """
-    Strategy: STANDARD & COMPLIANCE LOOKUP
-    
-    Search products by standards (EN, ISO, SAE) and certifications (FDA, DNV, MED).
-    Database-driven compliance checking.
-    
-    Function Chain:
-    1. Extract Standard Code → Parse standards from query
-    2. Query Database → Search by standards
-    3. Extract Attributes → Parse specifications
-    4. Analyze With LLM → Explain compliance
-    
-    Input: {"query": "Products certified to EN 857 2SC standard"}
-    Output: {"Standard": "EN 857 2SC", "CertifiedProducts": [...], "Analysis": "..."}
-    """
-    try:
-        query = params.get("query", "")
-        if not query:
-            return (False, "Missing query parameter")
-        
-        debug.print_function(f"[STRATEGY] COMPLIANCE_LOOKUP: Processing '{query}'")
-        
-        # Step 1: Extract standard code (use product extraction as proxy)
-        ok1, result1 = func_extract_product_number({"Input": query})
-        standard_code = result1 if isinstance(result1, str) else result1.get("Keyword Output", "")
-        
-        # Try to find standards in query text
-        standards = []
-        for std in ["EN 857", "EN 853", "EN 856", "ISO", "SAE", "FDA", "DNV", "MED"]:
-            if std in query.upper():
-                standards.append(std)
-        
-        if not standards and not standard_code:
-            return (False, "Could not extract standard code from query")
-        
-        debug.print_function(f"[STRATEGY] Extracted standards: {standards}")
-        
-        # Step 2: Query database for compliance
-        search_terms = " OR ".join(standards) if standards else standard_code
-        ok2, result2 = func_search_products({
-            "keywords": search_terms,
-            "limit": params.get("limit", 50)
-        })
-        
-        if not ok2:
-            return (False, f"Compliance search failed: {result2}")
-        
-        products = result2.get("items", []) if isinstance(result2, dict) else []
-        if not products:
-            return (False, f"No products found for standards: {', '.join(standards)}")
-        
-        debug.print_function(f"[STRATEGY] Found {len(products)} compliant products")
-        
-        # Step 3: Extract attributes
-        ok3, result3 = func_extract_attributes({"items": json.dumps(products)})
-        if not ok3:
-            extracted = products
-        else:
-            extracted = result3.get("extracted_data", products) if isinstance(result3, dict) else products
-        
-        # Step 4: Analyze with LLM
-        ok4, result4 = func_analyze_with_llm({
-            "question": query,
-            "extracted_data": json.dumps(extracted),
-            "task": "explain_compliance"
-        })
-        
-        analysis = result4.get("Analysis", "") if isinstance(result4, dict) else str(result4)
-        
-        return (True, {
-            "Strategy": "STANDARD & COMPLIANCE LOOKUP",
-            "Standards": standards,
-            "ProductCount": len(extracted),
-            "CertifiedProducts": extracted,
-            "Analysis": analysis,
-            "Success": True
-        })
-        
-    except Exception as e:
-        logger.error(f"[STRATEGY] COMPLIANCE_LOOKUP error: {e}")
-        return (False, f"Strategy error: {str(e)}")
 
 
-def strategy_knowledge_base_rag(params: dict) -> tuple[bool, dict | str]:
-    """
-    Strategy: KNOWLEDGE BASE & RAG
-    
-    Retrieval Augmented Generation for procedural and general knowledge.
-    Handles assembly instructions, standards definitions, FAQ.
-    
-    Function Chain:
-    1. Semantic Search Knowledge Base → Retrieve relevant documents
-    2. Extract Attributes → Parse document content
-    3. Analyze With LLM → Generate response from knowledge
-    
-    Input: {"query": "How do I assemble cutting ring couplings?"}
-    Output: {"Topic": "Assembly", "Instructions": [...], "Analysis": "..."}
-    """
-    try:
-        query = params.get("query", "")
-        if not query:
-            return (False, "Missing query parameter")
-        
-        debug.print_function(f"[STRATEGY] KNOWLEDGE_BASE_RAG: Processing '{query}'")
-        
-        # Step 1: Semantic search in knowledge base
-        ok1, result1 = func_semantic_search({
-            "Input": query,
-            "top_k": params.get("top_k", 5),
-        })
-        
-        if not ok1:
-            return (False, f"Knowledge base search failed: {result1}")
-        
-        docs = result1.get("results", []) if isinstance(result1, dict) else []
-        if not docs:
-            return (False, "No relevant knowledge base entries found")
-        
-        debug.print_function(f"[STRATEGY] Found {len(docs)} knowledge base entries")
-        
-        # Step 2: Extract attributes from documents
-        ok2, result2 = func_extract_attributes({"items": json.dumps(docs)})
-        if not ok2:
-            extracted_docs = docs
-        else:
-            extracted_docs = result2.get("extracted_data", docs) if isinstance(result2, dict) else docs
-        
-        # Step 3: Analyze with LLM to generate response
-        ok3, result3 = func_analyze_with_llm({
-            "question": query,
-            "extracted_data": json.dumps(extracted_docs),
-            "task": "answer_from_knowledge"
-        })
-        
-        analysis = result3.get("Analysis", "") if isinstance(result3, dict) else str(result3)
-        
-        return (True, {
-            "Strategy": "KNOWLEDGE BASE & RAG",
-            "SourceDocuments": len(extracted_docs),
-            "KnowledgeBase": extracted_docs,
-            "Response": analysis,
-            "Success": True
-        })
-        
-    except Exception as e:
-        logger.error(f"[STRATEGY] KNOWLEDGE_BASE_RAG error: {e}")
-        return (False, f"Strategy error: {str(e)}")
 
 
-# ── Strategy Registry ────────────────────────────────────────────────────────
-STRATEGY_MAP = {
-    "DIRECT SPECIFICATION LOOKUP": strategy_direct_specification_lookup,
-    "CONTEXTUAL PRODUCT SEARCH": strategy_contextual_product_search,
-    "TECHNICAL CALCULATION": strategy_technical_calculation,
-    "STANDARD & COMPLIANCE LOOKUP": strategy_compliance_lookup,
-    "KNOWLEDGE BASE & RAG": strategy_knowledge_base_rag,
-}
 
 
-def execute_strategy_by_name(sname: str, param_dict: dict) -> tuple[bool, dict | str]:
-    """Execute strategy orchestrator by name with error handling."""
-    fn = STRATEGY_MAP.get(sname)
-    if not fn:
-        return (False, f"Unknown strategy '{sname}'")
-    try:
-        ok, out = fn(param_dict)
-        return (ok, out)
-    except Exception as e:
-        logger.error(f"[STRATEGY] Execution error for '{sname}': {e}")
-        return (False, f"Strategy execution error: {str(e)}")
+
+
