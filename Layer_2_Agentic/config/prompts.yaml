@@ -480,7 +480,7 @@ function_execution:
       2. Match the user's question to the relevant attributes
       3. Extract the exact value with units
       4. Provide a complete answer: "The [attribute meaning] for product [code] is [value]."
-      
+      %. Add a page number from whereinfo is found 
       EXAMPLES:
       ❌ BAD: "14.0 MPa"
       ✅ GOOD: "The working pressure for product 1047-08-08 is 14.0 MPa."

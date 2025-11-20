@@ -26,7 +26,7 @@ llms:
     temperature: 0.0
   
   reasoning:
-    model: llama3.2:latest # Switched from llama3.2 for stability
+    model: llama3.2:latest
     temperature: 0.0
   
   multimodal:
