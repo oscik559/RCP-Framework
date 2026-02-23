@@ -81,6 +81,52 @@ This database implements the RCP schema described in Section 3.1:
 
 This separation enables deterministic replay, audit queries, and lineage tracing from any response artifact back to source extraction.
 
+**Figure 5: Data Distillation Workflow.** This diagram illustrates the transformation of a raw visual component into structured relational records.
+
+```mermaid
+graph TD
+    %% Define Styles to match JPEG Bounding Boxes
+    classDef category fill:#f8cecc,stroke:#b85450,stroke-width:2px;
+    classDef family fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
+    classDef product fill:#d5e8d4,stroke:#82b366,stroke-width:2px;
+    classDef specs fill:#dae8fe,stroke:#6c8ebf,stroke-width:2px;
+    classDef layout fill:#e1d5e7,stroke:#9673a6,stroke-width:2px;
+
+    subgraph RawSource ["Stage 1: Raw Image Component"]
+        direction TB
+        HDR["PRESSKOPPLINGAR"]:::category
+        FAM_H["4274~2 / M-gängad"]:::family
+        IMG_P["Image: 90° Bend"]:::layout
+        TABLE_RAW["Table: Spec Grid"]:::product
+    end
+
+    subgraph VLM_Extraction ["Stage 2: VLM Distillation (JSON)"]
+        direction TB
+        JSON_CAT["'category': 'PRESSKOPPLINGAR'"]:::category
+        JSON_FAM["'family_code': '4274~2',<br/>'name': 'M-gängad'"]:::family
+        JSON_PROD["'products': [<br/>  {'code': '4274-06-03-2', ...}<br/>]"]:::product
+    end
+
+    subgraph DatabaseStorage ["Stage 3: Knowledge Base (SQL)"]
+        direction LR
+        db_cat["<b>Categories Table</b><br/>Name: PRESSKOPPLINGAR"]:::category
+        db_fam["<b>Families Table</b><br/>Code: 4274~2"]:::family
+        db_prod["<b>Products Table</b><br/>Code: 4274-06-03-2<br/>Specs: {JSON}"]:::product
+        
+        db_cat --> db_fam
+        db_fam --> db_prod
+    end
+
+    %% Mappings
+    RawSource -- "Vision-Language<br/>Reasoning" --> VLM_Extraction
+    VLM_Extraction -- "Relational<br/>Mapping" --> DatabaseStorage
+
+    %% Detailed Connections for Traceability
+    HDR -.-> JSON_CAT
+    FAM_H -.-> JSON_FAM
+    TABLE_RAW -.-> JSON_PROD
+```
+
 ---
 
 ## 4.4 Strategy and Agent Library Instantiation
@@ -91,10 +137,10 @@ The implementation includes domain-specific strategy templates:
 
 | Strategy | Description | Sufficiency Condition |
 |----------|-------------|----------------------|
-| `product_search` | Retrieve products matching keyword or attribute criteria | At least one matching product with valid specifications |
-| `spec_lookup` | Extract specific attributes from identified products | Target attribute present with unit normalization |
-| `compatibility_check` | Verify thread or coupling compatibility between components | Matching thread standards confirmed |
-| `family_summary` | Aggregate specifications across a product family | All family members retrieved with consistent schema |
+| `CONTEXTUAL PRODUCT SEARCH` | Multi-criteria product search with semantic understanding | At least one matching product with valid specifications |
+| `DIRECT SPECIFICATION LOOKUP` | Direct database lookup for specific product specifications | Target attribute present with unit normalization |
+| `STANDARD & COMPLIANCE LOOKUP` | Search products by industrial standards and certifications | Matching thread standards confirmed |
+| `TECHNICAL CALCULATION` | Hydraulic engineering calculations (flow rate, pressure drop) | Result calculated within defined tolerances |
 
 Each strategy specifies eligible agents, fallback policies (e.g., broaden search scope), and validation requirements.
 
@@ -124,6 +170,35 @@ Table extraction employs a VLM pipeline to address the limitations of text-based
 4. **Structured output**: Extracted data is formatted as JSON with row–column indices, enabling direct database insertion.
 
 This approach preserves spatial relationships that text extraction destroys, maintaining the semantic integrity of specification tables.
+
+The extraction pipeline is formalized in Algorithm 2.
+
+```latex
+\begin{algorithm}
+\caption{Hierarchical Table-to-Database Extraction}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Document $D$, Target DB $K$
+\State \textbf{Output:} Population of Knowledge Base $K$
+\State
+\For{each $Page \in D$}
+    \State $Img \gets \text{RenderPage}(Page, 300\,\text{DPI})$
+    \State $Regions \gets \text{VLM.\,DetectTables}(Img)$ \Comment{Visual bounding boxes}
+    
+    \If{$\text{IsSearchable}(Page)$}
+        \State $T \gets \text{TextExtract}(Page, Regions)$ \Comment{High-fidelity text path}
+    \Else
+        \State $T \gets \text{VLM.\,ExtractCells}(Img, Regions)$ \Comment{Vision-Language fallback}
+    \EndIf
+    
+    \State $Hierarchy \gets \text{VLM.\,ParseStructure}(T)$ \Comment{Map Category $\to$ Family $\to$ Variant}
+    \For{each $Product \in Hierarchy$}
+        \State $K.\text{InsertNormalized}(Product)$
+        \State $K.\text{FTS.\,Index}(Product.\text{Metadata})$
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+```
 
 ---
 
