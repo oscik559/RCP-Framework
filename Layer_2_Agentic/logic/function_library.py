@@ -1878,11 +1878,15 @@ def func_semantic_search(params: dict) -> tuple[bool, dict | str]:
     Returns:
         tuple[bool, dict]: Success status and results with semantic matches with similarity scores
     """
-    query = params.get("Input", "").strip()
+    query = (
+        params.get("Input", "").strip() or
+        params.get("original_query", "").strip() or
+        params.get("query", "").strip()
+    )
     search_scope = params.get("search_scope", "both")
     similarity_threshold = float(params.get("similarity_threshold", 0.3))
     max_results = int(params.get("max_results", 5))
-    
+
     if not query:
         return (False, "Input query parameter missing")
     
@@ -2724,12 +2728,26 @@ def func_query_database(params: dict) -> tuple[bool, dict | str]:
     
     if not search_term:
         return (False, "No search term provided (Keyword Output or keywords required)")
-    
+
     limit = params.get("limit", 50)
     search_order = []
     result_source = "unknown"
     items = []
-    
+
+    # Detect multiple product codes (e.g., "1103-03-16, 1105-10-16") and query each separately
+    import re as _re
+    multi_codes = _re.findall(r'\d{4}-\d{2,3}-\d{2,3}(?:-\d{2})?', search_term)
+    if len(multi_codes) >= 2:
+        debug.print_function(f"[func_query_database] Multi-product query: {multi_codes}")
+        all_items = []
+        for code in multi_codes:
+            ok_c, res_c = func_search_products({"keywords": code, "limit": 1, "database_path": db_path})
+            if ok_c and isinstance(res_c, dict):
+                found = res_c.get("items", []) or res_c.get("Products", [])
+                all_items.extend(found)
+        if all_items:
+            return (True, {"items": all_items, "count": len(all_items), "result_source": "products", "search_order": ["products"]})
+
     try:
         # STEP 1: Try Search Products
         search_order.append("products")
@@ -4742,6 +4760,9 @@ FUNCTION_MAP = {
     
     # Category 5: Analysis (1)
     "Analyze With LLM": func_analyze_with_llm,
+
+    # Category 6: Comparison (1)
+    "Compare Items": func_compare_items,
 }
 
 

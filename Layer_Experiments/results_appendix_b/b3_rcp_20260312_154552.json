@@ -1,0 +1,16 @@
+[
+  {
+    "question_id": 58,
+    "question": "Compare the weight per meter of articles 1103-03-16 and 1105-10-16. Which is heavier?",
+    "ground_truth": "0.82 vs 0.79 kg/m",
+    "answer": "The weight per meter for article 1103-03-16 is 0.82 kg/m, and for article 1105-10-16 is 0.79 kg/m. Article 1103-03-16 is heavier. \n\nSource: Product data for 1103-03-16 and 1105-10-16, page 5 and 6 respectively.",
+    "latency_s": 12.64,
+    "baseline": "B3_RCP",
+    "goal_satisfied": true,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "judge_reasoning": "GT nums: ['0.82', '0.79'], Ans nums: ['1103', '03', '16', '0.82', '1105', '10', '16', '0.79', '1103', '03', '16', '1103', '03', '16', '1105', '10', '16', '5', '6'], correct=1"
+  }
+]

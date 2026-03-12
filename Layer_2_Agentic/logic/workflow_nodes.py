@@ -396,6 +396,21 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
 
             return session_state
 
+    # ─── Forced Strategy Override (bypasses LLM selection) ────────
+    forced = session_state.get("forcedStrategy")
+    if forced and forced in available_strategies:
+        debug.print_strategy(f"Forced strategy: {forced} (bypassing LLM selection)")
+        strategy_info = db.get_strategy_info(forced)
+        if strategy_info:
+            sname = forced
+            plan_steps = strategy_info.plan_steps
+            plan_funcs = [step.strip() for step in plan_steps.split(",")]
+            debug.print_strategy(f"Strategy {sname} with functions: {plan_funcs}")
+            # Jump directly to function instance creation (skip LLM block)
+            return _create_strategy_in_session(
+                session_state, db, gid, sname, strategy_info, plan_funcs
+            )
+
     lib_block = "\n".join([f"- {s}" for s in available_strategies])
 
     prompt = prompt_loader.format_prompt(

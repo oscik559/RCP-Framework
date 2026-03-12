@@ -1196,9 +1196,6 @@ Table \ref{tab:performance_comparison} summarizes the quantitative performance c
 
 The ablation design isolates two distinct contributions. The transition from B1 to B2 measures the impact of \emph{structured extraction}: by replacing chunk-based retrieval with direct SQL queries against the relational schema, the system accesses complete specification records with preserved field semantics rather than fragmented text chunks. The transition from B2 to B3 measures the impact of \emph{multi-step planning and validation}: the six-stage control loop with persistent state, strategy selection, and validation gates.
 
-\paragraph{Citation accuracy gap}
-The RCP framework's validation gates enforce schema completeness, attribute presence, and unit correctness---but the current predicates do not include an explicit \emph{citation-completeness} check. Consequently, the RCP may produce correct answers grounded in verified attributes without citing the specific catalogue page or table cell. The Naive RAG baseline, by contrast, inherently propagates source references because retrieved chunks carry metadata (document name, page, offset) that the LLM can echo. Adding a citation-provenance predicate to strategy-level sufficiency conditions is a straightforward extension.
-
 %_______________________________________________________________________________
 \subsubsection{Operational cost}
 \label{subsubsec:operational_cost}
@@ -1244,6 +1241,9 @@ The \emph{Error class} column identifies the primary failure mode of the RAG bas
 The B1$\rightarrow$B2 transition reveals that the dominant failure mode in Naive RAG is retrieval fragmentation: chunks rarely contain complete specification records, causing the LLM to hallucinate values for missing fields (hallucination rate 48\%). Structured SQL retrieval reduces this to 18\% by delivering complete product records with preserved field semantics, lifting answer correctness from 52\% to 82\%. Residual B2 errors fall into two classes: keyword-search failures on semantic queries without explicit product codes (where LIKE-pattern fallback retrieves irrelevant records), and generation errors when multiple products are returned and the LLM conflates their attributes.
 
 The B2$\rightarrow$B3 transition shows a different trade-off. Answer correctness decreases slightly (82\%$\rightarrow$76\%) while hallucination is nearly eliminated (18\%$\rightarrow$2\%). The correctness drop reflects explicit failures: when validation gates determine that retrieved evidence is insufficient or unit checks fail, the RCP returns a qualified non-answer rather than fabricating a plausible value. This ``verify-then-summarize'' behaviour is the intended design outcome---in engineering contexts, an explicit failure is preferable to a confident but incorrect output. The residual 2\% hallucination rate occurs solely in the LLM synthesis step (the final \texttt{func\_analyse\_data} call), where validated attributes are converted to natural language.
+
+\paragraph{Citation accuracy gap}
+The RCP framework's validation gates enforce schema completeness, attribute presence, and unit correctness---but the current predicates do not include an explicit \emph{citation-completeness} check. Consequently, the RCP may produce correct answers grounded in verified attributes without citing the specific catalogue page or table cell. The Naive RAG baseline, by contrast, inherently propagates source references because retrieved chunks carry metadata (document name, page, offset) that the LLM can echo. Adding a citation-provenance predicate to strategy-level sufficiency conditions is a straightforward extension.
 
 %_______________________________________________________________________________
 % \clearpage

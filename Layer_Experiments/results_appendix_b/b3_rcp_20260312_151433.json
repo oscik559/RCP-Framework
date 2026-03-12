@@ -1,0 +1,44 @@
+[
+  {
+    "question_id": 1,
+    "question": "I'm looking for the specific working pressure rating in MPa for the Hydroscand hose 1103-03-04. Can you find it?",
+    "ground_truth": "29.0 MPa",
+    "answer": "The working pressure for product 1103-03-04 is 29.0 MPa.",
+    "latency_s": 11.6,
+    "baseline": "B3_RCP",
+    "goal_satisfied": true,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "judge_reasoning": "GT nums: ['29.0'], Ans nums: ['1103', '03', '04', '29.0'], correct=1"
+  },
+  {
+    "question_id": 2,
+    "question": "We need to verify the maximum outer diameter (YD mm) for the KAPPAFLEX 1 model 1103-03-08. What is it?",
+    "ground_truth": "19.0 mm",
+    "answer": "The maximum outer diameter for product 1103-03-08 is 19,0 (mm).",
+    "latency_s": 9.87,
+    "baseline": "B3_RCP",
+    "goal_satisfied": true,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "judge_reasoning": "GT nums: ['19.0'], Ans nums: ['1103', '03', '08', '19.0'], correct=1"
+  },
+  {
+    "question_id": 3,
+    "question": "Can you tell me the internal diameter (ID) of the 1103-03-12 hydraulic hose in fractional inches?",
+    "ground_truth": "3/4''",
+    "answer": "The inner diameter (ID) of the 1103-03-12 hydraulic hose is 3/4\" (inches).",
+    "latency_s": 9.98,
+    "baseline": "B3_RCP",
+    "goal_satisfied": true,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "judge_reasoning": "GT nums: ['0.75'], Ans nums: ['0.75', '1103', '03', '12'], correct=1"
+  }
+]

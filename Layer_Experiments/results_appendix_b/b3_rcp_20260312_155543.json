@@ -1,0 +1,16 @@
+[
+  {
+    "question_id": 51,
+    "question": "I need a hydraulic hose rated for at least 45 MPa with a 1/4'' internal bore. Which Hydroscand article would you recommend?",
+    "ground_truth": "1105-10-04",
+    "answer": "No strategies succeeded in execution",
+    "latency_s": 21.55,
+    "baseline": "B3_RCP",
+    "goal_satisfied": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 0,
+    "judge_reasoning": "Empty or failed answer"
+  }
+]

@@ -68,11 +68,18 @@ strategies = [
         "Semantic Search, Extract Attributes, Analyze With LLM",
     ),
     
+    (
+        "MULTI-PRODUCT COMPARISON",
+        "compare",
+        "Side-by-side comparison of two or more products identified by code. Handles queries asking to compare, rank, or find differences between specific product variants.",
+        "Extract Product Number, Query Database, Compare Items, Analyze With LLM",
+    ),
+
     # ── OPTIMIZATION PATTERNS (Future - keeps for Phase 2+) ────────────────
     # These patterns improve performance and are kept for future implementation
-    
+
     (
-        "PARALLEL ENHANCED LOOKUP",  
+        "PARALLEL ENHANCED LOOKUP",
         "parallel",
         "Concurrent function execution for performance optimization. Independent functions run in parallel to reduce total execution time.",
         "Extract Product Number, Query Database, [Extract Attributes || Search Products], Filter Items, [Analyze With LLM || Convert Units], Aggregate Results, Analyze With LLM",
@@ -132,6 +139,11 @@ templates = [
     ),
     
     # Category 3: Data Processing
+    (
+        "Compare Items",
+        "compare",
+        "LLM-powered side-by-side comparison of two or more product records. Produces field-level differences, similarities, and a recommendation.",
+    ),
     (
         "Filter Items",
         "filter",
@@ -213,6 +225,10 @@ params = {
     ],
     
     # Category 3: Data Processing
+    "Compare Items": [
+        ("items", "[]", "json"),  # List of product records to compare
+        ("fields", "[]", "json"),  # Specific fields to compare (empty = all)
+    ],
     "Filter Items": [
         ("items", "[]", "json"),
         ("conditions", "[]", "json"),
@@ -293,6 +309,13 @@ outputs = {
     ],
     
     # Category 3: Data Processing
+    "Compare Items": [
+        ("comparison_table", "{}", "json"),
+        ("differences", "[]", "json"),
+        ("similarities", "[]", "json"),
+        ("items_compared", "0", "integer"),
+        ("items", "[]", "json"),  # Pass-through for Analyze With LLM
+    ],
     "Filter Items": [
         ("filtered_items", "[]", "json"),
         ("count", "0", "integer"),

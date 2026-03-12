@@ -18,6 +18,12 @@ import argparse
 import json
 import logging
 import sys
+
+# Force UTF-8 output on Windows (avoids cp1252 errors from emoji in workflow logs)
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 import time
 from datetime import datetime
 from pathlib import Path
@@ -93,7 +99,7 @@ def run_b1(questions: List[Dict]) -> List[Dict]:
         }
         results.append(record)
         
-        mark = "✅" if scores["answer_correct"] else "❌"
+        mark = "[OK]" if scores["answer_correct"] else "[--]"
         print(f"  {mark} correct={scores['answer_correct']} | latency={latency}s")
     
     return results
@@ -141,7 +147,7 @@ def run_b2(questions: List[Dict]) -> List[Dict]:
         }
         results.append(record)
         
-        mark = "✅" if scores["answer_correct"] else "❌"
+        mark = "[OK]" if scores["answer_correct"] else "[--]"
         print(f"  {mark} correct={scores['answer_correct']} | latency={latency}s")
     
     return results
@@ -197,7 +203,7 @@ def run_b3(questions: List[Dict]) -> List[Dict]:
         }
         results.append(record)
         
-        mark = "✅" if scores["answer_correct"] else "❌"
+        mark = "[OK]" if scores["answer_correct"] else "[--]"
         print(f"  {mark} correct={scores['answer_correct']} | latency={latency}s")
     
     return results

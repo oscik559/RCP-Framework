@@ -48,5 +48,21 @@
   {"id": 47, "question": "What is the mechanical bend radius for article 1003-11-12?", "ground_truth": "240 mm"},
   {"id": 48, "question": "Can you provide the outer diameter (YD) for article 1102-14-04?", "ground_truth": "14.04 mm"},
   {"id": 49, "question": "What is the longest bobbin length we can order for 1102-14-08-30?", "ground_truth": "95"},
-  {"id": 50, "question": "Compare the weight of 1102-14-04 and 1103-03-04. Are there significant differences?", "ground_truth": "0.31 vs 0.18 kg/m"}
+  {"id": 50, "question": "Compare the weight of 1102-14-04 and 1103-03-04. Are there significant differences?", "ground_truth": "0.31 vs 0.18 kg/m"},
+
+  {"id": 51, "question": "I need a hydraulic hose rated for at least 45 MPa with a 1/4'' internal bore. Which Hydroscand article would you recommend?", "ground_truth": "1105-10-04"},
+  {"id": 52, "question": "What is the working pressure rating for hoses in the 1103-03 series?", "ground_truth": "29.0 MPa"},
+  {"id": 53, "question": "Which Hydroscand product line achieves the highest pressure rating of 47 MPa?", "ground_truth": "1106"},
+  {"id": 54, "question": "I need a hose for a medium-pressure hydraulic system around 22 MPa. Which Hydroscand product family should I look at?", "ground_truth": "1071"},
+  {"id": 55, "question": "What is the weight per meter for the smallest bore hose in the KAPPAFLEX 1 range?", "ground_truth": "0.18 kg/m"},
+  {"id": 56, "question": "The 1105-10-04 is rated for 45 MPa at 1/4'' bore. Which article in the same 1105-10 series provides the same pressure at 1/2'' bore?", "ground_truth": "1105-10-08"},
+  {"id": 57, "question": "Is the working pressure of the 1106-73 series higher than the 1105-10 series? Provide both values.", "ground_truth": "47.0 MPa vs 45.0 MPa"},
+  {"id": 58, "question": "Compare the weight per meter of articles 1103-03-16 and 1105-10-16. Which is heavier?", "ground_truth": "0.82 vs 0.79 kg/m"},
+  {"id": 59, "question": "Do articles 1106-73-08 and 1106-43-08 share the same working pressure rating?", "ground_truth": "47.0 MPa"},
+  {"id": 60, "question": "Provide the outer diameters of both 1106-73-10 and 1106-43-12 so I can compare them.", "ground_truth": "28.8 vs 32.5 mm"},
+  {"id": 61, "question": "Between 1105-63-04 and 1105-10-04, which article has the higher pressure resistance rating?", "ground_truth": "45.0 MPa"},
+  {"id": 62, "question": "Compare the bend radii of 1071-00-24 and 1071-00-32. Which allows a tighter bend?", "ground_truth": "500 vs 630 mm"},
+  {"id": 63, "question": "How does the maximum working pressure of the 1110-00 series compare to the 1105-10 series? Which is higher?", "ground_truth": "10.0 MPa vs 45.0 MPa"},
+  {"id": 64, "question": "Which is heavier per meter: the 1'' bore hose from the 1103-03 series (article 1103-03-16) or the 1'' configuration from the 1104-17 series (article 1104-17-16)? Give both weights.", "ground_truth": "0.82 vs 1.17 kg/m"},
+  {"id": 65, "question": "What is the minimum bend radius for the 1105-63 series at 1'' bore size?", "ground_truth": "210 mm"}
 ]

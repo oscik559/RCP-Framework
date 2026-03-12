@@ -16,10 +16,43 @@ def normalize_number(s: str) -> str:
 
 
 def extract_numbers(text: str) -> list:
-    """Extract all numeric values from text."""
-    # Match decimals, integers, and fractions
-    nums = re.findall(r'\d+[.,]?\d*', text)
-    return [normalize_number(n) for n in nums]
+    """Extract all numeric values from text.
+
+    Handles:
+    - Slash fractions: 3/8'' → 0.375
+    - Mixed fractions: 1 1/2'' → 1.5
+    - Swedish inch fractions (N,D" where D is power-of-2 denominator): 3,8" → 0.375
+    - Swedish decimal comma: 3,5 → 3.5
+    - Plain decimals and integers
+
+    Fraction patterns are stripped from text before extracting plain numbers to
+    avoid double-counting the raw numerator/denominator digits.
+    """
+    result = []
+    remaining = text
+
+    # Swedish inch fractions: N,D" where D in {2,4,8,16,32} → treat as N/D
+    for m in re.finditer(r'(\d+),(2|4|8|16|32)"', text):
+        num, den = int(m.group(1)), int(m.group(2))
+        result.append(f"{num/den:.4f}".rstrip('0').rstrip('.'))
+    remaining = re.sub(r'\d+,(2|4|8|16|32)"', ' ', remaining)
+
+    # Mixed fractions: e.g. 1 1/2'' → 1.5
+    for m in re.finditer(r'(\d+)\s+(\d+)/(\d+)', remaining):
+        whole, num, den = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        result.append(f"{whole + num/den:.4f}".rstrip('0').rstrip('.'))
+    remaining = re.sub(r'\d+\s+\d+/\d+', ' ', remaining)
+
+    # Simple slash fractions: e.g. 3/8'' → 0.375
+    for m in re.finditer(r'(\d+)/(\d+)', remaining):
+        num, den = int(m.group(1)), int(m.group(2))
+        result.append(f"{num/den:.4f}".rstrip('0').rstrip('.'))
+    remaining = re.sub(r'\d+/\d+', ' ', remaining)
+
+    # Swedish decimal comma (3,5 → 3.5) and plain numbers from remaining text
+    nums = re.findall(r'\d+[.,]\d+|\d+', remaining)
+    result.extend([normalize_number(n) for n in nums])
+    return result
 
 
 def normalize_text(text: str) -> str:

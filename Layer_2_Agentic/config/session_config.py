@@ -37,7 +37,8 @@ from typing import Any, Dict, Optional
 
 
 def get_default_session_state(
-    query: Optional[str] = None, session_id: Optional[int] = None
+    query: Optional[str] = None, session_id: Optional[int] = None,
+    forced_strategy: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Initialize session state with default values and optional overrides.
@@ -75,6 +76,8 @@ def get_default_session_state(
         "parallelBatch": None,
         "parallelResults": None,
         "parallelGroups": None,
+        # Optional override: force a specific strategy name (bypasses LLM selection)
+        "forcedStrategy": forced_strategy,
     }
 
 
