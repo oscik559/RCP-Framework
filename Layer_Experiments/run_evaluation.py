@@ -109,6 +109,7 @@ def run_b2(questions: List[Dict]) -> List[Dict]:
     from sql_retrieval_baseline import SQLRetrievalBaseline
     
     pipeline = SQLRetrievalBaseline()
+    pipeline.initialize()
     
     results = []
     total = len(questions)
