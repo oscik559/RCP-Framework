@@ -1,0 +1,250 @@
+CATEGORY A
+Question 1:
+Column 1: I'm looking for the specific working pressure rating in MPa for the Hydroscand hose 1103-03-04. Can you find it?
+Column 2: The working pressure for article 1103-03-04 is 29.0 MPa.
+Column 3: Technical specification lookup.
+
+Question 2:
+Column 1: We need to verify the maximum outer diameter (YD mm) for the KAPPAFLEX 1 model 1103-03-08. What is it?
+Column 2: Technical records for 1103-03-08 indicate an outer diameter of 19.0 mm.
+Column 3: Direct attribute extraction.
+
+Question 3:
+Column 1: Can you tell me the internal diameter (ID) of the 1103-03-12 hydraulic hose in fractional inches?
+Column 2: The internal diameter for 1103-03-12 is 3/4".
+Column 3: Technical attribute lookup.
+
+Question 4:
+Column 1: What is the tightest bend radius we should allow for the 1 1/4" hose with article number 1103-03-20?
+Column 2: Article 1103-03-20 has a specified minimum bend radius of 300 mm.
+Column 3: Performance specification lookup.
+
+Question 5:
+Column 1: I need to compare the weight per meter between the 1103-03-04 and 1103-03-16 hoses. Which one is heavier?
+Column 2: 1103-03-04 weighs 0.18 kg/m, while 1103-03-16 is significantly heavier at 0.82 kg/m.
+Column 3: Quantitative product comparison.
+
+Question 6:
+Column 1: Within the 1105-10 series, which specific article number should I use if I need exactly 45.0 MPa working pressure?
+Column 2: 1105-10-04 is the model rated for 45.0 MPa in the 1105-10 series.
+Column 3: Product identification by performance constraint.
+
+Question 7:
+Column 1: Check the minimum and maximum lengths for the 1105-10-04-30 reel configuration.
+Column 2: Reel specifications for 1105-10-04-30 indicate a minimum length of 170 and a maximum of 230.
+Column 3: Logistics and packaging specification lookup.
+
+Question 8:
+Column 1: What's the internal diameter in millimeters for the 3/4" 1105-10-12 hose?
+Column 2: The internal diameter for 1105-10-12 is 19.0 mm.
+Column 3: Dimension validation.
+
+Question 9:
+Column 1: Can you find the specific weight in kg/m for the 1" 1105-10-16 hose?
+Column 2: The weight for 1105-10-16 is 0.79 kg/m.
+Column 3: Technical specification lookup.
+
+Question 10:
+Column 1: If I switch from 1105-10-04 to 1105-10-08, how much larger will the bend radius be?
+Column 2: 1105-10-08 has a bend radius of 90 mm, which is 45 mm larger than the 45 mm radius of 1105-10-04.
+Column 3: Multi-product performance evaluation.
+
+Question 11:
+Column 1: What is the maximum pressure limit for a Hydroscand 1105-63-04 hose?
+Column 2: The documentation defines a maximum working pressure of 45.0 MPa for 1105-63-04.
+Column 3: Pressure rating lookup.
+
+Question 12:
+Column 1: I'm looking at reels 1105-63-04-30 and 1105-63-08-30. Are there any differences in the hose dimensions?
+Column 2: 1105-63-04-30 is 1/4", while 1105-63-08-30 is 1/2".
+Column 3: Comparative dimensional analysis.
+
+Question 13:
+Column 1: What is the minimum recommended bend radius for the 1105-63-16 model?
+Column 2: The minimum bend radius for 1105-63-16 is 210 mm.
+Column 3: Mechanical constraint lookup.
+
+Question 14:
+Column 1: How much does a meter of the 1 1/4" hose 1105-63-20 weigh?
+Column 2: Article 1105-63-20 has a weight of 1.52 kg/m.
+Column 3: Physical property lookup.
+
+Question 15:
+Column 1: Can you verify the working pressure rating for article 1105-21-04?
+Column 2: 1105-21-04 is rated for a working pressure of 45.0 MPa.
+Column 3: Catalog attribute extraction.
+
+Question 16:
+Column 1: What is the external diameter (YD) of the 1105-21-16 variant?
+Column 2: The outer diameter for 1105-21-16 is 35.6 mm.
+Column 3: Geometric specification lookup.
+
+Question 17:
+Column 1: I need to know the ID in inches for the 1105-43-06 Hydroscand model.
+Column 2: 1105-43-06 has an internal diameter of 3/8".
+Column 3: Standard dimension lookup.
+
+Question 18:
+Column 1: What is the longest reel length I can get for article 1104-17-04-30?
+Column 2: The maximum reel length for 1104-17-04-30 is 260.
+Column 3: Packaging specification lookup.
+
+Question 19:
+Column 1: Find the weight per meter for the 1" configuration of 1104-17-16.
+Column 2: Article 1104-17-16 has a unit weight of 1.17 kg/m.
+Column 3: Mass property lookup.
+
+Question 20:
+Column 1: What is the nominal working pressure recorded for the 1/4" 1102-14-04?
+Column 2: The nominal working pressure for 1102-14-04 is 40.0 MPa.
+Column 3: Performance specification lookup.
+
+Question 21:
+Column 1: Can you find the working pressure for article 1106-73-08?
+Column 2: 1106-73-08 is rated for 47.0 MPa.
+Column 3: Technical data extraction.
+
+Question 22:
+Column 1: What is the outer diameter specification for 1106-73-10?
+Column 2: The outer diameter (YD mm) for 1106-73-10 is 28.8 mm.
+Column 3: Dimensional lookup.
+
+Question 23:
+Column 1: Check the bending radius for article 1106-73-12 in the catalog.
+Column 2: The bending radius for 1106-73-12 is 260 mm.
+Column 3: Mechanical constraint extraction.
+
+Question 24:
+Column 1: I need the weight per meter for the 1106-73-16 hose.
+Column 2: Article 1106-73-16 has a weight of 1.99 kg/m.
+Column 3: Physical property lookup.
+
+Question 25:
+Column 1: Identify the working pressure rating for the 1106-43-08 variant.
+Column 2: 1106-43-08 is rated for 47.0 MPa.
+Column 3: Pressure rating lookup.
+
+Question 26:
+Column 1: What is the geometric outer diameter for article 1106-43-12?
+Column 2: The outer diameter for 1106-43-12 is 32.5 mm.
+Column 3: Geometric property lookup.
+
+Question 27:
+Column 1: Are the working pressures of 1106-73-08 and 1106-43-08 the same?
+Column 2: Yes, both 1106-73-08 and 1106-43-08 are rated for 47.0 MPa.
+Column 3: Multi-product comparison.
+
+Question 28:
+Column 1: Between 1106-73-16 and 1106-43-16, which one has a larger bending radius?
+Column 2: Neither; both 1106-73-16 and 1106-43-16 have a bending radius of 310 mm.
+Column 3: Comparative analysis.
+
+Question 29:
+Column 1: I need the internal diameter (mm) and working pressure (MPa) for article 1110-00-04.
+Column 2: 1110-00-04 has an ID of 6.5 mm and a working pressure of 10.0 MPa.
+Column 3: Multi-attribute lookup.
+
+Question 30:
+Column 1: What is the documented weight for article 1110-00-08?
+Column 2: The weight for 1110-00-08 is 0.27 kg/m.
+Column 3: Physical property lookup.
+
+Question 31:
+Column 1: Can you find the mechanical bending radius for the 1110-03-06 hose?
+Column 2: The specified bending radius for 1110-03-06 is 40 mm.
+Column 3: Mechanical property lookup.
+
+Question 32:
+Column 1: Compare the internal diameters of 1110-00-06 and 1110-03-06. Are they identical?
+Column 2: Yes, both 1110-00-06 and 1110-03-06 have an ID of 10.0 mm.
+Column 3: Dimensional comparison.
+
+Question 33:
+Column 1: What's the performance rating for working pressure on the 1101-00-03?
+Column 2: 1101-00-03 is rated for a working pressure of 25.0 MPa.
+Column 3: Performance lookup.
+
+Question 34:
+Column 1: Is there a maximum length limit for article 1101-14-04-30 on a reel?
+Column 2: Yes, the maximum reel length for 1101-14-04-30 is 260.
+Column 3: Logistics data lookup.
+
+Question 35:
+Column 1: We need to know the outer diameter (YD) for the 1101-14-12 hose.
+Column 2: The outer diameter for 1101-14-12 is 27.8 mm.
+Column 3: Geometric specification.
+
+Question 36:
+Column 1: How heavy is article 1101-14-20 per meter?
+Column 2: Article 1101-14-20 has a weight of 1.23 kg/m.
+Column 3: Physical data lookup.
+
+Question 37:
+Column 1: Find the minimum allowed bend radius for the 1101-14-32 configuration.
+Column 2: The minimum bend radius for 1101-14-32 is 630 mm.
+Column 3: Mechanical data lookup.
+
+Question 38:
+Column 1: Can you specify the ID in inches for article 1101-14-24?
+Column 2: 1101-14-24 has an internal diameter of 1 1/2".
+Column 3: Standard dimension lookup.
+
+Question 39:
+Column 1: Which of the two, 1101-14-10 or 1101-14-16, is rated for higher working pressure?
+Column 2: 1101-14-10 has a higher rating (13.0 MPa) compared to 1101-14-16 (8.8 MPa).
+Column 3: Performance comparison.
+
+Question 40:
+Column 1: Verify the working pressure rating for article 1071-00-04.
+Column 2: The working pressure for 1071-00-04 is 22.5 MPa.
+Column 3: Performance lookup.
+
+Question 41:
+Column 1: What is the outer diameter specification for the 1071-00-12 hose?
+Column 2: The outer diameter for 1071-00-12 is 27.7 mm.
+Column 3: Dimensional data.
+
+Question 42:
+Column 1: I need the unit weight for article 1071-00-16.
+Column 2: 1071-00-16 weighs 0.88 kg/m.
+Column 3: Mass property lookup.
+
+Question 43:
+Column 1: Compare the bend radii of 1071-00-24 and 1071-00-32. Which is more flexible?
+Column 2: 1071-00-24 is more flexible (500 mm radius) than 1071-00-32 (630 mm radius).
+Column 3: Mechanical comparison.
+
+Question 44:
+Column 1: Determine the weight per meter for article 1003-11-04.
+Column 2: Article 1003-11-04 weighs 22 kg/m according to the technical data.
+Column 3: Technical data extraction.
+
+Question 45:
+Column 1: What is the internal diameter (ID mm) of the 1003-11-12 hose?
+Column 2: The internal diameter for 1003-11-12 is 19 mm.
+Column 3: Dimensional lookup.
+
+Question 46:
+Column 1: Between 1003-11-06 and 1003-11-16, which one can handle more pressure?
+Column 2: 1003-11-06 can handle more pressure (18 MPa) compared to 1003-11-16 (8.8 MPa).
+Column 3: Comparative performance analysis.
+
+Question 47:
+Column 1: What is the mechanical bend radius for article 1003-11-12?
+Column 2: The bend radius for 1003-11-12 is 240 mm.
+Column 3: Mechanical specification.
+
+Question 48:
+Column 1: Can you provide the outer diameter (YD) for article 1102-14-04?
+Column 2: The outer diameter for 1102-14-04 is 14.04 mm.
+Column 3: Geometric specification.
+
+Question 49:
+Column 1: What is the longest bobbin length we can order for 1102-14-08-30?
+Column 2: The maximum bobbin length for 1102-14-08-30 is 95.
+Column 3: Logistics data extraction.
+
+Question 50:
+Column 1: Compare the weight of 1102-14-04 and 1103-03-04. Are there significant differences?
+Column 2: Yes; 1102-14-04 (0.31 kg/m) is noticeably heavier than 1103-03-04 (0.18 kg/m).
+Column 3: Quantitative physical comparison.

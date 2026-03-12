@@ -51,21 +51,21 @@ strategies = [
         "TECHNICAL CALCULATION",  
         "calculate",
         "Hydraulic engineering calculations (flow rate, pressure drop, hose sizing). Pure mathematical computations with product recommendations.",
-        "Extract Calculation Inputs, Calculate, Convert Units, Search Products, Analyze With LLM",
+        "Extract Requirements, Calculate, Convert Units, Search Products, Analyze With LLM",
     ),
     
     (
         "STANDARD & COMPLIANCE LOOKUP",  
         "compliance",
         "Search products by standards (EN, ISO, SAE) and certifications (FDA, DNV, MED). Database-driven compliance checking.",
-        "Extract Standard Code, Query Database, Extract Attributes, Analyze With LLM",
+        "Extract Requirements, Query Database, Extract Attributes, Analyze With LLM",
     ),
     
     (
         "KNOWLEDGE BASE & RAG",  
         "knowledge",
         "Retrieval Augmented Generation for procedural and general knowledge. Handles assembly instructions, standards definitions, FAQ.",
-        "Semantic Search Knowledge Base, Retrieve Documents, Extract Relevant Content, Analyze With LLM",
+        "Semantic Search, Extract Attributes, Analyze With LLM",
     ),
     
     # ── OPTIMIZATION PATTERNS (Future - keeps for Phase 2+) ────────────────
@@ -115,6 +115,11 @@ templates = [
     ),
     
     # Category 2: Extract Operations
+    (
+        "Extract Requirements",
+        "extract",
+        "Parse user query for structured requirements (pressure, temperature, material, context).",
+    ),
     (
         "Extract Product Number",
         "extract",
@@ -195,6 +200,9 @@ params = {
     ],
     
     # Category 2: Extract Operations
+    "Extract Requirements": [
+        ("Input", "", "string"),
+    ],
     "Extract Product Number": [
         ("Input", "", "string"),
     ],
@@ -270,6 +278,11 @@ outputs = {
     ],
     
     # Category 2: Extract Operations
+    "Extract Requirements": [
+        ("requirements", "{}", "json"),
+        ("confidence", "0.0", "number"),
+        ("items", "[]", "json"),
+    ],
     "Extract Product Number": [
         ("Keyword Output", "", "string"),
     ],

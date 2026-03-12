@@ -1,0 +1,185 @@
+% =============================================================
+%  appendix_query_sets.tex
+%  Include in main document with: \input{appendix_query_sets}
+% =============================================================
+
+\section{Annotated Query Sets}
+\label{app:annotated_query_sets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ── Case Study I — Hydroscand ─────────────────────────────────────────────────
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table*}[htbp]
+    \captionsetup{skip=5pt}
+    \caption{Annotated query sample — Case I ($n = 10$ of 40 shown).}
+    \label{tab:qs_hydroscand}
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1}
+    \begin{tabularx}{\textwidth}{p{0.04\textwidth} p{0.25\textwidth} p{0.36\textwidth} p{0.27\textwidth}}
+        \toprule
+        \textbf{Q\,\#} & \textbf{Query} & \textbf{Ground Truth} & \textbf{Error Class} \\
+        \midrule
+        %
+        Q63 &
+        What is the maximum temperature for hose 1071-00-16? &
+        $+150\,^{\circ}$C (HYDROSCAND HI-TEMP, verified p.\,47 of catalogue). &
+        Correct (single-cell lookup). \\
+        
+        \addlinespace
+        
+        Q37 &
+        How many millimetres is 1/8 inch? &
+        $3.175$ mm (conversion table, chapter~11). &
+        Correct (trivial arithmetic). \\
+        
+        \addlinespace
+        
+        Q46 &
+        What is the ISO standard for textile hose protection? &
+        ISO 6945 (abrasion resistance); pressure test per SAE J343. &
+        Correct. \\
+        
+        \addlinespace
+        
+        Q64 &
+        Which sleeve fits hose 1118-12-16? &
+        Sleeve 4200-19-16 (compact 4-spiral, $1''$). &
+        Hallucination — cited 4200-20-xx (wrong spiral count). \\
+        
+        \addlinespace
+        
+        Q65 &
+        What is the burst pressure for 1105-10-08? &
+        $180\,\text{MPa}$ (table p.\,17). &
+        Hallucination — returned working pressure instead of burst. \\
+        
+        \addlinespace
+        
+        Q70 &
+        How do I calculate hose length under dynamic load? &
+        Multiply static length by elongation factor (1.02–1.04) under rated pressure. &
+        Partial — omitted factor values. \\
+        
+        \addlinespace
+        
+        Q45 &
+        How much heavier is 1103-03-16 than 1103-03-04? &
+        $0.64\,\text{kg/m}$ (0.82 vs 0.18). &
+        Parser error — returned individual values but no subtraction. \\
+        
+        \addlinespace
+        
+        Q49 &
+        Which article number has the highest working pressure in the 1106-73 series? &
+        All rated $47\,\text{MPa}$ (equal). &
+        Partial — returned first match only. \\
+        
+        \addlinespace
+        
+        Q66 &
+        What does the `P' designation mean in product codes? &
+        Permanent coupling (crimped or swaged). &
+        Hallucination — fabricated definition. \\
+        
+        \addlinespace
+        
+        Q42 &
+        Can I run refrigerant R134a through 1110-03-06? &
+        No; not listed in chemical compatibility table (p.\,93). &
+        Partial — did not reference the table or provide rationale. \\
+        
+        \bottomrule
+    \end{tabularx}
+\end{table*}
+
+\vspace{0.5em}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ── Case Study II — SAAB ──────────────────────────────────────────────────────
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table*}[htbp]
+    \captionsetup{skip=5pt}
+    \caption{Annotated query sample — Case II ($n = 10$ of 38 shown).}
+    \label{tab:qs_saab}
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1}
+    \begin{tabularx}{\textwidth}{p{0.04\textwidth} p{0.25\textwidth} p{0.36\textwidth} p{0.27\textwidth}}
+        \toprule
+        \textbf{Q\,\#} & \textbf{Query} & \textbf{Ground Truth} & \textbf{Error Class} \\
+        \midrule
+        %
+        Q12 &
+        What is the shell size for connector P/N~ABC-1234-56? &
+        Size~16 (Doc~D-789, Table~3.2, col.~4). &
+        Correct (single-table lookup). \\
+        
+        \addlinespace
+        
+        Q03 &
+        How many contacts does the XYZ-7890 receptacle have? &
+        37 contacts (Doc~D-456, Table~2.1). &
+        Correct. \\
+        
+        \addlinespace
+        
+        Q18 &
+        Which document revision supersedes D-123 rev.~A? &
+        D-123 rev.~B (issued 2023-11-02). &
+        Correct (revision-control lookup). \\
+        
+        \addlinespace
+        
+        Q07 &
+        What is the recommended torque for contact retention? &
+        $0.5$--$0.6\,\text{Nm}$ (Doc~D-789, section~4.3). &
+        Hallucination — cited incorrect document. \\
+        
+        \addlinespace
+        
+        Q22 &
+        Can the connector handle 150$^{\circ}$C continuous operation? &
+        No; max rated $125\,^{\circ}$C (Doc~D-012, Table~5). &
+        Hallucination — answered ``Yes'' without temperature check. \\
+        
+        \addlinespace
+        
+        Q11 &
+        What cable diameter range fits shell size~20? &
+        $12.0$--$16.5\,\text{mm}$ (Doc~D-456, Table~3.1, col.~3). &
+        Parser error — returned unformatted text instead of range. \\
+        
+        \addlinespace
+        
+        Q29 &
+        How do I distinguish plug from receptacle by P/N? &
+        Last digit: 1~=~plug, 2~=~receptacle (Doc~D-789, Appendix~C). &
+        Partial — omitted reference to appendix. \\
+        
+        \addlinespace
+        
+        Q14 &
+        Are contact inserts interchangeable between revisions? &
+        No; geometric tolerance updated in rev.~C. &
+        Hallucination — claimed ``Yes'' without checking revision notes. \\
+        
+        \addlinespace
+        
+        Q05 &
+        What is the minimum insertion/extraction cycle count? &
+        500 cycles (Doc~D-012, section~6.2). &
+        Partial — returned value but omitted source section. \\
+        
+        \addlinespace
+        
+        Q31 &
+        Which materials meet MIL-STD-1553 screening? &
+        Nickel-plated beryllium copper (Doc~D-345, Table~7). &
+        Hallucination — fabricated material specification. \\
+        
+        \bottomrule
+    \end{tabularx}
+\end{table*}

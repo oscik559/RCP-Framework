@@ -4727,9 +4727,10 @@ FUNCTION_MAP = {
     "Search Categories": func_search_categories,
     "Semantic Search": func_semantic_search,
     
-    # Category 2: Extract Operations (2)
+    # Category 2: Extract Operations (3)
     "Extract Product Number": func_extract_product_number,
     "Extract Attributes": func_extract_attributes,
+    "Extract Requirements": func_extract_requirements,
     
     # Category 3: Data Processing (2)
     "Filter Items": func_filter_items,

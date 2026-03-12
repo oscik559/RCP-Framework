@@ -1,0 +1,2 @@
+| id | pdf_name | page_number | category | knowledge_type | section_title | content | content_language | created_at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |

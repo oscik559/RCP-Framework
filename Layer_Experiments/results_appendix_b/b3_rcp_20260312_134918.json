@@ -1,0 +1,16 @@
+[
+  {
+    "question_id": 1,
+    "question": "I'm looking for the specific working pressure rating in MPa for the Hydroscand hose 1103-03-04. Can you find it?",
+    "ground_truth": "29.0 MPa",
+    "answer": "The working pressure for product 1103-03-04 is 29.0 MPa.",
+    "latency_s": 14.28,
+    "baseline": "B3_RCP",
+    "goal_satisfied": true,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "judge_reasoning": "GT nums: ['29.0'], Ans nums: ['1103', '03', '04', '29.0'], correct=1"
+  }
+]

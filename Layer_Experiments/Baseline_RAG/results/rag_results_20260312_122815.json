@@ -1,0 +1,312 @@
+[
+  {
+    "question_id": 5,
+    "category": "A",
+    "question": "What hoses can be used for boiling water?",
+    "ground_truth": "For hoses that are to be used for boiling water (i.e. hot water, both high and low pressures), stainless steel hoses and hose reels are particularly recommended. These are designed to withstand high temperatures and are common in corrosive environments, the food industry, kitchens, slaughterhouses and the chemical and pharmaceutical industries. Examples of such products are: Hose reel 5401 stainless steel – For hoses up to 1/2\", designed for hot water and corrosive environments. Hose reel 5403 stainless steel – For hoses up to 1/2\", also for hot water and similar environments. Hoses that are specified for hot water and that can withstand temperatures up to at least 150°C, which is relevant for boiling water, are often used for these reels. It is important that couplings and swivels are also dimensioned for these temperatures, for example, there are swivels that are approved for water up to 150°C. In summary: Always choose hose and accessories that are labeled for hot water and check that both hose and fittings are approved for at least 100°C (boiling water). Always check the product specifications for exact temperature resistance.",
+    "expert_comment": "The summary is correct but the hose reel recommendation is redundant.",
+    "rag_answer": "Unfortunately, the provided context does not contain any information about hoses that can be used for boiling water. The context appears to be related to hydraulic engineering products, specifically waterblast products, but it does not mention boiling water or any hoses that are suitable for that purpose.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1114-45-08",
+        "family_code": "1114-45",
+        "family_name": "WATERBLAST",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 22
+      },
+      {
+        "source": "products",
+        "product_code": "1114-45-06",
+        "family_code": "1114-45",
+        "family_name": "WATERBLAST",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 22
+      },
+      {
+        "source": "products",
+        "product_code": "1114-45-12",
+        "family_code": "1114-45",
+        "family_name": "WATERBLAST",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 22
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1105-63-04-30",
+        "family_code": "1105-63",
+        "family_name": "KAPPAFLEX 2K CO ROCK PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 7
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 3.047,
+    "token_estimate": 411,
+    "prompt_tokens": 335,
+    "response_tokens": 76,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 0,
+    "error_class": "hallucination",
+    "judge_reasoning": "Answer completely misses the topic and context of boiling water hoses"
+  },
+  {
+    "question_id": 7,
+    "category": "A",
+    "question": "Which hydraulic hose and sleeve should I get for a particular excavator?",
+    "ground_truth": "For an excavator, robust and durable hydraulic hoses that can withstand high pressures and tough environments are often recommended. Examples of suitable hoses from Hydroscand are Egeflex 1 CO (EN 853 1SN) and Egeflex 2 CO (EN 853 2SN), which are adapted for applications with medium to high working pressure and a lot of external wear. For these hoses, associated sleeves are used, for example the 4700 series, which are adapted to the respective hose dimension. Always check the machine's specific requirements and hose dimensions before choosing.",
+    "expert_comment": "Spiral hose with Rock is better choice",
+    "rag_answer": "I need more information about the excavator you're referring to. The context only provides product codes, family names, categories, configurations, and dimensions for different hydraulic hoses and sleeves, but it doesn't mention specific product recommendations for a particular excavator.\n\nIf you could provide more details about the excavator, such as its size, type, and specific hydraulic requirements, I'd be happy to try and help you choose the correct product.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-06-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-05-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-04-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.538,
+    "token_estimate": 429,
+    "prompt_tokens": 313,
+    "response_tokens": 116,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 0,
+    "error_class": "hallucination",
+    "judge_reasoning": "The AI answer contains a factual claim ('Spiral hose with Rock is better choice') not supported by the ground truth."
+  },
+  {
+    "question_id": 11,
+    "category": "A",
+    "question": "Which products are approved for food use?",
+    "ground_truth": "Hydroscand has several products that are approved for food use. One example is FOODSTEAM, a food-approved flushing hose for hot water and steam in the food industry. It is made of phthalate-free rubber and complies with FDA and REACH. The outer tube is resistant to animal and vegetable fats and does not discolour. There are also other industrial hoses in the range that are marked with a food symbol and are intended for the transport of food. Always check that the product is marked as food-approved before use.",
+    "expert_comment": "",
+    "rag_answer": "Based on the provided context, I can only find information about the dimensions, lengths, and configurations of various hydraulic engineering products. There is no mention of food use or approval for food use in any of the sources.\n\nTherefore, I must say that I do not have enough information to answer your question.",
+    "sources": [
+      {
+        "source": "product_families",
+        "product_code": "",
+        "family_code": "KAPITEL 4:2 PRESSKOPPLINGAR",
+        "family_name": "",
+        "category": "PRESSKOPPLINGAR",
+        "page_number": 181
+      },
+      {
+        "source": "products",
+        "product_code": "1105-63-04-30",
+        "family_code": "1105-63",
+        "family_name": "KAPPAFLEX 2K CO ROCK PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 7
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-04-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "product_families",
+        "product_code": "",
+        "family_code": "4268",
+        "family_name": "STpercat fläns",
+        "category": "PRESSKOPPLINGAR",
+        "page_number": 180
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.452,
+    "token_estimate": 347,
+    "prompt_tokens": 268,
+    "response_tokens": 79,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 0,
+    "error_class": "hallucination",
+    "judge_reasoning": "Answer claims no information about food use is available, despite the ground truth providing specific examples of approved products."
+  },
+  {
+    "question_id": 17,
+    "category": "A",
+    "question": "Do you have hoses that meet the EN 857 standard?",
+    "ground_truth": "Yes, Hydroscand has several hoses that meet the EN 857 standard. Examples of these are: Kappaflex 1 – Exceeds the requirements of EN 857 1SC . Kappaflex 2 CO Smooth – Exceeds the requirements of EN 857 2SC . Kappaflex 2K XA – Pressure and dimensions equivalent to EN 857 2SC . Kappaflex 3 PO – Pressure exceeding EN 857 2SC",
+    "expert_comment": "",
+    "rag_answer": "No, the provided sources do not mention the EN 857 standard. They do mention the EN 854 standard, which is a different standard.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "4200-14-05",
+        "family_code": "4200-40",
+        "family_name": "Hylsa EN 854 R3",
+        "category": "PRESSKOPPLINGAR",
+        "page_number": 171
+      },
+      {
+        "source": "products",
+        "product_code": "4200-14-10",
+        "family_code": "4200-40",
+        "family_name": "Hylsa EN 854 R3",
+        "category": "PRESSKOPPLINGAR",
+        "page_number": 171
+      },
+      {
+        "source": "products",
+        "product_code": "4200-07-05",
+        "family_code": "4200-07",
+        "family_name": "Hylsa EN1SC",
+        "category": "PRESSKOPPLINGAR",
+        "page_number": 170
+      },
+      {
+        "source": "products",
+        "product_code": "4200-14-06",
+        "family_code": "4200-40",
+        "family_name": "Hylsa EN 854 R3",
+        "category": "PRESSKOPPLINGAR",
+        "page_number": 171
+      },
+      {
+        "source": "products",
+        "product_code": "1045-01-02",
+        "family_code": "1045-01",
+        "family_name": "HYDROSCAND T7011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 29
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.258,
+    "token_estimate": 342,
+    "prompt_tokens": 310,
+    "response_tokens": 32,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "The AI answer contains a false claim about the EN 857 standard, which is not supported by the ground truth."
+  },
+  {
+    "question_id": 19,
+    "category": "A",
+    "question": "Do you have a product that can withstand both high pressure and vibrations?",
+    "ground_truth": "Yes, Hydroscand has several products that can withstand both high pressure and vibration. Examples of such hoses are: Steel wire braided rubber hose – Very flexible and suitable for applications with high pressure, high impulses and vibrations. Working pressure up to 47.0 MPa. Spiral wound rubber hose – For extremely high pressures up to 50.0 MPa and withstands harsh environments with vibrations. PTFE hose (Teflon®) – Very flexible, chemical resistant and can withstand both high pressure and vibration, with a temperature range up to +260°C.",
+    "expert_comment": "The question is to give a product. AI gives product types but not an article number.",
+    "rag_answer": "Based on the provided context, it appears that the ISOBAR 420 CO ROCK X-HP product family (Source 5) is suitable for applications where high pressure and vibrations are present. The product is described as a \"kraftfull spiralslang\" (strong spiral hose) that is \"lämplig för applikationer där det ställs höga krav på stora flöden och höga tryck\" (suitable for applications where high demands are placed on large flows and high pressure). Additionally, the product is mentioned as being \"MSHA-godkänd\" (MSHA-approved) and \"överträffar kraven enligt SAE 100 R15\" (meets or exceeds the requirements of SAE 100 R15).",
+    "sources": [
+      {
+        "source": "product_families",
+        "product_code": "",
+        "family_code": "1135-83",
+        "family_name": "ISOBAR 350 X-HP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 17
+      },
+      {
+        "source": "product_families",
+        "product_code": "",
+        "family_code": "1135-13",
+        "family_name": "ISOBAR 35 CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 21
+      },
+      {
+        "source": "product_families",
+        "product_code": "",
+        "family_code": "1020-83",
+        "family_name": "ISOBAR 210 CO ROCK X-HP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 18
+      },
+      {
+        "source": "product_families",
+        "product_code": "",
+        "family_code": "1142-13",
+        "family_name": "ISOBAR 42 CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 20
+      },
+      {
+        "source": "product_families",
+        "product_code": "",
+        "family_code": "1020-86",
+        "family_name": "ISOBAR 420 CO ROCK X-HP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 20
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 5.134,
+    "token_estimate": 1045,
+    "prompt_tokens": 893,
+    "response_tokens": 152,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 0,
+    "error_class": "hallucination",
+    "judge_reasoning": "The AI answer provides a product type (ISOBAR 420 CO ROCK X-HP) but lacks specific details and article numbers, and includes unsupported claims about the product's suitability."
+  }
+]

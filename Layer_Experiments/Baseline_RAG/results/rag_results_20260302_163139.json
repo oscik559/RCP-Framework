@@ -1,0 +1,3102 @@
+[
+  {
+    "question_id": 1,
+    "category": "A",
+    "question": "I'm looking for the specific working pressure rating in MPa for the Hydroscand hose 1103-03-04. Can you find it?",
+    "ground_truth": "The working pressure for article 1103-03-04 is 29.0 MPa.",
+    "expert_comment": "Technical specification lookup.",
+    "rag_answer": "I don't have any information about a product code \"1103-03-04\" in the provided context. The context only contains information about different products with various codes, but none of them match this specific code. Therefore, I cannot provide the working pressure rating for the Hydroscand hose 1103-03-04.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1031-01-04",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1032-04-04",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1112",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-03",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-12",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1034-01-12",
+        "family_code": "1034-01",
+        "family_name": "HYDROSCAND T1211",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 3.453,
+    "token_estimate": 468,
+    "prompt_tokens": 392,
+    "response_tokens": 76,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer is incorrect because it claims the AI couldn't find information, but the ground truth answer provides a clear working pressure rating."
+  },
+  {
+    "question_id": 2,
+    "category": "A",
+    "question": "We need to verify the maximum outer diameter (YD mm) for the KAPPAFLEX 1 model 1103-03-08. What is it?",
+    "ground_truth": "Technical records for 1103-03-08 indicate an outer diameter of 19.0 mm.",
+    "expert_comment": "Direct attribute extraction.",
+    "rag_answer": "According to Source 1, the maximum outer diameter (YD mm) for the KAPPAFLEX 1 model 1103-03-08 is 19,0 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1103-03-08",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-10",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-20",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-06",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-12",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.408,
+    "token_estimate": 388,
+    "prompt_tokens": 362,
+    "response_tokens": 26,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly extracts the correct value from the source, without any additional information or errors."
+  },
+  {
+    "question_id": 3,
+    "category": "A",
+    "question": "Can you tell me the internal diameter (ID) of the 1103-03-12 hydraulic hose in fractional inches?",
+    "ground_truth": "The internal diameter for 1103-03-12 is 3/4\".",
+    "expert_comment": "Technical attribute lookup.",
+    "rag_answer": "Unfortunately, there is no information about a product code \"1103-03-12\" provided in the context. The context only contains information about different products with various codes, but none of them match this specific code. Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1032-03-03",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1112",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-03",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1032-12-12",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1112",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1032-06-06",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1112",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1034-01-06",
+        "family_code": "1034-01",
+        "family_name": "HYDROSCAND T1211",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.606,
+    "token_estimate": 464,
+    "prompt_tokens": 387,
+    "response_tokens": 77,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 0,
+    "error_class": "unknown",
+    "judge_reasoning": "Judge error: Expecting ',' delimiter: line 7 column 73 (char 192)"
+  },
+  {
+    "question_id": 4,
+    "category": "A",
+    "question": "What is the tightest bend radius we should allow for the 1 1/4\" hose with article number 1103-03-20?",
+    "ground_truth": "Article 1103-03-20 has a specified minimum bend radius of 300 mm.",
+    "expert_comment": "Performance specification lookup.",
+    "rag_answer": "According to Source 1, the bend radius (Böjradie mm) for the 32.0mm hose with article number 1103-03-20 is 300mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1103-03-20",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-04",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-08",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-04",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-12",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.423,
+    "token_estimate": 387,
+    "prompt_tokens": 359,
+    "response_tokens": 28,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core facts as ground truth, with accurate citation and unit fidelity."
+  },
+  {
+    "question_id": 5,
+    "category": "A",
+    "question": "I need to compare the weight per meter between the 1103-03-04 and 1103-03-16 hoses. Which one is heavier?",
+    "ground_truth": "1103-03-04 weighs 0.18 kg/m, while 1103-03-16 is significantly heavier at 0.82 kg/m.",
+    "expert_comment": "Quantitative product comparison.",
+    "rag_answer": "To answer your question, we need to find the product codes 1103-03-04 and 1103-03-16 in the provided context.\n\nUnfortunately, none of the provided sources (Source 1, Source 2, Source 3, Source 4, or Source 5) contain product codes that match these specific numbers. Therefore, I cannot provide a comparison between the weight per meter of the hoses with these product codes.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-06",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-10",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1114-45-06",
+        "family_code": "1114-45",
+        "family_name": "WATERBLAST",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 22
+      },
+      {
+        "source": "products",
+        "product_code": "1106-43-10",
+        "family_code": "1106-43",
+        "family_name": "KAPPAFLEX 3 PO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.847,
+    "token_estimate": 455,
+    "prompt_tokens": 362,
+    "response_tokens": 93,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "The AI answer claims it cannot provide a comparison due to missing product codes, but the ground truth provides specific weights per meter."
+  },
+  {
+    "question_id": 6,
+    "category": "A",
+    "question": "Within the 1105-10 series, which specific article number should I use if I need exactly 45.0 MPa working pressure?",
+    "ground_truth": "1105-10-04 is the model rated for 45.0 MPa in the 1105-10 series.",
+    "expert_comment": "Product identification by performance constraint.",
+    "rag_answer": "Based on the provided context, within the 1105-10 series, you should use the product code 1105-21-04 or 1105-21-05, as both have an Arb.tr. MPa of 45.0. However, since Source 2 and Source 5 are identical in terms of product code, article number, ID, YD, and working pressure, but differ in the bending radius (Source 2 has a bending radius of 25 mm while Source 5 has a bending radius of 60 mm), it is not possible to determine which specific article number you should use based solely on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1105-21-04",
+        "family_code": "1105-21",
+        "family_name": "KAPPAFLEX 2K XA",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 8
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-04",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1045-01-05",
+        "family_code": "1045-01",
+        "family_name": "HYDROSCAND T7011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 29
+      },
+      {
+        "source": "products",
+        "product_code": "1105-21-05",
+        "family_code": "1105-21",
+        "family_name": "KAPPAFLEX 2K XA",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 8
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 5.035,
+    "token_estimate": 496,
+    "prompt_tokens": 369,
+    "response_tokens": 127,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "The AI answer contains an unsupported claim about the article numbers being identical despite having different bending radii."
+  },
+  {
+    "question_id": 7,
+    "category": "A",
+    "question": "Check the minimum and maximum lengths for the 1105-10-04-30 reel configuration.",
+    "ground_truth": "Reel specifications for 1105-10-04-30 indicate a minimum length of 170 and a maximum of 230.",
+    "expert_comment": "Logistics and packaging specification lookup.",
+    "rag_answer": "According to Source 3, the product code 1105-10-04-30 has a minimum length of 170 and a maximum length of 230.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1105-10-06-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-04-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-05-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.693,
+    "token_estimate": 342,
+    "prompt_tokens": 315,
+    "response_tokens": 27,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly replicates the ground truth without any deviations or inaccuracies."
+  },
+  {
+    "question_id": 8,
+    "category": "A",
+    "question": "What's the internal diameter in millimeters for the 3/4\" 1105-10-12 hose?",
+    "ground_truth": "The internal diameter for 1105-10-12 is 19.0 mm.",
+    "expert_comment": "Dimension validation.",
+    "rag_answer": "The product code is not provided in Source 3. The ID (internal diameter) is listed as 19.0 mm, but it is specified that this is for a 3/4\" ID, which is equivalent to 19.05 mm. However, the exact match for the 3/4\" ID is not found in the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1058-01-04",
+        "family_code": "1058-01",
+        "family_name": "HYDROSCAND T3011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 32
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1115-10-12",
+        "family_code": "1115-10",
+        "family_name": "DELTAFLEx 4 CT",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 16
+      },
+      {
+        "source": "products",
+        "product_code": "1115-10-06",
+        "family_code": "1115-10",
+        "family_name": "DELTAFLEx 4 CT",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 16
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-04",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.698,
+    "token_estimate": 428,
+    "prompt_tokens": 365,
+    "response_tokens": 63,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth, but with a minor unit discrepancy."
+  },
+  {
+    "question_id": 9,
+    "category": "A",
+    "question": "Can you find the specific weight in kg/m for the 1\" 1105-10-16 hose?",
+    "ground_truth": "The weight for 1105-10-16 is 0.79 kg/m.",
+    "expert_comment": "Technical specification lookup.",
+    "rag_answer": "I can't find any information about a product code \"1105-10-16\". The provided context only contains data for products with codes starting with \"1031-\" or \"1003-\", but not \"1105-10-16\". Therefore, I cannot determine the specific weight in kg/m for the requested hose.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1031-01-16",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1045-01-16",
+        "family_code": "1045-01",
+        "family_name": "HYDROSCAND T7011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 29
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-10",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-05",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-16",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.719,
+    "token_estimate": 439,
+    "prompt_tokens": 373,
+    "response_tokens": 66,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core facts as ground truth, but lacks a specific reference"
+  },
+  {
+    "question_id": 10,
+    "category": "A",
+    "question": "If I switch from 1105-10-04 to 1105-10-08, how much larger will the bend radius be?",
+    "ground_truth": "1105-10-08 has a bend radius of 90 mm, which is 45 mm larger than the 45 mm radius of 1105-10-04.",
+    "expert_comment": "Multi-product performance evaluation.",
+    "rag_answer": "The answer cannot be determined based on the provided context. The product codes 1105-10-04 and 1105-10-08 are not mentioned in any of the sources.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1115-10-06",
+        "family_code": "1115-10",
+        "family_name": "DELTAFLEx 4 CT",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 16
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-05",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1115-10-10",
+        "family_code": "1115-10",
+        "family_name": "DELTAFLEx 4 CT",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 16
+      },
+      {
+        "source": "products",
+        "product_code": "1104-17-05",
+        "family_code": "1104-17",
+        "family_name": "KAPPAFLEX 2 CO SMOOTH",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 9
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.462,
+    "token_estimate": 400,
+    "prompt_tokens": 364,
+    "response_tokens": 36,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "The AI answer contains an unsupported claim about the product codes not being mentioned in any sources."
+  },
+  {
+    "question_id": 11,
+    "category": "A",
+    "question": "What is the maximum pressure limit for a Hydroscand 1105-63-04 hose?",
+    "ground_truth": "The documentation defines a maximum working pressure of 45.0 MPa for 1105-63-04.",
+    "expert_comment": "Pressure rating lookup.",
+    "rag_answer": "There is no information provided in the context about a product code \"1105-63-04\". The context only contains information about five different products with various codes. Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1031-01-04",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1049-01-04",
+        "family_code": "1049-01",
+        "family_name": "HYDROSCAND T8011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 30
+      },
+      {
+        "source": "products",
+        "product_code": "1034-01-04",
+        "family_code": "1034-01",
+        "family_name": "HYDROSCAND T1211",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      },
+      {
+        "source": "products",
+        "product_code": "1045-01-04",
+        "family_code": "1045-01",
+        "family_name": "HYDROSCAND T7011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 29
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-16",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.573,
+    "token_estimate": 436,
+    "prompt_tokens": 372,
+    "response_tokens": 64,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "Answer claims no information is available for the product code, but actually provides a correct answer"
+  },
+  {
+    "question_id": 12,
+    "category": "A",
+    "question": "I'm looking at reels 1105-63-04-30 and 1105-63-08-30. Are there any differences in the hose dimensions?",
+    "ground_truth": "1105-63-04-30 is 1/4\", while 1105-63-08-30 is 1/2\".",
+    "expert_comment": "Comparative dimensional analysis.",
+    "rag_answer": "No, according to the provided context, there are no hose dimensions mentioned for reels 1105-63-04-30 and 1105-63-08-30. The context only provides information about other product codes and their corresponding dimensions.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1105-10-06-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-05-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-05-30",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.529,
+    "token_estimate": 378,
+    "prompt_tokens": 323,
+    "response_tokens": 55,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core facts as ground truth, but lacks context and specificity"
+  },
+  {
+    "question_id": 13,
+    "category": "A",
+    "question": "What is the minimum recommended bend radius for the 1105-63-16 model?",
+    "ground_truth": "The minimum bend radius for 1105-63-16 is 210 mm.",
+    "expert_comment": "Mechanical constraint lookup.",
+    "rag_answer": "There is no information provided in the context about a product code \"1105-63-16\". The context only contains information about five different products with their respective codes. Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1103-03-05",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1093-01-05",
+        "family_code": "1093-01",
+        "family_name": "P.T.F.E. SLANG - HEAVY WALL",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 35
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-05",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-00-03",
+        "family_code": "1101-00",
+        "family_name": "EGEFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-16",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.55,
+    "token_estimate": 422,
+    "prompt_tokens": 356,
+    "response_tokens": 66,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "Answer claims no information is available for the product code, but actually provides a correct answer"
+  },
+  {
+    "question_id": 14,
+    "category": "A",
+    "question": "How much does a meter of the 1 1/4\" hose 1105-63-20 weigh?",
+    "ground_truth": "Article 1105-63-20 has a weight of 1.52 kg/m.",
+    "expert_comment": "Physical property lookup.",
+    "rag_answer": "There is no information about a product with the code \"1105-63-20\" in the provided context. The context only contains information about five different products, but none of them have this specific code. Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1056-02-04",
+        "family_code": "1056-02",
+        "family_name": "HYDROSCAND T3311",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 33
+      },
+      {
+        "source": "products",
+        "product_code": "1114-45-06",
+        "family_code": "1114-45",
+        "family_name": "WATERBLAST",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 22
+      },
+      {
+        "source": "products",
+        "product_code": "1114-45-08",
+        "family_code": "1114-45",
+        "family_name": "WATERBLAST",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 22
+      },
+      {
+        "source": "products",
+        "product_code": "1045-01-04",
+        "family_code": "1045-01",
+        "family_name": "HYDROSCAND T7011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 29
+      },
+      {
+        "source": "products",
+        "product_code": "1057-01-04",
+        "family_code": "1057-01",
+        "family_name": "HYDROSCAND T6071",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 34
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.637,
+    "token_estimate": 430,
+    "prompt_tokens": 358,
+    "response_tokens": 72,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core fact (weight) as ground truth, but lacks context and references"
+  },
+  {
+    "question_id": 15,
+    "category": "A",
+    "question": "Can you verify the working pressure rating for article 1105-21-04?",
+    "ground_truth": "1105-21-04 is rated for a working pressure of 45.0 MPa.",
+    "expert_comment": "Catalog attribute extraction.",
+    "rag_answer": "Yes, I can verify that the working pressure rating for article 1105-21-04 is 45.0 MPa.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1105-21-04",
+        "family_code": "1105-21",
+        "family_name": "KAPPAFLEX 2K XA",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 8
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-04",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1105-43-04",
+        "family_code": "1105-43",
+        "family_name": "KAPPAFLEX 2K PO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 8
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.47,
+    "token_estimate": 378,
+    "prompt_tokens": 357,
+    "response_tokens": 21,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly replicates the ground truth without any deviations or inaccuracies."
+  },
+  {
+    "question_id": 16,
+    "category": "A",
+    "question": "What is the external diameter (YD) of the 1105-21-16 variant?",
+    "ground_truth": "The outer diameter for 1105-21-16 is 35.6 mm.",
+    "expert_comment": "Geometric specification lookup.",
+    "rag_answer": "The external diameter (YD) of the 1105-21-16 variant is 35.6 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1201-11-05",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1105-21-10",
+        "family_code": "1105-21",
+        "family_name": "KAPPAFLEX 2K XA",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 8
+      },
+      {
+        "source": "products",
+        "product_code": "1105-21-05",
+        "family_code": "1105-21",
+        "family_name": "KAPPAFLEX 2K XA",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 8
+      },
+      {
+        "source": "products",
+        "product_code": "1115-10-16",
+        "family_code": "1115-10",
+        "family_name": "DELTAFLEx 4 CT",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 16
+      },
+      {
+        "source": "products",
+        "product_code": "1105-21-16",
+        "family_code": "1105-21",
+        "family_name": "KAPPAFLEX 2K XA",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 8
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.446,
+    "token_estimate": 373,
+    "prompt_tokens": 357,
+    "response_tokens": 16,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer matches ground truth exactly, no extraneous information"
+  },
+  {
+    "question_id": 17,
+    "category": "A",
+    "question": "I need to know the ID in inches for the 1105-43-06 Hydroscand model.",
+    "ground_truth": "1105-43-06 has an internal diameter of 3/8\".",
+    "expert_comment": "Standard dimension lookup.",
+    "rag_answer": "There is no information provided about a product code \"1105-43-06\" in the given context. The context only provides information about five different products with their respective codes, but none of them match the code \"1105-43-06\". Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1056-02-04",
+        "family_code": "1056-02",
+        "family_name": "HYDROSCAND T3311",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 33
+      },
+      {
+        "source": "products",
+        "product_code": "1057-01-04",
+        "family_code": "1057-01",
+        "family_name": "HYDROSCAND T6071",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 34
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-04",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1049-01-04",
+        "family_code": "1049-01",
+        "family_name": "HYDROSCAND T8011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 30
+      },
+      {
+        "source": "products",
+        "product_code": "1034-01-04",
+        "family_code": "1034-01",
+        "family_name": "HYDROSCAND T1211",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.686,
+    "token_estimate": 446,
+    "prompt_tokens": 367,
+    "response_tokens": 79,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core fact (product code) as ground truth, but lacks context and specificity"
+  },
+  {
+    "question_id": 18,
+    "category": "A",
+    "question": "What is the longest reel length I can get for article 1104-17-04-30?",
+    "ground_truth": "The maximum reel length for 1104-17-04-30 is 260.",
+    "expert_comment": "Packaging specification lookup.",
+    "rag_answer": "There is no information provided in the context about product code 1104-17-04-30. Therefore, I cannot determine the longest reel length available for this product.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-04-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-04-30",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1105-63-04-30",
+        "family_code": "1105-63",
+        "family_name": "KAPPAFLEX 2K CO ROCK PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 7
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.387,
+    "token_estimate": 357,
+    "prompt_tokens": 317,
+    "response_tokens": 40,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer is correct but lacks context, citing the product code directly"
+  },
+  {
+    "question_id": 19,
+    "category": "A",
+    "question": "Find the weight per meter for the 1\" configuration of 1104-17-16.",
+    "ground_truth": "Article 1104-17-16 has a unit weight of 1.17 kg/m.",
+    "expert_comment": "Mass property lookup.",
+    "rag_answer": "There is no information provided in the context about a product code \"1104-17-16\". The context only contains data about five different products, but none of them match this product code. Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1007-01-04",
+        "family_code": "1007-01",
+        "family_name": "ISOBAR 21 TL R17",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 15
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-04",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.51,
+    "token_estimate": 414,
+    "prompt_tokens": 346,
+    "response_tokens": 68,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "Answer claims no information is available for the product code, but ground truth provides a clear unit weight value."
+  },
+  {
+    "question_id": 20,
+    "category": "A",
+    "question": "What is the nominal working pressure recorded for the 1/4\" 1102-14-04?",
+    "ground_truth": "The nominal working pressure for 1102-14-04 is 40.0 MPa.",
+    "expert_comment": "Performance specification lookup.",
+    "rag_answer": "The nominal working pressure recorded for the 1/4\" 1102-14-04 is 40.0 MPa.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-04",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1104-17-04",
+        "family_code": "1104-17",
+        "family_name": "KAPPAFLEX 2 CO SMOOTH",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 9
+      },
+      {
+        "source": "products",
+        "product_code": "1032-04-04",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1112",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.43,
+    "token_estimate": 385,
+    "prompt_tokens": 367,
+    "response_tokens": 18,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer matches ground truth exactly, no deviations or inaccuracies"
+  },
+  {
+    "question_id": 21,
+    "category": "A",
+    "question": "Can you find the working pressure for article 1106-73-08?",
+    "ground_truth": "1106-73-08 is rated for 47.0 MPa.",
+    "expert_comment": "Technical data extraction.",
+    "rag_answer": "Yes, I can help you with that. According to Source 2, the working pressure (Arb.tr. MPa) for article 1106-73-08 is 47.0 MPa.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1106-73-10",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1106-73-08",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1135-83-06",
+        "family_code": "1135-83",
+        "family_name": "ISOBAR 350 X-HP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 17
+      },
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.51,
+    "token_estimate": 385,
+    "prompt_tokens": 354,
+    "response_tokens": 31,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth and provides a specific reference."
+  },
+  {
+    "question_id": 22,
+    "category": "A",
+    "question": "What is the outer diameter specification for 1106-73-10?",
+    "ground_truth": "The outer diameter (YD mm) for 1106-73-10 is 28.8 mm.",
+    "expert_comment": "Dimensional lookup.",
+    "rag_answer": "The outer diameter (ID) specification for product code 1106-73-10 is 16,0 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1106-73-10",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-06",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1093-01-06",
+        "family_code": "1093-01",
+        "family_name": "P.T.F.E. SLANG - HEAVY WALL",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 35
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.334,
+    "token_estimate": 371,
+    "prompt_tokens": 352,
+    "response_tokens": 19,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "Incorrect unit value (mm) provided instead of the correct value (28.8 mm)"
+  },
+  {
+    "question_id": 23,
+    "category": "A",
+    "question": "Check the bending radius for article 1106-73-12 in the catalog.",
+    "ground_truth": "The bending radius for 1106-73-12 is 260 mm.",
+    "expert_comment": "Mechanical constraint extraction.",
+    "rag_answer": "The bending radius for article 1106-73-12 is 260 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1106-73-10",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1106-73-12",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-06",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1106-73-08",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-12",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.308,
+    "token_estimate": 371,
+    "prompt_tokens": 358,
+    "response_tokens": 13,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer exactly matches the ground truth, with no deviations or inaccuracies."
+  },
+  {
+    "question_id": 24,
+    "category": "A",
+    "question": "I need the weight per meter for the 1106-73-16 hose.",
+    "ground_truth": "Article 1106-73-16 has a weight of 1.99 kg/m.",
+    "expert_comment": "Physical property lookup.",
+    "rag_answer": "I don't have any information about a product code \"1106-73-16\" in the provided context. The only product with this family and configuration is \"1106-73-10\", but its ID is 5/8\" (ID mm: 16,0) which does not match the requested ID of 16,0 for the hose you are looking for.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1045-01-06",
+        "family_code": "1045-01",
+        "family_name": "HYDROSCAND T7011",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 29
+      },
+      {
+        "source": "products",
+        "product_code": "1057-01-06",
+        "family_code": "1057-01",
+        "family_name": "HYDROSCAND T6071",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 34
+      },
+      {
+        "source": "products",
+        "product_code": "1106-73-10",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1057-01-05",
+        "family_code": "1057-01",
+        "family_name": "HYDROSCAND T6071",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 34
+      },
+      {
+        "source": "products",
+        "product_code": "1057-01-03",
+        "family_code": "1057-01",
+        "family_name": "HYDROSCAND T6071",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 34
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.818,
+    "token_estimate": 427,
+    "prompt_tokens": 360,
+    "response_tokens": 67,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "AI claims to not have information about the product, but instead provides a plausible-sounding explanation that is not supported by the ground truth."
+  },
+  {
+    "question_id": 25,
+    "category": "A",
+    "question": "Identify the working pressure rating for the 1106-43-08 variant.",
+    "ground_truth": "1106-43-08 is rated for 47.0 MPa.",
+    "expert_comment": "Pressure rating lookup.",
+    "rag_answer": "The working pressure rating for the 1106-43-08 variant is 47.0 MPa.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1106-43-08",
+        "family_code": "1106-43",
+        "family_name": "KAPPAFLEX 3 PO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1106-43-10",
+        "family_code": "1106-43",
+        "family_name": "KAPPAFLEX 3 PO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-04",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.511,
+    "token_estimate": 370,
+    "prompt_tokens": 354,
+    "response_tokens": 16,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly matches the ground truth without any discrepancies."
+  },
+  {
+    "question_id": 26,
+    "category": "A",
+    "question": "What is the geometric outer diameter for article 1106-43-12?",
+    "ground_truth": "The outer diameter for 1106-43-12 is 32.5 mm.",
+    "expert_comment": "Geometric property lookup.",
+    "rag_answer": "There is no information provided in the context about an article with the product code \"1106-43-12\". The context only contains information about five different articles with various product codes. Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1101-14-04",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-20",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-10",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-06",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.494,
+    "token_estimate": 424,
+    "prompt_tokens": 354,
+    "response_tokens": 70,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "AI claims no information is available for the product code, but it should have looked up the correct value instead"
+  },
+  {
+    "question_id": 27,
+    "category": "A",
+    "question": "Are the working pressures of 1106-73-08 and 1106-43-08 the same?",
+    "ground_truth": "Yes, both 1106-73-08 and 1106-43-08 are rated for 47.0 MPa.",
+    "expert_comment": "Multi-product comparison.",
+    "rag_answer": "No, the working pressure of 1106-73-08 is not mentioned in Source 3. The working pressure for this product is 47.0 MPa. There is no information about a product code 1106-43-08 in the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1106-73-10",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1106-73-08",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-08",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.618,
+    "token_estimate": 406,
+    "prompt_tokens": 356,
+    "response_tokens": 50,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "The AI answer contains an unsupported claim about the product code 1106-43-08, which is not present in the ground truth."
+  },
+  {
+    "question_id": 28,
+    "category": "A",
+    "question": "Between 1106-73-16 and 1106-43-16, which one has a larger bending radius?",
+    "ground_truth": "Neither; both 1106-73-16 and 1106-43-16 have a bending radius of 310 mm.",
+    "expert_comment": "Comparative analysis.",
+    "rag_answer": "Between 1106-73-10 (210 mm) and 1106-43-10 (210 mm), they have the same bending radius.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1106-73-10",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-10",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1106-43-10",
+        "family_code": "1106-43",
+        "family_name": "KAPPAFLEX 3 PO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-08",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.401,
+    "token_estimate": 383,
+    "prompt_tokens": 362,
+    "response_tokens": 21,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Incorrect answer does not convey core facts; instead, it provides a different product code and measurement"
+  },
+  {
+    "question_id": 29,
+    "category": "A",
+    "question": "I need the internal diameter (mm) and working pressure (MPa) for article 1110-00-04.",
+    "ground_truth": "1110-00-04 has an ID of 6.5 mm and a working pressure of 10.0 MPa.",
+    "expert_comment": "Multi-attribute lookup.",
+    "rag_answer": "The internal diameter (ID) is 6.5 mm and the working pressure (Arb.tr.) is 10.0 MPa.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-04",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-04",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1201-10-04",
+        "family_code": "1201-10",
+        "family_name": "SPIR STAR, TYP 2",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 37
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.791,
+    "token_estimate": 379,
+    "prompt_tokens": 358,
+    "response_tokens": 21,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth, with correct units and no unsupported claims."
+  },
+  {
+    "question_id": 30,
+    "category": "A",
+    "question": "What is the documented weight for article 1110-00-08?",
+    "ground_truth": "The weight for 1110-00-08 is 0.27 kg/m.",
+    "expert_comment": "Physical property lookup.",
+    "rag_answer": "The documented weight for article 1110-00-08 is 0.27 kg/m.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-00-08",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1110-03-08",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-08",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-08",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.35,
+    "token_estimate": 370,
+    "prompt_tokens": 356,
+    "response_tokens": 14,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer matches the ground truth exactly, without any discrepancies or unsupported claims."
+  },
+  {
+    "question_id": 31,
+    "category": "A",
+    "question": "Can you find the mechanical bending radius for the 1110-03-06 hose?",
+    "ground_truth": "The specified bending radius for 1110-03-06 is 40 mm.",
+    "expert_comment": "Mechanical property lookup.",
+    "rag_answer": "Yes, I can find that information for you.\n\nAccording to Source 1, the mechanical bending radius (Böjradie mm) for the product code 1110-03-06 is 40 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-06",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-06",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-06",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.513,
+    "token_estimate": 394,
+    "prompt_tokens": 357,
+    "response_tokens": 37,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core facts as ground truth, with accurate citation and unit fidelity."
+  },
+  {
+    "question_id": 32,
+    "category": "A",
+    "question": "Compare the internal diameters of 1110-00-06 and 1110-03-06. Are they identical?",
+    "ground_truth": "Yes, both 1110-00-06 and 1110-03-06 have an ID of 10.0 mm.",
+    "expert_comment": "Dimensional comparison.",
+    "rag_answer": "Yes, the internal diameters (ID) of 1110-00-06 and 1110-03-06 are identical, both measuring 10.0 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-06",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-06",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.472,
+    "token_estimate": 386,
+    "prompt_tokens": 361,
+    "response_tokens": 25,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth and references specific product codes."
+  },
+  {
+    "question_id": 33,
+    "category": "A",
+    "question": "What's the performance rating for working pressure on the 1101-00-03?",
+    "ground_truth": "1101-00-03 is rated for a working pressure of 25.0 MPa.",
+    "expert_comment": "Performance lookup.",
+    "rag_answer": "The product code 1101-00-03 has an Arb.tr. MPa (Arbeitsdruck in MPa) of 25.0.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1101-00-03",
+        "family_code": "1101-00",
+        "family_name": "EGEFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-20",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-10",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1110-03-08",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.342,
+    "token_estimate": 373,
+    "prompt_tokens": 354,
+    "response_tokens": 19,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth, with correct units and a specific reference."
+  },
+  {
+    "question_id": 34,
+    "category": "A",
+    "question": "Is there a maximum length limit for article 1101-14-04-30 on a reel?",
+    "ground_truth": "Yes, the maximum reel length for 1101-14-04-30 is 260.",
+    "expert_comment": "Logistics data lookup.",
+    "rag_answer": "Yes, the maximum length limit for article 1101-14-04-30 on a reel is 260.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-04-30",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1105-10-04-30",
+        "family_code": "1105-10",
+        "family_name": "KAPPAFLEX 2K CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 6
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-06-30",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.405,
+    "token_estimate": 333,
+    "prompt_tokens": 315,
+    "response_tokens": 18,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer exactly matches the ground truth, with no deviations or inaccuracies."
+  },
+  {
+    "question_id": 35,
+    "category": "A",
+    "question": "We need to know the outer diameter (YD) for the 1101-14-12 hose.",
+    "ground_truth": "The outer diameter for 1101-14-12 is 27.8 mm.",
+    "expert_comment": "Geometric specification.",
+    "rag_answer": "There is no information available in the provided context about a product code \"1101-14-12\". The context only contains data about five different products with their respective codes, but none of them match this code. Therefore, I cannot provide an answer to your question based on the provided context.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1034-01-04",
+        "family_code": "1034-01",
+        "family_name": "HYDROSCAND T1211",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      },
+      {
+        "source": "products",
+        "product_code": "1034-01-12",
+        "family_code": "1034-01",
+        "family_name": "HYDROSCAND T1211",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1032-04-04",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1112",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.648,
+    "token_estimate": 440,
+    "prompt_tokens": 365,
+    "response_tokens": 75,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 1,
+    "error_class": "hallucination",
+    "judge_reasoning": "Answer claims no information is available, but ground truth provides a clear answer"
+  },
+  {
+    "question_id": 36,
+    "category": "A",
+    "question": "How heavy is article 1101-14-20 per meter?",
+    "ground_truth": "Article 1101-14-20 has a weight of 1.23 kg/m.",
+    "expert_comment": "Physical data lookup.",
+    "rag_answer": "According to Source 2, the weight of article 1101-14-20 per meter (Vikt kg/m) is 1.23 kg/m.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-20",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-04",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-20",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.461,
+    "token_estimate": 370,
+    "prompt_tokens": 348,
+    "response_tokens": 22,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly copies the ground truth without any deviation or error."
+  },
+  {
+    "question_id": 37,
+    "category": "A",
+    "question": "Find the minimum allowed bend radius for the 1101-14-32 configuration.",
+    "ground_truth": "The minimum bend radius for 1101-14-32 is 630 mm.",
+    "expert_comment": "Mechanical data lookup.",
+    "rag_answer": "The minimum allowed bend radius for the 1101-14-32 configuration is 630 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1101-14-20",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-32",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-12",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-20",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.417,
+    "token_estimate": 372,
+    "prompt_tokens": 354,
+    "response_tokens": 18,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer exactly matches the ground truth, with no deviations or inaccuracies."
+  },
+  {
+    "question_id": 38,
+    "category": "A",
+    "question": "Can you specify the ID in inches for article 1101-14-24?",
+    "ground_truth": "1101-14-24 has an internal diameter of 1 1/2\".",
+    "expert_comment": "Standard dimension lookup.",
+    "rag_answer": "According to Source 2, the ID in inches is 1 1/2\". To convert this to a decimal value, we can break it down as follows:\n\n1 1/2\" = 1 + 1/2\n= 1 + 0.5\n= 1.5\"\n\nSo, the ID in inches for article 1101-14-24 is 1.5\".",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-24",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-02",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1201-10-16",
+        "family_code": "1201-10",
+        "family_name": "SPIR STAR, TYP 2",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 37
+      },
+      {
+        "source": "products",
+        "product_code": "1201-10-04",
+        "family_code": "1201-10",
+        "family_name": "SPIR STAR, TYP 2",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 37
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.758,
+    "token_estimate": 408,
+    "prompt_tokens": 356,
+    "response_tokens": 52,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly quotes the ground truth and provides a clear conversion to inches."
+  },
+  {
+    "question_id": 39,
+    "category": "A",
+    "question": "Which of the two, 1101-14-10 or 1101-14-16, is rated for higher working pressure?",
+    "ground_truth": "1101-14-10 has a higher rating (13.0 MPa) compared to 1101-14-16 (8.8 MPa).",
+    "expert_comment": "Performance comparison.",
+    "rag_answer": "Based on the provided context, I can only find information about product code 1101-14-10. There is no mention of a product code 1101-14-16 in the sources.\n\nTherefore, I cannot answer your question as it is based on non-existent data.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1201-10-04",
+        "family_code": "1201-10",
+        "family_name": "SPIR STAR, TYP 2",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 37
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-10",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.486,
+    "token_estimate": 419,
+    "prompt_tokens": 361,
+    "response_tokens": 58,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core facts as ground truth, but lacks context"
+  },
+  {
+    "question_id": 40,
+    "category": "A",
+    "question": "Verify the working pressure rating for article 1071-00-04.",
+    "ground_truth": "The working pressure for 1071-00-04 is 22.5 MPa.",
+    "expert_comment": "Performance lookup.",
+    "rag_answer": "The working pressure rating (Arb.tr. MPa) for article 1071-00-04 is 22.5 MPa.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1071-00-04",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-10",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-12",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-20",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.359,
+    "token_estimate": 366,
+    "prompt_tokens": 347,
+    "response_tokens": 19,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly copies the ground truth without any deviation or error."
+  },
+  {
+    "question_id": 41,
+    "category": "A",
+    "question": "What is the outer diameter specification for the 1071-00-12 hose?",
+    "ground_truth": "The outer diameter for 1071-00-12 is 27.7 mm.",
+    "expert_comment": "Dimensional data.",
+    "rag_answer": "The outer diameter (ID) of the 1071-00-12 hose is specified as 19.0 mm or 3/4\".",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1071-00-12",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-10",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-20",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-32",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-06",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.382,
+    "token_estimate": 367,
+    "prompt_tokens": 348,
+    "response_tokens": 19,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 0,
+    "hallucination": 0,
+    "error_class": "unknown",
+    "judge_reasoning": "Judge response not parseable"
+  },
+  {
+    "question_id": 42,
+    "category": "A",
+    "question": "I need the unit weight for article 1071-00-16.",
+    "ground_truth": "1071-00-16 weighs 0.88 kg/m.",
+    "expert_comment": "Mass property lookup.",
+    "rag_answer": "The unit weight (Vikt kg/m) for article 1071-00-16 is 0.88 kg/m.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1071-00-16",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-10",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-06",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-08",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.37,
+    "token_estimate": 360,
+    "prompt_tokens": 344,
+    "response_tokens": 16,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth, with correct unit weight and proper formatting."
+  },
+  {
+    "question_id": 43,
+    "category": "A",
+    "question": "Compare the bend radii of 1071-00-24 and 1071-00-32. Which is more flexible?",
+    "ground_truth": "1071-00-24 is more flexible (500 mm radius) than 1071-00-32 (630 mm radius).",
+    "expert_comment": "Mechanical comparison.",
+    "rag_answer": "The bend radius of 1071-00-24 is 500 mm, while the bend radius of 1071-00-32 is 630 mm.\n\nSince a smaller bend radius indicates greater flexibility, 1071-00-24 has a more flexible design compared to 1071-00-32.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1071-00-24",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-32",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-20",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1071-00-12",
+        "family_code": "1071-00",
+        "family_name": "HI-TEMP",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-32",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.639,
+    "token_estimate": 405,
+    "prompt_tokens": 353,
+    "response_tokens": 52,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Lacks comparative analysis and interpretation of bend radii"
+  },
+  {
+    "question_id": 44,
+    "category": "A",
+    "question": "Determine the weight per meter for article 1003-11-04.",
+    "ground_truth": "Article 1003-11-04 weighs 22 kg/m according to the technical data.",
+    "expert_comment": "Technical data extraction.",
+    "rag_answer": "The weight per meter for article 1003-11-04 is 22 kg/m.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1003-11-04",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-04",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1032-04-04-04",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1113, TRILLING",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      },
+      {
+        "source": "products",
+        "product_code": "1114-45-12",
+        "family_code": "1114-45",
+        "family_name": "WATERBLAST",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 22
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.332,
+    "token_estimate": 373,
+    "prompt_tokens": 360,
+    "response_tokens": 13,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth, but lacks a specific reference to the source documentation."
+  },
+  {
+    "question_id": 45,
+    "category": "A",
+    "question": "What is the internal diameter (ID mm) of the 1003-11-12 hose?",
+    "ground_truth": "The internal diameter for 1003-11-12 is 19 mm.",
+    "expert_comment": "Dimensional lookup.",
+    "rag_answer": "The internal diameter (ID mm) of the 1003-11-12 hose is 19 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1032-03-03",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1112",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-12",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-03",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-12",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      },
+      {
+        "source": "products",
+        "product_code": "1031-01-06",
+        "family_code": "1031-01",
+        "family_name": "HYDROSCAND T1111",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 25
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.403,
+    "token_estimate": 390,
+    "prompt_tokens": 375,
+    "response_tokens": 15,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer matches ground truth exactly, no additional information or claims"
+  },
+  {
+    "question_id": 46,
+    "category": "A",
+    "question": "Between 1003-11-06 and 1003-11-16, which one can handle more pressure?",
+    "ground_truth": "1003-11-06 can handle more pressure (18 MPa) compared to 1003-11-16 (8.8 MPa).",
+    "expert_comment": "Comparative performance analysis.",
+    "rag_answer": "Based on the provided context, I can only compare products from the same family and category. Since Sources 4 and 5 are from different families (EGEFLEX 1 CO PÅ BOBIN and KAPPAFLEX 3 PO), respectively, we cannot directly compare their pressure-handling capabilities.\n\nHowever, within the same family and category, we can compare the products. Between Sources 3 and 5, both have the same configuration (STANDARD) and similar dimensions (ID mm: 16,0, ID tum: 5/8\"). They also have the same material properties (Arb.tr. MPa: 41,0).\n\nSince Source 4 has a REEL configuration, which is different from the STANDARD configuration of Sources 3 and 5, we cannot directly compare their pressure-handling capabilities.\n\nTherefore, I can only conclude that within the same family and category, Sources 3 and 5 have similar pressure-handling capabilities. However, without more information about Source 4's performance under the REEL configuration, it is unclear which one can handle more pressure between 1003-11-06 and 1003-11-16.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-03-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-06",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1106-73-10",
+        "family_code": "1106-73",
+        "family_name": "KAPPAFLEX 3 CO+",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1106-43-10",
+        "family_code": "1106-43",
+        "family_name": "KAPPAFLEX 3 PO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 10
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 5.584,
+    "token_estimate": 603,
+    "prompt_tokens": 349,
+    "response_tokens": 254,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer conveys the same core facts as the ground truth, but incorrectly concludes that direct comparison between products is not possible due to different configurations."
+  },
+  {
+    "question_id": 47,
+    "category": "A",
+    "question": "What is the mechanical bend radius for article 1003-11-12?",
+    "ground_truth": "The bend radius for 1003-11-12 is 240 mm.",
+    "expert_comment": "Mechanical specification.",
+    "rag_answer": "The mechanical bend radius for article 1003-11-12 is 240 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1103-03-12",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-12",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-06",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1103-03-20",
+        "family_code": "1103-03",
+        "family_name": "KAPPAFLEX 1",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 5
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-04",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.269,
+    "token_estimate": 360,
+    "prompt_tokens": 345,
+    "response_tokens": 15,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer matches ground truth exactly, no additional information or claims"
+  },
+  {
+    "question_id": 48,
+    "category": "A",
+    "question": "Can you provide the outer diameter (YD) for article 1102-14-04?",
+    "ground_truth": "The outer diameter for 1102-14-04 is 14.04 mm.",
+    "expert_comment": "Geometric specification.",
+    "rag_answer": "The outer diameter (YD) for article 1102-14-04 is 14.04 mm.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1102-14-04",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-04",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1201-11-02",
+        "family_code": "1201-11",
+        "family_name": "SPIR STAR, TYP 2W",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 38
+      },
+      {
+        "source": "products",
+        "product_code": "1003-11-04",
+        "family_code": "1003-11",
+        "family_name": "1SN RÖD",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 13
+      },
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.3,
+    "token_estimate": 371,
+    "prompt_tokens": 357,
+    "response_tokens": 14,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer exactly matches the ground truth, with no deviations or inaccuracies."
+  },
+  {
+    "question_id": 49,
+    "category": "A",
+    "question": "What is the longest bobbin length we can order for 1102-14-08-30?",
+    "ground_truth": "The maximum bobbin length for 1102-14-08-30 is 95.",
+    "expert_comment": "Logistics data extraction.",
+    "rag_answer": "According to Source 3, the Product Code 1102-14-08-30 has a maximum bobbin length of 95. Therefore, the longest bobbin length that can be ordered for this product is 95.",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1102-14-06-30",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-06-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-08-30",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-08-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-04-30",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.569,
+    "token_estimate": 357,
+    "prompt_tokens": 315,
+    "response_tokens": 42,
+    "skipped": false,
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "The AI answer directly quotes the ground truth and provides a specific reference."
+  },
+  {
+    "question_id": 50,
+    "category": "A",
+    "question": "Compare the weight of 1102-14-04 and 1103-03-04. Are there significant differences?",
+    "ground_truth": "Yes; 1102-14-04 (0.31 kg/m) is noticeably heavier than 1103-03-04 (0.18 kg/m).",
+    "expert_comment": "Quantitative physical comparison.",
+    "rag_answer": "There is no product code \"1103-03-04\" in the provided context. The available product codes are:\n\n* 1110-00-04 (Source 1)\n* 1101-14-04-30 (Source 2)\n* 1032-04-04-04 (Source 3)\n* 1102-14-04 (Source 4)\n\nSince there is no matching product code, it's not possible to compare the weight of \"1102-14-04\" and \"1103-03-04\".",
+    "sources": [
+      {
+        "source": "products",
+        "product_code": "1110-00-04",
+        "family_code": "1110-00/-03",
+        "family_name": "ISOBAR 10",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 11
+      },
+      {
+        "source": "products",
+        "product_code": "1101-14-04-30",
+        "family_code": "1101-14",
+        "family_name": "EGEFLEX 1 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 12
+      },
+      {
+        "source": "products",
+        "product_code": "1032-04-04-04",
+        "family_code": "1032",
+        "family_name": "HYDROSCAND T1113, TRILLING",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 26
+      },
+      {
+        "source": "products",
+        "product_code": "1102-14-04",
+        "family_code": "1102-14",
+        "family_name": "EGEFLEX 2 CO PÅ BOBIN",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 14
+      },
+      {
+        "source": "products",
+        "product_code": "1142-13-20",
+        "family_code": "1142-13",
+        "family_name": "ISOBAR 42 CO",
+        "category": "HÖGTRYCKSSLANG",
+        "page_number": 20
+      }
+    ],
+    "retrieved_chunks": 5,
+    "latency_s": 4.874,
+    "token_estimate": 436,
+    "prompt_tokens": 358,
+    "response_tokens": 78,
+    "skipped": false,
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": 0,
+    "error_class": "none",
+    "judge_reasoning": "Answer conveys the same core facts as ground truth, but lacks specific references"
+  }
+]

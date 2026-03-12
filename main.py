@@ -53,11 +53,12 @@ def main():
         # Can also be set via environment variable: DEBUG_LEVEL
         from Layer_2_Agentic.config import debug_config
 
-        debug_config.set_debug_level(0)  # Change this to adjust verbosity
+        debug_config.set_debug_level(2)  # Change this to adjust verbosity
 
         # =================================================================
         # QUERY SELECTION - Configure your query here
         # =================================================================
+        user_query = "What hoses can be used for boiling water?"
         # Example queries (domain-specific examples should be configured per application):
         # user_query = "Tell me all you know about this product: 1047-08-08?"
         # user_query = "What is the maximum temperature for hose 1071-00-16?"
@@ -65,7 +66,7 @@ def main():
         # user_query = "Vad är maxarbetstryck för denna slang 1071-00-16?"
         # user_query = "what is the ID of the hose 1071-00-16?"
 
-        user_query = "Vilken gängstorlek har en 4201-16-16?"
+        # user_query = "Vilken gängstorlek har en 4201-16-16?"
         # user_query = "Vilket max arbetstryck är 4270-12-06-2 klassad för?"
         # For testing, you can uncomment and modify these:
         # user_query = "What is the Slang ID for the product 4221-24-08?"
