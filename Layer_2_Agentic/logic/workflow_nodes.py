@@ -396,81 +396,75 @@ def node_strategy_plan(session_state: SessionState) -> SessionState:
 
             return session_state
 
-    # ─── Forced Strategy Override (bypasses LLM selection) ────────
+    # ─── Strategy Selection: Forced Override OR LLM ──────────────
+    sname = None
+    strategy_info = None
+
     forced = session_state.get("forcedStrategy")
     if forced and forced in available_strategies:
         debug.print_strategy(f"Forced strategy: {forced} (bypassing LLM selection)")
         strategy_info = db.get_strategy_info(forced)
         if strategy_info:
             sname = forced
-            plan_steps = strategy_info.plan_steps
-            plan_funcs = [step.strip() for step in plan_steps.split(",")]
-            debug.print_strategy(f"Strategy {sname} with functions: {plan_funcs}")
-            # Jump directly to function instance creation (skip LLM block)
-            return _create_strategy_in_session(
-                session_state, db, gid, sname, strategy_info, plan_funcs
+
+    if sname is None:
+        # LLM strategy selection
+        lib_block = "\n".join([f"- {s}" for s in available_strategies])
+
+        prompt = prompt_loader.format_prompt(
+            "strategy_selection",
+            query=query,
+            goal_desc=goal_desc,
+            tried_readable=tried_readable,
+            lib_block=lib_block,
+        )
+
+        from .llm_helpers import invoke_llm_with_retry
+
+        try:
+            llm_raw = invoke_llm_with_retry(
+                get_basic_llm(),
+                [
+                    {"role": "system", "content": prompt["system"]},
+                    {"role": "user", "content": prompt["user"]},
+                ],
+                max_retries=3,
+                base_delay=2.0
+            )
+        except Exception as e:
+            error_msg = f"LLM strategy selection failed after retries: {str(e)}"
+            debug.print_error(error_msg)
+            raise StrategyError(error_msg, {"exception": str(e), "query": query})
+
+        if hasattr(llm_raw, "content"):
+            llm_resp = llm_raw.content.strip()
+        else:
+            llm_resp = str(llm_raw).strip()
+
+        strategy_resp = parse_json_response(llm_resp)
+
+        if not strategy_resp:
+            raise StrategyError(
+                f"Strategy selection failed - LLM returned invalid JSON: {llm_resp}",
+                {"llm_response": llm_resp, "query": query},
             )
 
-    lib_block = "\n".join([f"- {s}" for s in available_strategies])
+        sname = strategy_resp.get(
+            "strategy_name", strategy_resp.get("StrategyName", "")
+        ).strip()
+        if not sname:
+            raise StrategyError(
+                f"Strategy selection failed - missing strategy_name: {strategy_resp}",
+                {"strategy_response": strategy_resp, "query": query},
+            )
 
-    prompt = prompt_loader.format_prompt(
-        "strategy_selection",
-        query=query,
-        goal_desc=goal_desc,
-        tried_readable=tried_readable,
-        lib_block=lib_block,
-    )
-
-    # Import retry helper
-    from .llm_helpers import invoke_llm_with_retry
-    
-    # Use retry logic for LLM invocation
-    try:
-        llm_raw = invoke_llm_with_retry(
-            get_basic_llm(),
-            [
-                {"role": "system", "content": prompt["system"]},
-                {"role": "user", "content": prompt["user"]},
-            ],
-            max_retries=3,
-            base_delay=2.0
-        )
-    except Exception as e:
-        error_msg = f"LLM strategy selection failed after retries: {str(e)}"
-        debug.print_error(error_msg)
-        raise StrategyError(error_msg, {"exception": str(e), "query": query})
-
-    if hasattr(llm_raw, "content"):
-        llm_resp = llm_raw.content.strip()
-    else:
-        llm_resp = str(llm_raw).strip()
-
-    # Parse JSON response robustly
-    strategy_resp = parse_json_response(llm_resp)
-
-    if not strategy_resp:
-        raise StrategyError(
-            f"Strategy selection failed - LLM returned invalid JSON: {llm_resp}",
-            {"llm_response": llm_resp, "query": query},
-        )
-
-    sname = strategy_resp.get(
-        "strategy_name", strategy_resp.get("StrategyName", "")
-    ).strip()
-    if not sname:
-        raise StrategyError(
-            f"Strategy selection failed - missing strategy_name: {strategy_resp}",
-            {"strategy_response": strategy_resp, "query": query},
-        )
-
-    # Get strategy details from database
-    strategy_info = db.get_strategy_info(sname)
-    if not strategy_info:
-        available_strategies = db.get_available_strategies()
-        raise StrategyError(
-            f"Strategy '{sname}' not found. Available: {available_strategies}",
-            {"requested_strategy": sname, "available_strategies": available_strategies},
-        )
+        strategy_info = db.get_strategy_info(sname)
+        if not strategy_info:
+            available_strategies = db.get_available_strategies()
+            raise StrategyError(
+                f"Strategy '{sname}' not found. Available: {available_strategies}",
+                {"requested_strategy": sname, "available_strategies": available_strategies},
+            )
 
     plan_steps = strategy_info.plan_steps
     plan_funcs = [step.strip() for step in plan_steps.split(",")]

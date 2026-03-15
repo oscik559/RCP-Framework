@@ -181,7 +181,8 @@ def run_b3(questions: List[Dict]) -> List[Dict]:
         try:
             db.clear_all_sessions()
             start = time.time()
-            init_state = get_default_session_state(query=q["question"])
+            forced_strategy = q.get("strategy")  # Use per-question strategy hint if provided
+            init_state = get_default_session_state(query=q["question"], forced_strategy=forced_strategy)
             final_state = graph.invoke(init_state, config=config)
             latency = round(time.time() - start, 2)
             answer = final_state.get("finalAnswer", "No answer generated")
