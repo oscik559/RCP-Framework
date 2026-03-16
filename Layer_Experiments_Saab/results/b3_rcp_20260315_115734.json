@@ -1,0 +1,44 @@
+[
+  {
+    "question_id": 1,
+    "question": "What is the maximum cable entry diameter in mm for backshell C0000268-10904?",
+    "ground_truth": "6.3 mm",
+    "answer": "The maximum cable entry diameter for backshell C0000268-10904 is 6.3 mm.",
+    "latency_s": 5.343,
+    "baseline": "B3_RCP",
+    "forced_strategy": "DIRECT SPECIFICATION LOOKUP",
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": true,
+    "judge_reasoning": "answer contains numbers not in GT"
+  },
+  {
+    "question_id": 2,
+    "question": "What plating does the backshell C0000268-11105 have?",
+    "ground_truth": "ZN",
+    "answer": "The backshell C0000268-11105 has ZN plating.",
+    "latency_s": 7.536,
+    "baseline": "B3_RCP",
+    "forced_strategy": "DIRECT SPECIFICATION LOOKUP",
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": false,
+    "judge_reasoning": "OK"
+  },
+  {
+    "question_id": 3,
+    "question": "What is the backshell configuration (Straight or 90 deg) for product C0000268-20904?",
+    "ground_truth": "90 deg",
+    "answer": "90 deg",
+    "latency_s": 4.973,
+    "baseline": "B3_RCP",
+    "forced_strategy": "DIRECT SPECIFICATION LOOKUP",
+    "answer_correct": 1,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": false,
+    "judge_reasoning": "product code not cited"
+  }
+]

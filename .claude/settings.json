@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m Layer_Experiments.run_evaluation --baseline b1)",
+      "Read(//c/Users/oscik35/AppData/Local/Temp/claude//**)",
+      "Bash(grep -n \"65 queries\\\\|30 queries\\\\|65 technical\\\\|30 technical\\\\|65 questions\\\\|30 questions\\\\|n = 65\\\\|n=65\\\\|$n=30$\\\\|n = 30\" \"C:\\\\Users\\\\oscik35\\\\Desktop\\\\PROJECTS\\\\Hydroscand_Produktbok\\\\Paper\\\\interactnlmsample \\(17\\).tex\")",
+      "Bash(curl -s http://127.0.0.1:11434/api/ps)",
+      "Bash(tasklist)",
+      "Bash(wmic process:*)"
+    ]
+  }
+}

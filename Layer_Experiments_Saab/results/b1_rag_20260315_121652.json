@@ -1,0 +1,28 @@
+[
+  {
+    "question_id": 1,
+    "question": "What is the maximum cable entry diameter in mm for backshell C0000268-10904?",
+    "ground_truth": "6.3 mm",
+    "answer": "Not found in documentation.",
+    "latency_s": 7.307,
+    "baseline": "B1_RAG",
+    "answer_correct": 0,
+    "citation_accurate": 0,
+    "unit_fidelity": 1,
+    "hallucination": false,
+    "judge_reasoning": "GT='6.3 mm' not found in answer; product code not cited"
+  },
+  {
+    "question_id": 2,
+    "question": "What plating does the backshell C0000268-11105 have?",
+    "ground_truth": "ZN",
+    "answer": "According to the documentation, the backshell C0000268-11105 has ZN (Zinc Nickel) plating.",
+    "latency_s": 9.43,
+    "baseline": "B1_RAG",
+    "answer_correct": 1,
+    "citation_accurate": 1,
+    "unit_fidelity": 1,
+    "hallucination": false,
+    "judge_reasoning": "OK"
+  }
+]

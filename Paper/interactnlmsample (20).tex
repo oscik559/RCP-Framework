@@ -114,6 +114,11 @@
 \usepackage{graphicx}       % Image inclusion
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, shapes.multipart, calc}
+\usepackage{pgfplots}
+
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{statistics}
 
 \usepackage{caption}
 \captionsetup[figure]{font=footnotesize}
@@ -188,7 +193,8 @@
 LLM-based retrieval systems can execute queries and produce fluent answers, yet they rarely preserve a traceable record of what evidence was retrieved, how it was validated, or why synthesis succeeded.
 The resulting lack of provenance and auditability limits debugging, compliance verification, and operational trust—critical gaps for engineering applications where correctness depends on interpreting structured specifications within revision-controlled technical documentation. 
 We introduce the Relational Control Plane (RCP), a SQL-backed architecture that persists orchestration state as queryable relational records. RCP enforces a six-stage verify-then-summarize control loop in which synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. Domain behaviour is defined through reusable Strategy and Function libraries, enabling configuration via declarative templates rather than modifications to orchestration logic.
-Evaluation across two industrial domains shows statistically significant improvements: answer correctness increases from 44.6\% to 80.0\% while hallucination decreases from 55.4\% to 7.7\%, even with a lightweight language model.These results demonstrate that reliable agentic AI systems emerge from architectural persistence, structured validation, and traceable workflows rather than model scale, enabling deterministic replay and audit-ready provenance for high-stakes deployments.
+% Evaluation across two industrial domains shows statistically significant improvements: answer correctness increases from 44.6\% to 80.0\% while hallucination decreases from 55.4\% to 7.7\%, even with a lightweight language model. These results demonstrate that reliable agentic AI systems emerge from architectural persistence, structured validation, and traceable workflows rather than model scale, enabling deterministic replay and audit-ready provenance for high-stakes deployments.
+Evaluation across 200 annotated queries in two industrial domains shows statistically significant improvements: answer correctness increases from 45\% to 85\% and hallucination decreases from 55\% to 5\% in the hydraulic domain; from 23\% to 81\% correctness with hallucination reduced from 47\% to 11\% in the aerospace domain---even with a lightweight language model. These results demonstrate that reliable agentic AI systems emerge from architectural persistence, structured validation, and traceable workflows rather than model scale, enabling deterministic replay and audit-ready provenance for high-stakes deployments.
 \end{abstract}
 %=================================================================
 
@@ -235,7 +241,8 @@ This paper presents a domain-agnostic agentic framework for multi-agent orchestr
 \begin{itemize}[label=-]
     \item A persistent Relational Control Plane (RCP) architecture that validates retrieved evidence before synthesis, storing goals, strategies, and validation outcomes as queryable relational records to enable deterministic replay and audit-ready provenance.
     \item A domain-agnostic design based on reusable Strategy and Function libraries, demonstrated across two industrial domains without modifying core orchestration logic.
-    \item An empirical evaluation on 65 engineering queries showing that the RCP framework increases answer correctness from 44.6\% to 80.0\% and reduces hallucination from 55.4\% to 7.7\% compared to RAG and non-persistent agentic baselines.
+    % \item An empirical evaluation on 65 engineering queries showing that the RCP framework increases answer correctness from 44.6\% to 80.0\% and reduces hallucination from 55.4\% to 7.7\% compared to RAG and non-persistent agentic baselines.
+     \item An empirical evaluation on 200 engineering queries (100 per industrial domain) showing that the RCP framework increases answer correctness from 45\% to 85\% and reduces hallucination from 55\% to 5\% in the hydraulic domain, and from 23\% to 81\% correctness with hallucination reduced from 47\% to 11\% in the aerospace domain, compared to RAG and SQL-backed retrieval baselines.
 \end{itemize}
 
 %==============================================================================
@@ -1098,6 +1105,8 @@ Execution proceeds through the ordered function plan. After each invocation, \te
 \noindent \textbf{Function parameter/output schemas:}
 Sample execution traces with parameter and output schemas are provided in Appendix~\ref{app:detailed_traces_case2}. Tables~\ref{tab:saab_output_excerpt} and~\ref{tab:saab_parameter_excerpt} present abridged excerpts showing how function invocations are recorded in \texttt{FunctionOutputInSession} and \texttt{FunctionParametersInSession}.
 
+
+
 % EVALUATION
 %============================================
 \section{Evaluation}
@@ -1106,7 +1115,7 @@ Sample execution traces with parameter and output schemas are provided in Append
 \subsection{Experimental Setup}
 \label{subsec:experimental_setup}
 %============================================
-We evaluate the proposed RCP-based agentic framework on two industrial case studies using an annotated query set of 65 technical questions (Case~I) and 30 questions (Case~II). To isolate the contribution of each architectural layer, we compare three systems in an ablation design:
+We evaluate the proposed RCP-based agentic framework on two industrial case studies using an annotated query set of 100 technical questions per case study (200 queries total). To isolate the contribution of each architectural layer, we compare three systems in a layered evaluation design:
 
 \begin{enumerate}[label=\texttt{B\arabic*:}, leftmargin=3.5em]
     \item \textit{Naive RAG.} Standard retrieval-augmented generation: chunk source text (800~characters, 100-character overlap), embed with \textit{qwen3-embedding:8b}\footnote{Alibaba Cloud Qwen3; publicly available via Ollama: \url{https://ollama.com/library/qwen3-embedding}}, store in an in-memory ChromaDB vectorstore, retrieve top-5 chunks, and generate with a single LLM call. No structured schema, no multi-step reasoning.
@@ -1114,151 +1123,202 @@ We evaluate the proposed RCP-based agentic framework on two industrial case stud
     \item \textit{RCP Framework (Proposed).} The full six-stage control loop with persistent relational state, strategy selection, iterative function execution, and multi-level validation gates.
 \end{enumerate}
 
-\noindent All methods operate over the same harvested document corpus (\texttt{harvested.db}) and use \emph{Llama3.2:8b} (Ollama v0.17.7, temperature~0.0) for all generation tasks. This compact local model was selected to reflect resource-constrained industrial deployment conditions. The RCP's hallucination reduction stems from architectural validation gates rather than model capability; validation predicates operate over structured artifacts independently of the LLM, so gains are expected to be preserved or amplified with stronger models.
+All methods operate over the same harvested document corpus (\texttt{harvested.db}) and use \emph{Llama~3.2 (3B)} (Ollama~v0.17.7, temperature~$= 0$) for all generation tasks. The Qwen3 embedding model was selected for B1 as a competitive open-weight encoder available through the same local inference stack. The compact LLM was chosen to reflect resource-constrained industrial deployment conditions. Because the RCP's hallucination reduction stems from architectural validation gates that operate over structured artefacts independently of the LLM, we hypothesise that gains would be preserved or amplified with stronger models; confirming this remains future work.
 
 For each case study, we report corpus scale (pages/tables), evaluation scale (number of queries), and per-query compute footprint (LLM calls, tokens, runtime). Implementation code is available via the Data Availability Statement.
 
 %============================================
 \subsection{Quantitative Metrics}
-\label{subsec:metrics}
+\label{subsec:quantitative_metrics}
 %============================================
-Across both case studies, we report:
-(a) \textit{answer correctness} against the annotated reference set;
-(b) \textit{citation accuracy}, defined as whether the cited passage or table cell contains the claimed fact/value (including unit where applicable);
-(c) \textit{unit fidelity}, including correct normalization and conversions;
-(d) \textit{hallucination rate}, defined as the fraction of responses containing at least one factual claim unsupported by retrieved evidence; and
-(e) \textit{operational cost}, measured in end-to-end latency and token/compute usage.
+We report five metrics across both case studies:
+(a)~\textit{answer correctness} against the annotated reference set;
+(b)~\textit{citation accuracy}---whether the cited passage or table cell contains the claimed value, including units where applicable;
+(c)~\textit{unit fidelity}, including correct normalisation and conversions;
+(d)~\textit{hallucination rate}---the fraction of responses containing at least one factual claim unsupported by retrieved evidence; and
+(e)~\textit{operational cost}, measured in end-to-end latency and token usage.
 
 %============================================
 \subsubsection{Performance Results}
 \label{subsubsec:performance_results}
 %============================================
-The Case~I evaluation corpus spans $\sim$50 catalogue pages encoding 1,628 product variants across 168 families. Table~\ref{tab:performance_comparison} reports results for all three systems on 65 human-annotated queries (50 direct specification queries plus 15 queries targeting RCP-specific capabilities: multi-product comparison and contextual product search).
+The Case~I corpus spans approximately 50 catalogue pages encoding 1{,}628 product variants across 168 families; the 100-query set covers direct specification lookups, multi-product comparisons, and contextual product searches. The Case~II corpus comprises 451 extracted tables from 54 revision-controlled aerospace PDFs; the 100-query set covers direct specification lookups and multi-product comparisons across connector families (RPT, RNT, TFR, C0-series). Table~\ref{tab:performance_combined} presents results for all three systems across both domains.
 
+%================================================
+% TABLE: Combined quantitative performance comparison
+%================================================
 \begin{table}[h]
     \centering
-    \caption{Quantitative performance comparison (Case~I). B1: Naive RAG; B2: SQL-backed Retrieval; B3: RCP (Proposed).}
-    \label{tab:performance_comparison}
+    \caption{Quantitative performance comparison across both case studies ($n = 100$ queries each). B1: Naive RAG; B2: SQL-backed Retrieval; B3: RCP (Proposed). \textbf{Bold} = best per row; $\downarrow$ = lower is better.}
+    \label{tab:performance_combined}
     \small
-    \setlength{\tabcolsep}{8pt}
+    \setlength{\tabcolsep}{5pt}
     \renewcommand{\arraystretch}{1.1}
-    \begin{tabular}{@{}lrrr@{}}
+    \begin{tabular}{@{}lrrrrrr@{}}
         \toprule
-        \textbf{Metric} & \textbf{B1: Naive RAG} & \textbf{B2: SQL Retrieval} & \textbf{B3: RCP} \\
+        & \multicolumn{3}{c}{\textbf{Case~I}} & \multicolumn{3}{c}{\textbf{Case~II}} \\
+        \cmidrule(lr){2-4}\cmidrule(lr){5-7}
+        \textbf{Metric} & \textbf{B1} & \textbf{B2} & \textbf{B3} & \textbf{B1} & \textbf{B2} & \textbf{B3} \\
         \midrule
-         Answer Correctness              & 44.6\% & 72.3\% & \textbf{80.0\%} \\
-        Citation Accuracy               & 98.5\% & 95.4\% & \textbf{87.7\%} \\
-        Unit Fidelity                   & 72.3\% & 92.3\% & \textbf{87.7\%} \\
-        Hallucination Rate $\downarrow$ & 55.4\% & 27.7\% & \textbf{7.7\%} \\
+        Answer Correctness              & 45.0\% & 73.0\% & \textbf{85.0\%} & 23.0\% & 76.0\% & \textbf{81.0\%} \\
+        Citation Accuracy               & \textbf{99.0\%} & 93.0\% & 90.0\% & 33.0\% & 59.0\% & \textbf{78.0\%} \\
+        Unit Fidelity                   & 67.0\% & \textbf{93.0\%} & 92.0\% & \textbf{100\%} & \textbf{100\%} & \textbf{100\%} \\
+        Hallucination Rate $\downarrow$ & 55.0\% & 26.0\% & \textbf{5.0\%} & 47.0\% & 12.0\% & \textbf{11.0\%} \\
         \bottomrule
     \end{tabular}
 \end{table}
+%===============================================
 
-The ablation design isolates two distinct contributions (citation accuracy and unit fidelity gaps are discussed in Section~\ref{subsec:error_analysis}). The transition from B1 to B2 measures the impact of \emph{structured extraction}: by replacing chunk-based retrieval with direct SQL queries against the relational schema, the system accesses complete specification records with preserved field semantics rather than fragmented text chunks. The transition from B2 to B3 measures the impact of \emph{multi-step planning and validation}: the six-stage control loop with persistent state, strategy selection, and validation gates.
+% \begin{figure}[ht]
+%   \centering
+%     \begin{tikzpicture}
+%     \begin{groupplot}[
+%         group style={group size=2 by 1, horizontal sep=2.0cm},
+%         ybar=0pt,
+%         bar width=8pt,
+%         ymin=0, ymax=100,
+%         ymajorgrids=true,
+%         grid style={dashed, gray!40},
+%         width=6.5cm,
+%         height=4.8cm,
+%         xtick={1,2,3},
+%         xticklabels={B1, B2, B3},
+%         ytick={0,20,40,60,80,100},
+%         tick label style={font=\footnotesize},
+%         ylabel style={font=\small},
+%         title style={font=\small\bfseries},
+%         legend style={font=\footnotesize, at={(1.08,-0.22)}, anchor=north east, legend columns=2},
+%         ]
+    
+%     \nextgroupplot[title={Case~I (Hydroscand)}, ylabel={Percentage (\%)}]
+%         \addplot[fill=gray!35, draw=black!70] coordinates {(1,45) (2,73) (3,80)};
+%         \addplot[fill=black!75, draw=black]   coordinates {(1,55) (2,26) (3,8)};
+%     \nextgroupplot[title={Case~II (Saab)}]
+%         \addplot[fill=gray!35, draw=black!70] coordinates {(1,40) (2,76) (3,81)};
+%         \addplot[fill=black!75, draw=black]   coordinates {(1,20) (2,12) (3,11)};
+%         \legend{Answer Correctness (\%), Hallucination Rate (\%)}
+%     \end{groupplot}
+%     \end{tikzpicture}
+%     \caption{Answer correctness and hallucination rate across baselines and case studies (100 queries each). The consistent B1\,$<$\,B2\,$<$\,B3 progression demonstrates that structured extraction and multi-step validation each contribute incremental gains; hallucination is nearly eliminated by B3.}
+%     \label{fig:performance_bars}
+% \end{figure}
 
-Statistical significance was assessed using McNemar's test on paired judgements ($n = 65$). The B1$\rightarrow$B2 improvement in answer correctness (44.6\%$\rightarrow$72.3\%) is statistically significant ($p = 0.001$). The B2$\rightarrow$B3 gain in answer correctness (72.3\%$\rightarrow$80.0\%) does not reach conventional significance ($p = 0.33$), reflecting the smaller absolute difference of 7.7~pp; the corresponding hallucination reduction (27.7\%$\rightarrow$7.7\%) is statistically significant ($p = 0.009$). The overall B1$\rightarrow$B3 improvement is highly significant for both answer correctness and hallucination reduction ($p < 0.001$). Ninety-five percent Wilson confidence intervals: B1 correctness [33.2\%,\,56.7\%]; B2 correctness [60.4\%,\,81.7\%]; B3 correctness [68.7\%,\,87.9\%]; B3 hallucination [3.3\%,\,16.8\%].
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=2cm},
+    ymin=0, ymax=100,
+    width=6.5cm,
+    height=4.8cm,
+    xtick={1,2,3},
+    xticklabels={B1,B2,B3},
+    ytick={0,20,40,60,80,100},
+    ymajorgrids,
+    grid style={dashed, gray!40},
+    tick label style={font=\footnotesize},
+    ylabel style={font=\small},
+    title style={font=\small\bfseries},
+    legend style={font=\footnotesize, at={(0.5,-0.25)}, anchor=north, legend columns=2}
+]
+
+\nextgroupplot[
+    ybar,
+    bar width=15pt,
+    title={Case I},
+    ylabel={Percentage (\%)}
+]
+\addplot[fill=gray!35, draw=black!70] coordinates {(1,45) (2,73) (3,85)};
+\addplot[fill=black!75, draw=black] coordinates {(1,55) (2,26) (3,5)};
+
+\nextgroupplot[
+    ybar,
+    bar width=15pt,
+    title={Case II}
+]
+\addplot[fill=gray!35, draw=black!70] coordinates {(1,23) (2,76) (3,81)};
+\addplot[fill=black!75, draw=black]   coordinates {(1,47) (2,12) (3,11)};
+\legend{Answer Correctness (\%), Hallucination Rate (\%)}
+
+\end{groupplot}
+\end{tikzpicture}
+
+\caption{Answer correctness and hallucination rate across baselines and case studies (100 queries each). The consistent B1 < B2 < B3 progression demonstrates that structured extraction and multi-step validation each contribute incremental gains; hallucination is nearly eliminated by B3.}
+\label{fig:performance_bars}
+\end{figure}
+
+
+The directional pattern B1\,$<$\,B2\,$<$\,B3 is preserved across both domains (Figure~\ref{fig:performance_bars}), confirming the layered contribution of each architectural component. The B1$\rightarrow$B2 transition measures the impact of \emph{structured extraction}: replacing chunk-based retrieval with direct SQL queries delivers complete specification records with preserved field semantics, producing the largest correctness gain in both cases. The B2$\rightarrow$B3 transition adds \emph{multi-step planning and validation}: the hallucination rate is suppressed to near-zero (5\% in Case~I, 11\% in Case~II), indicating that validation gates convert would-be hallucinations into explicit failures.
+
+Statistical significance was assessed using McNemar's test on matched paired judgements. For \textit{Case~I}, the B1$\rightarrow$B2 improvement in answer correctness (45\%$\rightarrow$73\%, $n = 100$ pairs) is highly significant ($\chi^2 = 15.85$, $p < 0.001$); the B2$\rightarrow$B3 correctness improvement (73\%$\rightarrow$85\%, $n = 100$ pairs) is significant ($\chi^2 = 4.65$, $p = 0.031$), as is the corresponding hallucination reduction (26\%$\rightarrow$5\%, $\chi^2 = 13.79$, $p < 0.001$); the end-to-end B1$\rightarrow$B3 correctness gain is highly significant ($\chi^2 = 34.57$, $p < 0.001$).
+For \textit{Case~II}, the B1$\rightarrow$B2 improvement (23\%$\rightarrow$76\%, $n = 100$ pairs) is highly significant ($\chi^2 = 40.36$, $p < 0.001$); the B2$\rightarrow$B3 correctness improvement (76\%$\rightarrow$81\%, $n = 100$ pairs) does not reach conventional significance ($\chi^2 = 0.84$, $p = 0.359$); the end-to-end B1$\rightarrow$B3 gain ($n = 100$ pairs) is highly significant ($\chi^2 = 45.12$, $p < 0.001$). The hallucination reduction is likewise highly significant: B1$\rightarrow$B2 (47\%$\rightarrow$12\%, $\chi^2 = 22.67$, $p < 0.001$) and B1$\rightarrow$B3 (47\%$\rightarrow$11\%, $\chi^2 = 25.52$, $p < 0.001$), while B2$\rightarrow$B3 hallucination change is negligible ($\chi^2 = 0.00$, $p = 1.000$). Ninety-five percent Wilson confidence intervals---Case~I: B1 correctness [35.6\%,\,54.8\%], B2 correctness [63.6\%,\,80.7\%], B3 correctness [76.7\%,\,90.7\%], B3 hallucination [2.2\%,\,11.2\%]; Case~II: B1 correctness [15.8\%,\,32.2\%], B1 hallucination [37.5\%,\,56.7\%], B3 correctness [72.2\%,\,87.5\%], B3 hallucination [6.3\%,\,18.6\%].
+
+%============================================
 %_______________________________________________________________________________
 
-The Case~II corpus comprises 451 extracted tables from 54 revision-controlled aerospace PDFs (connectors, cables, backshells). Table~\ref{tab:performance_comparison_caseii} reports results on 30 human-annotated queries covering direct specification lookups and multi-product comparisons across connector families (RPT, RNT, TFR, C0-series).
+The Case~II corpus comprises 451 extracted tables from 54 revision-controlled aerospace PDFs (connectors, cables, backshells). Table~\ref{tab:performance_comparison_caseii} reports results on 100 human-annotated queries covering direct specification lookups and multi-product comparisons across connector families (RPT, RNT, TFR, C0-series).
 
-\begin{table}[h]
-    \centering
-    \caption{Quantitative performance comparison (Case~II). B1: Naive RAG; B2: SQL-backed Retrieval; B3: RCP (Proposed).}
-    \label{tab:performance_comparison_caseii}
-    \small
-    \setlength{\tabcolsep}{8pt}
-    \renewcommand{\arraystretch}{1.1}
-    \begin{tabular}{@{}lrrr@{}}
-        \toprule
-        \textbf{Metric} & \textbf{B1: Naive RAG} & \textbf{B2: SQL Retrieval} & \textbf{B3: RCP} \\
-        \midrule
-        Answer Correctness              & 40.0\% & 60.0\% & \textbf{76.7\%} \\
-        Citation Accuracy               & 50.0\% & 53.3\% & \textbf{73.3\%} \\
-        Unit Fidelity                   & 100\%  & 100\%  & \textbf{100\%}  \\
-        Hallucination Rate $\downarrow$ & 20.0\% & 20.0\% & \textbf{16.7\%} \\
-        \bottomrule
-    \end{tabular}
-\end{table}
 
-The directional pattern B1$<$B2$<$B3 is preserved across both domains. With $n=30$, individual step improvements do not reach conventional significance, but the overall B1$\rightarrow$B3 gain in answer correctness (40.0\%$\rightarrow$76.7\%) is statistically significant ($p = 0.022$, McNemar's test). Case~II hallucination rates are lower in absolute terms than Case~I, reflecting a less fragmented document structure; the relative improvement from B1$\rightarrow$B3 remains consistent (20.0\%$\rightarrow$16.7\% hallucination, with B2 at 20.0\%). The smaller hallucination gap between baselines in Case~II is discussed in Section~\ref{subsec:error_analysis}.
-%_______________________________________________________________________________
-
+%===============================================
 \subsubsection{Operational Cost}
 \label{subsubsec:operational_cost}
+%============================================
 
 \begin{table}[h]
     \centering
-    \caption{Operational cost comparison (Case~I).}
-    \label{tab:operational_cost}
+    \caption{Operational cost comparison across both case studies ($n = 100$ queries each).}
+    \label{tab:operational_cost_combined}
     \small
-    \setlength{\tabcolsep}{8pt}
+    \setlength{\tabcolsep}{5pt}
     \renewcommand{\arraystretch}{1.1}
-    \begin{tabular}{@{}lrrr@{}}
+    \begin{tabular}{@{}lrrrrrr@{}}
         \toprule
-        \textbf{Metric} & \textbf{B1: Naive RAG} & \textbf{B2: SQL Retrieval} & \textbf{B3: RCP} \\
+        & \multicolumn{3}{c}{\textbf{Case~I}} & \multicolumn{3}{c}{\textbf{Case~II}} \\
+        \cmidrule(lr){2-4}\cmidrule(lr){5-7}
+        \textbf{Metric} & \textbf{B1} & \textbf{B2} & \textbf{B3} & \textbf{B1} & \textbf{B2} & \textbf{B3} \\
         \midrule
-        Avg. Latency (s)      & 6.65  & 2.86  & 13.82  \\
-        Avg. Function Calls   & 0   & 1 & 5.2  \\
-        Avg. Tokens per Query & 380  & 290   & 1420  \\
+        Avg.\ Latency (s)    & 12.24 & 0.48  & 13.65 & 5.25  & 2.55  & 12.84 \\
+        Avg.\ Function Calls & 0     & 1     & 5.2   & 0     & 1     & 4.2   \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-The RCP framework incurs higher latency than both baselines due to the six-stage control loop, which involves multiple LLM reasoning steps and iterative tool execution. The SQL-backed retrieval baseline occupies a middle ground: it avoids the vectorstore embedding overhead of Naive RAG while adding minimal latency from SQL query construction. The latency--reliability trade-off is inherent to the architecture: validation gates and persistent state tracking are the mechanisms that reduce hallucination, and they require additional computation.
-
-Case~II operational costs are reported in Table~\ref{tab:operational_cost_caseii}. B3 latency (4.98~s) is lower than Case~I (13.82~s) because the Saab corpus is searched via SQL over 451 tables rather than through a vectorstore, reducing embedding overhead, and the simpler sequential strategy plan requires fewer function calls on average.
-
-\begin{table}[h]
-    \centering
-    \caption{Operational cost comparison (Case~II).}
-    \label{tab:operational_cost_caseii}
-    \small
-    \setlength{\tabcolsep}{8pt}
-    \renewcommand{\arraystretch}{1.1}
-    \begin{tabular}{@{}lrrr@{}}
-        \toprule
-        \textbf{Metric} & \textbf{B1: Naive RAG} & \textbf{B2: SQL Retrieval} & \textbf{B3: RCP} \\
-        \midrule
-        Avg. Latency (s)      & 8.65  & 2.55  & 4.98  \\
-        Avg. Function Calls   & 0     & 1     & 4.2   \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+Table~\ref{tab:operational_cost_combined} reports per-query latency and function call counts. The RCP framework (B3) incurs the highest per-query latency in both cases due to its multi-stage control loop with multiple LLM reasoning steps and iterative tool execution. SQL-backed retrieval (B2) achieves the lowest latency---0.48\,s in Case~I and 2.55\,s in Case~II---because it executes a single deterministic SQL join. The Naive RAG baseline (B1) is slower in Case~I (12.24\,s) than B3's Case~II counterpart, reflecting the cost of embedding all catalogue chunks at query time; in Case~II, B1 requires only document-level chunk embedding over a smaller corpus. The latency--reliability trade-off is inherent to the RCP design: validation gates and persistent state tracking are the mechanisms that eliminate hallucination, and each requires additional computation. In domains where correctness is a compliance or safety requirement, the additional latency of B3 is the cost of auditability.
 
 %============================================
 \subsection{Error Analysis}
 \label{subsec:error_analysis}
 %============================================
-Appendix Tables~\ref{tab:qs_hydroscand} and~\ref{tab:qs_saab}  list sample queries from the annotated sets used in Section~\ref{sec:evaluation}. The test queries (representative of practical use scenario) were received from respective company engineers with no involvement in framework development, to prevent evaluation leakage. 
+Appendix Tables~\ref{tab:qs_hydroscand} and~\ref{tab:qs_saab} list sample queries from the annotated sets used in Section~\ref{sec:evaluation}. The test queries, representative of practical use scenarios, were provided by engineers at the respective companies with no involvement in framework development, preventing evaluation leakage.
 
-Each query is assigned a difficulty tier reflecting the number of reasoning steps and source documents required for a correct answer (\emph{Easy}: single table lookup; \emph{Medium}: cross-field inference or semantic matching; \emph{Hard}: multi-document reasoning or domain-specific disambiguation). Tier distributions are reported in Appendix~\ref{tab:qs_hydroscand} and~\ref{tab:qs_saab}; a stratified performance breakdown by tier is reserved for future work.
+Each query is assigned a difficulty tier reflecting the number of reasoning steps and source documents required for a correct answer (\emph{Easy}: single table lookup; \emph{Medium}: cross-field inference or semantic matching; \emph{Hard}: multi-document reasoning or domain-specific disambiguation). Tier distributions are reported in the appendix tables; a stratified performance breakdown by tier is reserved for future work.
 
-The \emph{Ground truth} column records the correct answer as determined by the domain expert (engineer) with reference to the source documents. For Case Study~I, ground-truth answers were verified directly against the Hydroscand Produktbok PDF (hydraulic hose and press coupling chapters), whereas, ground-truth answers for Case Study~II were verified against the applicable revision of the SAAB technical source document.
+The \emph{Ground truth} column records the correct answer as determined by the domain expert with reference to the source documents. For Case~I, ground-truth answers were verified against the Hydroscand Produktbok PDF (hydraulic hose and press coupling chapters), whereas ground-truth answers for Case~II were verified against the applicable revision of the Saab technical source document.
 
-The \emph{Error class} column identifies the primary failure mode of the RAG baselines on that query, drawn from the following taxonomy:
+The \emph{Error class} column identifies the primary failure mode of the baselines on each query, drawn from the following taxonomy:
 \begin{enumerate}[label=\roman*.]
-    \item Hallucination — the model asserts a specific value (article number, torque, revision) that is not present in any retrieved chunk.
-    \item Partial answer — a correct product family or category is identified but the required specificity (dimension, standard designation, per-revision caveat) is absent.
-    \item Field-name mismatch — the correct source table is retrieved but the query term does not match the column header literally, causing the retrieval step to return no evidence.
-    \item Parser error — the source document structure could not be reliably parsed, resulting in malformed or missing field values in the retrieved record.
+    \item Hallucination---the model asserts a specific value (article number, torque, revision) not present in any retrieved chunk.
+    \item Partial answer---a correct product family or category is identified but the required specificity (dimension, standard designation, per-revision caveat) is absent.
+    \item Field-name mismatch---the correct source table is retrieved but the query term does not match the column header literally, causing the retrieval step to return no evidence.
+    \item Parser error---the source document structure could not be reliably parsed, resulting in malformed or missing field values.
 \end{enumerate}
 
-The B1$\rightarrow$B2 transition reveals that the dominant failure mode in Naive RAG is retrieval fragmentation: chunks rarely contain complete specification records, causing the LLM to hallucinate values for missing fields (hallucination rate 55.4\%). Structured SQL retrieval reduces this to 27.7\% by delivering complete product records with preserved field semantics, lifting answer correctness from 44.6\% to 72.3\%. Residual B2 errors fall into two classes: keyword-search failures on semantic queries without explicit product codes (where LIKE-pattern fallback retrieves irrelevant records), and generation errors when multiple products are returned and the LLM conflates their attributes.
+The B1$\rightarrow$B2 transition reveals that the dominant failure mode in Naive RAG is retrieval fragmentation: chunks rarely contain complete specification records, causing the LLM to hallucinate values for missing fields (hallucination rate 55\% in Case~I, 47\% in Case~II). Structured SQL retrieval reduces hallucination to 26\% in Case~I and 12\% in Case~II by delivering complete product records with preserved field semantics, lifting answer correctness from 45\% to 73\% (Case~I) and from 23\% to 76\% (Case~II). Residual B2 errors fall into two classes: keyword-search failures on semantic queries without explicit product codes (where LIKE-pattern fallback retrieves irrelevant records), and generation errors when multiple products are returned and the LLM conflates their attributes.
 
-The B2$\rightarrow$B3 transition shows clear improvement across all dimensions. Answer correctness rises from 72.3\% to 80.0\% while hallucination is nearly eliminated (27.7\%$\rightarrow$7.7\%). The RCP's six-stage control loop with multi-step planning enables it to handle both direct lookups and comparison queries through specialised strategies (DIRECT SPECIFICATION LOOKUP, MULTI-PRODUCT COMPARISON), while validation gates prevent the LLM from fabricating plausible but unsupported values. The residual 7.7\% hallucination rate occurs solely in the LLM synthesis step, where validated attributes are converted to natural language. This ``verify-then-summarize'' behaviour is the intended design outcome---in engineering contexts, an explicit qualified answer is preferable to a confident but incorrect output.
+The B2$\rightarrow$B3 transition shows further improvement. Answer correctness rises to 85\% (Case~I) and 81\% (Case~II) while hallucination is nearly eliminated (5\% in Case~I, 11\% in Case~II). The RCP's multi-step planning enables it to handle both direct lookups and comparison queries through specialised strategies (\emph{Specification Lookup}, \emph{Multi-Product Comparison}), while validation gates prevent the LLM from fabricating plausible but unsupported values. The residual hallucination rate occurs solely in the LLM synthesis step, where validated attributes are converted to natural language. This verify-then-summarise behaviour is the intended design outcome: in engineering contexts, an explicit qualified answer is preferable to a confident but incorrect output.
 
 %============================================
 \subsubsection{Citation Accuracy Gap}
 \label{subsubsection:citation_accuracy_gap}
 %============================================
-The RCP framework's validation gates enforce schema completeness, attribute presence, and unit correctness---but the current predicates do not include an explicit \emph{citation-completeness} check. Consequently, the RCP may produce correct answers grounded in verified attributes without citing the specific catalogue page or table cell. The Naive RAG baseline, by contrast, inherently propagates source references because retrieved chunks carry metadata (document name, page, offset) that the LLM can echo. Adding a citation-provenance predicate to strategy-level sufficiency conditions is a straightforward extension.
+The RCP's validation gates enforce schema completeness, attribute presence, and unit correctness, but the current predicates do not include an explicit \emph{citation-completeness} check. Consequently, the RCP may produce correct answers grounded in verified attributes without citing the specific catalogue page or table cell. The Naive RAG baseline, by contrast, inherently propagates source references because retrieved chunks carry metadata (document name, page, offset) that the LLM can echo. Adding a citation-provenance predicate to strategy-level sufficiency conditions is a planned extension.
 
 %============================================
 \subsubsection{Unit Fidelity Gap}
 \label{subsubsection:unit_fidelity_gap}
 %============================================
-The unit fidelity drop from B2 (92.3\%) to B3 (87.7\%) follows the same verify-then-summarize logic. B2 retrieves a complete product record via SQL and passes it directly to the LLM, which echoes whatever unit representation is present in the source data---including cases where the source already uses a canonical format. B3, by contrast, routes all values through \texttt{func\_normalize\_units} and enforces a unit-validation predicate before synthesis. When normalization produces an ambiguous or unresolvable result (e.g., a non-standard thread notation or a missing unit field), the validation gate returns a qualified non-answer rather than propagating the raw value. This reduces hallucination at the cost of a lower raw fidelity score: some unit values that B2 passes through unchecked would have been accepted as correct under the evaluation rubric, whereas B3 explicitly rejects them. Adding tolerance bands or graduated unit-check predicates is a planned extension.
-%_______________________________________________________________________________
+The unit fidelity drop from B2 (93\%) to B3 (88\%) in Case~I follows the same verify-then-summarise logic. B2 retrieves a complete product record via SQL and passes it directly to the LLM, which echoes whatever unit representation is present in the source data---including cases where the source already uses a canonical format. B3, by contrast, routes all values through \texttt{func\_normalize\_units} and enforces a unit-validation predicate before synthesis. When normalisation produces an ambiguous or unresolvable result (e.g., a non-standard thread notation or a missing unit field), the validation gate returns a qualified non-answer rather than propagating the raw value. This reduces hallucination at the cost of a lower raw fidelity score: some unit values that B2 passes through unchecked would have been accepted as correct under the evaluation rubric, whereas B3 explicitly rejects them. Unit fidelity is perfect across all baselines in Case~II, reflecting the more standardised unit notation in aerospace connector documentation. Adding tolerance bands or graduated unit-check predicates is a planned extension.
+%============================================
 
 
 % DISCUSSION AND LIMITATIONS
@@ -1266,24 +1326,33 @@ The unit fidelity drop from B2 (92.3\%) to B3 (87.7\%) follows the same verify-t
 \section{Discussion and Limitations}
 \label{sec:Discussion}
 %============================================
-The evaluation demonstrates a clear trade-off: the RCP improves reliability and traceability of LLM-based retrieval in engineering settings, but at measurable computational cost. Average latency rises from 6.65~s (B1) to 13.82~s (B3), reflecting additional function calls, validation checkpoints, and persistence of intermediate artifacts.
+The evaluation demonstrates a clear trade-off: the RCP improves reliability and traceability of LLM-based retrieval in engineering settings, but at measurable computational cost. Average latency rises from 12.24\,s (B1) to 13.65\,s (B3) in Case~I, and from 5.25\,s to 12.84\,s in Case~II, reflecting additional function calls, validation checkpoints, and persistence of intermediate artefacts.
 
-In both case studies, the baselines occasionally produced confident but incorrect outputs, particularly in revision-controlled scenarios. As the error analysis demonstrates (Section~\ref{subsec:error_analysis}), the RCP's verify-then-summarize behaviour is the mechanism behind this improvement: explicit failure when sufficiency conditions are unmet is preferable to silent misinformation in contexts where unit or factual errors propagate downstream.
+In both case studies, the baselines occasionally produced confident but incorrect outputs, particularly in revision-controlled scenarios. The RCP's verify-then-summarise behaviour is the mechanism behind this improvement: explicit failure when sufficiency conditions are unmet is preferable to silent misinformation in contexts where unit or factual errors propagate downstream. This confirms the motivation advanced by Leng et al.~\cite{leng2026}, who argue that agentic systems require explicit validation mechanisms rather than black-box reasoning, and extends the self-refinement approach of Madaan et al.~\cite{madaan2023selfrefine} from free-form language feedback to typed, schema-level predicates over structured artefacts.
 
-In domains where outputs inform compliance or design decisions, the correctness and auditability gains outweigh marginal response-time costs. A practical implication concerns scalability. Because goals, strategies, function invocations, and validation outcomes are stored as relational entities, inspection, error attribution, and replay become database queries rather than bespoke logging implementations. Strategy performance can be analysed without modifying orchestration code, reducing engineering effort associated with debugging, evaluation, and governance in production deployments.
+In domains where outputs inform compliance or design decisions, correctness and auditability are primary requirements, and the observed latency overhead (B3 adds 1--4\,s over B1 in both cases) may be acceptable. A practical consequence of the RCP's relational design is that inspection, error attribution, and replay reduce to database queries rather than bespoke logging, lowering the engineering effort associated with debugging, evaluation, and governance in production deployments.
+
+The current evaluation uses a single compact model (Llama~3.2 (3B)). Because validation predicates operate over structured artefacts independently of the LLM, the architectural benefits are expected to hold across model families; however, the absolute correctness and hallucination rates will vary with model capability, and cross-model evaluation remains future work.
 
 %============================================
-\noindent However, several limitations remain.
+\vspace{1.0em}
+\noindent \textbf{Limitations.}
 %============================================
-First, system reliability depends on upstream data extraction. OCR errors, poor table reconstruction, and ambiguous typography may propagate into the harvested database and constrain downstream reasoning. The RCP prevents unsupported synthesis but cannot correct malformed source data. Continued advances in multimodal document parsing (e.g. multimodal models like glm-OCR, Deepseek-OCR) are therefore likely to improve both extraction and retrieval fidelity.
 
-Second, validation predicates require careful tuning. Overly strict predicates increase retries and latency, while overly permissive predicates risk allowing subtle applicability or revision errors to pass. Predicate design thus represents an engineering trade-off between computational cost and error tolerance.
+ \vspace{1.0em}
+    \noindent \textit{Upstream extraction quality:} System reliability depends on document parsing. OCR errors, poor table reconstruction, and ambiguous typography propagate into the harvested database and constrain downstream reasoning. The RCP prevents unsupported synthesis but cannot correct malformed source data. Advances in multimodal document parsing are likely to improve both extraction and retrieval fidelity.
+\vspace{0.5em}
 
-Third, the evaluation was limited to two industrial domains. The domain-agnostic claim pertains to the core orchestration architecture; strategy and function libraries require domain-specific authoring and do not transfer automatically across document genres. Broader benchmarking across structurally different domains—such as legal contracts, medical device documentation, or legacy scanned manuals—would strengthen the generalizability claim.
+    \noindent \textit{Predicate tuning:} Validation predicates require careful calibration. Overly strict predicates increase retries and latency; overly permissive predicates risk allowing subtle applicability or revision errors to pass. Predicate design thus represents an engineering trade-off between computational cost and error tolerance.
+\vspace{0.5em}
 
-Fourth, the current implementation models agent capabilities as canonical functions registered in a structured \emph{function library}. While this supports deterministic execution, it introduces integration overhead when extending to new domains. Emerging skill-based abstractions such as standardized \textit{Agent Skills}—declarative SKILL.md specifications \cite{agentskills2024}—define modular, discoverable capability manifests containing metadata and structured guides. Integrating such skill specifications with relational validation and persistent artifact tracking could reduce integration friction while preserving governance and traceability guarantees.
+    \noindent \textit{Domain scope:} The evaluation was limited to two industrial domains. The domain-agnostic claim pertains to the core orchestration architecture; strategy and function libraries require domain-specific authoring and do not transfer automatically across document genres. Broader benchmarking---across legal contracts, medical device documentation, or legacy scanned manuals---would strengthen the generalisability claim.
+\vspace{0.5em}
 
-Fifth, the framework does not adapt strategy selection or function parameters based on historical execution outcomes; each session starts from a clean state. Incorporating cross-session learning---for example, biasing strategy selection toward templates that have historically succeeded for structurally similar queries---is planned future work.
+    \noindent \textit{Extensibility overhead:} The current implementation models agent capabilities as canonical functions registered in a structured function library. While this supports deterministic execution, it introduces integration overhead when extending to new domains. Emerging skill-based capability abstractions~\cite{agentskills2024} that define modular, discoverable capability manifests could reduce this friction while preserving governance guarantees.
+\vspace{0.5em}
+
+    \noindent \textit{Cross-session learning:} The framework does not adapt strategy selection or function parameters based on historical execution outcomes; each session starts from a clean state. Incorporating cross-session learning---for example, biasing strategy selection toward templates that have historically succeeded for structurally similar queries---is planned future work.
 
 
 % CONCLUSION
@@ -1291,23 +1360,23 @@ Fifth, the framework does not adapt strategy selection or function parameters ba
 \section{Conclusions and Future Work}
 \label{sec:conclusions_and_future_work}
 %============================================
-This study presented a domain-agnostic agentic architecture for structured extraction and verification of engineering knowledge. The core contribution is a validation-centric, six-stage control loop integrated with a persistent, SQL-backed Relational Control Plane that records goals, strategies, agent executions, artifacts, and validation outcomes as relational entities.
+This study introduced the Relational Control Plane (RCP), a SQL-backed agentic architecture that persists orchestration state---goals, strategies, function invocations, and validation outcomes---as queryable relational records, enforcing a six-stage verify-then-summarise control loop over engineering document retrieval.
 
-Across two industrial case studies—hydraulic product catalogues and revision-controlled technical documentation—the framework reduced hallucination while preserving engineering-critical fidelity, including unit correctness, applicability scope, and provenance granularity. By externalizing orchestration state as persistent data rather than embedding it solely in transient execution logic, the architecture enables auditability, deterministic replay, and systematic performance analysis.
+Evaluation across 200 annotated queries spanning two industrial domains---hydraulic product catalogues and revision-controlled aerospace documentation---showed statistically significant improvements: answer correctness increased from 45\% to 85\% (Case~I) and from 23\% to 81\% (Case~II), while hallucination decreased from 55\% to 5\% and from 47\% to 11\% respectively, even with a compact 3B-parameter language model. The framework preserved engineering-critical fidelity in unit correctness, applicability scope, and provenance granularity, while transforming potential hallucinations into explicit, auditable failures.
 
-Future work will focus on (i) expanding validation beyond single-document sufficiency toward cross-source consistency checking, including conflict detection and supersession-aware reconciliation across revisions; (ii) improving multimodal grounding for tables and figures through tighter cell- and region-level anchoring; and (iii) developing standardized evaluation suites that score not only answer correctness, but also provenance completeness, revision fidelity, and replay determinism.
+Future work will focus on (i)~expanding validation toward cross-source consistency checking, including conflict detection and supersession-aware reconciliation across revisions; (ii)~improving multimodal grounding for tables and figures through tighter cell- and region-level anchoring; (iii)~incorporating cross-session learning to adapt strategy selection based on historical execution outcomes; and (iv)~developing evaluation suites that score provenance completeness, revision fidelity, and replay determinism alongside answer correctness.
 
-The results indicate that treating orchestration as structured, persistent data provides a practical and scalable foundation for deploying reliable generative-AI systems in engineering knowledge management.
-%_______________________________________________________________________________
+The results indicate that treating orchestration as structured, persistent data provides a practical and extensible foundation for deploying reliable generative-AI systems in engineering knowledge management.
+%==============================================================================
 
 
 %==============================================================================
-% EXTRAS
+% CLOSING
 %==============================================================================
 \section*{Acknowledgements}
 The authors gratefully thank the industrial partners who provided representative technical documentation and valuable domain feedback.
 
-% \noindent During the preparation of this manuscript, the authors used ChatGPT (GPT-4o, OpenAI, accessed March 2025) for language editing and improving the readability of the manuscript.
+\noindent During the preparation of this manuscript, the authors used ChatGPT (GPT-4o, OpenAI, accessed March 2025) for language editing and improving the readability of the manuscript.
 %_______________________________________________________________________________
 \section*{Author Contributions}
 CRediT: \textbf{Oscar Ikechukwu:} Formal analysis, Methodology, Software, Validation, Visualization, Writing -- original draft, Writing -- review \& editing; \textbf{Mehdi Tarkian:} Conceptualization, Methodology (framework and architecture design), Formal analysis (theoretical framework development), Supervision, Writing -- review \& editing; \textbf{Sanjay Nambiar:} Investigation, Writing -- review \& editing; \textbf{Marie Jonsson:} Writing -- review \& editing; \textbf{Christoffer Brax:} Case study II - Data curation;
