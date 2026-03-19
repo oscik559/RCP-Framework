@@ -1,35 +1,33 @@
 # Centralized Database Structure
 
-## ✅ Completed Reorganization
+## ✅ Centralized Database Structure
 
 ### Directory Structure
 
 ```
-Project_Hydroscand-Hoses/
-├── data/
-│   └── database/              # 🎯 CENTRALIZED DATABASE
-│       ├── db_utils.py        # Database utilities (shared)
-│       ├── harvested_schema.sql  # Schema definition (shared)
-│       ├── harvested.db       # Production database
-│       └── harvested_test.db  # Test database
+RCP-Framework/
+├── database/                      # 🎯 CENTRALIZED DATABASE
+│   ├── db_utils.py                # Database utilities (shared)
+│   ├── harvested_schema.sql       # Schema definition
+│   ├── harvested.db               # Production database (Case I)
+│   └── agentic.db                 # Workflow state database
 │
-├── Layer_1a_Extraction/        # Hose extraction
+├── Layer_1a_Extraction/           # Legacy extraction (hoses)
 │   ├── 1_pdf_to_png.py
-│   ├── 2_detect_headers_footers.py  # imports from database/
-│   ├── 3_detect_tables.py           # imports from database/
-│   ├── 4_extract_product.py         # imports from database/
+│   ├── 2_detect_headers_footers.py
+│   ├── 3_detect_tables.py
+│   ├── 4_extract_product.py
 │   └── 5_extract_images.py
 │
-└── Layer_1b_Extraction/      # Coupling extraction
+└── Layer_1b_Extraction/           # Production extraction pipeline
     ├── Press_Couplings.pdf
-    ├── 0_extract_knowledge.py       # imports from database/
+    ├── 0_extract_knowledge.py
     ├── 1_pdf_to_png.py
-    ├── 2_detect_headers_footers.py  # imports from database/
-    ├── 3_detect_tables.py           # imports from database/
-    ├── 4_extract_product.py         # imports from database/
-    ├── run_pipeline.sh
-    └── data/                   # Coupling-specific data
-        ├── pdf_pages/
+    ├── 2_detect_headers_footers.py
+    ├── 2b_extract_categories.py
+    ├── 3a_extract_families.py
+    ├── 3b_extract_products_vlm.py
+    └── data/
         ├── png_pages/
         └── tables/
 ```

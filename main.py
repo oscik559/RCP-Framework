@@ -23,6 +23,8 @@ from sympy import product
 # Ensure UTF-8 encoding for Windows
 if sys.platform.startswith("win"):
     os.environ["PYTHONIOENCODING"] = "utf-8"
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 from Layer_2_Agentic.config.constants import ANSWER_FIELDS
 from Layer_2_Agentic.config.session_config import (
@@ -84,7 +86,7 @@ def main():
         workflow_config = get_workflow_config()
 
         # Header
-        print("[🤖] Generic Agentic Reasoning System")
+        print("[AI] Generic Agentic Reasoning System")
         print("=" * 60)
         print(f"Query: {init_state['query']}")
         print(f"Session: {init_state['sessionID']}")

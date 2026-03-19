@@ -1,4 +1,4 @@
-# Copilot Instructions for Project_Hydroscand-Hoses
+# Copilot Instructions for RCP-Framework
 
 ## Overview
 This project is a three-layer intelligent system for extracting, reasoning about, and querying industrial product data from PDF catalogs. It is organized into three main layers:
