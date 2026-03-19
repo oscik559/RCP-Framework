@@ -13,39 +13,8 @@ This repository contains the implementation of the **RCP (Relational Control Pla
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    Q([Query]) --> GD
 
-    subgraph RCP["RCP Reasoning Engine"]
-        direction TB
 
-        subgraph LOOP["6-Stage Verify-Then-Summarise Loop"]
-            direction TB
-            GD[Goal Definition] --> SS[Strategy Selection]
-            SS --> FE[Function Execution]
-            FE --> FV{Function Validation}
-            FV -->|pass| SV{Strategy Validation}
-            FV -->|fail: retry function| FE
-            SV -->|retry strategy| SS
-            SV -->|strategy sufficient| GV{Goal Validation}
-            GV -->|goal not met| GD
-        end
-    end
-
-    GV -->|goal met| R([Result])
-
-    subgraph DATA["Data Stores"]
-        direction TB
-        HDB[(Harvested DB)]
-        TDB[(Temp DB)]
-        ADB[(Agentic DB)]
-    end
-
-    HDB -. product/family/knowledge retrieval .-> FE
-    FE -. intermediate outputs .-> TDB
-    ADB -. workflow state persistence .-> LOOP
-```
 
 | Layer | Role | Key Components |
 |-------|------|----------------|
