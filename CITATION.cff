@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "RCP Framework: A Domain-Agnostic Agentic Architecture for Structured Extraction of Engineering Knowledge"
+type: software
+authors:
+  - family-names: Ikechukwu
+    given-names: Oscar
+    affiliation: "Division of Product Realization, IEI, Linköping University"
+  - family-names: Tarkian
+    given-names: Mehdi
+    affiliation: "Division of Product Realization, IEI, Linköping University"
+  - family-names: Nambiar
+    given-names: Sanjay
+    affiliation: "Division of Product Realization, IEI, Linköping University"
+  - family-names: Jonsson
+    given-names: Marie
+    affiliation: "Division of Product Realization, IEI, Linköping University"
+  - family-names: Brax
+    given-names: Christoffer
+    affiliation: "Saab AB"
+repository-code: "https://github.com/oscik559/Hydroscand_Produktbok"
+license: MIT
+version: "1.0.0"
+date-released: "2026-03-19"
+keywords:
+  - agentic AI
+  - knowledge extraction
+  - engineering knowledge
+  - LLM
+  - retrieval-augmented generation
+  - product catalog

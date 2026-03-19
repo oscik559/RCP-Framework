@@ -1,381 +1,192 @@
-# Hydroscand Produktbok
+# RCP Framework — Code Repository
 
-A three-layer intelligent system for extracting and querying industrial product information from PDF catalogs.
+Supplementary code for the paper:
 
-## 🏗️ Architecture
+> **"A Domain-Agnostic Agentic Architecture for Structured Extraction of Engineering Knowledge"**
+> Oscar Ikechukwu, Mehdi Tarkian, Sanjay Nambiar, Marie Jonsson, Christoffer Brax
+> Division of Product Realization, IEI, Linköping University
+> Funded by Vinnova DART project (grant 2024-01420)
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Layer 1: Data Extraction Pipeline                         │
-│  PDF → Tables → Products → Hierarchical Database            │
-└─────────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Layer 2: Agentic Reasoning Framework                      │
-│  Core Logic: Goal → Strategy → Function                     │
-└─────────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Layer 3: Application Layer                                │
-│  Web UI, APIs, User Interactions                            │
-└─────────────────────────────────────────────────────────────┘
-```
+This repository contains the implementation of the **RCP (Retrieve–Contextualize–Plan) framework**, a three-layer agentic architecture for querying structured engineering knowledge from industrial PDF catalogs. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog) and **Case II** (Saab aerospace connector catalog).
 
-### Layer 1: Data Extraction
-- **PDF to PNG conversion**: High-resolution page rendering
-- **Table detection**: Automatic detection using PyMuPDF
-- **VLM extraction**: Content extraction using Vision Language Models (Qwen)
-- **Hierarchical database**: Categories → Product Families → Individual Products
+---
 
-### Layer 2: Agentic Reasoning Framework
-- **Core reasoning engine**: Goal → Strategy → Function workflow
-- **Generic function library**: 30 reusable building blocks
-- **Template system**: Reusable strategy and function templates
-- **Intelligent search**: Semantic search with FTS5 full-text indexing
-- **Parallel execution**: Support for concurrent function execution with batching
-- **Validation loops**: Multi-level validation with retry mechanisms
-- **Database integration**: State tracking and execution history
-- **LLM integration**: Powered by language models for intelligent reasoning
-
-### Layer 3: Application Layer
-- **Web interface**: Flask-based UI for natural language queries
-- **Progress tracking**: Real-time workflow execution visualization
-- **Session management**: Multi-user session handling
-- **Export capabilities**: Results export and data visualization
-- **API endpoints**: RESTful APIs for external integration
-
-## 🎯 System Workflow
+## Architecture
 
 ```
-User Query (Layer 3: Web UI)
-    ↓
-Goal Definition (Layer 2: parse intent)
-    ↓
-Strategy Planning (Layer 2: select reasoning approach)
-    ↓
-Function Execution (Layer 2: execute actions, can be parallel)
-    ↓
-Multi-level Validation (Layer 2: function → strategy → goal)
-    ↓
-Data Access (Layer 1: query database)
-    ↓
-Final Answer (Layer 3: display to user)
+Layer 1: Data Extraction
+  PDF → PNG → VLM Extraction → Hierarchical SQLite Database
+
+Layer 2: Agentic Reasoning (RCP Framework)
+  Goal → Strategy → Function → Validated Answer
+
+Layer 3: Application
+  Web UI / CLI / API
 ```
 
-### Layer Responsibilities
+| Layer | Role | Key Components |
+|-------|------|----------------|
+| Layer 1 | Extraction pipeline | PDF rendering, VLM-based parsing, SQLite schema |
+| Layer 2 | Reasoning engine | LangGraph workflow, function library, vector search |
+| Layer 3 | User interface | Flask web app, CLI entry point |
 
-| Layer | Purpose | Components |
-|-------|---------|------------|
-| **Layer 1** | Data Storage | Database schema, product data, extracted tables |
-| **Layer 2** | Reasoning Engine | Config, logic, database connections, workflows |
-| **Layer 3** | User Interface | Web app, APIs, templates, progress tracking |
+---
 
-## 🚀 Quick Start
+## Repository Structure
 
-### Prerequisites
+```
+├── Layer_1a_Extraction/          # Baseline extraction (legacy, kept for reference)
+├── Layer_1b_Extraction/          # Production extraction pipeline
+├── Layer_2_Agentic/              # Core RCP reasoning framework
+│   ├── config/                   # Configuration: constants, prompts, domain settings
+│   ├── db/                       # Database connections and strategy templates
+│   └── logic/                    # State graph, workflow nodes, function library
+├── Layer_3_Application/          # Web interface and APIs
+├── Layer_Experiments_Case_I/     # Case I evaluation (Hydroscand, n=100 queries)
+│   ├── Baseline_RAG/             # B1: Naive RAG baseline
+│   ├── Baseline_SQL_Retrieval/   # B2: SQL retrieval baseline
+│   ├── RCP_Framework/            # B3: RCP framework evaluation
+│   ├── compute_mcnemar.py        # McNemar's test for statistical significance
+│   └── test_questions_appendix_b.json  # Annotated query set (100 questions)
+├── Layer_Experiments_Case_II/    # Case II evaluation (Saab, n=100 queries)
+│   └── test_questions_saab.json  # Annotated query set (100 questions)
+├── database/                     # SQLite databases and schema
+│   ├── harvested.db              # Product database (Case I)
+│   ├── agentic.db                # Workflow state database
+│   ├── harvested_schema.sql      # Schema definition
+│   └── db_utils.py               # Database utilities
+├── docs/                         # Architecture and design documentation
+├── tests/                        # Unit, integration, and end-to-end tests
+├── main.py                       # CLI entry point
+└── run_web.py                    # Web server launcher
+```
+
+---
+
+## Requirements
+
+- Python 3.12
+- [Ollama](https://ollama.com) with a vision model for Layer 1 extraction (e.g., `qwen2-vl`)
+- An LLM API key (OpenAI, Anthropic, or local Ollama) for Layer 2 reasoning
+
+---
+
+## Installation
 
 ```bash
-# Python 3.9+
-python --version
+git clone https://github.com/oscik559/Hydroscand_Produktbok.git
+cd Hydroscand_Produktbok
 
-# Ollama with vision model (for Layer 1)
-ollama pull qwen3-vl:235b-cloud
-ollama serve
-```
-
-### Installation
-
-```bash
-# Clone repository
-git clone <repository-url>
-cd Project_Hydroscand-Hoses
-
-# Install dependencies
 pip install -r requirements.txt
-# OR install in editable mode (recommended for development)
+# or install in editable mode
 pip install -e .
-
-# Initialize database (Layer 1)
-python database/db_utils.py --init
-
-# Configure environment (optional for production)
-# A .env file with secure defaults is already created
-# Customize if needed: SECRET_KEY, FLASK_DEBUG
 ```
 
-## 📋 Usage
+Create a `.env` file at the project root:
 
-### Layer 1: Extract Products from PDF
-
-**Layer 1a** (Basic extraction - legacy scripts):
 ```bash
-# Convert PDF pages to PNG
-python Layer_1a_Extraction/1_pdf_to_png.py Layer_1a_Extraction/High-Pressure_Hose.pdf
-
-# Detect and extract tables
-python Layer_1a_Extraction/3_detect_tables.py
-
-# Extract product data
-python Layer_1a_Extraction/4_extract_product.py Layer_1a_Extraction/High-Pressure_Hose.pdf --page 31
+SECRET_KEY=<generate-with: python -c "import secrets; print(secrets.token_urlsafe(48))">
+FLASK_DEBUG=false
 ```
 
-**Layer 1b** (Advanced extraction - current production scripts):
+---
+
+## Usage
+
+### Layer 1: Extract products from PDF
+
 ```bash
-# See Layer_1b_Extraction/README.md for complete pipeline documentation
+# Production pipeline (Layer 1b)
 python Layer_1b_Extraction/0_extract_knowledge.py
 python Layer_1b_Extraction/2b_extract_categories.py
 python Layer_1b_Extraction/3a_extract_families.py
+python Layer_1b_Extraction/3b_extract_products_vlm.py
 ```
 
-**Options:**
-- `--page N`: Extract from page N
-- `--ollama-url URL`: Ollama API URL (default: http://localhost:11434)
-- `--model NAME`: VLM model name (default: qwen3-vl:235b-cloud)
+Requires Ollama running locally (`ollama serve`) with a vision model.
+See [Layer_1b_Extraction/README.md](Layer_1b_Extraction/README.md) for the full pipeline.
 
-**Output:**
-- **Database**: `database/harvested.db` - Hierarchical product database
-- **Tables**: `Layer_1a_Extraction/data/tables/` - Extracted table data (JSON)
-- **Visualizations**: `Layer_1a_Extraction/data/output/` - Images with bounding boxes
+### Layer 2 & 3: Query products
 
-### Layer 2 & 3: Query Products
-
-**Option 1: Command Line (Layer 2 Direct)**
+**CLI:**
 ```bash
 python main.py
 ```
 
-Edit queries in `main.py` (at project root):
-```python
-# Example queries
-user_query = "What are the specifications of product 1059-01-04?"
-user_query = "Find all products in HÖGTRYCKSSLANG category"
-user_query = "Compare product 1059-01-04 with 1059-01-06"
-```
+Edit the query directly in `main.py`. Debug verbosity is controlled by `debug_level` (0 = silent, 4 = verbose).
 
-**Debug Levels** (set in `main.py`):
-- **0 = SILENT**: No debug output
-- **1 = MINIMAL**: Only major workflow steps
-- **2 = NORMAL**: Standard progress indicators (recommended)
-- **3 = DETAILED**: Function parameters and outputs
-- **4 = VERBOSE**: All debug information
-
-**Option 2: Web Interface (Layer 3)**
+**Web interface:**
 ```bash
-cd Layer_3
-python app/web_app.py
+python run_web.py
+# Open http://localhost:5001
 ```
 
-Then open: `http://localhost:5001`
+---
 
-**Quick Start Guide**: See [`QUICK_START.md`](QUICK_START.md) for detailed integration guide
+## Evaluation (Case I & Case II)
 
-## 🗄️ Database Schema
-
-### Hierarchical Structure
-
-```sql
-categories (LEVEL 1: Top-level product groups)
-  ├── id, name, chapter, description, page_number
-  │
-  └── product_families (LEVEL 2: Product lines)
-        ├── id, category_id, family_code, name, subtitle
-        ├── construction_details (JSON)
-        ├── applications (TEXT, FTS5 indexed)
-        │
-        └── products (LEVEL 3: Individual SKUs)
-              ├── id, family_id, product_code, variant_suffix
-              ├── configuration_type, specifications (JSON)
-              └── bounding_box (JSON), page_number
-```
-
-### Example Data
-
-```
-HÖGTRYCKSSLANG (Category)
-  └── 1059-01 HYDROSCAND T8081 (Family)
-        ├── 1059-01-04 (Product)
-        ├── 1059-01-06 (Product)
-        └── 1059-01-08 (Product)
-```
-
-## 📁 Project Structure
-
-```
-Hydroscand_Produktbok/
-├── Layer_1a_Extraction/                    # Data extraction pipeline
-│   ├── 1_pdf_to_png.py
-│   ├── 3_detect_tables.py
-│   ├── 4_extract_product.py
-│   └── schema.sql
-│
-├── Layer_2_Agentic/                    # Agentic reasoning framework (CORE)
-│   ├── config/             # Configuration files
-│   │   ├── constants.py
-│   │   ├── config.yaml
-│   │   ├── prompts.yaml
-│   │   ├── debug_config.py
-│   │   ├── session_config.py
-│   │   └── domain_config.py
-│   ├── db/                 # Database connection & schemas
-│   │   ├── connection.py
-│   │   ├── database_manager.py
-│   │   └── templates.py
-│   └── logic/              # Core reasoning logic
-│       ├── state_graph.py          # LangGraph workflow
-│       ├── workflow_nodes.py       # Goal/Strategy/Function nodes
-│       ├── function_library.py     # Generic functions
-│       ├── llm_helpers.py          # LLM integration
-│       └── async_helpers.py        # Async execution support
-│
-├── Layer_3_Application/                    # Application layer (UI/APIs)
-│   ├── README.md              # Layer 3 documentation
-│   ├── web_app.py             # Flask web interface
-│   ├── progress_flow.py       # Progress tracking
-│   └── templates/             # HTML templates
-│       └── index.html
-│
-├── database/                  # SQLite databases
-│   ├── harvested.db          # Product database
-│   ├── agentic.db            # Workflow state database
-│   ├── db_utils.py           # Database utilities
-│   ├── harvested_schema.sql
-│   └── README.md
-│
-├── vector_index/             # Vector embeddings (ChromaDB)
-│
-├── data/                     # Temporary data (will be deprecated)
-│
-├── Layer_1a_Extraction/      # Legacy extraction scripts
-│   ├── data/                 # Layer 1a outputs
-│   │   ├── exports/          # CSV/Excel exports
-│   │   ├── output/           # Visualizations
-│   │   ├── pdf_pages/        # PDF page images
-│   │   ├── png_pages/        # PNG conversions
-│   │   └── tables/           # Extracted table data (JSON)
-│   └── README.md
-│
-├── docs/                       # Documentation
-│   ├── graph.md               # Workflow diagram
-│   ├── SETUP.md
-│   └── [other docs]
-│
-├── tests/                      # All tests
-│   ├── test_*.py              # High-level tests
-│   └── layer2/                # Framework tests
-│       ├── unit/
-│       ├── integration/
-│       ├── performance/
-│       └── utilities/
-│
-├── main.py                     # CLI entry point
-├── QUICK_START.md             # Integration guide
-└── README.md                  # This file
-```
-
-## 🔌 Layer 2 Integration
-
-The Layer 2 framework is **domain-agnostic** and can be adapted for any use case. See [`QUICK_START.md`](QUICK_START.md) for detailed integration guide.
-
-### Key Integration Steps:
-
-1. **Define domain-specific functions** in `Layer_2_Agentic/logic/function_library.py`
-2. **Create strategy templates** in `Layer_2_Agentic/db/templates.py`
-3. **Configure your database** in `Layer_2_Agentic/config/domain_config.py`
-4. **Set up LLM provider** in `Layer_2_Agentic/config/config.yaml`
-5. **Test with queries** by running `main.py`
-
-### Example Workflows
-
-**Simple Query:**
-```
-Query: "Find product 1059-01-04"
-  ↓ Goal: "Retrieve product information"
-  ↓ Strategy: "Database Lookup"
-  ↓ Functions: [query_database]
-  ↓ Answer: Product specifications
-```
-
-**Complex Query:**
-```
-Query: "Compare product A with B"
-  ↓ Goal: "Provide comparative analysis"
-  ↓ Strategy: "Multi-Product Comparison"
-  ↓ Functions: [get_product(A), get_product(B), compare_specs, summarize]
-  ↓ Answer: Detailed comparison
-```
-
-## 🧪 Testing
+The experiment folders contain the three baselines (B1: Naive RAG, B2: SQL Retrieval, B3: RCP) and the annotated query sets used in the paper.
 
 ```bash
-# Run all tests
+# Run Case I evaluation
+cd Layer_Experiments_Case_I
+python run_evaluation.py
+
+# Run Case II evaluation
+cd Layer_Experiments_Case_II
+python run_evaluation_saab.py
+
+# Statistical significance (McNemar's test)
+python Layer_Experiments_Case_I/compute_mcnemar.py
+```
+
+Results are written to `results/` within each experiment folder. The consolidated results used in the paper are in `results_appendix_b/`.
+
+---
+
+## Testing
+
+```bash
+# All tests
 python -m pytest tests/
 
-# Run Layer 2 framework tests
-python -m pytest tests/layer2/
+# Unit tests only
+python -m pytest tests/unit/
 
-# Run specific test
-python -m pytest tests/test_workflow.py
+# With coverage
+python -m pytest tests/ --cov=Layer_2_Agentic
 ```
 
-## 📝 Documentation
+---
 
-- **[QUICK_START.md](QUICK_START.md)** - Integration guide for Layer 2 framework
-- **[docs/](docs/)** - Detailed documentation and architecture diagrams
-- **[docs/graph.md](docs/graph.md)** - Visual workflow architecture
+## Database
 
-## 🔒 Security & Configuration
-
-### Environment Variables
-
-The project includes a `.env` file with secure defaults:
+The pre-populated product database for Case I is included at `database/harvested.db`. The schema is documented in `database/harvested_schema.sql` and `database/README.md`.
 
 ```bash
-SECRET_KEY=<auto-generated-secure-key>
-FLASK_DEBUG=false
+# Inspect or reinitialize the database
+python database/db_utils.py --help
 ```
 
-**For production deployment:**
-- Keep `FLASK_DEBUG=false` (security)
-- Regenerate `SECRET_KEY` for production environments
-- Never commit `.env` to version control (already in .gitignore)
+---
 
-**For development:**
-- Set `FLASK_DEBUG=true` if you need Flask auto-reload
-- Default secure settings work out of the box
+## Documentation
 
-## 🔍 Troubleshooting
+- [docs/SETUP.md](docs/SETUP.md) — detailed setup instructions
+- [docs/STRATEGY_ARCHITECTURE.md](docs/STRATEGY_ARCHITECTURE.md) — RCP framework design
+- [docs/GENERIC_FUNCTIONS_SUMMARY.md](docs/GENERIC_FUNCTIONS_SUMMARY.md) — function library reference
+- [docs/graph.png](docs/graph.png) — workflow state graph
 
-### Layer 1 (Data Extraction)
-- **Connection refused**: Make sure Ollama is running (`ollama serve`)
-- **No model**: Pull a vision model first (`ollama pull qwen2-vl`)
-- **No products extracted**: Check that the page contains product specification tables
+---
 
-### Layer 2 (Agentic Reasoning)
-- **LLM not responding**: Check API keys are set correctly
-- **Functions not found**: Ensure functions are registered in function library
-- **Database errors**: Verify database path in `domain_config.py`
-- **Import errors**: Make sure you're running from project root
+## License
 
-## 🤝 Contributing
+MIT License — see [LICENSE](LICENSE).
 
-This framework is designed to be extended:
-1. Implement domain-specific functions
-2. Create strategy templates for common patterns
-3. Configure database schema for your data
-4. Test with real-world queries
+## Acknowledgments
 
-## 📄 License
-
-[Your License Here]
-
-## 🙏 Acknowledgments
-
-**Layer 1:**
-- PyMuPDF for PDF processing
-- Ollama + Qwen for vision language models
-
-**Layer 2:**
-- LangGraph for state machine orchestration
-- LangChain for LLM integration
-- ChromaDB for vector storage
-- SQLite for state persistence
+- [LangGraph](https://github.com/langchain-ai/langgraph) for state machine orchestration
+- [LangChain](https://github.com/langchain-ai/langchain) for LLM integration
+- [ChromaDB](https://www.trychroma.com) for vector storage
+- [PyMuPDF](https://pymupdf.readthedocs.io) for PDF processing
+- [Ollama](https://ollama.com) + Qwen for vision language model inference
