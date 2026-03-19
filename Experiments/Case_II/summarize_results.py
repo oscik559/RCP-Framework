@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-results_dir = Path("Experiments/Case_I/results")
+results_dir = Path("Experiments/Case_II/results")
 
 
 def summarize(name, file_path):
@@ -29,7 +29,7 @@ def summarize(name, file_path):
 
 
 print("=" * 50)
-print("CASE I — Hydroscand")
+print("CASE II — Saab")
 print("=" * 50)
 summarize("B1: Naive RAG", results_dir / "b1_rag_latest.json")
 summarize("B2: SQL Retrieval", results_dir / "b2_sql_latest.json")

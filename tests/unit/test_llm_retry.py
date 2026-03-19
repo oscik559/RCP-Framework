@@ -33,11 +33,9 @@ def test_successful_invocation():
         
         print(f"✅ SUCCESS: Got response in {elapsed:.2f}s")
         print(f"Response: {response.content[:100]}")
-        return True
-        
+
     except Exception as e:
-        print(f"❌ FAILED: {str(e)}")
-        return False
+        raise AssertionError(f"LLM invocation failed: {str(e)}") from e
 
 
 def test_model_info():
@@ -47,22 +45,20 @@ def test_model_info():
     print("="*60)
     
     try:
-        from agentic_reasoning.config.config_loader import CONFIG
-        
+        from Layer_2_Agentic_Reasoning.config.config_loader import CONFIG
+
         print("\nConfigured LLM Models:")
         for tier, config in CONFIG["llms"].items():
             print(f"  {tier:12} -> {config['model']} (temp={config['temperature']})")
-        
+
         # Test model instantiation
         llm = get_basic_llm()
         print(f"\n✅ Basic LLM initialized: {llm.model}")
         print(f"   Timeout: {llm.timeout if hasattr(llm, 'timeout') else 'Not set'}s")
         print(f"   Context: {llm.num_ctx if hasattr(llm, 'num_ctx') else 'Not set'} tokens")
-        return True
-        
+
     except Exception as e:
-        print(f"❌ Configuration check failed: {str(e)}")
-        return False
+        raise AssertionError(f"Configuration check failed: {str(e)}") from e
 
 
 def test_strategy_selection_simulation():
@@ -100,13 +96,11 @@ Respond with JSON: {"strategy_name": "chosen_strategy", "reasoning": "why"}"""
         
         print(f"✅ SUCCESS: Got strategy response in {elapsed:.2f}s")
         print(f"Response:\n{response.content[:300]}...")
-        return True
-        
+
     except Exception as e:
-        print(f"❌ FAILED: {str(e)}")
         import traceback
         traceback.print_exc()
-        return False
+        raise AssertionError(f"Strategy selection failed: {str(e)}") from e
 
 
 def main():

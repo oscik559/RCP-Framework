@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Unified Evaluation Runner (Appendix B)
-=======================================
-Runs all three baselines against the 50 curated Appendix B questions
-using a deterministic judge instead of the LLM-based judge.
+Unified Evaluation Runner — Case I (Hydroscand)
+================================================
+Runs all three baselines against the 100 curated evaluation questions
+using a deterministic judge instead of an LLM-based judge.
 
 Usage:
   python run_evaluation.py --baseline b1          # B1: Naive RAG only
@@ -45,7 +45,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("UNIFIED_EVAL")
 
-RESULTS_DIR = Path(__file__).resolve().parent / "results_appendix_b"
+RESULTS_DIR = Path(__file__).resolve().parent / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
 
@@ -253,7 +253,7 @@ def main():
     parser.add_argument("--baseline", choices=["b1", "b2", "b3", "all"], default="all")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--questions", type=str, 
-                       default=str(Path(__file__).resolve().parent / "test_questions_appendix_b.json"))
+                       default=str(Path(__file__).resolve().parent / "test_questions.json"))
     args = parser.parse_args()
     
     questions = load_questions(args.questions, args.limit)

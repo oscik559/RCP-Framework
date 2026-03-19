@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-results_dir = Path("Experiments/Case_I/results")
+results_dir = Path("Experiments/Case_II/results")
 
 
 def get_avg_metrics(name, file_path):
@@ -21,7 +21,7 @@ def get_avg_metrics(name, file_path):
 
 
 print("=" * 50)
-print("CASE I — Token Cost Estimates")
+print("CASE II — Token Cost Estimates")
 print("=" * 50)
 print("B1:", get_avg_metrics("B1", results_dir / "b1_rag_latest.json"))
 print("B2:", get_avg_metrics("B2", results_dir / "b2_sql_latest.json"))

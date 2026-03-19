@@ -87,5 +87,5 @@ python database/db_utils.py --verify
 | Source | Hydroscand AB — *Produktbok* (Swedish catalog) |
 | Language | Swedish |
 | Database | `database/harvested.db` (included) |
-| Evaluation set | 100 annotated queries (`Experiments/Case_I/test_questions_appendix_b.json`) |
-| Results | `Experiments/Case_I/results_appendix_b/` |
+| Evaluation set | 100 annotated queries (`Experiments/Case_I/test_questions.json`) |
+| Results | `Experiments/Case_I/results/` |

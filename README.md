@@ -73,7 +73,7 @@ flowchart LR
 │   │   ├── Baseline_SQL_Retrieval/  # B2: SQL retrieval baseline
 │   │   ├── RCP_Framework/        # B3: RCP framework evaluation
 │   │   ├── compute_mcnemar.py    # McNemar's test for statistical significance
-│   │   └── test_questions_appendix_b.json  # Annotated query set (100 questions)
+│   │   └── test_questions.json             # Annotated query set (100 questions)
 │   ├── Case_II/                  # Case II evaluation (Saab, n=100 queries)
 │   │   └── test_questions_saab.json  # Annotated query set (100 questions)
 │   └── questions/                # Shared test question sets
@@ -169,7 +169,7 @@ python run_evaluation_saab.py
 python Experiments/Case_I/compute_mcnemar.py
 ```
 
-Results are written to `results/` within each experiment folder. The consolidated results used in the paper are in `results_appendix_b/`.
+Results are written to `results/` within each experiment folder.
 
 ---
 

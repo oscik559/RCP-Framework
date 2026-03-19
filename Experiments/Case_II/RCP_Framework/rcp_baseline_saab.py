@@ -20,6 +20,7 @@ Functions (mirrors Saab FunctionTemplateLibrary):
 """
 
 import json
+import os
 import re
 import sqlite3
 import time
@@ -27,10 +28,8 @@ from pathlib import Path
 
 import requests
 
-SAAB_DB = Path(
-    r"C:\Users\oscik35\Desktop\PROJECTS\Test_Projects_DELETE"
-    r"\Project_Saab_fork\Project_Saab\data\database\harvested.db"
-)
+# Set SAAB_DB_PATH environment variable to override the default location.
+SAAB_DB = Path(os.environ.get("SAAB_DB_PATH", "database/saab_harvested.db"))
 OLLAMA_URL = "http://localhost:11434"
 LLM_MODEL = "llama3.2:latest"
 

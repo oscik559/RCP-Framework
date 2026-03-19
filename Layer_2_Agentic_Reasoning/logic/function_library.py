@@ -1812,17 +1812,37 @@ def func_extract_requirements(params: dict) -> tuple[bool, dict | str]:
         
         debug.print_function(f"[func_extract_requirements] LLM response: {response[:200]}...")
         
-        # Parse JSON response - no fallback allowed
+        # Parse JSON response robustly: model output may include multiple JSON objects
+        # (e.g., requirements object + confidence object + trailing note text).
         try:
-            # Try to extract JSON from the response (in case it has extra text)
-            import re
-            json_match = re.search(r'\{.*\}', response, re.DOTALL)
-            if json_match:
-                requirements = json.loads(json_match.group())
+            cleaned_response = response.replace("```json", "").replace("```", "").strip()
+
+            parsed_objects = []
+            decoder = json.JSONDecoder()
+            cursor = 0
+            while cursor < len(cleaned_response):
+                start = cleaned_response.find("{", cursor)
+                if start == -1:
+                    break
+                try:
+                    obj, end = decoder.raw_decode(cleaned_response, start)
+                    if isinstance(obj, dict):
+                        parsed_objects.append(obj)
+                    cursor = end
+                except json.JSONDecodeError:
+                    cursor = start + 1
+
+            if not parsed_objects:
+                requirements = json.loads(cleaned_response)
+                metadata = {}
             else:
-                requirements = json.loads(response)
+                requirements = max(parsed_objects, key=lambda d: len(d))
+                metadata = {}
+                for obj in parsed_objects:
+                    if "confidence_score" in obj or "intent_summary" in obj:
+                        metadata.update(obj)
+
         except json.JSONDecodeError as e:
-            # Fail if JSON parsing fails - no fallback
             logger.error(f"[func_extract_requirements] JSON parse error: {e}")
             logger.error(f"[func_extract_requirements] LLM response was: {response}")
             return (False, f"Failed to parse requirements from LLM response: {str(e)}")
@@ -1832,7 +1852,11 @@ def func_extract_requirements(params: dict) -> tuple[bool, dict | str]:
         
         # Calculate confidence based on number of extracted requirements
         num_requirements = len(cleaned_requirements)
-        confidence = min(num_requirements / 5, 1.0)  # Confidence increases with more requirements
+        extracted_confidence = metadata.get("confidence_score") if isinstance(metadata, dict) else None
+        if isinstance(extracted_confidence, (int, float)):
+            confidence = max(0.0, min(float(extracted_confidence), 1.0))
+        else:
+            confidence = min(num_requirements / 5, 1.0)  # Confidence increases with more requirements
         
         debug.print_function(
             f"[func_extract_requirements] Extracted {num_requirements} requirements, confidence: {confidence:.2f}"

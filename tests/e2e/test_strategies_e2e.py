@@ -102,15 +102,15 @@ def test_product_comparison_strategy():
     })
     
     print_result("Product Comparison", success, result)
-    
+
     if success and isinstance(result, dict):
         print("     Comparison Table:")
         for field, values in result.get('comparison_table', {}).items():
             print(f"       {field}: {values}")
-        
+
         print(f"\n     Recommendation: {result.get('recommendation', 'N/A')[:150]}...")
-    
-    return success
+
+    assert success
 
 
 # =============================================================================
@@ -158,7 +158,7 @@ def test_technical_calculation_strategy():
     if convert_success:
         print(f"     {convert_result.get('original_value')} bar = {convert_result.get('converted_value')} psi")
     
-    return calc_success and convert_success
+    assert calc_success and convert_success
 
 
 # =============================================================================
@@ -196,7 +196,7 @@ def test_standard_compliance_strategy():
         lines = details.split('\n')[:6]
         print(f"     SAE 100R2 Details:\n       {chr(10).join('       ' + line for line in lines)}")
     
-    return sae_success
+    assert sae_success
 
 
 # =============================================================================
@@ -232,8 +232,8 @@ def test_smart_recommendation_strategy():
         analysis = result.get('analysis', '')
         lines = analysis.split('\n')[:10]
         print(f"     Analysis:\n       {chr(10).join('       ' + line for line in lines)}")
-    
-    return success
+
+    assert success
 
 
 # =============================================================================
@@ -306,7 +306,7 @@ def test_specification_analysis_strategy():
         lines = analysis.split('\n')[:8]
         print(f"     Analysis:\n       {chr(10).join('       ' + line for line in lines)}")
     
-    return diameter_success and bar_to_psi_success
+    assert diameter_success and bar_to_psi_success
 
 
 # =============================================================================
@@ -410,7 +410,7 @@ def test_complex_real_world_query():
     passed = sum(1 for _, success in results if success)
     print(f"     Sub-tests passed: {passed}/{len(results)}")
     
-    return all(success for _, success in results)
+    assert all(success for _, success in results)
 
 
 # =============================================================================

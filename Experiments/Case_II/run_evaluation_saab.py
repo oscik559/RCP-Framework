@@ -28,7 +28,10 @@ QUESTIONS_FILE = HERE / "test_questions_saab.json"
 
 # ── Import baselines ──────────────────────────────────────────────────────────
 sys.path.insert(0, str(HERE.parent.parent))  # project root
-sys.path.insert(0, str(HERE))  # for local imports
+sys.path.insert(0, str(HERE))  # for local imports (deterministic_judge_saab)
+sys.path.insert(0, str(HERE / "Baseline_RAG"))
+sys.path.insert(0, str(HERE / "Baseline_SQL_Retrieval"))
+sys.path.insert(0, str(HERE / "RCP_Framework"))
 from deterministic_judge_saab import judge
 
 
