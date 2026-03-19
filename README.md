@@ -13,8 +13,9 @@ This repository contains the implementation of the **RCP (Relational Control Pla
 
 ## Architecture
 
-
-
+<p align="center">
+<img width="294" height="645" alt="Agentic_Flowchart" src="https://github.com/user-attachments/assets/4e1be63b-462b-4d9f-9d5e-32bc6630d8f6" />
+</p>
 
 | Layer | Role | Key Components |
 |-------|------|----------------|
