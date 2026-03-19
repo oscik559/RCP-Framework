@@ -1,6 +1,0 @@
-question_id,category,question,answer_correct,citation_accurate,unit_fidelity,hallucination,error_class,latency_s,token_estimate,judge_reasoning
-5,A,What hoses can be used for boiling water?,0,0,0,0,hallucination,3.047,411,Answer completely misses the topic and context of boiling water hoses
-7,A,Which hydraulic hose and sleeve should I get for a particular excavator?,0,0,0,0,hallucination,4.538,429,The AI answer contains a factual claim ('Spiral hose with Rock is better choice') not supported by the ground truth.
-11,A,Which products are approved for food use?,0,0,0,0,hallucination,4.452,347,"Answer claims no information about food use is available, despite the ground truth providing specific examples of approved products."
-17,A,Do you have hoses that meet the EN 857 standard?,0,0,0,1,hallucination,4.258,342,"The AI answer contains a false claim about the EN 857 standard, which is not supported by the ground truth."
-19,A,Do you have a product that can withstand both high pressure and vibrations?,0,0,0,0,hallucination,5.134,1045,"The AI answer provides a product type (ISOBAR 420 CO ROCK X-HP) but lacks specific details and article numbers, and includes unsupported claims about the product's suitability."
