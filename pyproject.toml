@@ -67,4 +67,4 @@ package-dir = {"" = "."}
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["Layer_2_Agentic_Reasoning", "Layer_2_Agentic_Reasoning.*", "Layer_3_Application", "Layer_3_Application.*"]
+include = ["Layer_2_Agentic_Reasoning", "Layer_2_Agentic_Reasoning.*", "Layer_3_User_Interface", "Layer_3_User_Interface.*"]

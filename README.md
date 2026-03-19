@@ -28,7 +28,7 @@ Layer 3: Application
 |-------|------|----------------|
 | Layer 1 | Extraction pipeline | PDF rendering, VLM-based parsing, SQLite schema |
 | Layer 2 | Reasoning engine | LangGraph workflow, function library, vector search |
-| Layer 3 | User interface | Flask web app, CLI entry point |
+| Layer 3 | User interface | Flask web app (`Layer_3_User_Interface/`), CLI entry point |
 
 ---
 
@@ -42,7 +42,7 @@ Layer 3: Application
 │   ├── config/                   # Configuration: constants, prompts, domain settings
 │   ├── db/                       # Database connections and strategy templates
 │   └── logic/                    # State graph, workflow nodes, function library
-├── Layer_3_Application/          # Web interface and APIs
+├── Layer_3_User_Interface/          # Web interface and APIs
 ├── Experiments/
 │   ├── Case_I/                   # Case I evaluation (Hydroscand, n=100 queries)
 │   │   ├── Baseline_RAG/         # B1: Naive RAG baseline
@@ -178,7 +178,14 @@ python database/db_utils.py --help
 - [docs/SETUP.md](docs/SETUP.md) — detailed setup instructions
 - [docs/STRATEGY_ARCHITECTURE.md](docs/STRATEGY_ARCHITECTURE.md) — RCP framework design
 - [docs/GENERIC_FUNCTIONS_SUMMARY.md](docs/GENERIC_FUNCTIONS_SUMMARY.md) — function library reference
+- [docs/SPEC_GLOSSARY.md](docs/SPEC_GLOSSARY.md) — product database attribute glossary
 - [docs/graph.png](docs/graph.png) — workflow state graph
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, code conventions, and how to submit changes.
 
 ---
 

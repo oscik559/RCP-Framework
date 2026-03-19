@@ -86,7 +86,7 @@ python main.py
 
 #### Web Interface
 ```bash
-cd Layer_3_Application
+cd Layer_3_User_Interface
 python web_app.py
 ```
 
@@ -102,7 +102,7 @@ Project_Hydroscand-Hoses/
 │   ├── config/              # Configuration files
 │   ├── db/                  # Database connections & schema
 │   └── logic/               # Workflow nodes & functions
-├── Layer_3_Application/     # Web interface
+├── Layer_3_User_Interface/     # Web interface
 ├── data/                    # Data storage
 │   ├── database/            # SQLite databases
 │   ├── tables/              # Extracted tables
@@ -116,7 +116,7 @@ Project_Hydroscand-Hoses/
 ### ✅ Folder Renaming (Python Compatible)
 All folders now use underscores instead of hyphens:
 - `Layer_2-Agentic` → `Layer_2_Agentic_Reasoning`
-- `Layer_3-Application` → `Layer_3_Application`
+- `Layer_3-Application` → `Layer_3_User_Interface`
 - `Layer_1a-Extraction` → `Layer_1_Extraction/Layer_1a`
 - `Layer_1b-Extraction` → `Layer_1_Extraction/Layer_1b`
 
@@ -252,7 +252,7 @@ python Layer_2_Agentic_Reasoning/db/templates.py
 python main.py
 
 # 5. Or run web interface
-cd Layer_3_Application
+cd Layer_3_User_Interface
 python web_app.py
 ```
 

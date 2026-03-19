@@ -23,7 +23,7 @@ This project is a three-layer intelligent system for extracting, reasoning about
 - **Query Data**: Use Layer 2 (main.py) for CLI queries, or Layer 3 (web_app.py) for web UI. Example:
   ```pwsh
   python main.py
-  cd Layer_3_Application
+  cd Layer_3_User_Interface
   python web_app.py
   ```
 - **Database Access**: Use `database/db_utils.py` for verification and schema management. Example:
@@ -123,7 +123,7 @@ pytest tests/functional/test_product_search.py::test_search_by_material
 ## Example File References
 - `Layer_1_Extraction/Layer_1a/4_extract_product.py`: Product extraction logic
 - `Layer_2_Agentic_Reasoning/logic/function_library.py`: Core function library
-- `Layer_3_Application/web_app.py`: Web interface
+- `Layer_3_User_Interface/web_app.py`: Web interface
 - `database/db_utils.py`: Database utilities
 - `tests/`: All test scripts
 

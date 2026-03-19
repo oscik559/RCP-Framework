@@ -1,10 +1,10 @@
-# Layer_3_Application
+# Layer_3_User_Interface
 
 The application layer provides user interfaces and interaction points for the agentic reasoning system.
 
 ## 🎯 Purpose
 
-Layer_3_Application sits on top of Layer_2_Agentic_Reasoning (the core framework) and provides:
+Layer_3_User_Interface sits on top of Layer_2_Agentic_Reasoning (the core framework) and provides:
 - Web interfaces
 - API endpoints
 - User interaction flows
@@ -13,7 +13,7 @@ Layer_3_Application sits on top of Layer_2_Agentic_Reasoning (the core framework
 ## 📁 Structure
 
 ```
-Layer_3_Application/
+Layer_3_User_Interface/
 ├── __init__.py
 ├── web_app.py           # Flask web interface
 ├── progress_flow.py     # Progress tracking workflow
@@ -25,7 +25,7 @@ Layer_3_Application/
 ## 🚀 Running the Web App
 
 ```bash
-cd Layer_3_Application
+cd Layer_3_User_Interface
 python web_app.py
 ```
 
@@ -33,7 +33,7 @@ Then open your browser to: `http://localhost:5001`
 
 ## 🔌 Dependencies
 
-Layer_3_Application depends on:
+Layer_3_User_Interface depends on:
 - **Layer_2_Agentic_Reasoning** for core reasoning capabilities
 - **Flask** for web server
 - **LangGraph** for workflow execution
@@ -41,7 +41,7 @@ Layer_3_Application depends on:
 ## 📊 Architecture
 
 ```
-Layer_3_Application (UI)
+Layer_3_User_Interface (UI)
     ↓ uses
 Layer_2_Agentic_Reasoning (Framework)
     ↓ uses
@@ -53,7 +53,7 @@ Layer_1_Extraction/Layer_1b (Coupling Data)
 
 - **Layer_1_Extraction/Layer_1a / Layer_1_Extraction/Layer_1b**: Data extraction and storage (PDF → Database)
 - **Layer_2_Agentic_Reasoning**: Core reasoning framework (Goal → Strategy → Function)
-- **Layer_3_Application**: User interfaces and applications (Web UI, APIs)
+- **Layer_3_User_Interface**: User interfaces and applications (Web UI, APIs)
 
 ## 🔧 Configuration
 
@@ -120,15 +120,15 @@ pip install flask
 
 ## 🤝 Contributing
 
-When adding new applications to Layer_3_Application:
+When adding new applications to Layer_3_User_Interface:
 1. Keep business logic in Layer_2_Agentic_Reasoning
-2. Only handle UI/UX concerns in Layer_3_Application
+2. Only handle UI/UX concerns in Layer_3_User_Interface
 3. Use progress_flow.py for execution tracking
 4. Follow Flask best practices
 5. Document new endpoints
 
 ---
 
-**Layer_3_Application Status: ACTIVE** ✅  
+**Layer_3_User_Interface Status: ACTIVE** ✅  
 **Dependencies: Layer_2_Agentic_Reasoning** ✅  
 **Web Interface: Flask** ✅

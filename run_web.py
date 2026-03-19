@@ -27,7 +27,7 @@ import sys
 if sys.platform.startswith("win"):
     os.environ["PYTHONIOENCODING"] = "utf-8"
 
-from Layer_3_Application.web_app import app
+from Layer_3_User_Interface.web_app import app
 
 
 def main():

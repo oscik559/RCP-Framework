@@ -1,51 +1,40 @@
 # Documentation
 
-This folder contains all project documentation and analysis reports.
+This folder contains architecture documentation, setup guides, and reference material for the RCP Framework.
 
 ## Contents
 
-### Architecture Documentation
-- **GENERIC_FUNCTIONS_SUMMARY.md** - Complete reference of all 30 generic function building blocks
-- **FUNCTION_REVIEW_ANALYSIS.md** - Analysis of function genericity and domain-specificity
-- **GENERICIZATION_COMPLETE.md** - Final report on framework genericization efforts
-- **graph.md** - Workflow state graph architecture documentation
-- **graph.mmd** - Mermaid diagram source for workflow visualization
-- **graph.png** - Visual workflow diagram (auto-generated)
+### Setup & Installation
+- [SETUP.md](SETUP.md) — Installation and environment setup (all platforms)
+- [MACOS_SETUP.md](MACOS_SETUP.md) — macOS-specific setup notes
 
-### Development Reports
-- **DOMAIN_SPECIFICITY_ANALYSIS.md** - Detailed analysis of domain-specific elements in codebase
-- **NEW_STRATEGIES_SUMMARY.md** - Documentation of new reasoning strategies added to framework
+### Architecture & Design
+- [STRATEGY_ARCHITECTURE.md](STRATEGY_ARCHITECTURE.md) — RCP control loop and strategy design
+- [GENERIC_FUNCTIONS_SUMMARY.md](GENERIC_FUNCTIONS_SUMMARY.md) — Complete reference for the 30 generic function building blocks
+- [graph.md](graph.md) — Workflow state graph architecture
+- [graph.mmd](graph.mmd) — Mermaid diagram source
+- [graph.png](graph.png) — Visual workflow diagram
 
-### Setup & Configuration
-- **SETUP.md** - Project setup and installation instructions
-
-## Related Documentation
-
-- **Main README**: See `../README.md` for project overview
-- **API Documentation**: See `../Layer_2/agentic_reasoning/` for inline documentation
-- **Test Documentation**: See `../tests/` for test suite documentation
+### Reference
+- [SPEC_GLOSSARY.md](SPEC_GLOSSARY.md) — Complete specification attribute glossary for the product database
 
 ## Quick Navigation
 
 ```
 docs/
-├── README.md (this file)
-├── SETUP.md                          # Setup instructions
-├── graph.md                          # Workflow architecture
-├── graph.mmd                         # Mermaid diagram source
-├── graph.png                         # Visual workflow diagram
-├── GENERIC_FUNCTIONS_SUMMARY.md      # Function reference
-├── FUNCTION_REVIEW_ANALYSIS.md       # Function analysis
-├── GENERICIZATION_COMPLETE.md        # Genericization report
-├── DOMAIN_SPECIFICITY_ANALYSIS.md    # Domain analysis
-└── NEW_STRATEGIES_SUMMARY.md         # Strategy documentation
+├── README.md                    # This file
+├── SETUP.md                     # Setup instructions
+├── MACOS_SETUP.md               # macOS notes
+├── STRATEGY_ARCHITECTURE.md     # RCP framework design
+├── GENERIC_FUNCTIONS_SUMMARY.md # Function library reference
+├── SPEC_GLOSSARY.md             # Database attribute glossary
+├── graph.md                     # Workflow architecture
+├── graph.mmd                    # Mermaid diagram source
+└── graph.png                    # Visual workflow diagram
 ```
 
-## Contributing
+## Related
 
-When adding new documentation:
-1. Place technical architecture docs in this folder
-2. Keep user-facing docs in root (README.md)
-3. Use markdown format with clear headers
-4. Include code examples where applicable
-5. Update this README's Contents section
+- [README.md](../README.md) — Project overview and quick start
+- [CONTRIBUTING.md](../CONTRIBUTING.md) — How to contribute
+- [tests/README.md](../tests/README.md) — Test suite documentation

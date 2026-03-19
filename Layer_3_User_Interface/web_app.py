@@ -33,7 +33,7 @@ from Layer_2_Agentic_Reasoning.db.connection import (
     get_agentic_connection,
     get_output_connection,
 )
-from Layer_3_Application.progress_flow import create_progress_workflow
+from Layer_3_User_Interface.progress_flow import create_progress_workflow
 
 app = Flask(__name__)
 # Use environment variable for secret key, or generate a secure random key
