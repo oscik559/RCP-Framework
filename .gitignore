@@ -21,7 +21,7 @@ sdist/
 var/
 wheels/
 share/python-wheels/
-# *.egg-info/
+*.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
@@ -135,7 +135,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-# .env
+.env
 .envrc
 .venv
 env/
@@ -236,6 +236,9 @@ Layer_1a_Extraction/data/png_pages/
 Layer_1a_Extraction/data/output/
 Layer_1a_Extraction/data/exports/
 Layer_1a_Extraction/data/tables/
+
+# Paper (manuscript — not versioned in code repo)
+Paper/
 
 # Temporary files
 *.tmp
