@@ -86,6 +86,15 @@ Open an issue on [GitHub Issues](https://github.com/oscik559/RCP-Framework/issue
 
 ---
 
+## Core Team
+
+| Name | Role | Contact |
+|------|------|---------|
+| Oscar Ikechukwu | Lead developer | oscar.ikechukwu@liu.se |
+| Mehdi Tarkian | Supervisor | mehdi.tarkian@liu.se |
+
+---
+
 ## License
 
 By contributing you agree that your contributions will be licensed under the [MIT License](LICENSE).
