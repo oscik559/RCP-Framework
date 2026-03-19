@@ -178,7 +178,7 @@ python database/db_utils.py --help
 
 ## Documentation
 
-- [docs/SETUP.md](docs/SETUP.md) — detailed setup instructions
+- [SETUP.md](SETUP.md) — detailed setup instructions (Windows, macOS, Linux)
 - [docs/graph.png](docs/graph.png) — workflow state graph
 - [docs/Case_I/STRATEGY_ARCHITECTURE.md](docs/Case_I/STRATEGY_ARCHITECTURE.md) — RCP strategy design (Case I)
 - [docs/Case_I/GENERIC_FUNCTIONS_SUMMARY.md](docs/Case_I/GENERIC_FUNCTIONS_SUMMARY.md) — function library reference

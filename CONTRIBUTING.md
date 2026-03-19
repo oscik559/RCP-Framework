@@ -20,6 +20,8 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
+See [SETUP.md](SETUP.md) for full platform-specific instructions (Windows, macOS, Linux).
+
 Requires Python 3.12 and [Ollama](https://ollama.com) for local model inference.
 
 ---

@@ -4,10 +4,6 @@ This folder contains architecture documentation, setup guides, and reference mat
 
 ## Contents
 
-### Setup & Installation
-- [SETUP.md](SETUP.md) — Installation and environment setup (all platforms)
-- [MACOS_SETUP.md](MACOS_SETUP.md) — macOS-specific setup notes
-
 ### Framework Architecture
 - [graph.md](graph.md) — Workflow state graph architecture
 - [graph.mmd](graph.mmd) — Mermaid diagram source
@@ -23,8 +19,6 @@ This folder contains architecture documentation, setup guides, and reference mat
 ```
 docs/
 ├── README.md                          # This file
-├── SETUP.md                           # General setup instructions
-├── MACOS_SETUP.md                     # macOS notes
 ├── graph.md / graph.mmd / graph.png   # Workflow diagrams
 ├── Agentic_Flowchart.jpg              # Algorithm overview figure
 └── Case_I/                            # Case I specific documentation
@@ -36,5 +30,6 @@ docs/
 ## Related
 
 - [README.md](../README.md) — Project overview and quick start
+- [SETUP.md](../SETUP.md) — Installation guide (Windows, macOS, Linux)
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — How to contribute
 - [tests/README.md](../tests/README.md) — Test suite documentation
