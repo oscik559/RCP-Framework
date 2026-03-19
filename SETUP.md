@@ -113,6 +113,8 @@ Your prompt should now show `(.venv)`.
 ```bash
 pip install --upgrade pip
 pip install -e .
+# Include test dependencies if you want to run pytest
+pip install -e ".[test]"
 ```
 
 > `pip install -e .` installs the project in editable mode, enabling clean imports like
@@ -150,7 +152,7 @@ python -c "from Layer_2_Agentic_Reasoning.logic.workflow_types import SessionSta
 python database/db_utils.py --verify
 
 # Run tests
-pytest tests/unit/ -q
+python -m pytest tests/unit/ -q
 ```
 
 Expected database output:

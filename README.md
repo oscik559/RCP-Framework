@@ -14,35 +14,37 @@ This repository contains the implementation of the **RCP (Relational Control Pla
 ## Architecture
 
 ```mermaid
-flowchart TD
-    Q([Query])
+flowchart LR
+    Q([Query]) --> GD
 
-    Q --> GD
-
-    subgraph RCP["RCP Reasoning Engine — 6-Stage Control Loop"]
+    subgraph RCP["RCP Reasoning Engine"]
         direction TB
-        GD["Goal\nDefinition"]
-        SS["Strategy\nSelection"]
-        FE["Function\nExecution"]
-        FV{Function\nValidation}
-        SV{Strategy\nValidation}
-        GV{Goal\nValidation}
 
-        GD --> SS
-        SS --> FE
-        FE -->|call next function| FE
-        FE --> FV
-        FV --> SV
-        SV -->|try another strategy| SS
-        SV --> GV
-        GV -->|redefine goal| GD
+        subgraph LOOP["6-Stage Verify-Then-Summarise Loop"]
+            direction TB
+            GD[Goal Definition] --> SS[Strategy Selection]
+            SS --> FE[Function Execution]
+            FE --> FV{Function Validation}
+            FV -->|pass| SV{Strategy Validation}
+            FV -->|fail: retry function| FE
+            SV -->|retry strategy| SS
+            SV -->|strategy sufficient| GV{Goal Validation}
+            GV -->|goal not met| GD
+        end
     end
 
-    HDB[(Harvested DB)] -.->|product data| FE
-    FE -.->|intermediate results| TDB[(Temp DB)]
-    ADB[(Agentic DB)] -.->|workflow state| RCP
+    GV -->|goal met| R([Result])
 
-    GV --> R([Result])
+    subgraph DATA["Data Stores"]
+        direction TB
+        HDB[(Harvested DB)]
+        TDB[(Temp DB)]
+        ADB[(Agentic DB)]
+    end
+
+    HDB -. product/family/knowledge retrieval .-> FE
+    FE -. intermediate outputs .-> TDB
+    ADB -. workflow state persistence .-> LOOP
 ```
 
 | Layer | Role | Key Components |
@@ -105,6 +107,8 @@ cd RCP-Framework
 pip install -r requirements.txt
 # or install in editable mode
 pip install -e .
+# install test tooling (required to run pytest commands below)
+pip install -e ".[test]"
 ```
 
 Create a `.env` file at the project root:
@@ -170,6 +174,12 @@ Results are written to `results/` within each experiment folder. The consolidate
 ---
 
 ## Testing
+
+Install test dependencies first if you used only `-r requirements.txt` or `pip install -e .`:
+
+```bash
+python -m pip install -e ".[test]"
+```
 
 ```bash
 # All tests

@@ -79,6 +79,13 @@ Run individually: `python tests/utilities/script_name.py`
 
 ## Running Tests
 
+### Prerequisite
+Install test tooling first:
+
+```bash
+python -m pip install -e ".[test]"
+```
+
 ### Run All Tests
 ```bash
 pytest tests/

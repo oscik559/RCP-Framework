@@ -31,7 +31,7 @@ class TestStrategyManagement:
     def test_strategy_templates_import(self):
         """Test that strategy templates can be imported."""
         try:
-            from Layer_2_Agentic_Reasoning.db.templates import STRATEGY_TEMPLATES
+            from Layer_2_Agentic_Reasoning.logic.templates import STRATEGY_TEMPLATES
             assert isinstance(STRATEGY_TEMPLATES, dict)
             assert len(STRATEGY_TEMPLATES) > 0, "Should have strategy templates"
         except (ImportError, ModuleNotFoundError, AttributeError) as e:
@@ -40,7 +40,7 @@ class TestStrategyManagement:
     def test_goal_strategy_function_pattern(self):
         """Test Goal -> Strategy -> Function pattern structure."""
         try:
-            from Layer_2_Agentic_Reasoning.db.templates import STRATEGY_TEMPLATES
+            from Layer_2_Agentic_Reasoning.logic.templates import STRATEGY_TEMPLATES
             
             # Each strategy should have required structure
             for strategy_name, strategy_config in STRATEGY_TEMPLATES.items():
