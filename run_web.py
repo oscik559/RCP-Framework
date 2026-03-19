@@ -58,7 +58,7 @@ def main():
     debug_mode = args.debug or os.getenv("FLASK_DEBUG", "false").lower() == "true"
 
     print("=" * 60)
-    print("🌐 Hydroscand Produktbok - Agentic Reasoning Web Interface")
+    print("🌐 RCP Framework - Agentic Reasoning Web Interface")
     print("=" * 60)
     print(f"📍 URL: http://{args.host}:{args.port}")
     print(f"🔧 Debug Mode: {'ON' if debug_mode else 'OFF'}")

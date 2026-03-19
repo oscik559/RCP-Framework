@@ -1,7 +1,7 @@
 """
-Domain Configuration - Hydroscand Produktbok
+Domain Configuration - RCP Framework (Case I: Hydroscand)
 
-Active domain configuration for the Hydroscand product catalog project.
+Active domain configuration for the Hydroscand product catalog (Case I).
 Uses the product database from Layer_1 extraction.
 
 Database: database/harvested.db (335 products, 69 families)

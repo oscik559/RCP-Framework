@@ -1,5 +1,5 @@
 [project]
-name = "hydroscand-produktbok"
+name = "rcp-framework"
 version = "1.0.0"
 description = "RCP Framework - A domain-agnostic agentic architecture for structured extraction of engineering knowledge"
 requires-python = ">=3.12,<3.13"

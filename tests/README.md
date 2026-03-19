@@ -1,8 +1,8 @@
-# Test Suite for Hydroscand Produktbok
+# Test Suite for RCP Framework
 
 ## Overview
 
-This directory contains all tests for the Hydroscand Product Catalog system, organized into 4 logical categories based on testing scope and strategy.
+This directory contains all tests for the RCP Framework, organized into 4 logical categories based on testing scope and strategy.
 
 ## Directory Structure
 

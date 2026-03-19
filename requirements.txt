@@ -1,4 +1,4 @@
-# Hydroscand Produktbok Dependencies
+# RCP Framework Dependencies
 # Generated from pyproject.toml
 # Python >=3.12,<3.13
 
