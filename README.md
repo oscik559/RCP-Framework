@@ -7,32 +7,47 @@ Supplementary code for the paper:
 > Division of Product Realization, IEI, Linköping University
 > Funded by Vinnova DART project (grant 2024-01420)
 
-<p align="center">
-  <img src="docs/Agentic_Flowchart.jpg" width="720" alt="RCP Framework — Agentic Workflow">
-</p>
-
-This repository contains the implementation of the **RCP (Relational Control Plane) framework**, a SQL-backed agentic architecture that persists orchestration state as queryable relational records and enforces a six-stage verify-then-summarise control loop. Synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. The architecture is structured into three layers for PDF extraction, agentic reasoning, and application delivery. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog, n=100 queries) and **Case II** (Saab aerospace connector/cable catalog, n=100 queries).
+This repository contains the implementation of the **RCP (Relational Control Plane) framework**, a SQL-backed agentic architecture that persists orchestration state as queryable relational records and enforces a six-stage verify-then-summarise control loop. Synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog, n=100 queries) and **Case II** (Saab aerospace connector/cable catalog, n=100 queries).
 
 ---
 
 ## Architecture
 
-```
-Layer 1: Data Extraction
-  PDF → PNG → VLM Extraction → Hierarchical SQLite Database
+```mermaid
+flowchart LR
+    subgraph L1["Layer 1 — Extraction"]
+        direction TB
+        PDF[📄 PDF Catalog] --> VLM[VLM Extraction\nqwen2-vl]
+        VLM --> DB[(SQLite\nharvested.db)]
+    end
 
-Layer 2: Agentic Reasoning (RCP Framework)
-  Goal → Strategy → Function → Validated Answer
+    subgraph L2["Layer 2 — RCP Reasoning Engine"]
+        direction TB
+        GD["① GoalDefine\nStructure the query"] --> SP["② StrategyPlan\nSelect strategy"]
+        SP --> FE["③ FunctionExecute\nRun function pipeline"]
+        FE --> FV["④ FunctionValidate\nSchema check"]
+        FV --> SV{"⑤ StrategyValidate\nConfidence gate"}
+        SV -->|retry fn| FE
+        SV -->|new strategy| SP
+        SV -->|pass| GV{"⑥ GoalValidate\nSynthesize answer"}
+        GV -->|insufficient| SP
+        GV -->|✓ valid| ANS["✅ Validated Answer"]
+    end
 
-Layer 3: Application
-  Web UI / CLI / API
+    subgraph L3["Layer 3 — User Interface"]
+        WEB["Flask Web UI\nrun_web.py"]
+        CLI["CLI\nmain.py"]
+    end
+
+    DB --> L2
+    L2 --> L3
 ```
 
 | Layer | Role | Key Components |
 |-------|------|----------------|
 | Layer 1 | Extraction pipeline | PDF rendering, VLM-based parsing, SQLite schema |
-| Layer 2 | Reasoning engine | LangGraph workflow, function library, vector search |
-| Layer 3 | User interface | Flask web app (`Layer_3_User_Interface/`), CLI entry point |
+| Layer 2 | Reasoning engine | LangGraph workflow, 6-stage control loop, function library |
+| Layer 3 | User interface | Flask web app, CLI entry point |
 
 ---
 
