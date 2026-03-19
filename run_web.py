@@ -23,9 +23,11 @@ import argparse
 import os
 import sys
 
-# Ensure UTF-8 encoding for Windows
+# Ensure UTF-8 encoding for Windows (must be before any import that prints)
 if sys.platform.startswith("win"):
     os.environ["PYTHONIOENCODING"] = "utf-8"
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 from Layer_3_User_Interface.web_app import app
 

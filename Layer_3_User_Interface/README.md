@@ -1,134 +1,82 @@
-# Layer_3_User_Interface
+# Layer 3 — User Interface
 
-The application layer provides user interfaces and interaction points for the agentic reasoning system.
+This layer sits on top of `Layer_2_Agentic_Reasoning` and provides the user-facing entry points: a Flask web application and a CLI runner.
 
-## 🎯 Purpose
+## Files
 
-Layer_3_User_Interface sits on top of Layer_2_Agentic_Reasoning (the core framework) and provides:
-- Web interfaces
-- API endpoints
-- User interaction flows
-- Progress tracking and visualization
+| File | Purpose |
+|------|---------|
+| `web_app.py` | Flask web server — query UI with real-time progress tracking |
+| `progress_flow.py` | Workflow progress event stream for the web interface |
+| `templates/index.html` | Single-page HTML/JS frontend |
 
-## 📁 Structure
+## Running
 
-```
-Layer_3_User_Interface/
-├── __init__.py
-├── web_app.py           # Flask web interface
-├── progress_flow.py     # Progress tracking workflow
-├── templates/           # HTML templates
-│   └── index.html
-└── README.md
-```
-
-## 🚀 Running the Web App
-
+### Web Interface (recommended)
 ```bash
-cd Layer_3_User_Interface
-python web_app.py
+# From project root
+python run_web.py
+# Open http://localhost:5000
 ```
 
-Then open your browser to: `http://localhost:5001`
-
-## 🔌 Dependencies
-
-Layer_3_User_Interface depends on:
-- **Layer_2_Agentic_Reasoning** for core reasoning capabilities
-- **Flask** for web server
-- **LangGraph** for workflow execution
-
-## 📊 Architecture
-
-```
-Layer_3_User_Interface (UI)
-    ↓ uses
-Layer_2_Agentic_Reasoning (Framework)
-    ↓ uses
-Layer_1_Extraction/Case_I/Layer_1a (Hose Data)
-Layer_1_Extraction/Case_I/Layer_1b (Coupling Data)
+### CLI
+```bash
+# From project root — edit user_query in main.py first
+python main.py
 ```
 
-### Separation of Concerns
+## How It Works
 
-- **Layer_1_Extraction/Case_I/Layer_1a / Layer_1_Extraction/Case_I/Layer_1b**: Data extraction and storage (PDF → Database)
-- **Layer_2_Agentic_Reasoning**: Core reasoning framework (Goal → Strategy → Function)
-- **Layer_3_User_Interface**: User interfaces and applications (Web UI, APIs)
-
-## 🔧 Configuration
-
-The web app automatically configures paths to access Layer_2_Agentic_Reasoning:
-
-```python
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Layer_2_Agentic_Reasoning'))
+```
+Browser → Flask (web_app.py)
+              ↓
+         Layer_2_Agentic_Reasoning  (get_graph().invoke(...))
+              ↓
+         Goal → Strategy → Function → Validated Answer
+              ↓
+         JSON response streamed back to browser via progress_flow.py
 ```
 
-## 📝 Features
+The web app initializes the LangGraph workflow on startup and exposes two endpoints:
 
-### Web Interface
-- Submit natural language queries
-- Real-time progress tracking
-- Display structured answers
-- Session management
-- Export results
+- `POST /query` — submit a natural language query, returns a session ID
+- `GET /progress/<session_id>` — Server-Sent Events stream of workflow progress
+- `GET /result/<session_id>` — final structured answer
 
-### Progress Flow
-- Track workflow execution
-- Show goal → strategy → function progression
-- Display function outputs
-- Validation status
+## Configuration
 
-## 🎨 Customization
+All LLM and database settings come from `Layer_2_Agentic_Reasoning/config/`:
 
-You can extend Layer 3 by:
-1. Adding new web endpoints
-2. Creating different UI themes
-3. Building mobile apps
-4. Adding API integrations
-5. Creating dashboards
+- **Domain name / description**: `config/domain_config.py`
+- **LLM model**: `config/config_loader.py`
+- **Debug verbosity**: `config/debug_config.py` (0 = silent, 4 = verbose)
+- **Secret key / debug mode**: `.env` file at project root (`SECRET_KEY`, `FLASK_DEBUG`)
 
-## 📄 Example Usage
+## Dependencies
 
-```python
-# Run the web app
-python web_app.py
-
-# Or import for custom use
-from web_app import app
-app.run(host='0.0.0.0', port=5001)
+```
+Layer_3_User_Interface
+    └── Layer_2_Agentic_Reasoning  (reasoning engine)
+         └── database/harvested.db  (product data)
+         └── database/agentic.db    (workflow state)
 ```
 
-## 🔍 Troubleshooting
+Flask, Flask-SocketIO, and python-socketio are installed via `pip install -e .`.
+
+## Troubleshooting
+
+**Emoji/encoding errors on Windows** — handled automatically; `web_app.py` reconfigures stdout to UTF-8 on import.
 
 **Port already in use:**
 ```bash
-# Find process using port 5001
-lsof -i :5001
+# Windows
+netstat -ano | findstr :5000
+taskkill /PID <pid> /F
 
-# Kill the process
-kill -9 <PID>
+# macOS/Linux
+lsof -i :5000 && kill -9 <PID>
 ```
 
-**Import errors:**
-- Ensure Layer_2_Agentic_Reasoning exists at `../Layer_2_Agentic_Reasoning/`
-- Check Python path configuration in web_app.py
+**Workflow not initializing** — ensure Ollama is running (`ollama serve`) and the reasoning LLM is pulled (`ollama pull llama3.2:latest`).
 
-**Flask not found:**
-```bash
-pip install flask
-```
-
-## 🤝 Contributing
-
-When adding new applications to Layer_3_User_Interface:
-1. Keep business logic in Layer_2_Agentic_Reasoning
-2. Only handle UI/UX concerns in Layer_3_User_Interface
-3. Use progress_flow.py for execution tracking
-4. Follow Flask best practices
-5. Document new endpoints
-
----
-
-**Layer_3_User_Interface Status: ACTIVE** ✅  
-**Dependencies: Layer_2_Agentic_Reasoning** ✅  
-**Web Interface: Flask** ✅
+**Import errors** — run from project root with the package installed: `pip install -e .`
