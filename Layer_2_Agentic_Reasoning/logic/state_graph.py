@@ -49,6 +49,14 @@ PNG_CONFIG = {"width": 1200, "height": 800, "timeout": 30}
 DIAGRAM_FILES = {"mermaid": "Layer_2_Agentic_Reasoning/outputs/graph.mmd", "png": "Layer_2_Agentic_Reasoning/outputs/graph.png"}
 
 
+def _as_state_node(node_fn):
+    """Wrap node functions to match LangGraph callable expectations."""
+    def _wrapped(state: SessionState, *args: Any, **kwargs: Any) -> SessionState:
+        return node_fn(state)
+
+    return _wrapped
+
+
 def _get_next_strategy_node(state: SessionState) -> str:
     """
     Determine next node based on strategy completion state.
@@ -132,7 +140,7 @@ def _generate_png_diagram() -> None:
         debug.print_system("Install with: npm install -g @mermaid-js/mermaid-cli")
 
 
-def build_graph() -> StateGraph:
+def build_graph() -> Any:
     """Build LangGraph workflow with tri-condition routing system."""
     builder = StateGraph(state_schema=SessionState)
 
@@ -148,7 +156,7 @@ def build_graph() -> StateGraph:
     }
 
     for name, node in nodes.items():
-        builder.add_node(name, node)
+        builder.add_node(name, _as_state_node(node))
 
     # Set entry point
     builder.set_entry_point("GoalDefine")

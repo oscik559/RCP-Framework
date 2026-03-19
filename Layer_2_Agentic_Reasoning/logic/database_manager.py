@@ -338,7 +338,7 @@ class DatabaseManager:
         session_id: int,
         description: str,
         name: str = "MainGoal",
-        target: str = None,
+        target: Optional[str] = None,
     ) -> int:
         """Create a new goal and return its ID."""
         if target is None:
@@ -354,6 +354,8 @@ class DatabaseManager:
             )
             goal_id = cur.lastrowid
             conn.commit()
+            if goal_id is None:
+                raise RuntimeError("Failed to create goal: lastrowid is None")
             return goal_id
 
     def update_goal_status(self, goal_id: int, success: bool) -> None:
@@ -445,23 +447,9 @@ class DatabaseManager:
             )
             strategy_id = cur.lastrowid
             conn.commit()
+            if strategy_id is None:
+                raise RuntimeError("Failed to create strategy: lastrowid is None")
             return strategy_id
-
-    def update_strategy_status(
-        self, strategy_id: int, success: bool, aborted: bool = False
-    ) -> None:
-        """Update strategy completion status."""
-        with get_agentic_connection() as conn:
-            cur = conn.cursor()
-
-            success_value = 1 if success else 0
-            cur.execute(
-                """UPDATE StrategyInSession
-                   SET StrategySuccess=?
-                   WHERE StrategyID=?""",
-                (success_value, strategy_id),
-            )
-            conn.commit()
 
     def get_current_strategy(self, goal_id: int) -> Optional[StrategyInfo]:
         """Get the most recent strategy for a goal that is not yet complete."""
@@ -501,10 +489,12 @@ class DatabaseManager:
             )
             function_id = cur.lastrowid
             conn.commit()
+            if function_id is None:
+                raise RuntimeError("Failed to create function: lastrowid is None")
             return function_id
 
     def update_function_status(
-        self, function_id: int, success: bool, failed_text: str = None
+        self, function_id: int, success: bool, failed_text: Optional[str] = None
     ) -> None:
         """Update function execution status."""
         with self._db_lock:
@@ -792,7 +782,7 @@ class DatabaseManager:
         with get_agentic_connection() as conn:
             cur = conn.cursor()
             cur.execute(
-                """SELECT FunctionID, StrategyID, FunctionName, FunctionSuccess, failedtext
+                """SELECT FunctionID, StrategyID, StrategyName, FunctionName, FunctionSuccess, failedtext
                    FROM FunctionInSession
                    WHERE StrategyID=?
                    ORDER BY FunctionID""",
@@ -805,9 +795,10 @@ class DatabaseManager:
                     FunctionInfo(
                         function_id=row[0],
                         strategy_id=row[1],
-                        function_name=row[2],
-                        success=None if row[3] is None else bool(row[3]),
-                        failed_text=row[4],
+                        strategy_name=row[2],
+                        function_name=row[3],
+                        success=None if row[4] is None else bool(row[4]),
+                        failed_text=row[5],
                     )
                 )
             return results
@@ -957,7 +948,7 @@ class DatabaseManager:
             return row[0] if row else None
 
     def collect_outputs(
-        self, session_id: int, goal_id: int, output_name: str, strategy_id: int = None
+        self, session_id: int, goal_id: int, output_name: str, strategy_id: Optional[int] = None
     ) -> List[str]:
         """
         Collect output values from previously executed functions.
@@ -1213,11 +1204,12 @@ class DatabaseManager:
         """Update goal validation status and confidence."""
         with get_agentic_connection() as conn:
             cur = conn.cursor()
+            validation_text = f"confidence={confidence:.3f}; {reason}" if reason else f"confidence={confidence:.3f}"
             cur.execute(
                 """UPDATE GoalInSession
-                   SET GoalSuccess=?, GoalConfidence=?
+                   SET GoalSuccess=?, GoalValidation=?
                    WHERE GoalID=?""",
-                (is_satisfied, confidence, goal_id),
+                (1 if is_satisfied else 0, validation_text, goal_id),
             )
             conn.commit()
 
@@ -1232,9 +1224,9 @@ class DatabaseManager:
             )
             cur.execute(
                 """UPDATE StrategyInSession
-                   SET StrategySuccess=?, StrategyOutcome=?
+                   SET StrategySuccess=?, StrategyValidation=?
                    WHERE StrategyID=?""",
-                (is_satisfied, status_text, strategy_id),
+                (1 if is_satisfied else 0, status_text, strategy_id),
             )
             conn.commit()
 

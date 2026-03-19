@@ -3241,9 +3241,9 @@ def func_get_related_items(params: dict) -> tuple[bool, dict | str]:
         if relationship_type == "compatible":
             # Find compatible products (e.g., sleeves for hoses)
             query = """
-                SELECT p.product_code, p.specifications, p.family_id, f.family_name
-                FROM Products p
-                LEFT JOIN ProductFamilies f ON p.family_id = f.id
+                SELECT p.product_code, p.specifications, p.family_id, pf.name AS family_name
+                FROM products p
+                LEFT JOIN product_families pf ON p.family_id = pf.id
                 WHERE p.specifications LIKE ?
                 LIMIT 20
             """
@@ -3253,8 +3253,8 @@ def func_get_related_items(params: dict) -> tuple[bool, dict | str]:
             # Find alternative products in same family
             query = """
                 SELECT p.product_code, p.specifications
-                FROM Products p
-                WHERE p.family_id = (SELECT family_id FROM Products WHERE product_code = ?)
+                FROM products p
+                WHERE p.family_id = (SELECT family_id FROM products WHERE product_code = ?)
                 AND p.product_code != ?
                 LIMIT 20
             """
@@ -4503,18 +4503,22 @@ def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
                 # Family → Products
                 query = """
                     SELECT product_code, specifications
-                    FROM Products
-                    WHERE family_id = (SELECT family_id FROM ProductFamilies WHERE family_name LIKE ?)
+                    FROM products
+                    WHERE family_id = (
+                        SELECT id FROM product_families
+                        WHERE name LIKE ? OR family_code LIKE ?
+                        LIMIT 1
+                    )
                     LIMIT 50
                 """
-                cursor.execute(query, (f"%{start_node}%",))
+                cursor.execute(query, (f"%{start_node}%", f"%{start_node}%"))
                 
             elif direction == "parent":
                 # Product → Family
                 query = """
-                    SELECT f.id as family_id, f.family_name, f.description
-                    FROM ProductFamilies f
-                    JOIN Products p ON p.family_id = f.id
+                    SELECT f.id as family_id, f.name AS family_name, f.description
+                    FROM product_families f
+                    JOIN products p ON p.family_id = f.id
                     WHERE p.product_code = ?
                 """
                 cursor.execute(query, (start_node,))
@@ -4523,8 +4527,8 @@ def func_navigate_hierarchy(params: dict) -> tuple[bool, dict | str]:
                 # Other products in same family
                 query = """
                     SELECT product_code, specifications
-                    FROM Products
-                    WHERE family_id = (SELECT family_id FROM Products WHERE product_code = ?)
+                    FROM products
+                    WHERE family_id = (SELECT family_id FROM products WHERE product_code = ?)
                     AND product_code != ?
                     LIMIT 50
                 """
@@ -4591,13 +4595,27 @@ def func_discover_items(params: dict) -> tuple[bool, dict | str]:
             raise ValueError("db_path cannot be None")
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
+
+        allowed_fields = {
+            "product_code",
+            "specifications",
+            "family_id",
+            "variant_suffix",
+            "configuration_type",
+            "configuration_name",
+            "page_number",
+            "notes",
+        }
+        if field not in allowed_fields:
+            conn.close()
+            return (False, f"Unsupported field '{field}'. Allowed: {sorted(allowed_fields)}")
         
         # Convert wildcard pattern to SQL LIKE pattern
         sql_pattern = pattern.replace("*", "%")
         
         query = f"""
             SELECT product_code, specifications, family_id
-            FROM Products
+            FROM products
             WHERE {field} LIKE ?
             LIMIT 50
         """
@@ -4656,7 +4674,11 @@ def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
         cursor = conn.cursor()
         
         if metadata_type == "families":
-            query = "SELECT family_id, family_name, description FROM ProductFamilies ORDER BY family_name"
+            query = """
+                SELECT id AS family_id, family_code, name AS family_name, description
+                FROM product_families
+                ORDER BY name
+            """
             cursor.execute(query)
             rows = cursor.fetchall()
             metadata = [dict(row) for row in rows]
@@ -4665,21 +4687,28 @@ def func_get_metadata(params: dict) -> tuple[bool, dict | str]:
             stats = {}
             
             # Count products
-            cursor.execute("SELECT COUNT(*) as count FROM Products")
+            cursor.execute("SELECT COUNT(*) as count FROM products")
             stats["total_products"] = cursor.fetchone()["count"]
             
             # Count families
-            cursor.execute("SELECT COUNT(*) as count FROM ProductFamilies")
+            cursor.execute("SELECT COUNT(*) as count FROM product_families")
             stats["total_families"] = cursor.fetchone()["count"]
+
+            # Count categories
+            cursor.execute("SELECT COUNT(*) as count FROM categories")
+            stats["total_categories"] = cursor.fetchone()["count"]
             
             metadata = stats
             
         elif metadata_type == "categories":
-            # Get unique categories from family names or descriptions
-            query = "SELECT DISTINCT family_name FROM ProductFamilies ORDER BY family_name"
+            query = """
+                SELECT id AS category_id, name AS category_name, chapter, description
+                FROM categories
+                ORDER BY name
+            """
             cursor.execute(query)
             rows = cursor.fetchall()
-            metadata = [row["family_name"] for row in rows]
+            metadata = [dict(row) for row in rows]
         
         elif metadata_type == "location":
             # Get location information for a specific product

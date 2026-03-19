@@ -47,6 +47,7 @@ def get_db_connection(db):
     db_path = Path(db)
     db_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure parent folders exist
     logger.debug(f"Connecting to database: {db_path}")
+    conn = None
     
     try:
         # Enhanced connection with timeout and optimizations
@@ -74,8 +75,9 @@ def get_db_connection(db):
         raise
     finally:
         try:
-            conn.close()
-            logger.debug("Database connection closed.")
+            if conn is not None:
+                conn.close()
+                logger.debug("Database connection closed.")
         except Exception as e:
             logger.warning(f"Error closing database connection: {e}")
 
