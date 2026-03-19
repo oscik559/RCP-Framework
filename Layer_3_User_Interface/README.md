@@ -45,13 +45,13 @@ Layer_3_User_Interface (UI)
     ↓ uses
 Layer_2_Agentic_Reasoning (Framework)
     ↓ uses
-Layer_1_Extraction/Layer_1a (Hose Data)
-Layer_1_Extraction/Layer_1b (Coupling Data)
+Layer_1_Extraction/Case_I/Layer_1a (Hose Data)
+Layer_1_Extraction/Case_I/Layer_1b (Coupling Data)
 ```
 
 ### Separation of Concerns
 
-- **Layer_1_Extraction/Layer_1a / Layer_1_Extraction/Layer_1b**: Data extraction and storage (PDF → Database)
+- **Layer_1_Extraction/Case_I/Layer_1a / Layer_1_Extraction/Case_I/Layer_1b**: Data extraction and storage (PDF → Database)
 - **Layer_2_Agentic_Reasoning**: Core reasoning framework (Goal → Strategy → Function)
 - **Layer_3_User_Interface**: User interfaces and applications (Web UI, APIs)
 

@@ -96,8 +96,8 @@ Then open: http://localhost:5001
 
 ```
 Project_Hydroscand-Hoses/
-├── Layer_1_Extraction/Layer_1a/     # PDF extraction pipeline
-├── Layer_1_Extraction/Layer_1b/     # Alternative extraction pipeline
+├── Layer_1_Extraction/Case_I/Layer_1a/     # PDF extraction pipeline
+├── Layer_1_Extraction/Case_I/Layer_1b/     # Alternative extraction pipeline
 ├── Layer_2_Agentic_Reasoning/         # Core reasoning engine
 │   ├── config/              # Configuration files
 │   ├── db/                  # Database connections & schema
@@ -117,8 +117,8 @@ Project_Hydroscand-Hoses/
 All folders now use underscores instead of hyphens:
 - `Layer_2-Agentic` → `Layer_2_Agentic_Reasoning`
 - `Layer_3-Application` → `Layer_3_User_Interface`
-- `Layer_1a-Extraction` → `Layer_1_Extraction/Layer_1a`
-- `Layer_1b-Extraction` → `Layer_1_Extraction/Layer_1b`
+- `Layer_1a-Extraction` → `Layer_1_Extraction/Case_I/Layer_1a`
+- `Layer_1b-Extraction` → `Layer_1_Extraction/Case_I/Layer_1b`
 
 ### ✅ Module Renaming (Avoid Standard Library Conflicts)
 - `logic/types.py` → `logic/workflow_types.py` (avoids shadowing Python's built-in `types` module)

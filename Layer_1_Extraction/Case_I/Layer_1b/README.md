@@ -2,7 +2,7 @@
 
 **Status**: ✅ **Production** - Actively maintained extraction system  
 **Database**: `database/harvested.db`  
-**Legacy Alternative**: See `Layer_1_Extraction/Layer_1a` for basic/reference scripts
+**Legacy Alternative**: See `Layer_1_Extraction/Case_I/Layer_1a` for basic/reference scripts
 
 ## Overview
 
@@ -24,7 +24,7 @@ PDF Catalog
 ┌─────────────────────────────────────────┐
 │  0. Extract Knowledge (intro pages)     │  → product_knowledge table
 ├─────────────────────────────────────────┤
-│  1. PDF to PNG (page rendering)         │  → Layer_1_Extraction/Layer_1b/data/png_pages/
+│  1. PDF to PNG (page rendering)         │  → Layer_1_Extraction/Case_I/Layer_1b/data/png_pages/
 ├─────────────────────────────────────────┤
 │  2. Detect Headers/Footers              │  → page_regions table
 ├─────────────────────────────────────────┤
@@ -115,22 +115,22 @@ python database/db_utils.py --verify
 python database/db_utils.py --init
 
 # 2. Extract knowledge (optional but recommended)
-python Layer_1_Extraction/Layer_1b/0_extract_knowledge.py --pdf Press_Couplings.pdf --all
+python Layer_1_Extraction/Case_I/Layer_1b/0_extract_knowledge.py --pdf Press_Couplings.pdf --all
 
 # 3. Convert PDF to images
-python Layer_1_Extraction/Layer_1b/1_pdf_to_png.py Press_Couplings.pdf
+python Layer_1_Extraction/Case_I/Layer_1b/1_pdf_to_png.py Press_Couplings.pdf
 
 # 4. Detect page structure
-python Layer_1_Extraction/Layer_1b/2_detect_headers_footers.py
+python Layer_1_Extraction/Case_I/Layer_1b/2_detect_headers_footers.py
 
 # 5. Extract categories
-python Layer_1_Extraction/Layer_1b/2b_extract_categories.py --pdf Press_Couplings.pdf
+python Layer_1_Extraction/Case_I/Layer_1b/2b_extract_categories.py --pdf Press_Couplings.pdf
 
 # 6. Extract families
-python Layer_1_Extraction/Layer_1b/3a_extract_families.py --pdf Press_Couplings.pdf
+python Layer_1_Extraction/Case_I/Layer_1b/3a_extract_families.py --pdf Press_Couplings.pdf
 
 # 7. Extract products
-python Layer_1_Extraction/Layer_1b/3b_extract_products_vlm.py --pdf Press_Couplings.pdf
+python Layer_1_Extraction/Case_I/Layer_1b/3b_extract_products_vlm.py --pdf Press_Couplings.pdf
 
 # 8. Verify database
 python database/db_utils.py --verify
@@ -138,15 +138,15 @@ python database/db_utils.py --verify
 
 ## Output Locations
 - **Database**: `database/harvested.db` (project root)
-- **Images**: `Layer_1_Extraction/Layer_1b/data/png_pages/`
-- **Visualizations**: `Layer_1_Extraction/Layer_1b/data/output/`
-- **Tables**: `Layer_1_Extraction/Layer_1b/data/tables/` (JSON format)
+- **Images**: `Layer_1_Extraction/Case_I/Layer_1b/data/png_pages/`
+- **Visualizations**: `Layer_1_Extraction/Case_I/Layer_1b/data/output/`
+- **Tables**: `Layer_1_Extraction/Case_I/Layer_1b/data/tables/` (JSON format)
 
 ## Validation
 
 Check database status:
 ```bash
-python ../Layer_1_Extraction/Layer_1a/db_utils.py --verify
+python ../Layer_1_Extraction/Case_I/Layer_1a/db_utils.py --verify
 ```
 
 Expected output:

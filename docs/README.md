@@ -8,29 +8,29 @@ This folder contains architecture documentation, setup guides, and reference mat
 - [SETUP.md](SETUP.md) — Installation and environment setup (all platforms)
 - [MACOS_SETUP.md](MACOS_SETUP.md) — macOS-specific setup notes
 
-### Architecture & Design
-- [STRATEGY_ARCHITECTURE.md](STRATEGY_ARCHITECTURE.md) — RCP control loop and strategy design
-- [GENERIC_FUNCTIONS_SUMMARY.md](GENERIC_FUNCTIONS_SUMMARY.md) — Complete reference for the 30 generic function building blocks
+### Framework Architecture
 - [graph.md](graph.md) — Workflow state graph architecture
 - [graph.mmd](graph.mmd) — Mermaid diagram source
 - [graph.png](graph.png) — Visual workflow diagram
 
-### Reference
-- [SPEC_GLOSSARY.md](SPEC_GLOSSARY.md) — Complete specification attribute glossary for the product database
+### Case I — Hydroscand (docs/Case_I/)
+- [Case_I/STRATEGY_ARCHITECTURE.md](Case_I/STRATEGY_ARCHITECTURE.md) — RCP strategy design for Case I
+- [Case_I/GENERIC_FUNCTIONS_SUMMARY.md](Case_I/GENERIC_FUNCTIONS_SUMMARY.md) — Function library reference
+- [Case_I/SPEC_GLOSSARY.md](Case_I/SPEC_GLOSSARY.md) — Product database attribute glossary
 
-## Quick Navigation
+## Directory Structure
 
 ```
 docs/
-├── README.md                    # This file
-├── SETUP.md                     # Setup instructions
-├── MACOS_SETUP.md               # macOS notes
-├── STRATEGY_ARCHITECTURE.md     # RCP framework design
-├── GENERIC_FUNCTIONS_SUMMARY.md # Function library reference
-├── SPEC_GLOSSARY.md             # Database attribute glossary
-├── graph.md                     # Workflow architecture
-├── graph.mmd                    # Mermaid diagram source
-└── graph.png                    # Visual workflow diagram
+├── README.md                          # This file
+├── SETUP.md                           # General setup instructions
+├── MACOS_SETUP.md                     # macOS notes
+├── graph.md / graph.mmd / graph.png   # Workflow diagrams
+├── Agentic_Flowchart.jpg              # Algorithm overview figure
+└── Case_I/                            # Case I specific documentation
+    ├── STRATEGY_ARCHITECTURE.md       # RCP strategy design
+    ├── GENERIC_FUNCTIONS_SUMMARY.md   # Function library reference
+    └── SPEC_GLOSSARY.md               # Database attribute glossary
 ```
 
 ## Related

@@ -81,13 +81,13 @@ Now that the structure is clean, you can:
 
 1. **Run table detection** on coupling pages
    ```bash
-   cd Layer_1_Extraction/Layer_1b
+   cd Layer_1_Extraction/Case_I/Layer_1b
    uv run python 3_detect_tables.py --pdf-path Press_Couplings.pdf --page 2
    ```
 
 2. **Extract products** using the test database
    ```bash
-   cd Layer_1_Extraction/Layer_1b
+   cd Layer_1_Extraction/Case_I/Layer_1b
    uv run python 4_extract_product.py --page 2 --test
    ```
 

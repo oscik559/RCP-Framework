@@ -7,6 +7,8 @@ Supplementary code for the paper:
 > Division of Product Realization, IEI, Linköping University
 > Funded by Vinnova DART project (grant 2024-01420)
 
+![RCP Framework — Agentic Workflow](docs/Agentic_Flowchart.jpg)
+
 This repository contains the implementation of the **RCP (Relational Control Plane) framework**, a SQL-backed agentic architecture that persists orchestration state as queryable relational records and enforces a six-stage verify-then-summarise control loop. Synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. The architecture is structured into three layers for PDF extraction, agentic reasoning, and application delivery. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog, n=100 queries) and **Case II** (Saab aerospace connector/cable catalog, n=100 queries).
 
 ---
@@ -36,8 +38,9 @@ Layer 3: Application
 
 ```
 ├── Layer_1_Extraction/
-│   ├── Layer_1a/                 # Baseline extraction (legacy, kept for reference)
-│   └── Layer_1b/                 # Production extraction pipeline
+│   └── Case_I/                   # Extraction pipeline for Case I (Hydroscand)
+│       ├── Layer_1a/             # Legacy extraction (reference)
+│       └── Layer_1b/             # Production extraction pipeline
 ├── Layer_2_Agentic_Reasoning/    # Core RCP reasoning framework
 │   ├── config/                   # Configuration: constants, prompts, domain settings
 │   ├── db/                       # Database connections and strategy templates
@@ -100,14 +103,14 @@ FLASK_DEBUG=false
 
 ```bash
 # Production pipeline (Layer 1b)
-python Layer_1_Extraction/Layer_1b/0_extract_knowledge.py
-python Layer_1_Extraction/Layer_1b/2b_extract_categories.py
-python Layer_1_Extraction/Layer_1b/3a_extract_families.py
-python Layer_1_Extraction/Layer_1b/3b_extract_products_vlm.py
+python Layer_1_Extraction/Case_I/Layer_1b/0_extract_knowledge.py
+python Layer_1_Extraction/Case_I/Layer_1b/2b_extract_categories.py
+python Layer_1_Extraction/Case_I/Layer_1b/3a_extract_families.py
+python Layer_1_Extraction/Case_I/Layer_1b/3b_extract_products_vlm.py
 ```
 
 Requires Ollama running locally (`ollama serve`) with a vision model.
-See [Layer_1_Extraction/Layer_1b/README.md](Layer_1_Extraction/Layer_1b/README.md) for the full pipeline.
+See [Layer_1_Extraction/Case_I/Layer_1b/README.md](Layer_1_Extraction/Case_I/Layer_1b/README.md) for the full pipeline.
 
 ### Layer 2 & 3: Query products
 
@@ -176,10 +179,10 @@ python database/db_utils.py --help
 ## Documentation
 
 - [docs/SETUP.md](docs/SETUP.md) — detailed setup instructions
-- [docs/STRATEGY_ARCHITECTURE.md](docs/STRATEGY_ARCHITECTURE.md) — RCP framework design
-- [docs/GENERIC_FUNCTIONS_SUMMARY.md](docs/GENERIC_FUNCTIONS_SUMMARY.md) — function library reference
-- [docs/SPEC_GLOSSARY.md](docs/SPEC_GLOSSARY.md) — product database attribute glossary
 - [docs/graph.png](docs/graph.png) — workflow state graph
+- [docs/Case_I/STRATEGY_ARCHITECTURE.md](docs/Case_I/STRATEGY_ARCHITECTURE.md) — RCP strategy design (Case I)
+- [docs/Case_I/GENERIC_FUNCTIONS_SUMMARY.md](docs/Case_I/GENERIC_FUNCTIONS_SUMMARY.md) — function library reference
+- [docs/Case_I/SPEC_GLOSSARY.md](docs/Case_I/SPEC_GLOSSARY.md) — product database attribute glossary
 
 ---
 

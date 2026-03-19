@@ -284,8 +284,8 @@ def main():
     else:
         # Default to Press_Couplings.pdf - check multiple locations
         possible_paths = [
-            script_dir / "Press_Couplings.pdf",              # Layer_1_Extraction/Layer_1b/Press_Couplings.pdf
-            script_dir / "PDF" / "Press_Couplings.pdf",      # Layer_1_Extraction/Layer_1b/PDF/Press_Couplings.pdf
+            script_dir / "Press_Couplings.pdf",              # Layer_1_Extraction/Case_I/Layer_1b/Press_Couplings.pdf
+            script_dir / "PDF" / "Press_Couplings.pdf",      # Layer_1_Extraction/Case_I/Layer_1b/PDF/Press_Couplings.pdf
             script_dir.parent / "PDF" / "Press_Couplings.pdf" # Project_Hydroscand-Hoses/PDF/Press_Couplings.pdf
         ]
         
