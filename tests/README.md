@@ -218,16 +218,16 @@ Configuration in `.vscode/settings.json`:
 ## Common Issues & Solutions
 
 ### Import Errors
-- Ensure running from project root: `cd Hydroscand_Produktbok`
+- Ensure running from project root: `cd RCP-Framework`
 - Check Layer_2_Agentic_Reasoning imports use correct module name (not `agentic_reasoning`)
 
 ### Database Errors
 - Verify `database/harvested.db` exists
-- Run diagnostics: `python tests/utilities/database_checker.py`
+- Run: `python database/db_utils.py --verify`
 
 ### LLM/Ollama Errors
 - Check Ollama is running: `ollama serve`
-- Run diagnosis: `python tests/utilities/diagnose_ollama.py`
+- Check model is pulled: `ollama list`
 
 ### Connection Timeouts
 - Increase timeout in `Layer_2_Agentic_Reasoning/db/connection.py`

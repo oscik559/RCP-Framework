@@ -1,4 +1,4 @@
-# agentic_reasoning/config/strategy_testing.py
+# Layer_2_Agentic_Reasoning/config/strategy_testing.py
 """
 Strategy testing configuration and control system for the agentic reasoning system.
 

@@ -1,4 +1,4 @@
-# agentic_reasoning/config/config_loader.py
+# Layer_2_Agentic_Reasoning/config/config_loader.py
 """
 Configuration loader for the agentic reasoning system.
 
@@ -93,7 +93,7 @@ def _normalize_paths(config: dict) -> dict:
     return config
 
 
-def load_config(path="agentic_reasoning/config/config.yaml"):
+def load_config(path="Layer_2_Agentic_Reasoning/config/config.yaml"):
     """
     Load YAML configuration file and return parsed configuration dict.
 
@@ -156,4 +156,4 @@ logging.basicConfig(
     ],
 )
 
-logger = logging.getLogger("agentic_reasoning")
+logger = logging.getLogger("Layer_2_Agentic_Reasoning")

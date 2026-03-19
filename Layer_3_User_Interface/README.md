@@ -16,7 +16,7 @@ This layer sits on top of `Layer_2_Agentic_Reasoning` and provides the user-faci
 ```bash
 # From project root
 python run_web.py
-# Open http://localhost:5000
+# Open http://localhost:5001
 ```
 
 ### CLI
@@ -70,11 +70,11 @@ Flask, Flask-SocketIO, and python-socketio are installed via `pip install -e .`.
 **Port already in use:**
 ```bash
 # Windows
-netstat -ano | findstr :5000
+netstat -ano | findstr :5001
 taskkill /PID <pid> /F
 
 # macOS/Linux
-lsof -i :5000 && kill -9 <PID>
+lsof -i :5001 && kill -9 <PID>
 ```
 
 **Workflow not initializing** — ensure Ollama is running (`ollama serve`) and the reasoning LLM is pulled (`ollama pull llama3.2:latest`).

@@ -2,7 +2,7 @@
 
 **Date:** November 1, 2025  
 **Status:** ✅ All 15 functions implemented and tested  
-**File:** `Layer_2/agentic_reasoning/logic/function_library.py` (3,492 lines)
+**File:** `Layer_2_Agentic_Reasoning/logic/function_library.py` (3,492 lines)
 
 ---
 
@@ -391,13 +391,13 @@ All 15 functions have been added to `templates.py` with:
 
 1. **Test functions individually:**
    ```bash
-   cd Layer_2/agentic_reasoning
+   cd Layer_2_Agentic_Reasoning
    python test_new_functions.py
    ```
 
 2. **Repopulate templates database:**
    ```bash
-   cd Layer_2/agentic_reasoning
+   cd Layer_2_Agentic_Reasoning
    python logic/templates.py
    ```
 
@@ -415,9 +415,9 @@ All 15 functions have been added to `templates.py` with:
 
 ## 📚 Reference
 
-- **Main file:** `Layer_2/agentic_reasoning/logic/function_library.py`
-- **Prompts:** `Layer_2/agentic_reasoning/config/prompts.yaml`
-- **Templates:** `Layer_2/agentic_reasoning/logic/templates.py`
+- **Main file:** `Layer_2_Agentic_Reasoning/logic/function_library.py`
+- **Prompts:** `Layer_2_Agentic_Reasoning/config/prompts.yaml`
+- **Templates:** `Layer_2_Agentic_Reasoning/logic/templates.py`
 - **Database:** `data/database/agentic.db`
 
 ---

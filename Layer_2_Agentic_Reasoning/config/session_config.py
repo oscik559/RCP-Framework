@@ -1,4 +1,4 @@
-# agentic_reasoning/config/session_config.py
+# Layer_2_Agentic_Reasoning/config/session_config.py
 """
 Session management and workflow configuration for the agentic reasoning system.
 

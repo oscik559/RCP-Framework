@@ -1,4 +1,4 @@
-# agentic_reasoning/config/debug_config.py
+# Layer_2_Agentic_Reasoning/config/debug_config.py
 """
 Centralized debug configuration and logging system for the agentic reasoning system.
 

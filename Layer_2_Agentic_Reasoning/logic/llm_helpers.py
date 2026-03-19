@@ -1,4 +1,4 @@
-# agentic_reasoning/logic/llm_helpers.py
+# Layer_2_Agentic_Reasoning/logic/llm_helpers.py
 """
 LLM integration utilities for the agentic reasoning system.
 

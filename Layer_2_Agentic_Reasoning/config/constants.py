@@ -1,4 +1,4 @@
-# agentic_reasoning/config/constants.py
+# Layer_2_Agentic_Reasoning/config/constants.py
 """
 System-wide constants and default values for the agentic reasoning system.
 
