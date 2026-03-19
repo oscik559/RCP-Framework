@@ -1,7 +1,7 @@
 # Layer 1a: Basic Extraction Scripts (Legacy)
 
 ## Overview
-This directory contains the **original/legacy** extraction scripts for processing PDF catalogs. These scripts provide basic extraction functionality and serve as reference implementations.
+This directory contains the **original/legacy** extraction scripts for processing PDF documentation. These scripts provide basic extraction functionality and serve as reference implementations.
 
 **Status**: Legacy - maintained for reference and simple extraction tasks  
 **Current Production**: See `Layer_1_Extraction/Case_I/Layer_1b` for the actively maintained pipeline

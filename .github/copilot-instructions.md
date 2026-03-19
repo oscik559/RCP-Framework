@@ -1,7 +1,7 @@
 # Copilot Instructions for RCP-Framework
 
 ## Overview
-This project is a three-layer intelligent system for extracting, reasoning about, and querying industrial product data from PDF catalogs. It is organized into three main layers:
+This project is a three-layer intelligent system for extracting, reasoning about, and querying industrial product data from PDF documentation. It is organized into three main layers:
 - **Layer 1: Extraction** (PDF → Tables → Products → Database)
 - **Layer 2: Agentic Reasoning** (Goal → Strategy → Function, with LLM and workflow orchestration)
 - **Layer 3: Application** (Web UI, APIs, progress tracking)
