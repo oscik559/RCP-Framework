@@ -212,6 +212,9 @@ __marimo__/
 # PROJECT-SPECIFIC ADDITIONS
 # ═══════════════════════════════════════════════════════════════════════
 
+# Claude Code settings (local AI tooling — not part of the project)
+.claude/
+
 # Logs
 *.log
 logs/

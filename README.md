@@ -7,7 +7,7 @@ Supplementary code for the paper:
 > Division of Product Realization, IEI, Linköping University
 > Funded by Vinnova DART project (grant 2024-01420)
 
-This repository contains the implementation of the **RCP (Retrieve–Contextualize–Plan) framework**, a three-layer agentic architecture for querying structured engineering knowledge from industrial PDF catalogs. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog) and **Case II** (Saab aerospace connector catalog).
+This repository contains the implementation of the **RCP (Relational Control Plane) framework**, a SQL-backed agentic architecture that persists orchestration state as queryable relational records and enforces a six-stage verify-then-summarise control loop. Synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. The architecture is structured into three layers for PDF extraction, agentic reasoning, and application delivery. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog, n=100 queries) and **Case II** (Saab aerospace connector/cable catalog, n=100 queries).
 
 ---
 
@@ -74,8 +74,8 @@ Layer 3: Application
 ## Installation
 
 ```bash
-git clone https://github.com/oscik559/Hydroscand_Produktbok.git
-cd Hydroscand_Produktbok
+git clone https://github.com/oscik559/RCP-Framework.git
+cd RCP-Framework
 
 pip install -r requirements.txt
 # or install in editable mode
