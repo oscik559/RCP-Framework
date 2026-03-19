@@ -38,9 +38,14 @@ PDF Catalog
 Hierarchical Database (harvested.db)
 ```
 
-## Sample Data
-- `Press_Couplings.pdf` - Swedish coupling catalog (production)
-- `Press_Couplings_en.pdf` - English coupling catalog (reference)
+## Source PDFs
+
+| File | Description |
+|------|-------------|
+| `Produktbok_2020.pdf` | Hydroscand main catalog — hoses, sleeves, fittings (Swedish, 2020 edition) |
+| `High-Pressure_Hose.pdf` | High-pressure hose supplement |
+| `Press_Couplings.pdf` | Press couplings catalog (Swedish) |
+| `Press_Couplings_en.pdf` | Press couplings catalog (English reference) |
 
 ## Files
 
@@ -146,7 +151,7 @@ python database/db_utils.py --verify
 
 Check database status:
 ```bash
-python ../Layer_1_Extraction/Case_I/Layer_1a/db_utils.py --verify
+python database/db_utils.py --verify
 ```
 
 Expected output:
