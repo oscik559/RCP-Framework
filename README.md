@@ -14,33 +14,35 @@ This repository contains the implementation of the **RCP (Relational Control Pla
 ## Architecture
 
 ```mermaid
-flowchart LR
-    subgraph L1["Layer 1 — Extraction"]
+flowchart TD
+    Q([Query])
+
+    Q --> GD
+
+    subgraph RCP["RCP Reasoning Engine — 6-Stage Control Loop"]
         direction TB
-        PDF[📄 PDF Catalog] --> VLM[VLM Extraction\nqwen2-vl]
-        VLM --> DB[(SQLite\nharvested.db)]
+        GD["Goal\nDefinition"]
+        SS["Strategy\nSelection"]
+        FE["Function\nExecution"]
+        FV{Function\nValidation}
+        SV{Strategy\nValidation}
+        GV{Goal\nValidation}
+
+        GD --> SS
+        SS --> FE
+        FE -->|call next function| FE
+        FE --> FV
+        FV --> SV
+        SV -->|try another strategy| SS
+        SV --> GV
+        GV -->|redefine goal| GD
     end
 
-    subgraph L2["Layer 2 — RCP Reasoning Engine"]
-        direction TB
-        GD["① GoalDefine\nStructure the query"] --> SP["② StrategyPlan\nSelect strategy"]
-        SP --> FE["③ FunctionExecute\nRun function pipeline"]
-        FE --> FV["④ FunctionValidate\nSchema check"]
-        FV --> SV{"⑤ StrategyValidate\nConfidence gate"}
-        SV -->|retry fn| FE
-        SV -->|new strategy| SP
-        SV -->|pass| GV{"⑥ GoalValidate\nSynthesize answer"}
-        GV -->|insufficient| SP
-        GV -->|✓ valid| ANS["✅ Validated Answer"]
-    end
+    HDB[(Harvested DB)] -.->|product data| FE
+    FE -.->|intermediate results| TDB[(Temp DB)]
+    ADB[(Agentic DB)] -.->|workflow state| RCP
 
-    subgraph L3["Layer 3 — User Interface"]
-        WEB["Flask Web UI\nrun_web.py"]
-        CLI["CLI\nmain.py"]
-    end
-
-    DB --> L2
-    L2 --> L3
+    GV --> R([Result])
 ```
 
 | Layer | Role | Key Components |
