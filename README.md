@@ -7,7 +7,9 @@ Supplementary code for the paper:
 > Division of Product Realization, IEI, Linköping University
 > Funded by Vinnova DART project (grant 2024-01420)
 
-![RCP Framework — Agentic Workflow](docs/Agentic_Flowchart.jpg)
+<p align="center">
+  <img src="docs/Agentic_Flowchart.jpg" width="720" alt="RCP Framework — Agentic Workflow">
+</p>
 
 This repository contains the implementation of the **RCP (Relational Control Plane) framework**, a SQL-backed agentic architecture that persists orchestration state as queryable relational records and enforces a six-stage verify-then-summarise control loop. Synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. The architecture is structured into three layers for PDF extraction, agentic reasoning, and application delivery. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog, n=100 queries) and **Case II** (Saab aerospace connector/cable catalog, n=100 queries).
 
