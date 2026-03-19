@@ -9,9 +9,9 @@ real-time progress to users.
 import time
 import threading
 from typing import Dict, Any, Callable, Optional
-from Layer_2_Agentic.logic.workflow_types import SessionState
-from Layer_2_Agentic.logic.state_graph import get_graph
-from Layer_2_Agentic.config.debug_config import debug
+from Layer_2_Agentic_Reasoning.logic.workflow_types import SessionState
+from Layer_2_Agentic_Reasoning.logic.state_graph import get_graph
+from Layer_2_Agentic_Reasoning.config.debug_config import debug
 
 
 class ProgressAwareWorkflow:
@@ -178,7 +178,7 @@ class ProgressAwareWorkflow:
 
     def _monitor_database_progress(self, session_id: int):
         """Monitor database for progress updates"""
-        from Layer_2_Agentic.db.connection import get_agentic_connection
+        from Layer_2_Agentic_Reasoning.db.connection import get_agentic_connection
         import time
 
         last_goal_count = 0

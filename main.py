@@ -26,13 +26,13 @@ if sys.platform.startswith("win"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-from Layer_2_Agentic.config.constants import ANSWER_FIELDS
-from Layer_2_Agentic.config.session_config import (
+from Layer_2_Agentic_Reasoning.config.constants import ANSWER_FIELDS
+from Layer_2_Agentic_Reasoning.config.session_config import (
     get_default_session_state,
     get_workflow_config,
 )
-from Layer_2_Agentic.logic.state_graph import get_graph
-from Layer_2_Agentic.logic.templates import populate_template_libraries
+from Layer_2_Agentic_Reasoning.logic.state_graph import get_graph
+from Layer_2_Agentic_Reasoning.logic.templates import populate_template_libraries
 
 
 def main():
@@ -53,7 +53,7 @@ def main():
         #   3 = DETAILED   - Include function parameters and outputs
         #   4 = VERBOSE    - All debug information including merging details
         # Can also be set via environment variable: DEBUG_LEVEL
-        from Layer_2_Agentic.config import debug_config
+        from Layer_2_Agentic_Reasoning.config import debug_config
 
         debug_config.set_debug_level(2)  # Change this to adjust verbosity
 
@@ -98,7 +98,7 @@ def main():
         
         # Clear any old session data to ensure fresh start
         print(f"[SETUP] Clearing all old session data...")
-        from Layer_2_Agentic.logic.database_manager import DatabaseManager
+        from Layer_2_Agentic_Reasoning.logic.database_manager import DatabaseManager
         db = DatabaseManager()
         db.clear_all_sessions()
 

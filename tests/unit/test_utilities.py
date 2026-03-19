@@ -17,7 +17,7 @@ class TestPathUtilities:
             
             # Look for project markers
             has_pyproject = (current_path / "pyproject.toml").exists()
-            has_layer2 = (current_path / "Layer_2_Agentic").exists()
+            has_layer2 = (current_path / "Layer_2_Agentic_Reasoning").exists()
             
             assert has_pyproject or has_layer2, "Should find project root markers"
         except Exception as e:
@@ -32,49 +32,49 @@ class TestPathUtilities:
             pytest.fail(f"Database directory check failed: {e}")
 
     def test_layer2_module_exists(self):
-        """Test that Layer_2_Agentic module exists."""
+        """Test that Layer_2_Agentic_Reasoning module exists."""
         try:
-            layer2_path = Path(__file__).parent.parent.parent / "Layer_2_Agentic"
-            assert layer2_path.exists(), "Layer_2_Agentic module should exist"
+            layer2_path = Path(__file__).parent.parent.parent / "Layer_2_Agentic_Reasoning"
+            assert layer2_path.exists(), "Layer_2_Agentic_Reasoning module should exist"
             assert (layer2_path / "__init__.py").exists(), "Module should have __init__.py"
         except Exception as e:
-            pytest.fail(f"Layer_2_Agentic module check failed: {e}")
+            pytest.fail(f"Layer_2_Agentic_Reasoning module check failed: {e}")
 
 
 class TestImportPatterns:
     """Test common import patterns used in the project."""
 
     def test_layer2_import_path(self):
-        """Test that Layer_2_Agentic can be imported."""
+        """Test that Layer_2_Agentic_Reasoning can be imported."""
         try:
-            import Layer_2_Agentic
-            assert Layer_2_Agentic is not None
+            import Layer_2_Agentic_Reasoning
+            assert Layer_2_Agentic_Reasoning is not None
         except ImportError as e:
-            pytest.fail(f"Failed to import Layer_2_Agentic: {e}")
+            pytest.fail(f"Failed to import Layer_2_Agentic_Reasoning: {e}")
 
     def test_layer2_config_import(self):
-        """Test that Layer_2_Agentic config can be imported."""
+        """Test that Layer_2_Agentic_Reasoning config can be imported."""
         try:
-            import Layer_2_Agentic.config
-            assert Layer_2_Agentic.config is not None
+            import Layer_2_Agentic_Reasoning.config
+            assert Layer_2_Agentic_Reasoning.config is not None
         except ImportError as e:
-            pytest.fail(f"Failed to import Layer_2_Agentic.config: {e}")
+            pytest.fail(f"Failed to import Layer_2_Agentic_Reasoning.config: {e}")
 
     def test_layer2_db_import(self):
-        """Test that Layer_2_Agentic db can be imported."""
+        """Test that Layer_2_Agentic_Reasoning db can be imported."""
         try:
-            import Layer_2_Agentic.db
-            assert Layer_2_Agentic.db is not None
+            import Layer_2_Agentic_Reasoning.db
+            assert Layer_2_Agentic_Reasoning.db is not None
         except ImportError as e:
-            pytest.fail(f"Failed to import Layer_2_Agentic.db: {e}")
+            pytest.fail(f"Failed to import Layer_2_Agentic_Reasoning.db: {e}")
 
     def test_layer2_logic_import(self):
-        """Test that Layer_2_Agentic logic can be imported."""
+        """Test that Layer_2_Agentic_Reasoning logic can be imported."""
         try:
-            import Layer_2_Agentic.logic
-            assert Layer_2_Agentic.logic is not None
+            import Layer_2_Agentic_Reasoning.logic
+            assert Layer_2_Agentic_Reasoning.logic is not None
         except ImportError as e:
-            pytest.fail(f"Failed to import Layer_2_Agentic.logic: {e}")
+            pytest.fail(f"Failed to import Layer_2_Agentic_Reasoning.logic: {e}")
 
 
 class TestEnvironmentSetup:
@@ -135,14 +135,14 @@ class TestProjectStructure:
             pytest.fail(f"Tests directory structure check failed: {e}")
 
     def test_layer2_structure(self):
-        """Test that Layer_2_Agentic has expected structure."""
+        """Test that Layer_2_Agentic_Reasoning has expected structure."""
         try:
-            layer2_path = Path(__file__).parent.parent.parent / "Layer_2_Agentic"
+            layer2_path = Path(__file__).parent.parent.parent / "Layer_2_Agentic_Reasoning"
             
             expected_subdirs = ["config", "db", "logic"]
             
             for subdir in expected_subdirs:
                 subdir_path = layer2_path / subdir
-                assert subdir_path.exists(), f"Layer_2_Agentic should have {subdir} subdirectory"
+                assert subdir_path.exists(), f"Layer_2_Agentic_Reasoning should have {subdir} subdirectory"
         except Exception as e:
-            pytest.fail(f"Layer_2_Agentic structure check failed: {e}")
+            pytest.fail(f"Layer_2_Agentic_Reasoning structure check failed: {e}")

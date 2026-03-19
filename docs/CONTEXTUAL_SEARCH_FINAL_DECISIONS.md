@@ -14,7 +14,7 @@
 
 ```python
 # Usage:
-python Layer_2_Agentic/logic/embeddings.py --action populate --model multilingual-e5-base
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action populate --model multilingual-e5-base
 
 # Process:
 # 1. Load all 168 product families from harvested.db
@@ -288,7 +288,7 @@ CONTEXTUAL_SEARCH_LOGGING:
     cache_hits: true                # Log Chroma cache effectiveness
     final_rankings: true            # Log composite score calculations
     
-  log_file: "Layer_2_Agentic/config/logs/contextual_search.log"
+  log_file: "Layer_2_Agentic_Reasoning/config/logs/contextual_search.log"
 ```
 
 **Log Output Example:**
@@ -426,11 +426,11 @@ def analyze_with_cache(query, products):
 
 ### Phase 1: Infrastructure (Day 1)
 
-- [ ] Create `Layer_2_Agentic/logic/embeddings.py` (batch generation script)
+- [ ] Create `Layer_2_Agentic_Reasoning/logic/embeddings.py` (batch generation script)
 - [ ] Move `vector_index/chroma.sqlite3` → `database/chroma.sqlite3`
 - [ ] Update all config references to new Chroma path
 - [ ] Update `config.yaml` with all CONTEXTUAL_SEARCH settings
-- [ ] Run embedding population: `python Layer_2_Agentic/logic/embeddings.py --action populate`
+- [ ] Run embedding population: `python Layer_2_Agentic_Reasoning/logic/embeddings.py --action populate`
 - [ ] Verify 168 embeddings loaded in Chroma
 
 ### Phase 2: Core Functions (Day 2-3)
@@ -463,11 +463,11 @@ def analyze_with_cache(query, products):
 
 | File | Action | Purpose |
 |------|--------|---------|
-| `Layer_2_Agentic/logic/embeddings.py` | CREATE | Embedding generation & Chroma management |
+| `Layer_2_Agentic_Reasoning/logic/embeddings.py` | CREATE | Embedding generation & Chroma management |
 | `database/chroma.sqlite3` | MOVE | Vector DB (from vector_index/) |
 | `config.yaml` | UPDATE | Add CONTEXTUAL_SEARCH settings + logging |
-| `Layer_2_Agentic/logic/function_library.py` | UPDATE | Implement 5 core functions |
-| `Layer_2_Agentic/db/templates.py` | UPDATE | Verify 5 templates are correct |
+| `Layer_2_Agentic_Reasoning/logic/function_library.py` | UPDATE | Implement 5 core functions |
+| `Layer_2_Agentic_Reasoning/db/templates.py` | UPDATE | Verify 5 templates are correct |
 | `tests/functional/test_contextual_search.py` | CREATE | Test all 11 questions |
 
 ---
@@ -509,5 +509,5 @@ def analyze_with_cache(query, products):
 
 **Status: ✅ READY FOR IMPLEMENTATION**
 
-**Next Action: Create `Layer_2_Agentic/logic/embeddings.py` and begin Phase 1 infrastructure setup.**
+**Next Action: Create `Layer_2_Agentic_Reasoning/logic/embeddings.py` and begin Phase 1 infrastructure setup.**
 

@@ -8,7 +8,7 @@ Chapter 1 of the Hydroscand product catalogue (hydraulic hoses).
 import os
 import sqlite3
 
-from Layer_2_Agentic.logic.function_library import (
+from Layer_2_Agentic_Reasoning.logic.function_library import (
     func_search_products,
     func_compare_items,
     func_calculate,

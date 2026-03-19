@@ -11,7 +11,7 @@ Tests the new invoke_llm_with_retry() function to ensure:
 import time
 from pathlib import Path
 
-from Layer_2_Agentic.logic.llm_helpers import get_basic_llm, invoke_llm_with_retry
+from Layer_2_Agentic_Reasoning.logic.llm_helpers import get_basic_llm, invoke_llm_with_retry
 
 
 def test_successful_invocation():

@@ -29,7 +29,7 @@ Result with Guidance
 
 ### Step 1.1: Create `embeddings.py` ✅
 
-**Status:** Script created at `Layer_2_Agentic/logic/embeddings.py`
+**Status:** Script created at `Layer_2_Agentic_Reasoning/logic/embeddings.py`
 
 **What it does:**
 - Loads all 168 product families from `harvested.db`
@@ -60,13 +60,13 @@ pip install chromadb
 cd c:\Users\oscik35\Desktop\PROJECTS\Hydroscand_Produktbok
 
 # Run embedding population (uses qwen3-embedding:8b by default, takes ~2-5 minutes)
-python Layer_2_Agentic/logic/embeddings.py --action populate
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action populate
 
 # OR explicitly specify the model:
-python Layer_2_Agentic/logic/embeddings.py --action populate --model qwen3-embedding:8b
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action populate --model qwen3-embedding:8b
 
 # With debug logging:
-python Layer_2_Agentic/logic/embeddings.py --action populate --debug
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action populate --debug
 ```
 
 **Expected Output:**
@@ -101,7 +101,7 @@ python Layer_2_Agentic/logic/embeddings.py --action populate --debug
 
 **Command:**
 ```powershell
-python Layer_2_Agentic/logic/embeddings.py --action verify
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action verify
 ```
 
 **Expected:**
@@ -115,7 +115,7 @@ python Layer_2_Agentic/logic/embeddings.py --action verify
 
 ### Step 1.4: Update Config
 
-**File:** `Layer_2_Agentic/config/config.yaml`
+**File:** `Layer_2_Agentic_Reasoning/config/config.yaml`
 
 **Add this section:**
 ```yaml
@@ -155,13 +155,13 @@ CONTEXTUAL_SEARCH:
       analyze_with_llm: true
       cache_hits: true
       rankings: true
-    log_file: "Layer_2_Agentic/config/logs/contextual_search.log"
+    log_file: "Layer_2_Agentic_Reasoning/config/logs/contextual_search.log"
 ```
 
 **Verify update:**
 ```powershell
 # Check config loads correctly
-python -c "from Layer_2_Agentic.config.config_loader import load_config; cfg = load_config(); print(cfg.get('CONTEXTUAL_SEARCH'))"
+python -c "from Layer_2_Agentic_Reasoning.config.config_loader import load_config; cfg = load_config(); print(cfg.get('CONTEXTUAL_SEARCH'))"
 ```
 
 ---
@@ -201,7 +201,7 @@ python -c "from Layer_2_Agentic.config.config_loader import load_config; cfg = l
 
 ### Step 2.1: Implement `extract_requirements()`
 
-**Location:** `Layer_2_Agentic/logic/function_library.py`
+**Location:** `Layer_2_Agentic_Reasoning/logic/function_library.py`
 
 **Skeleton:**
 ```python
@@ -240,7 +240,7 @@ def extract_requirements(params: Dict) -> Tuple[bool, Dict]:
 
 ### Step 2.2: Implement `semantic_search()`
 
-**Location:** `Layer_2_Agentic/logic/function_library.py`
+**Location:** `Layer_2_Agentic_Reasoning/logic/function_library.py`
 
 **Skeleton:**
 ```python
@@ -280,7 +280,7 @@ def semantic_search(params: Dict) -> Tuple[bool, Dict]:
 
 ### Step 2.3: Implement `filter_items()`
 
-**Location:** `Layer_2_Agentic/logic/function_library.py`
+**Location:** `Layer_2_Agentic_Reasoning/logic/function_library.py`
 
 **Skeleton:**
 ```python
@@ -319,7 +319,7 @@ def filter_items(params: Dict) -> Tuple[bool, Dict]:
 
 ### Step 2.4: Enhance `analyze_with_llm()`
 
-**Location:** `Layer_2_Agentic/logic/function_library.py`
+**Location:** `Layer_2_Agentic_Reasoning/logic/function_library.py`
 
 **Current Implementation:**
 - Works for single products (DIRECT LOOKUP)
@@ -345,7 +345,7 @@ def analyze_with_llm(params: Dict) -> Tuple[bool, Dict]:
 
 ### Step 2.5: Implement `extract_attributes()`
 
-**Location:** `Layer_2_Agentic/logic/function_library.py` (or new file)
+**Location:** `Layer_2_Agentic_Reasoning/logic/function_library.py` (or new file)
 
 **Skeleton:**
 ```python
@@ -393,7 +393,7 @@ Tests all 5 functions end-to-end with 11 refined questions
 """
 
 import pytest
-from Layer_2_Agentic.logic.function_library import (
+from Layer_2_Agentic_Reasoning.logic.function_library import (
     extract_requirements,
     semantic_search,
     filter_items,
@@ -542,8 +542,8 @@ ollama pull nomic-embed-text  # Terminal 2
 python -c "from pathlib import Path; print(Path('database/chroma.sqlite3').exists())"
 
 # Reinitialize
-python Layer_2_Agentic/logic/embeddings.py --action clear
-python Layer_2_Agentic/logic/embeddings.py --action populate
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action clear
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action populate
 ```
 
 ### Problem: "LLM context overflow"
@@ -578,9 +578,9 @@ python Layer_2_Agentic/logic/embeddings.py --action populate
 
 | File | Action | Status |
 |------|--------|--------|
-| `Layer_2_Agentic/logic/embeddings.py` | CREATE | ✅ DONE |
-| `Layer_2_Agentic/config/config.yaml` | UPDATE | ⏳ TODO |
-| `Layer_2_Agentic/logic/function_library.py` | UPDATE | ⏳ TODO |
+| `Layer_2_Agentic_Reasoning/logic/embeddings.py` | CREATE | ✅ DONE |
+| `Layer_2_Agentic_Reasoning/config/config.yaml` | UPDATE | ⏳ TODO |
+| `Layer_2_Agentic_Reasoning/logic/function_library.py` | UPDATE | ⏳ TODO |
 | `tests/functional/test_contextual_search.py` | CREATE | ⏳ TODO |
 | `tests/performance/test_contextual_search_perf.py` | CREATE | ⏳ TODO |
 | `docs/CONTEXTUAL_SEARCH_IMPLEMENTATION.md` | CREATE | ⏳ TODO |
@@ -601,6 +601,6 @@ python Layer_2_Agentic/logic/embeddings.py --action populate
 
 **Next Command:**
 ```powershell
-python Layer_2_Agentic/logic/embeddings.py --action populate --model multilingual-e5-base
+python Layer_2_Agentic_Reasoning/logic/embeddings.py --action populate --model multilingual-e5-base
 ```
 

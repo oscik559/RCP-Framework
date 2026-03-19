@@ -294,7 +294,7 @@ def main():
     # Find database
     db_paths = {
         "harvested": "database/harvested.db",
-        "agentic": "Layer_2_Agentic/db/agentic.db",
+        "agentic": "Layer_2_Agentic_Reasoning/db/agentic.db",
     }
 
     db_path = db_paths.get(db_choice)

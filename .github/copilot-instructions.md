@@ -9,16 +9,16 @@ This project is a three-layer intelligent system for extracting, reasoning about
 ## Key Architectural Patterns
 - **Centralized Database**: All product, family, and knowledge data is stored in `database/harvested.db` (see `database/db_utils.py` and `database/harvested_schema.sql`).
 - **Layer Separation**: Extraction, reasoning, and UI logic are strictly separated. Package installed via `pip install -e .` for clean imports.
-- **Agentic Reasoning**: Layer 2 uses a Goal → Strategy → Function pattern, with reusable function libraries and strategy templates. See `Layer_2_Agentic/logic/function_library.py` and `Layer_2_Agentic/db/templates.py`.
+- **Agentic Reasoning**: Layer 2 uses a Goal → Strategy → Function pattern, with reusable function libraries and strategy templates. See `Layer_2_Agentic_Reasoning/logic/function_library.py` and `Layer_2_Agentic_Reasoning/db/templates.py`.
 - **VLM Integration**: Vision Language Models (Ollama + Qwen) are used for table and product extraction in Layer 1. Model and API configuration is passed via CLI args.
 - **Testing**: All tests are organized in `tests/` by category (unit, integration, functional, e2e, performance). Use `pytest tests/` for full suite. See `tests/README.md` for guidelines.
 
 ## Developer Workflows
 - **Extract Data**: Run Layer 1 scripts to convert PDF pages to PNG, detect tables, and extract products. Example:
   ```pwsh
-  python Layer_1a_Extraction/1_pdf_to_png.py Layer_1a_Extraction/High-Pressure_Hose.pdf
-  python Layer_1a_Extraction/3_detect_tables.py
-  python Layer_1a_Extraction/4_extract_product.py Layer_1a_Extraction/High-Pressure_Hose.pdf --page 31
+  python Layer_1_Extraction/Layer_1a/1_pdf_to_png.py Layer_1_Extraction/Layer_1a/High-Pressure_Hose.pdf
+  python Layer_1_Extraction/Layer_1a/3_detect_tables.py
+  python Layer_1_Extraction/Layer_1a/4_extract_product.py Layer_1_Extraction/Layer_1a/High-Pressure_Hose.pdf --page 31
   ```
 - **Query Data**: Use Layer 2 (main.py) for CLI queries, or Layer 3 (web_app.py) for web UI. Example:
   ```pwsh
@@ -59,7 +59,7 @@ tests/
 ### Test Creation Checklist
 1. ✅ Choose correct category (unit/integration/functional/e2e/performance)
 2. ✅ Create file in appropriate `tests/<category>/` subdirectory
-3. ✅ Use correct imports: `from Layer_2_Agentic...` (NOT `agentic_reasoning`)
+3. ✅ Use correct imports: `from Layer_2_Agentic_Reasoning...` (NOT `agentic_reasoning`)
 4. ✅ Add docstrings explaining what is tested
 5. ✅ Use descriptive test names that indicate the scenario
 6. ✅ Store in `tests/` for reuse (DO NOT create on project root)
@@ -71,7 +71,7 @@ tests/
 # tests/functional/test_product_search.py
 """Test product search functionality."""
 
-from Layer_2_Agentic.logic.function_library import func_search_products
+from Layer_2_Agentic_Reasoning.logic.function_library import func_search_products
 
 def test_search_by_material():
     """Test searching products by material type (rubber)."""
@@ -110,8 +110,8 @@ pytest tests/functional/test_product_search.py::test_search_by_material
 - **Thread Standards**: Coupling extraction focuses on thread compatibility (G, JIC, ORFS, NPTF, BSP).
 - **Debug Levels**: Set in `main.py` (0=SILENT, 4=VERBOSE).
 - **Output Locations**: 
-  - Layer 1a outputs: `Layer_1a_Extraction/data/` (tables, png_pages, output, exports)
-  - Layer 1b outputs: `Layer_1b_Extraction/data/` (png_pages, tables, etc.)
+  - Layer 1a outputs: `Layer_1_Extraction/Layer_1a/data/` (tables, png_pages, output, exports)
+  - Layer 1b outputs: `Layer_1_Extraction/Layer_1b/data/` (png_pages, tables, etc.)
   - Core databases: `database/` (harvested.db, agentic.db)
   - Vector index: `vector_index/`
 
@@ -121,8 +121,8 @@ pytest tests/functional/test_product_search.py::test_search_by_material
 - **Flask**: Web UI in Layer 3.
 
 ## Example File References
-- `Layer_1a_Extraction/4_extract_product.py`: Product extraction logic
-- `Layer_2_Agentic/logic/function_library.py`: Core function library
+- `Layer_1_Extraction/Layer_1a/4_extract_product.py`: Product extraction logic
+- `Layer_2_Agentic_Reasoning/logic/function_library.py`: Core function library
 - `Layer_3_Application/web_app.py`: Web interface
 - `database/db_utils.py`: Database utilities
 - `tests/`: All test scripts

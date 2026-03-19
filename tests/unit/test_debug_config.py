@@ -3,7 +3,7 @@ Unit tests for debug configuration and logging.
 """
 
 import pytest
-from Layer_2_Agentic.config.debug_config import debug
+from Layer_2_Agentic_Reasoning.config.debug_config import debug
 
 
 class TestDebugConfig:

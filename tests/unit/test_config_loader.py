@@ -3,7 +3,7 @@ Unit tests for configuration loader and settings.
 """
 
 import pytest
-from Layer_2_Agentic.config.config_loader import CONFIG
+from Layer_2_Agentic_Reasoning.config.config_loader import CONFIG
 
 
 class TestConfigLoader:

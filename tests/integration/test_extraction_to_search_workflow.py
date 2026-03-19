@@ -9,7 +9,7 @@ Tests the complete pipeline:
 
 import json
 import pytest
-from Layer_2_Agentic.logic.function_library import (
+from Layer_2_Agentic_Reasoning.logic.function_library import (
     func_extract_requirements,
     func_semantic_search
 )

@@ -8,12 +8,12 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from Layer_2_Agentic.db.connection import (
+from Layer_2_Agentic_Reasoning.db.connection import (
     get_agentic_connection,
     get_output_connection,
     get_temp_connection,
 )
-from Layer_2_Agentic.db.schema_manager import init_db
+from Layer_2_Agentic_Reasoning.db.schema_manager import init_db
 
 
 class TestDatabaseSchema(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestDatabaseSchema(unittest.TestCase):
         if os.path.exists(self.test_db_path):
             os.unlink(self.test_db_path)
 
-    @patch("Layer_2_Agentic.db.schema_manager.get_agentic_connection")
+    @patch("Layer_2_Agentic_Reasoning.db.schema_manager.get_agentic_connection")
     def test_schema_initialization(self, mock_connection):
         """Test database schema initialization."""
         # Create in-memory database for testing
@@ -68,7 +68,7 @@ class TestDatabaseSchema(unittest.TestCase):
         """Test that success fields use tri-state INTEGER instead of BOOLEAN."""
         conn = sqlite3.connect(":memory:")
 
-        with patch("Layer_2_Agentic.db.schema_manager.get_agentic_connection") as mock_conn:
+        with patch("Layer_2_Agentic_Reasoning.db.schema_manager.get_agentic_connection") as mock_conn:
             mock_conn.return_value.__enter__.return_value = conn
             init_db(drop_and_recreate=True)
 

@@ -149,7 +149,7 @@ def audit_temp_db():
     print("TEMPORARY DATABASE (ASSEMBLY) CAPABILITY")
     print("=" * 70)
 
-    from Layer_2_Agentic.db.connection import get_temp_connection
+    from Layer_2_Agentic_Reasoning.db.connection import get_temp_connection
 
     try:
         conn = get_temp_connection()
@@ -206,8 +206,8 @@ def audit_llm_context_limits():
     print("=" * 70)
 
     try:
-        from Layer_2_Agentic.config.config_loader import CONFIG
-        from Layer_2_Agentic.logic.llm_helpers import get_basic_llm
+        from Layer_2_Agentic_Reasoning.config.config_loader import CONFIG
+        from Layer_2_Agentic_Reasoning.logic.llm_helpers import get_basic_llm
 
         print(f"\n📋 LLM Configuration:")
         print(f"   Model: {CONFIG.get('llm_model', 'unknown')}")

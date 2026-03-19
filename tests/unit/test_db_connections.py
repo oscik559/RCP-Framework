@@ -13,7 +13,7 @@ class TestDatabaseConnectionContextManagers:
     def test_output_connection_context_manager(self):
         """Test that get_output_connection works as context manager."""
         try:
-            from Layer_2_Agentic.db.connection import get_output_connection
+            from Layer_2_Agentic_Reasoning.db.connection import get_output_connection
             
             with get_output_connection() as conn:
                 assert conn is not None
@@ -30,7 +30,7 @@ class TestDatabaseConnectionContextManagers:
     def test_agentic_connection_context_manager(self):
         """Test that get_agentic_connection works as context manager."""
         try:
-            from Layer_2_Agentic.db.connection import get_agentic_connection
+            from Layer_2_Agentic_Reasoning.db.connection import get_agentic_connection
             
             with get_agentic_connection() as conn:
                 assert conn is not None
@@ -47,7 +47,7 @@ class TestDatabaseConnectionContextManagers:
     def test_temp_connection_context_manager(self):
         """Test that get_temp_connection works as context manager."""
         try:
-            from Layer_2_Agentic.db.connection import get_temp_connection
+            from Layer_2_Agentic_Reasoning.db.connection import get_temp_connection
             
             with get_temp_connection() as conn:
                 assert conn is not None
@@ -64,7 +64,7 @@ class TestDatabaseConnectionContextManagers:
     def test_temp_connection_table_creation(self):
         """Test creating tables in temp connection."""
         try:
-            from Layer_2_Agentic.db.connection import get_temp_connection
+            from Layer_2_Agentic_Reasoning.db.connection import get_temp_connection
             
             with get_temp_connection() as conn:
                 cursor = conn.cursor()
@@ -84,7 +84,7 @@ class TestDatabaseConnectionContextManagers:
     def test_connection_isolation(self):
         """Test that each context manager gives a new connection."""
         try:
-            from Layer_2_Agentic.db.connection import get_temp_connection
+            from Layer_2_Agentic_Reasoning.db.connection import get_temp_connection
             
             # Create data in first connection
             with get_temp_connection() as conn1:
@@ -114,7 +114,7 @@ class TestConnectionContextManagerBehavior:
     def test_connection_closes_after_context(self):
         """Test that connection is closed after exiting context."""
         try:
-            from Layer_2_Agentic.db.connection import get_temp_connection
+            from Layer_2_Agentic_Reasoning.db.connection import get_temp_connection
             
             conn_ref = None
             with get_temp_connection() as conn:
@@ -132,7 +132,7 @@ class TestConnectionContextManagerBehavior:
     def test_connection_exception_handling(self):
         """Test that connection closes even on exception."""
         try:
-            from Layer_2_Agentic.db.connection import get_temp_connection
+            from Layer_2_Agentic_Reasoning.db.connection import get_temp_connection
             
             conn_ref = None
             try:

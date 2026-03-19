@@ -13,7 +13,7 @@ Each test validates that the function correctly integrates with the embeddings d
 
 from typing import Any, Dict, Tuple
 import pytest
-from Layer_2_Agentic.logic.function_library import (
+from Layer_2_Agentic_Reasoning.logic.function_library import (
     func_extract_requirements,
     func_semantic_search,
     func_filter_items,

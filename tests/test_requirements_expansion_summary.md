@@ -141,7 +141,7 @@ All 79 customer questions from question database now have proper requirement ext
 ## Files Modified/Created
 
 ### Modified
-- `Layer_2_Agentic/config/prompts.yaml` - Added 34 new requirement fields with comprehensive taxonomy
+- `Layer_2_Agentic_Reasoning/config/prompts.yaml` - Added 34 new requirement fields with comprehensive taxonomy
 
 ### Created
 - `tests/functional/test_extract_requirements_comprehensive.py` (437 lines, 28 tests)

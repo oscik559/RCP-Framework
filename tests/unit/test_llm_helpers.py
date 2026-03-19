@@ -12,7 +12,7 @@ class TestLLMHelpers:
     def test_get_basic_llm_import(self):
         """Test that get_basic_llm can be imported."""
         try:
-            from Layer_2_Agentic.logic.llm_helpers import get_basic_llm
+            from Layer_2_Agentic_Reasoning.logic.llm_helpers import get_basic_llm
             assert callable(get_basic_llm)
         except ImportError as e:
             pytest.fail(f"Failed to import get_basic_llm: {e}")
@@ -20,7 +20,7 @@ class TestLLMHelpers:
     def test_get_reasoning_llm_import(self):
         """Test that get_reasoning_llm can be imported."""
         try:
-            from Layer_2_Agentic.logic.llm_helpers import get_reasoning_llm
+            from Layer_2_Agentic_Reasoning.logic.llm_helpers import get_reasoning_llm
             assert callable(get_reasoning_llm)
         except ImportError as e:
             pytest.fail(f"Failed to import get_reasoning_llm: {e}")
@@ -28,7 +28,7 @@ class TestLLMHelpers:
     def test_get_basic_llm_returns_llm(self):
         """Test that get_basic_llm returns an LLM instance."""
         try:
-            from Layer_2_Agentic.logic.llm_helpers import get_basic_llm
+            from Layer_2_Agentic_Reasoning.logic.llm_helpers import get_basic_llm
             
             llm = get_basic_llm()
             assert llm is not None
@@ -40,7 +40,7 @@ class TestLLMHelpers:
     def test_get_reasoning_llm_returns_llm(self):
         """Test that get_reasoning_llm returns an LLM instance."""
         try:
-            from Layer_2_Agentic.logic.llm_helpers import get_reasoning_llm
+            from Layer_2_Agentic_Reasoning.logic.llm_helpers import get_reasoning_llm
             
             llm = get_reasoning_llm()
             assert llm is not None
@@ -56,7 +56,7 @@ class TestPromptLoader:
     def test_get_prompt_loader_import(self):
         """Test that get_prompt_loader can be imported."""
         try:
-            from Layer_2_Agentic.config.prompt_loader import get_prompt_loader
+            from Layer_2_Agentic_Reasoning.config.prompt_loader import get_prompt_loader
             assert callable(get_prompt_loader)
         except ImportError as e:
             pytest.fail(f"Failed to import get_prompt_loader: {e}")
@@ -64,7 +64,7 @@ class TestPromptLoader:
     def test_get_prompt_loader_returns_loader(self):
         """Test that get_prompt_loader returns a loader."""
         try:
-            from Layer_2_Agentic.config.prompt_loader import get_prompt_loader
+            from Layer_2_Agentic_Reasoning.config.prompt_loader import get_prompt_loader
             
             loader = get_prompt_loader()
             assert loader is not None
@@ -75,7 +75,7 @@ class TestPromptLoader:
     def test_get_prompt_returns_dict(self):
         """Test that get_prompt returns a dictionary."""
         try:
-            from Layer_2_Agentic.config.prompt_loader import get_prompt_loader
+            from Layer_2_Agentic_Reasoning.config.prompt_loader import get_prompt_loader
             
             loader = get_prompt_loader()
             # Try to get a prompt (might not exist, but method should work)
@@ -96,7 +96,7 @@ class TestFunctionLibraryImports:
     def test_func_search_products_import(self):
         """Test that func_search_products can be imported."""
         try:
-            from Layer_2_Agentic.logic.function_library import func_search_products
+            from Layer_2_Agentic_Reasoning.logic.function_library import func_search_products
             assert callable(func_search_products)
         except ImportError as e:
             pytest.fail(f"Failed to import func_search_products: {e}")
@@ -104,7 +104,7 @@ class TestFunctionLibraryImports:
     def test_func_filter_items_import(self):
         """Test that func_filter_items can be imported."""
         try:
-            from Layer_2_Agentic.logic.function_library import func_filter_items
+            from Layer_2_Agentic_Reasoning.logic.function_library import func_filter_items
             assert callable(func_filter_items)
         except ImportError as e:
             pytest.fail(f"Failed to import func_filter_items: {e}")
@@ -112,7 +112,7 @@ class TestFunctionLibraryImports:
     def test_func_analyze_data_import(self):
         """Test that func_analyze_data can be imported."""
         try:
-            from Layer_2_Agentic.logic.function_library import func_analyze_data
+            from Layer_2_Agentic_Reasoning.logic.function_library import func_analyze_data
             assert callable(func_analyze_data)
         except ImportError as e:
             pytest.fail(f"Failed to import func_analyze_data: {e}")
@@ -120,7 +120,7 @@ class TestFunctionLibraryImports:
     def test_all_core_functions_callable(self):
         """Test that all core functions are callable."""
         try:
-            from Layer_2_Agentic.logic import function_library
+            from Layer_2_Agentic_Reasoning.logic import function_library
             
             # Get all functions that start with 'func_'
             funcs = [getattr(function_library, name) for name in dir(function_library) 

@@ -191,7 +191,7 @@ docs/
 **Plan:** ✅ Detailed
 **Tools:** ✅ Created
 
-**Start with:** `func_calculate_hose_size()` in `Layer_2_Agentic/logic/function_library.py`
+**Start with:** `func_calculate_hose_size()` in `Layer_2_Agentic_Reasoning/logic/function_library.py`
 
 ---
 

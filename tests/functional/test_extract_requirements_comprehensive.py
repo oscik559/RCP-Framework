@@ -16,7 +16,7 @@ Tests cover:
 
 import json
 import pytest
-from Layer_2_Agentic.logic.function_library import func_extract_requirements
+from Layer_2_Agentic_Reasoning.logic.function_library import func_extract_requirements
 
 
 class TestCoreSpecifications:

@@ -12,24 +12,25 @@ RCP-Framework/
 │   ├── harvested.db               # Production database (Case I)
 │   └── agentic.db                 # Workflow state database
 │
-├── Layer_1a_Extraction/           # Legacy extraction (hoses)
-│   ├── 1_pdf_to_png.py
-│   ├── 2_detect_headers_footers.py
-│   ├── 3_detect_tables.py
-│   ├── 4_extract_product.py
-│   └── 5_extract_images.py
-│
-└── Layer_1b_Extraction/           # Production extraction pipeline
-    ├── Press_Couplings.pdf
-    ├── 0_extract_knowledge.py
-    ├── 1_pdf_to_png.py
-    ├── 2_detect_headers_footers.py
-    ├── 2b_extract_categories.py
-    ├── 3a_extract_families.py
-    ├── 3b_extract_products_vlm.py
-    └── data/
-        ├── png_pages/
-        └── tables/
+├── Layer_1_Extraction/
+│   ├── Layer_1a/                  # Legacy extraction (hoses)
+│   │   ├── 1_pdf_to_png.py
+│   │   ├── 2_detect_headers_footers.py
+│   │   ├── 3_detect_tables.py
+│   │   ├── 4_extract_product.py
+│   │   └── 5_extract_images.py
+│   │
+│   └── Layer_1b/                  # Production extraction pipeline
+│       ├── Press_Couplings.pdf
+│       ├── 0_extract_knowledge.py
+│       ├── 1_pdf_to_png.py
+│       ├── 2_detect_headers_footers.py
+│       ├── 2b_extract_categories.py
+│       ├── 3a_extract_families.py
+│       ├── 3b_extract_products_vlm.py
+│       └── data/
+│           ├── png_pages/
+│           └── tables/
 ```
 
 ## Benefits
@@ -80,13 +81,13 @@ Now that the structure is clean, you can:
 
 1. **Run table detection** on coupling pages
    ```bash
-   cd Layer_1b_Extraction
+   cd Layer_1_Extraction/Layer_1b
    uv run python 3_detect_tables.py --pdf-path Press_Couplings.pdf --page 2
    ```
 
 2. **Extract products** using the test database
    ```bash
-   cd Layer_1b_Extraction
+   cd Layer_1_Extraction/Layer_1b
    uv run python 4_extract_product.py --page 2 --test
    ```
 

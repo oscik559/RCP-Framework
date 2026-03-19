@@ -217,7 +217,7 @@ ARCHITECTURE_ANALYSIS = {
     "integration_points": {
         "langchain": "LLM invocations via llm_helpers.py",
         "langgraph": "State graph orchestration via state_graph.py",
-        "sqlite": "Database access via Layer_2_Agentic/db/connection.py",
+        "sqlite": "Database access via Layer_2_Agentic_Reasoning/db/connection.py",
         "ollama": "Local LLM inference (http://127.0.0.1:11434)",
         "chroma": "Vector index for semantic search (referenced but not yet used)"
     },

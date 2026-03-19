@@ -104,7 +104,7 @@ pytest tests/unit/test_utilities.py::TestPathUtilities::test_project_root_detect
 
 ### Run with Coverage
 ```bash
-pytest tests/ --cov=Layer_2_Agentic --cov-report=html
+pytest tests/ --cov=Layer_2_Agentic_Reasoning --cov-report=html
 ```
 
 ### Run with Verbose Output
@@ -212,7 +212,7 @@ Configuration in `.vscode/settings.json`:
 
 ### Import Errors
 - Ensure running from project root: `cd Hydroscand_Produktbok`
-- Check Layer_2_Agentic imports use correct module name (not `agentic_reasoning`)
+- Check Layer_2_Agentic_Reasoning imports use correct module name (not `agentic_reasoning`)
 
 ### Database Errors
 - Verify `database/harvested.db` exists
@@ -223,7 +223,7 @@ Configuration in `.vscode/settings.json`:
 - Run diagnosis: `python tests/utilities/diagnose_ollama.py`
 
 ### Connection Timeouts
-- Increase timeout in `Layer_2_Agentic/db/connection.py`
+- Increase timeout in `Layer_2_Agentic_Reasoning/db/connection.py`
 - Check database file permissions
 
 ## File Organization Standards
@@ -236,5 +236,5 @@ All tests should be stored in `tests/` directory for reuse and discoverability:
 ## References
 
 - [pytest documentation](https://docs.pytest.org/)
-- [Layer_2_Agentic module structure](../Layer_2_Agentic/)
+- [Layer_2_Agentic_Reasoning module structure](../Layer_2_Agentic_Reasoning/)
 - [Copilot instructions for test creation](../.github/copilot-instructions.md)

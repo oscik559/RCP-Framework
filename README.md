@@ -35,21 +35,24 @@ Layer 3: Application
 ## Repository Structure
 
 ```
-├── Layer_1a_Extraction/          # Baseline extraction (legacy, kept for reference)
-├── Layer_1b_Extraction/          # Production extraction pipeline
-├── Layer_2_Agentic/              # Core RCP reasoning framework
+├── Layer_1_Extraction/
+│   ├── Layer_1a/                 # Baseline extraction (legacy, kept for reference)
+│   └── Layer_1b/                 # Production extraction pipeline
+├── Layer_2_Agentic_Reasoning/    # Core RCP reasoning framework
 │   ├── config/                   # Configuration: constants, prompts, domain settings
 │   ├── db/                       # Database connections and strategy templates
 │   └── logic/                    # State graph, workflow nodes, function library
 ├── Layer_3_Application/          # Web interface and APIs
-├── Layer_Experiments_Case_I/     # Case I evaluation (Hydroscand, n=100 queries)
-│   ├── Baseline_RAG/             # B1: Naive RAG baseline
-│   ├── Baseline_SQL_Retrieval/   # B2: SQL retrieval baseline
-│   ├── RCP_Framework/            # B3: RCP framework evaluation
-│   ├── compute_mcnemar.py        # McNemar's test for statistical significance
-│   └── test_questions_appendix_b.json  # Annotated query set (100 questions)
-├── Layer_Experiments_Case_II/    # Case II evaluation (Saab, n=100 queries)
-│   └── test_questions_saab.json  # Annotated query set (100 questions)
+├── Experiments/
+│   ├── Case_I/                   # Case I evaluation (Hydroscand, n=100 queries)
+│   │   ├── Baseline_RAG/         # B1: Naive RAG baseline
+│   │   ├── Baseline_SQL_Retrieval/  # B2: SQL retrieval baseline
+│   │   ├── RCP_Framework/        # B3: RCP framework evaluation
+│   │   ├── compute_mcnemar.py    # McNemar's test for statistical significance
+│   │   └── test_questions_appendix_b.json  # Annotated query set (100 questions)
+│   ├── Case_II/                  # Case II evaluation (Saab, n=100 queries)
+│   │   └── test_questions_saab.json  # Annotated query set (100 questions)
+│   └── questions/                # Shared test question sets
 ├── database/                     # SQLite databases and schema
 │   ├── harvested.db              # Product database (Case I)
 │   ├── agentic.db                # Workflow state database
@@ -97,14 +100,14 @@ FLASK_DEBUG=false
 
 ```bash
 # Production pipeline (Layer 1b)
-python Layer_1b_Extraction/0_extract_knowledge.py
-python Layer_1b_Extraction/2b_extract_categories.py
-python Layer_1b_Extraction/3a_extract_families.py
-python Layer_1b_Extraction/3b_extract_products_vlm.py
+python Layer_1_Extraction/Layer_1b/0_extract_knowledge.py
+python Layer_1_Extraction/Layer_1b/2b_extract_categories.py
+python Layer_1_Extraction/Layer_1b/3a_extract_families.py
+python Layer_1_Extraction/Layer_1b/3b_extract_products_vlm.py
 ```
 
 Requires Ollama running locally (`ollama serve`) with a vision model.
-See [Layer_1b_Extraction/README.md](Layer_1b_Extraction/README.md) for the full pipeline.
+See [Layer_1_Extraction/Layer_1b/README.md](Layer_1_Extraction/Layer_1b/README.md) for the full pipeline.
 
 ### Layer 2 & 3: Query products
 
@@ -129,15 +132,15 @@ The experiment folders contain the three baselines (B1: Naive RAG, B2: SQL Retri
 
 ```bash
 # Run Case I evaluation
-cd Layer_Experiments_Case_I
+cd Experiments/Case_I
 python run_evaluation.py
 
 # Run Case II evaluation
-cd Layer_Experiments_Case_II
+cd Experiments/Case_II
 python run_evaluation_saab.py
 
 # Statistical significance (McNemar's test)
-python Layer_Experiments_Case_I/compute_mcnemar.py
+python Experiments/Case_I/compute_mcnemar.py
 ```
 
 Results are written to `results/` within each experiment folder. The consolidated results used in the paper are in `results_appendix_b/`.
@@ -154,7 +157,7 @@ python -m pytest tests/
 python -m pytest tests/unit/
 
 # With coverage
-python -m pytest tests/ --cov=Layer_2_Agentic
+python -m pytest tests/ --cov=Layer_2_Agentic_Reasoning
 ```
 
 ---

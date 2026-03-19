@@ -53,14 +53,14 @@ pip install -e .
 - pandas, openpyxl (data export)
 
 **Why `pip install -e .`?**
-- Enables clean imports: `from Layer_2_Agentic.logic import ...`
+- Enables clean imports: `from Layer_2_Agentic_Reasoning.logic import ...`
 - No sys.path manipulation needed
 - Changes to code immediately reflected
 
 ### 3. Verify Installation
 ```bash
 # Test imports
-python -c "from Layer_2_Agentic.logic.workflow_types import SessionState; print('✅ Package imports work')"
+python -c "from Layer_2_Agentic_Reasoning.logic.workflow_types import SessionState; print('✅ Package imports work')"
 
 # Test database initialization
 python database/db_utils.py --verify
@@ -96,9 +96,9 @@ Then open: http://localhost:5001
 
 ```
 Project_Hydroscand-Hoses/
-├── Layer_1a_Extraction/     # PDF extraction pipeline
-├── Layer_1b_Extraction/     # Alternative extraction pipeline
-├── Layer_2_Agentic/         # Core reasoning engine
+├── Layer_1_Extraction/Layer_1a/     # PDF extraction pipeline
+├── Layer_1_Extraction/Layer_1b/     # Alternative extraction pipeline
+├── Layer_2_Agentic_Reasoning/         # Core reasoning engine
 │   ├── config/              # Configuration files
 │   ├── db/                  # Database connections & schema
 │   └── logic/               # Workflow nodes & functions
@@ -115,10 +115,10 @@ Project_Hydroscand-Hoses/
 
 ### ✅ Folder Renaming (Python Compatible)
 All folders now use underscores instead of hyphens:
-- `Layer_2-Agentic` → `Layer_2_Agentic`
+- `Layer_2-Agentic` → `Layer_2_Agentic_Reasoning`
 - `Layer_3-Application` → `Layer_3_Application`
-- `Layer_1a-Extraction` → `Layer_1a_Extraction`
-- `Layer_1b-Extraction` → `Layer_1b_Extraction`
+- `Layer_1a-Extraction` → `Layer_1_Extraction/Layer_1a`
+- `Layer_1b-Extraction` → `Layer_1_Extraction/Layer_1b`
 
 ### ✅ Module Renaming (Avoid Standard Library Conflicts)
 - `logic/types.py` → `logic/workflow_types.py` (avoids shadowing Python's built-in `types` module)
@@ -130,14 +130,14 @@ pip install -e .
 ```
 
 This enables:
-- Clean imports: `from Layer_2_Agentic.logic import ...`
+- Clean imports: `from Layer_2_Agentic_Reasoning.logic import ...`
 - No need for sys.path manipulation in most cases
 - Editable mode: changes reflect immediately
 
 ## Configuration
 
 ### Database Paths
-Edit `Layer_2_Agentic/config/config_loader.py` if needed:
+Edit `Layer_2_Agentic_Reasoning/config/config_loader.py` if needed:
 ```python
 CONFIG = {
     "agentic_db": "database/agentic.db",      # Workflow tracking
@@ -147,12 +147,12 @@ CONFIG = {
 ```
 
 ### LLM Configuration
-Models are configured in `Layer_2_Agentic/config/config_loader.py`:
+Models are configured in `Layer_2_Agentic_Reasoning/config/config_loader.py`:
 - **Basic LLM**: `qwen2.5:3b` (fast, simple tasks)
 - **Reasoning LLM**: `qwen2.5:3b` (complex reasoning)
 
 ### Strategy Testing
-Enable/disable strategies in `Layer_2_Agentic/config/strategy_testing.py`:
+Enable/disable strategies in `Layer_2_Agentic_Reasoning/config/strategy_testing.py`:
 ```python
 ENABLED_STRATEGIES = [
     "SIMPLE LOOKUP",
@@ -189,7 +189,7 @@ ollama list
 If databases are missing:
 ```bash
 # Initialize agentic database
-python Layer_2_Agentic/db/templates.py
+python Layer_2_Agentic_Reasoning/db/templates.py
 
 # Check database files exist
 ls -lh database/*.db
@@ -246,7 +246,7 @@ pip install --upgrade pip
 pip install -e .
 
 # 3. Initialize databases
-python Layer_2_Agentic/db/templates.py
+python Layer_2_Agentic_Reasoning/db/templates.py
 
 # 4. Run CLI
 python main.py

@@ -5,9 +5,9 @@ Uses real product codes and families from harvested.db to test the complete
 agent workflow: Goal → Strategy → Functions → Answer
 """
 
-from Layer_2_Agentic.config.session_config import get_default_session_state, get_workflow_config
-from Layer_2_Agentic.logic.state_graph import get_graph
-from Layer_2_Agentic.db.templates import populate_template_libraries
+from Layer_2_Agentic_Reasoning.config.session_config import get_default_session_state, get_workflow_config
+from Layer_2_Agentic_Reasoning.logic.state_graph import get_graph
+from Layer_2_Agentic_Reasoning.db.templates import populate_template_libraries
 
 # Real Hydroscand test questions from Chapter 1 (Hydraulic Hoses)
 TEST_QUESTIONS = [
