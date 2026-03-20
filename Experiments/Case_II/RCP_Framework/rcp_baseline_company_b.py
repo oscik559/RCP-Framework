@@ -1,7 +1,7 @@
 """
-B3: RCP (Relational Control Plane) baseline for Saab Case II evaluation.
+B3: RCP (Relational Control Plane) baseline for Company B Case II evaluation.
 
-Implements a local-model version of the Saab RCP pipeline using llama3.2
+Implements a local-model version of the Company B RCP pipeline using llama3.2
 via Ollama. The six-stage control loop:
 
   1. GoalDefine      – parse the query into a structured goal
@@ -11,7 +11,7 @@ via Ollama. The six-stage control loop:
   5. StrategyValidate– check if goal is satisfied; retry with ENHANCED if not
   6. GoalValidate    – final confidence-gated answer synthesis
 
-Functions (mirrors Saab FunctionTemplateLibrary):
+Functions (mirrors Company B FunctionTemplateLibrary):
   - Extract Keywords
   - Table Search
   - Filter Table
@@ -34,8 +34,8 @@ from pathlib import Path
 
 import requests
 
-# Set SAAB_DB_PATH environment variable to override the default location.
-SAAB_DB = Path(os.environ.get("SAAB_DB_PATH", "database/saab_harvested.db"))
+# Set COMPANY_B_DB_PATH environment variable to override the default location.
+COMPANY_B_DB = Path(os.environ.get("COMPANY_B_DB_PATH", "database/company_b_harvested.db"))
 OLLAMA_URL = "http://localhost:11434"
 LLM_MODEL = "llama3.2:latest"
 
@@ -125,7 +125,7 @@ def func_table_search(state: dict) -> dict:
     Output: state["retrieved_tables"] – list[dict]
     """
     keywords = state.get("keywords", [])
-    con = sqlite3.connect(SAAB_DB)
+    con = sqlite3.connect(COMPANY_B_DB)
     cur = con.cursor()
     results = []
     seen = set()
@@ -206,7 +206,7 @@ def func_analyze_data(state: dict) -> dict:
     context = "\n".join(context_parts)
 
     prompt = (
-        "You are a technical documentation assistant for Saab aerospace connector "
+        "You are a technical documentation assistant for Company B aerospace connector "
         "and cable products. Find the exact answer in the table records below.\n"
         "Each table shows 'Columns:' (header) followed by 'Row:' entries.\n"
         "Identify the correct row and column for the requested specification.\n"

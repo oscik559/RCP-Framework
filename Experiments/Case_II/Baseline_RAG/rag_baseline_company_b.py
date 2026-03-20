@@ -1,5 +1,5 @@
 """
-B1: Naive RAG baseline for Saab Case II evaluation.
+B1: Naive RAG baseline for Company B Case II evaluation.
 
 Chunks the text content of all extracted_tables, embeds them with
 qwen3-embedding:8b (Ollama), retrieves top-5 chunks for each query,
@@ -20,8 +20,8 @@ from pathlib import Path
 
 import requests
 
-# Set SAAB_DB_PATH environment variable to override the default location.
-SAAB_DB = Path(os.environ.get("SAAB_DB_PATH", "database/saab_harvested.db"))
+# Set COMPANY_B_DB_PATH environment variable to override the default location.
+COMPANY_B_DB = Path(os.environ.get("COMPANY_B_DB_PATH", "database/company_b_harvested.db"))
 OLLAMA_URL = "http://localhost:11434"
 EMBED_MODEL = "qwen3-embedding:latest"
 LLM_MODEL = "llama3.2:latest"
@@ -73,7 +73,7 @@ def cosine_sim(a: list[float], b: list[float]) -> float:
 
 def load_chunks() -> list[dict]:
     """Convert each row in extracted_tables to a text chunk."""
-    con = sqlite3.connect(SAAB_DB)
+    con = sqlite3.connect(COMPANY_B_DB)
     cur = con.cursor()
     cur.execute(
         "SELECT filename, heading_name, table_name, tablecontent FROM extracted_tables"
@@ -122,7 +122,7 @@ def retrieve(query: str, chunks: list[dict], top_k: int = TOP_K) -> list[dict]:
 # ── Answer generation ──────────────────────────────────────────────────────────
 
 PROMPT_TEMPLATE = """\
-You are a technical documentation assistant for Saab aerospace connector and cable products.
+You are a technical documentation assistant for Company B aerospace connector and cable products.
 Answer the question using ONLY the information in the provided context.
 If the answer is not in the context, say "Not found in documentation."
 Be precise and include exact values with units.

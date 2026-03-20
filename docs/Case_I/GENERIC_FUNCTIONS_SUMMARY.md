@@ -250,7 +250,7 @@ All 15 functions are registered in `FUNCTION_MAP` (lines 3441-3475):
 
 ```python
 FUNCTION_MAP = {
-    # Original SAAB functions (12)
+    # Original Company B functions (12)
     "Table Search": func_table_search,
     "Display Images": func_display_images,
     "Table Search On Document": func_table_search_on_document,
@@ -365,7 +365,7 @@ All 15 functions have been added to `templates.py` with:
 - ✅ All functions registered in FUNCTION_MAP
 - ✅ All 15 templates added to templates.py (params + outputs)
 - ✅ 6 LLM prompts added to prompts.yaml
-- ✅ SAAB-specific patterns removed from helper functions
+- ✅ Company B-specific patterns removed from helper functions
 - ✅ Syntax validated (no errors)
 
 ### Implementation Needed:
@@ -380,8 +380,8 @@ All 15 functions have been added to `templates.py` with:
 
 - **Total lines:** 3,492 (up from 2,869 backup)
 - **Net addition:** +622 lines (15 new functions)
-- **SAAB helpers removed:** ~590 lines
-- **Total functions:** 27 (12 SAAB + 15 generic)
+- **Company B helpers removed:** ~590 lines
+- **Total functions:** 27 (12 Company B + 15 generic)
 - **Functions with LLM:** 1 (func_analyze_with_llm)
 - **Pure logic functions:** 26
 

@@ -1,4 +1,4 @@
-# SQL Retrieval Baseline (B2) — Case II (Saab)
+# SQL Retrieval Baseline (B2) — Case II (Company B)
 
 This baseline implements structured SQL retrieval over the `extracted_tables` in `harvested.db`, without agentic reasoning or vector search.
 
@@ -12,7 +12,7 @@ This baseline implements structured SQL retrieval over the `extracted_tables` in
 
 Run via the unified runner:
 ```bash
-python Experiments/Case_II/run_evaluation_saab.py --baseline b2
+python Experiments/Case_II/run_evaluation_company_b.py --baseline b2
 ```
 
 Results are saved to `Experiments/Case_II/results/`.

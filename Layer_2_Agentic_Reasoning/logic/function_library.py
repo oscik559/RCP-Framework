@@ -2162,7 +2162,7 @@ def func_normalize_product_number(params: dict) -> tuple[bool, dict | str]:
     """
     Normalize product code by removing extra spaces and standardizing format (GENERIC).
     
-    No longer truncates to specific length - that was SAAB-specific.
+    No longer truncates to specific length - that was Company B-specific.
     Just cleans and standardizes the format.
     """
     import re
@@ -2281,7 +2281,7 @@ def func_suggest_keywords(params: dict) -> tuple[bool, dict]:
 
 def func_generate_visual_layout(params: dict) -> tuple[bool, dict]:
     """
-    Generate visual layout (SIMPLIFIED - SAAB-specific features removed).
+    Generate visual layout (SIMPLIFIED - Company B-specific features removed).
     
     Simplified version that returns a basic layout description.
     For full visual layout generation with image search, use the image search functions.

@@ -1,12 +1,12 @@
 """
-Unified evaluation runner for Saab Case II (B1 / B2 / B3).
+Unified evaluation runner for Company B Case II (B1 / B2 / B3).
 
 Usage:
-    python Experiments/Case_II/run_evaluation_saab.py --baseline all
-    python Experiments/Case_II/run_evaluation_saab.py --baseline b1
-    python Experiments/Case_II/run_evaluation_saab.py --baseline b2
-    python Experiments/Case_II/run_evaluation_saab.py --baseline b3
-    python Experiments/Case_II/run_evaluation_saab.py --baseline b3 --limit 5
+    python Experiments/Case_II/run_evaluation_company_b.py --baseline all
+    python Experiments/Case_II/run_evaluation_company_b.py --baseline b1
+    python Experiments/Case_II/run_evaluation_company_b.py --baseline b2
+    python Experiments/Case_II/run_evaluation_company_b.py --baseline b3
+    python Experiments/Case_II/run_evaluation_company_b.py --baseline b3 --limit 5
 """
 
 import argparse
@@ -24,15 +24,15 @@ if hasattr(sys.stderr, "reconfigure"):
 HERE = Path(__file__).parent
 RESULTS_DIR = HERE / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
-QUESTIONS_FILE = HERE / "test_questions_saab.json"
+QUESTIONS_FILE = HERE / "test_questions_company_b.json"
 
 # ── Import baselines ──────────────────────────────────────────────────────────
 sys.path.insert(0, str(HERE.parent.parent))  # project root
-sys.path.insert(0, str(HERE))  # for local imports (deterministic_judge_saab)
+sys.path.insert(0, str(HERE))  # for local imports (deterministic_judge_company_b)
 sys.path.insert(0, str(HERE / "Baseline_RAG"))
 sys.path.insert(0, str(HERE / "Baseline_SQL_Retrieval"))
 sys.path.insert(0, str(HERE / "RCP_Framework"))
-from deterministic_judge_saab import judge
+from deterministic_judge_company_b import judge
 
 
 # ── Load questions ─────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ def load_questions(limit: int | None = None) -> list[dict]:
 # ── Per-baseline runners ───────────────────────────────────────────────────────
 
 def run_b1(questions: list[dict]) -> list[dict]:
-    from rag_baseline_saab import run_b1 as _run_b1
+    from rag_baseline_company_b import run_b1 as _run_b1
 
     results = []
     total = len(questions)
@@ -74,7 +74,7 @@ def run_b1(questions: list[dict]) -> list[dict]:
 
 
 def run_b2(questions: list[dict]) -> list[dict]:
-    from sql_retrieval_saab import run_b2 as _run_b2
+    from sql_retrieval_company_b import run_b2 as _run_b2
 
     results = []
     total = len(questions)
@@ -102,7 +102,7 @@ def run_b2(questions: list[dict]) -> list[dict]:
 
 
 def run_b3(questions: list[dict]) -> list[dict]:
-    from rcp_baseline_saab import run_b3 as _run_b3
+    from rcp_baseline_company_b import run_b3 as _run_b3
 
     results = []
     total = len(questions)
@@ -168,7 +168,7 @@ def print_summary(results: list[dict], label: str) -> None:
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Saab Case II evaluation runner")
+    parser = argparse.ArgumentParser(description="Company B Case II evaluation runner")
     parser.add_argument(
         "--baseline",
         choices=["b1", "b2", "b3", "all"],

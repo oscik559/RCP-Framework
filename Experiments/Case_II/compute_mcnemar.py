@@ -1,5 +1,5 @@
 """
-Compute McNemar's test statistics and Wilson CIs for Case II (Saab).
+Compute McNemar's test statistics and Wilson CIs for Case II (Company B).
 
 Usage: python Experiments/Case_II/compute_mcnemar.py
 """
@@ -74,7 +74,7 @@ n10_13_ii = sum(1 for a, b in pairs_13_ii if a == 1 and b == 0)
 chi_13_ii, p_13_ii = mcnemar_chi2(n01_13_ii, n10_13_ii)
 
 print("=" * 60)
-print("CASE II (Saab)")
+print("CASE II (Company B)")
 print("=" * 60)
 print(f"B1 AC: {sum(r['answer_correct'] for r in b1_ii)/n_b1_ii*100:.1f}%  "
       f"HR: {sum(r['hallucination'] for r in b1_ii)/n_b1_ii*100:.1f}%  (n={n_b1_ii})")

@@ -1,5 +1,5 @@
 """
-Deterministic judge for Saab Case II evaluation.
+Deterministic judge for Company B Case II evaluation.
 Mirrors the logic in Experiments/Case_I/deterministic_judge.py adapted for
 connector and cable specifications (mm, Ohm/km, deg C, V, A, #contacts).
 """

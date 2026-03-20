@@ -86,11 +86,11 @@
     Mehdi Tarkian\textsuperscript{a},
     Sanjay Nambiar\textsuperscript{a},
     Marie Jonsson\textsuperscript{a},
-    Christoffer Brax\textsuperscript{b}\thanks{Correspondence for the SAAB AB team may be directed to Anton Strömqvist. Email: anton.stromqvist2@saabgroup.com}
+    Christoffer Brax\textsuperscript{b}\thanks{Correspondence for the Company B team may be directed to Anton Strömqvist. Email: [contact details withheld]}
     }
     \affil{\textsuperscript{a}Department of Management and Engineering,
     Linköping University, Linköping, Sweden;
-    \textsuperscript{b}SAAB AB, Linköping, Sweden}
+    \textsuperscript{b}Company B}
 }
 %=================================================================
 % \tableofcontents
@@ -363,7 +363,7 @@ The Strategy Library contains reusable plan templates that standardise patterns 
     \item \text{Sufficiency conditions:} Formal predicates that must hold before a strategy is considered complete (e.g., at least two corroborating sources; explicit revision supersession confirmed).
     \item \text{Fallback policies:} Adaptive behaviours when sufficiency is not met (e.g., expand search scope, trigger hierarchical retrieval).
 \end{itemize}
-For example, a \emph{Specification Lookup} strategy declares: target = product attribute with unit; plan = [extract product code $\rightarrow$ retrieve record $\rightarrow$ extract attribute $\rightarrow$ validate]; sufficiency = attribute resolved and unit normalised. Concrete instantiations for each case study are presented in Sections~\ref{subsec:hydroscand_case} and~\ref{subsec:saab_case}.
+For example, a \emph{Specification Lookup} strategy declares: target = product attribute with unit; plan = [extract product code $\rightarrow$ retrieve record $\rightarrow$ extract attribute $\rightarrow$ validate]; sufficiency = attribute resolved and unit normalised. Concrete instantiations for each case study are presented in Sections~\ref{subsec:hydroscand_case} and~\ref{subsec:caseII_case}.
 
 %==============================================================================
 \subsection{Function Library}
@@ -452,7 +452,8 @@ Function execution cost is dominated by external operations: SQL retrieval runs 
 \section{Domain Applications}
 \label{sec:domain_applications}
 %===============================================================
-Two industrial instantiations of the framework are presented below. Case~I (Hydroscand~AB) addresses catalogue-style extraction from dense, multilingual product tables; Case~II (SAAB~AB) targets query-driven reasoning over revision-controlled aerospace documentation. Quantitative evaluation follows in Section~\ref{sec:evaluation}.
+Two industrial applications of the framework are presented below. Case~I (Hydroscand~AB) addresses catalogue-style extraction from dense, multilingual product tables; Case~II (Company B) targets query-driven reasoning over revision-controlled aerospace documentation. Quantitative evaluation follows in Section~\ref{sec:evaluation}. For confidentiality reasons, the Case II industrial collaborator has been anonymised and is referred to as Company B throughout this paper.
+
 
 % CASE I
 %===============================================================
@@ -743,16 +744,16 @@ Each function invocation results in multiple parameter and output records, mater
 
 % CASE II
 %===============================================================================
-\subsection{Case II: Revision-Controlled Aerospace Documentation (SAAB AB)}
-\label{subsec:saab_case}
+\subsection{Case II: Revision-Controlled Aerospace Documentation (Company B)}
+\label{subsec:caseII_case}
 %===============================================================================
-The second case study addresses revision-controlled aerospace documentation in collaboration with SAAB~AB (Svenska Aeroplan Aktiebolaget). Unlike Case~I, where queries target a well-defined product catalogue, Case~II requires cross-document reasoning with applicability constraints, revision scope resolution, and multimodal evidence fusion. A single query may require coordinated retrieval from textual, tabular, and graphical elements across several documents.
+The second case study addresses revision-controlled aerospace documentation in collaboration with Company B. Unlike Case~I, where queries target a well-defined product catalogue, Case~II requires cross-document reasoning with applicability constraints, revision scope resolution, and multimodal evidence fusion. A single query may require coordinated retrieval from textual, tabular, and graphical elements across several documents.
 
 In compliance with confidentiality requirements, proprietary identifiers, document titles, part numbers, and content values have been anonymised or abstracted. The execution traces, schemas, and control logic presented here nevertheless reflect real runtime artefacts persisted within the RCP.
 
 %================================================================
 \subsubsection{Document Pre-processing and Extraction (Case II)}
-\label{subsubsec:saab_document_harvesting}
+\label{subsubsec:caseII_document_harvesting}
 %================================================================
 The extraction pipeline produces a document-centric knowledge database that preserves applicability metadata and structural context. The ingested corpus comprises 54 source documents yielding 451 technical tables, 576 annotated images, and 3{,}488 text segments. The domain encompasses six product series of component variants spanning electronic connectors, cable assemblies, and filter components, with product codes following multiple format conventions requiring dedicated normalisation (e.g., space/dash insertion, prefix handling). During ingestion, each document is represented as linked relational units capturing: (i)~document identity and revision markers, (ii)~section hierarchy, and (iii)~modality-specific artefacts (text passages, table fragments, and figure-referenced elements).
 
@@ -797,13 +798,13 @@ Extracted records retain provenance anchors (section labels, table captions, pag
 
 %================================================================
 \subsubsection{Agentic Reasoning (Case II)}
-\label{subsubsec:saab_agentic_reasoning}
+\label{subsubsec:caseII_agentic_reasoning}
 %================================================================
 Case~II reuses the same six-stage control loop without architectural modification, instantiated through a richer strategy and function set tailored to document-centric reasoning. Compared to Case~I, strategies here involve deeper plan structures (up to six sequential steps), parallel execution blocks, and multimodal artefacts including figure-referenced layout generation.
 
 %================================================================
 \noindent \textbf{Strategy templates:}
-Table~\ref{tab:saab_strategy_templates} presents strategy templates for this domain. Each template follows the structure defined in Section~\ref{subsec:strategy_library}: targets, eligible functions, sufficiency conditions, and fallback policies.
+Table~\ref{tab:caseII_strategy_templates} presents strategy templates for this domain. Each template follows the structure defined in Section~\ref{subsec:strategy_library}: targets, eligible functions, sufficiency conditions, and fallback policies.
 
 %==========================================================
 % TABLE: Strategy templates instantiated for case II domain.
@@ -811,7 +812,7 @@ Table~\ref{tab:saab_strategy_templates} presents strategy templates for this dom
 \begin{table*}[!htbp]
 \captionsetup{width=0.92\linewidth, skip=2pt}
     \caption{Strategy templates instantiated for Case II domain.}
-    \label{tab:saab_strategy_templates}
+    \label{tab:caseII_strategy_templates}
     \centering
     \small
     \setlength{\tabcolsep}{6pt}
@@ -868,15 +869,15 @@ Table~\ref{tab:saab_strategy_templates} presents strategy templates for this dom
 %================================================================
 
 \noindent \textbf{Function library:}
-Table~\ref{tab:saab_function_library} lists some sample functions used in this domain.
+Table~\ref{tab:caseII_function_library} lists some sample functions used in this domain.
 
 % ==========================================================
-% TABLE: Functions used in the SAAB documentation case.
+% TABLE: Functions used in the Case II.
 % ==========================================================
 \begin{table*}[!htbp]
 \captionsetup{width=0.92\linewidth, skip=2pt}
     \caption{Functions used in the Case II.}
-    \label{tab:saab_function_library}
+    \label{tab:caseII_function_library}
     \centering
     \small
     \setlength{\tabcolsep}{5pt}
@@ -937,13 +938,13 @@ The controller selects the \emph{Simple Lookup} strategy based on the presence o
 \begin{table}[!htbp]
     \captionsetup{width=0.95\linewidth, skip=5pt}
     \caption{Goal and strategy instances (Case II).}
-    \label{tab:saab_goal_strategy}
+    \label{tab:caseII_goal_strategy}
     \centering
     \small
     \setlength{\tabcolsep}{2pt}
     \renewcommand{\arraystretch}{1.0}
     \subcaptionsetup{skip=0.5pt}
-    \subcaptionbox{Goal instance.\label{tab:saab_goal_instance}}[0.49\linewidth]{
+    \subcaptionbox{Goal instance.\label{tab:caseII_goal_instance}}[0.49\linewidth]{
         \begin{tabular}{@{}p{0.32\linewidth}@{\hspace{2pt}}p{0.64\linewidth}@{}}
             \toprule
             \textbf{Field} & \textbf{Value} \\
@@ -958,7 +959,7 @@ The controller selects the \emph{Simple Lookup} strategy based on the presence o
         \end{tabular}
         }
         \hfill
-        \subcaptionbox{Strategy instance.\label{tab:saab_strategy_instance}}[0.49\linewidth]{
+        \subcaptionbox{Strategy instance.\label{tab:caseII_strategy_instance}}[0.49\linewidth]{
         \begin{tabular}{@{}p{0.32\linewidth}@{\hspace{2pt}}p{0.64\linewidth}@{}}
             \toprule
             \textbf{Field} & \textbf{Value} \\
@@ -980,7 +981,7 @@ Execution proceeds through the ordered function plan. After each invocation, \te
 
 %==========================================================
 \noindent \textbf{Function parameter/output schemas:}
-Sample execution traces with parameter and output schemas are provided in Appendix~\ref{app:detailed_traces_case2}. Tables~\ref{tab:saab_output_excerpt} and~\ref{tab:saab_parameter_excerpt} present abridged excerpts showing how function invocations are recorded in \texttt{FunctionOutputInSession} and \texttt{FunctionParametersInSession}.
+Sample execution traces with parameter and output schemas are provided in Appendix~\ref{app:detailed_traces_case2}. Tables~\ref{tab:caseII_output_excerpt} and~\ref{tab:caseII_parameter_excerpt} present abridged excerpts showing how function invocations are recorded in \texttt{FunctionOutputInSession} and \texttt{FunctionParametersInSession}.
 
 
 
@@ -1193,11 +1194,11 @@ In Case~I, B1 latency (12.24\,s) is comparable to B3 (13.65\,s) because B1's emb
 \subsection{Error Analysis}
 \label{subsec:error_analysis}
 %============================================
-Appendix Tables~\ref{tab:qs_hydroscand} and~\ref{tab:qs_saab} list sample queries from the annotated sets used in Section~\ref{sec:evaluation}. The test queries, representative of practical use scenarios, were authored by domain engineers at the respective companies who had no involvement in framework development, mitigating data leakage between query authoring and system design.
+Appendix Tables~\ref{tab:qs_hydroscand} and~\ref{tab:qs_caseII} list sample queries from the annotated sets used in Section~\ref{sec:evaluation}. The test queries, representative of practical use scenarios, were authored by domain engineers at the respective companies who had no involvement in framework development, mitigating data leakage between query authoring and system design.
 
 Each query is assigned a difficulty tier reflecting the number of reasoning steps and source documents required for a correct answer (\emph{Easy}: single table lookup; \emph{Medium}: cross-field inference or semantic matching; \emph{Hard}: multi-document reasoning or domain-specific disambiguation). Tier distributions are reported in the appendix tables; a stratified performance breakdown by tier is reserved for future work.
 
-The \emph{Ground truth} column records the correct answer as determined by the domain expert with reference to the source documents. For Case~I, ground-truth answers were verified against the Hydroscand Produktbok PDF (hydraulic hose and press coupling chapters), whereas ground-truth answers for Case~II were verified against the applicable revision of the SAAB AB technical source document.
+The \emph{Ground truth} column records the correct answer as determined by the domain expert with reference to the source documents. For Case~I, ground-truth answers were verified against the Hydroscand Produktbok PDF (hydraulic hose and press coupling chapters), whereas ground-truth answers for Case~II were verified against the applicable revision of the Company B technical source document.
 
 The \emph{Error class} column identifies the primary failure mode of the baselines on each query, drawn from the following taxonomy:
 \begin{enumerate}[label=\roman*.]
@@ -1306,10 +1307,9 @@ No potential conflict of interest was reported by the author(s).
 
 \section*{Data Availability Statement}
  The code for the RCP-Framework is openly available on GitHub at \url{https://github.com/oscik559/RCP-Framework}.
-The data supporting Case~I (Hydroscand hydraulic catalogue) available in the same repo. However, the data supporting Case~II are subject to third-party restrictions and were used under confidentiality agreement with SAAB AB; they are not 
-publicly available. Requests may be directed to the SAAB AB correspondent listed in the author notes.
+The data supporting Case~I (Hydroscand hydraulic catalogue) available in the same repo. However, the data supporting Case~II are subject to third-party restrictions and were used under confidentiality agreement with Company B; they are not publicly available. Requests may be directed to the Company B correspondent listed in the author notes.
 
-% The implementation code supporting both case studies is available on GitHub at \url{https://github.com/oscik559/RCP-Framework}. This includes the full extraction pipeline, the RCP agentic framework, evaluation baselines (B1--B3), annotated query sets, and result files for Case~I and Case~II. The product database for Case~I (Hydroscand hydraulic catalogue) is included in the repository. The raw source data supporting Case~II are subject to third-party restrictions and were used under a confidentiality agreement with SAAB AB; they are not publicly available. Requests may be directed to the SAAB AB correspondent listed in the author notes.
+% The implementation code supporting both case studies is available on GitHub at \url{https://github.com/oscik559/RCP-Framework}. This includes the full extraction pipeline, the RCP agentic framework, evaluation baselines (B1--B3), annotated query sets, and result files for Case~I and Case~II. The product database for Case~I (Hydroscand hydraulic catalogue) is included in the repository. The raw source data supporting Case~II are subject to third-party restrictions and were used under a confidentiality agreement with Company B; they are not publicly available. Requests may be directed to the Company B correspondent listed in the author notes.
 %==============================================================================
 % References
 %==============================================================================

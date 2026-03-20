@@ -1,28 +1,28 @@
-# Experiments — Case II: Saab Aerospace Documentation
+# Experiments — Case II: Company B Aerospace Documentation
 
-This folder contains the baseline experiments for **Case II (Saab AB)** reported in the paper ($n = 100$ queries). All three baselines operate over the same extracted document corpus (`harvested.db`, 451 tables from 54 revision-controlled aerospace PDFs) using local models only (Ollama).
+This folder contains the baseline experiments for **Case II (Company B)** reported in the paper ($n = 100$ queries). All three baselines operate over the same extracted document corpus (`harvested.db`, 451 tables from 54 revision-controlled aerospace PDFs) using local models only (Ollama).
 
 ## Structure
 
 ```
 Experiments/Case_II/
-├── run_evaluation_saab.py          # Unified runner: B1, B2, B3 (main entry point)
-├── deterministic_judge_saab.py     # Scoring logic (correctness, hallucination, etc.)
+├── run_evaluation_company_b.py          # Unified runner: B1, B2, B3 (main entry point)
+├── deterministic_judge_company_b.py     # Scoring logic (correctness, hallucination, etc.)
 ├── summarize_results.py            # Prints summary tables from saved JSON results
 ├── extract_costs.py                # Token/latency cost extraction helper
 ├── compute_mcnemar.py              # McNemar's test for statistical significance
-├── test_questions_saab.json        # 100 annotated evaluation questions
+├── test_questions_company_b.json        # 100 annotated evaluation questions
 │
 ├── Baseline_RAG/                   # B1: Naive RAG baseline
-│   ├── rag_baseline_saab.py        #   Pipeline implementation
+│   ├── rag_baseline_company_b.py        #   Pipeline implementation
 │   └── results/
 │
 ├── Baseline_SQL_Retrieval/         # B2: SQL-backed retrieval baseline
-│   ├── sql_retrieval_saab.py       #   Pipeline implementation
+│   ├── sql_retrieval_company_b.py       #   Pipeline implementation
 │   └── results/
 │
 ├── RCP_Framework/                  # B3: RCP framework
-│   ├── rcp_baseline_saab.py        #   Pipeline implementation
+│   ├── rcp_baseline_company_b.py        #   Pipeline implementation
 │   └── results/
 │
 └── results/                        # Consolidated evaluation outputs (JSON per run)
@@ -35,22 +35,22 @@ Experiments/Case_II/
 
 ```bash
 # Run all three baselines (100 questions)
-python Experiments/Case_II/run_evaluation_saab.py --baseline all
+python Experiments/Case_II/run_evaluation_company_b.py --baseline all
 
 # Run individual baselines
-python Experiments/Case_II/run_evaluation_saab.py --baseline b1   # Naive RAG
-python Experiments/Case_II/run_evaluation_saab.py --baseline b2   # SQL Retrieval
-python Experiments/Case_II/run_evaluation_saab.py --baseline b3   # Full RCP
+python Experiments/Case_II/run_evaluation_company_b.py --baseline b1   # Naive RAG
+python Experiments/Case_II/run_evaluation_company_b.py --baseline b2   # SQL Retrieval
+python Experiments/Case_II/run_evaluation_company_b.py --baseline b3   # Full RCP
 
 # Limit to first N questions (for quick testing)
-python Experiments/Case_II/run_evaluation_saab.py --baseline b3 --limit 5
+python Experiments/Case_II/run_evaluation_company_b.py --baseline b3 --limit 5
 ```
 
 > **Note:** B1 builds a 451-chunk embedding index on first run (~18 min with `qwen3-embedding:latest`). Subsequent questions in the same run use the cached index.
 
-## Test Questions (`test_questions_saab.json`)
+## Test Questions (`test_questions_company_b.json`)
 
-100 human-annotated queries covering connector and cable products from the Saab document corpus (connector families: RPT, RNT, TFR, C0-series). Each question includes a `"strategy"` field used by B3 to bypass LLM strategy selection, improving reproducibility.
+100 human-annotated queries covering connector and cable products from the Company B document corpus (connector families: RPT, RNT, TFR, C0-series). Each question includes a `"strategy"` field used by B3 to bypass LLM strategy selection, improving reproducibility.
 
 ## Evaluation Results (Final — $n = 100$ queries)
 
@@ -70,7 +70,7 @@ B2→B3 correctness improvement: +5 pp ($p = 0.359$, not significant).
 
 | Resource | Path |
 |----------|------|
-| Document corpus | `database/saab_harvested.db` (451 tables, 54 PDFs) — set `SAAB_DB_PATH` env var to override |
+| Document corpus | `database/company_b_harvested.db` (451 tables, 54 PDFs) — set `COMPANY_B_DB_PATH` env var to override |
 | Orchestration DB | `database/agentic.db` |
 | LLM | `llama3.2:latest` (8B) via Ollama, temperature 0.0 |
 | Embeddings | `qwen3-embedding:latest` via Ollama |

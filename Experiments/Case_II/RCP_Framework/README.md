@@ -1,6 +1,6 @@
-# RCP Framework Baseline (B3) — Case II (Saab)
+# RCP Framework Baseline (B3) — Case II (Company B)
 
-This is the proposed system: the **RCP (Relational Control Plane)** reasoning engine adapted for Case II (Saab aerospace connector/cable catalog).
+This is the proposed system: the **RCP (Relational Control Plane)** reasoning engine adapted for Case II (Company B aerospace connector/cable catalog).
 
 ## Pipeline Details
 
@@ -17,7 +17,7 @@ The RCP implements the same 6-stage verify-then-summarise control loop as Case I
 
 Run via the unified runner:
 ```bash
-python Experiments/Case_II/run_evaluation_saab.py --baseline b3
+python Experiments/Case_II/run_evaluation_company_b.py --baseline b3
 ```
 
 Results are saved to `Experiments/Case_II/results/`.

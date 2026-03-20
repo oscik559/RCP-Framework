@@ -1,8 +1,8 @@
-# Layer 1 Extraction — Case II (Saab)
+# Layer 1 Extraction — Case II (Company B)
 
 ## Overview
 
-This folder corresponds to the Layer 1 extraction pipeline for **Case II**, which operates over a corpus of aerospace connector and cable specification documents provided by **Saab AB**.
+This folder corresponds to the Layer 1 extraction pipeline for **Case II**, which operates over a corpus of aerospace connector and cable specification documents provided by **Company B**.
 
 The extraction pipeline follows the same architecture as Case I (`Layer_1_Extraction/Case_I/`):
 
@@ -20,13 +20,13 @@ Hierarchical SQLite Database (harvested.db)
 
 > **The source PDFs, extracted databases, and intermediate data for Case II are not included in this repository.**
 >
-> The Saab document corpus contains proprietary aerospace connector and cable specifications and is subject to a non-disclosure agreement. Access to the raw data must be arranged directly with Saab AB.
+> The Company B document corpus contains proprietary aerospace connector and cable specifications and is subject to a non-disclosure agreement. Access to the raw data must be arranged directly with Company B.
 
 The evaluation questions and aggregated results that do not expose proprietary content are available in [`Experiments/Case_II/`](../../Experiments/Case_II/).
 
 ## Extraction Pipeline
 
-The same scripts used in Case I apply here. To run extraction on the Saab corpus (requires access to the source PDFs and appropriate permissions):
+The same scripts used in Case I apply here. To run extraction on the Company B corpus (requires access to the source PDFs and appropriate permissions):
 
 ```bash
 # Initialize the database
@@ -47,10 +47,10 @@ Requires Ollama running locally with a vision model (e.g., `qwen2-vl`).
 | Attribute | Value |
 |-----------|-------|
 | Domain | Aerospace connectors and cables |
-| Source | Saab AB internal specification documents |
+| Source | Company B internal specification documents |
 | Corpus size | 54 PDFs, 451 extracted tables |
 | Database | `harvested.db` (not included — confidential) |
-| Evaluation set | 100 annotated queries (`Experiments/Case_II/test_questions_saab.json`) |
+| Evaluation set | 100 annotated queries (`Experiments/Case_II/test_questions_company_b.json`) |
 | LLM | `llama3.2:latest` via Ollama (temperature 0.0) |
 | Embeddings | `qwen3-embedding:latest` via Ollama |
 

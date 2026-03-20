@@ -1,5 +1,5 @@
 """
-B2: SQL-backed Retrieval baseline for Saab Case II evaluation.
+B2: SQL-backed Retrieval baseline for Company B Case II evaluation.
 
 1. Extracts product code / keyword from query using regex + LLM.
 2. Queries extracted_tables via SQL LIKE on tablecontent.
@@ -21,8 +21,8 @@ from pathlib import Path
 
 import requests
 
-# Set SAAB_DB_PATH environment variable to override the default location.
-SAAB_DB = Path(os.environ.get("SAAB_DB_PATH", "database/saab_harvested.db"))
+# Set COMPANY_B_DB_PATH environment variable to override the default location.
+COMPANY_B_DB = Path(os.environ.get("COMPANY_B_DB_PATH", "database/company_b_harvested.db"))
 OLLAMA_URL = "http://localhost:11434"
 LLM_MODEL = "llama3.2:latest"
 
@@ -46,7 +46,7 @@ def generate(prompt: str, temperature: float = 0.0) -> str:
 
 # ── Keyword extraction ─────────────────────────────────────────────────────────
 
-# Patterns for Saab product codes
+# Patterns for Company B product codes
 PRODUCT_CODE_RE = re.compile(
     r"""
     (?:
@@ -88,7 +88,7 @@ def extract_keywords(query: str) -> list[str]:
 
 def sql_search(keywords: list[str], max_rows: int = 10) -> list[dict]:
     """Return matching rows from extracted_tables for any of the given keywords."""
-    con = sqlite3.connect(SAAB_DB)
+    con = sqlite3.connect(COMPANY_B_DB)
     cur = con.cursor()
     results = []
     seen = set()
@@ -141,7 +141,7 @@ def format_results(results: list[dict]) -> str:
 # ── Answer generation ──────────────────────────────────────────────────────────
 
 ANSWER_PROMPT = """\
-You are a technical documentation assistant for Saab aerospace connector and cable products.
+You are a technical documentation assistant for Company B aerospace connector and cable products.
 Answer the question using ONLY the information in the provided database records.
 Look carefully at each table row to find the specific value for the requested product or shell size.
 Include the exact numeric value with units. Do NOT say "Not found" if you can see the value in the records.

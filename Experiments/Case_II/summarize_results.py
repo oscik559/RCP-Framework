@@ -29,7 +29,7 @@ def summarize(name, file_path):
 
 
 print("=" * 50)
-print("CASE II — Saab")
+print("CASE II — Company B")
 print("=" * 50)
 summarize("B1: Naive RAG", results_dir / "b1_rag_latest.json")
 summarize("B2: SQL Retrieval", results_dir / "b2_sql_latest.json")

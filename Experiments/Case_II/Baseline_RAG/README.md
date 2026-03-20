@@ -1,6 +1,6 @@
-# RAG Baseline (B1) — Case II (Saab)
+# RAG Baseline (B1) — Case II (Company B)
 
-This baseline implements a standard Retrieval-Augmented Generation (RAG) pipeline over the Saab document corpus (451 tables from 54 PDFs extracted into `harvested.db`).
+This baseline implements a standard Retrieval-Augmented Generation (RAG) pipeline over the Company B document corpus (451 tables from 54 PDFs extracted into `harvested.db`).
 
 ## Pipeline Details
 
@@ -15,7 +15,7 @@ This baseline implements a standard Retrieval-Augmented Generation (RAG) pipelin
 
 Run via the unified runner:
 ```bash
-python Experiments/Case_II/run_evaluation_saab.py --baseline b1
+python Experiments/Case_II/run_evaluation_company_b.py --baseline b1
 ```
 
 Results are saved to `Experiments/Case_II/results/`.

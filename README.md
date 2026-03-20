@@ -7,7 +7,7 @@ Supplementary code for the paper:
 > Division of Product Realization, IEI, Linköping University
 > Funded by Vinnova DART project (grant 2024-01420)
 
-This repository contains the implementation of the **RCP (Relational Control Plane) framework**, a SQL-backed agentic architecture that persists orchestration state as queryable relational records and enforces a six-stage verify-then-summarise control loop. Synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog, n=100 queries) and **Case II** (Saab aerospace connector/cable catalog, n=100 queries).
+This repository contains the implementation of the **RCP (Relational Control Plane) framework**, a SQL-backed agentic architecture that persists orchestration state as queryable relational records and enforces a six-stage verify-then-summarise control loop. Synthesis is permitted only after retrieved evidence satisfies validation constraints, transforming potential hallucinations into explicit, auditable failures. Two case studies are included: **Case I** (Hydroscand hydraulic product catalog, n=100 queries) and **Case II** (Company B aerospace connector/cable catalog, n=100 queries).
 
 ---
 
@@ -44,8 +44,8 @@ This repository contains the implementation of the **RCP (Relational Control Pla
 │   │   ├── RCP_Framework/        # B3: RCP framework evaluation
 │   │   ├── compute_mcnemar.py    # McNemar's test for statistical significance
 │   │   └── test_questions.json             # Annotated query set (100 questions)
-│   ├── Case_II/                  # Case II evaluation (Saab, n=100 queries)
-│   │   └── test_questions_saab.json  # Annotated query set (100 questions)
+│   ├── Case_II/                  # Case II evaluation (Company B, n=100 queries)
+│   │   └── test_questions_company_b.json  # Annotated query set (100 questions)
 │   └── questions/                # Shared test question sets
 ├── database/                     # SQLite databases and schema
 │   ├── harvested.db              # Product database (Case I)
@@ -133,7 +133,7 @@ python run_evaluation.py
 
 # Run Case II evaluation
 cd Experiments/Case_II
-python run_evaluation_saab.py
+python run_evaluation_company_b.py
 
 # Statistical significance (McNemar's test)
 python Experiments/Case_I/compute_mcnemar.py
