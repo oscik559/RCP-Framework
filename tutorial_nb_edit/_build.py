@@ -603,15 +603,10 @@ L2_CELLS: list[dict] = [
             except Exception:
                 pass
 
-        print("python    :", sys.version.split()[0])
-        print(f"{DB_HARVESTED:25s}",
-              f"{Path(DB_HARVESTED).stat().st_size // 1024} KB" if Path(DB_HARVESTED).exists() else "MISSING")
-        print(f"{DB_AGENTIC:25s}",
-              "(will be created in §3)" if not Path(DB_AGENTIC).exists() else
-              f"{Path(DB_AGENTIC).stat().st_size // 1024} KB (existing — will be reset in §3)")
         IS_COLAB = "google.colab" in sys.modules or "COLAB_RELEASE_TAG" in os.environ
-        print(f"environment              : {'Google Colab' if IS_COLAB else 'local'}")
 
+        print("python                   :", sys.version.split()[0])
+        print(f"environment              : {'Google Colab' if IS_COLAB else 'local'}")
         print(f"{DB_HARVESTED:25s}",
               f"{Path(DB_HARVESTED).stat().st_size // 1024} KB" if Path(DB_HARVESTED).exists() else "MISSING")
         print(f"{DB_AGENTIC:25s}",
@@ -638,73 +633,155 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ## §1.5 Bring up Ollama (Colab + first-time-local helper)
+        ## §1.5 Bring up Ollama  *(Colab + first-time-local helper)*
 
         The reasoning workflow needs an Ollama server reachable on
         `http://localhost:11434` with two models pulled:
 
-        - `llama3.2:latest` — chat / reasoning
-        - `nomic-embed-text` — embeddings for the vector index in §6
+        - **`llama3.2:latest`** — chat / reasoning
+        - **`nomic-embed-text`** — embeddings for the vector index in §6
 
-        **Local machine, already running Ollama:** skip this section, the
-        probe above already confirmed reachability.
+        Three small cells follow — `install`, `start`, `pull`. Each prints
+        what it's doing so you can see exactly where it fails on first run.
 
-        **Local machine, no Ollama yet:** install it from
-        [ollama.com/download](https://ollama.com/download), run
-        `ollama serve` in a terminal, then run the cell below — it will
-        just pull missing models if any.
+        | Environment | What to do |
+        |-------------|------------|
+        | **Local, Ollama already running** | The §1 probe will say `reachable` — skip §1.5 entirely. |
+        | **Local, no Ollama yet** *(macOS / Windows)* | Install from [ollama.com/download](https://ollama.com/download) and start it manually (`ollama serve` in a terminal); the §1.5b "start" cell will detect it's already up and the §1.5c "pull" cell will fetch the two models. |
+        | **Local, no Ollama yet** *(Linux)* | Run all three cells. |
+        | **Google Colab** | Run all three cells. **Switch the runtime to a T4 GPU** first (Runtime → Change runtime type) — CPU inference for an LLM is painfully slow. The first model pull is ~2 GB. |
 
-        **Google Colab:** run the cell below as-is. It downloads and starts
-        Ollama, then pulls the two models. **Allow ~5 minutes the first
-        time** — model downloads are several GB. Switch the runtime to a
-        T4 GPU (Runtime → Change runtime type) for noticeably faster
-        inference.
+        ### Known Colab gotchas the cells handle
+
+        - **`systemctl` failure during install.** The official Ollama installer
+          tries to register a systemd service. Colab has no systemd, so this
+          step fails and the script exits non-zero — but the binary
+          `/usr/local/bin/ollama` is installed correctly and that's all we
+          need. The cell ignores the script's exit code and verifies the
+          binary exists separately.
+        - **`ollama serve` background process.** We start it via `Popen` and
+          poll `/api/tags` until it responds. If it dies, we surface its
+          stderr instead of just hanging.
+        - **Pulls can be slow.** Output streams live; if you don't see
+          progress for ~60s, your runtime may be paused — re-engage it.
+    """),
+    md("""
+        ### §1.5a — Install the binary
     """),
     py("""
-        # ── Install Ollama if missing ───────────────────────────────────
-        # Skip if a server is already responding.
-        if not ollama_status()[0]:
-            if IS_COLAB or sys.platform.startswith("linux"):
-                print("Installing Ollama (one-time, ~5 min on first run)...")
-                # Official install script — Linux + WSL only.
-                os.system("curl -fsSL https://ollama.com/install.sh | sh")
+        import shutil
+        import subprocess
 
-                print("Starting `ollama serve` in the background...")
-                import subprocess
-                subprocess.Popen(
-                    ["ollama", "serve"],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                )
-                # Wait until the server responds.
-                for _ in range(30):
-                    if ollama_status()[0]:
-                        break
-                    time.sleep(1)
+        OLLAMA_BIN = shutil.which("ollama")
+        if OLLAMA_BIN:
+            print(f"  ✅ ollama binary already present at {OLLAMA_BIN}")
+        elif IS_COLAB or sys.platform.startswith("linux"):
+            print("Running official install script (this may take 1–3 min)...")
+            # We DO NOT raise on non-zero return: systemctl errors are expected on Colab
+            # and don't prevent the binary from being installed.
+            ret = subprocess.run(
+                "curl -fsSL https://ollama.com/install.sh | sh",
+                shell=True,
+            ).returncode
+            print(f"  install script exit code: {ret} (non-zero is OK on Colab — systemd unavailable)")
+
+            OLLAMA_BIN = shutil.which("ollama")
+            if not OLLAMA_BIN:
+                # Fallback: the script also drops the binary at /usr/local/bin/ollama
+                fallback = "/usr/local/bin/ollama"
+                if Path(fallback).exists():
+                    OLLAMA_BIN = fallback
+                    print(f"  ✅ found binary at {fallback} (not on PATH yet)")
                 else:
-                    raise RuntimeError("Ollama failed to come up. Check the install log above.")
-                print("Ollama is up.")
+                    raise RuntimeError(
+                        "Ollama install failed: no `ollama` binary found.\\n"
+                        "Try running this in a separate cell with !-magic to see full output:\\n"
+                        "    !curl -fsSL https://ollama.com/install.sh | sh"
+                    )
             else:
-                # Windows / macOS — install must be done manually.
-                raise RuntimeError(
-                    "Ollama is not reachable on http://localhost:11434.\\n"
-                    "Install from https://ollama.com/download and run `ollama serve`, "
-                    "then re-run §1 to confirm and continue here."
-                )
+                print(f"  ✅ ollama installed at {OLLAMA_BIN}")
+        else:
+            raise RuntimeError(
+                "macOS / Windows: install Ollama from https://ollama.com/download, "
+                "then start it (`ollama serve`) and re-run §1."
+            )
 
-        # ── Pull required models if not already present ────────────────
-        ok, tags = ollama_status()
+        # Verify the binary actually runs.
+        ver = subprocess.run([OLLAMA_BIN, "--version"], capture_output=True, text=True)
+        print("  version:", ver.stdout.strip() or ver.stderr.strip())
+    """),
+    md("""
+        ### §1.5b — Start `ollama serve` in the background
+
+        We keep a handle to the process (`ollama_proc`) so a later cell can
+        read its stderr if anything goes wrong, and so you can `.terminate()`
+        it manually if you want to restart cleanly.
+    """),
+    py("""
+        import subprocess
+
+        ollama_proc: Optional[subprocess.Popen] = None
+
+        if ollama_status()[0]:
+            print("  ✅ ollama already responding on", OLLAMA_URL)
+        else:
+            # Stream stderr to a log file we can tail if startup fails.
+            log_path = Path("db/ollama_serve.log")
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            log_fp = open(log_path, "wb")
+
+            print("Starting `ollama serve` …")
+            ollama_proc = subprocess.Popen(
+                [OLLAMA_BIN, "serve"],
+                stdout=log_fp,
+                stderr=subprocess.STDOUT,
+            )
+
+            # Poll for readiness up to 60s. Bail out early if the process dies.
+            ready = False
+            for i in range(60):
+                if ollama_proc.poll() is not None:
+                    log_fp.close()
+                    tail = log_path.read_text(errors="replace")[-2000:]
+                    raise RuntimeError(
+                        f"ollama serve exited with code {ollama_proc.returncode}.\\n"
+                        f"Tail of {log_path}:\\n{tail}"
+                    )
+                if ollama_status()[0]:
+                    ready = True
+                    print(f"  ✅ ollama up after {i + 1}s")
+                    break
+                time.sleep(1)
+
+            if not ready:
+                tail = log_path.read_text(errors="replace")[-2000:]
+                raise RuntimeError(
+                    f"Ollama did not respond within 60s. Tail of {log_path}:\\n{tail}"
+                )
+    """),
+    md("""
+        ### §1.5c — Pull the required models
+
+        First pulls download a few GB; subsequent runs are no-ops.
+    """),
+    py("""
+        import subprocess
+
         for need in (OLLAMA_MODEL, OLLAMA_EMBED_MODEL):
+            _, tags = ollama_status()
             if need in tags:
                 print(f"  ✅ {need} already pulled")
-            else:
-                print(f"  ⏳ pulling {need} ...")
-                # Stream so you can see progress in Colab.
-                os.system(f"ollama pull {need}")
+                continue
+            print(f"  ⏳ pulling {need} …  (first time: several minutes)")
+            # capture_output=False so download progress streams to the cell.
+            ret = subprocess.run([OLLAMA_BIN, "pull", need]).returncode
+            if ret != 0:
+                raise RuntimeError(f"`ollama pull {need}` failed with exit code {ret}.")
+            print(f"  ✅ {need} pulled")
 
         ok, tags = ollama_status()
-        print("\\nFinal Ollama status:", "ready" if ok else "FAILED")
-        for t in tags:
+        print("\\nFinal Ollama status:", "ready ✅" if ok else "FAILED ❌")
+        for t in sorted(tags):
             print(" •", t)
     """),
 
