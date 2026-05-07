@@ -2964,11 +2964,32 @@ L2_CELLS: list[dict] = [
                 "goal_validation",
                 query=query, goal_definition=goal_def, evidence=evidence,
             ))
-            payload = parse_json_response(judge_resp) or {"confidence": 0.0}
+
+            # ── Resilient confidence extraction ──────────────────────────
+            # Small models like llama3.2:3b often respond with prose around
+            # the JSON ("Based on the answer, the confidence is 0.85"). We
+            # try strict JSON first; if that fails, we regex out any
+            # "confidence: 0.X" pattern. If both fail we score 0.0 — but
+            # that's now an honest "couldn't parse" rather than a constant
+            # rejection that exhausts the recursion budget.
+            payload = parse_json_response(judge_resp) or {}
+            conf: float = 0.0
             try:
                 conf = float(payload.get("confidence", 0.0))
-            except Exception:
+            except (TypeError, ValueError):
                 conf = 0.0
+            if conf == 0.0:
+                m = re.search(r'"?confidence"?\\s*[:=]\\s*([0-9]*\\.?[0-9]+)',
+                              judge_resp, flags=re.IGNORECASE)
+                if m:
+                    try:    conf = float(m.group(1))
+                    except: pass
+                else:
+                    # Last resort: any standalone 0.x number in the output.
+                    m2 = re.search(r'\\b0?\\.[0-9]+\\b', judge_resp)
+                    if m2:
+                        try:    conf = float(m2.group(0))
+                        except: pass
 
             state["judgeConfidence"] = conf
             satisfied = conf >= 0.5
@@ -3089,9 +3110,9 @@ L2_CELLS: list[dict] = [
             builder.add_edge("done", END)
 
             graph = builder.compile()
-            if graph.config is None:
-                graph.config = {}
-            graph.config["recursion_limit"] = 60        # cap retries per query
+            # NOTE on `recursion_limit`: in LangGraph 1.0+ this is set on the
+            # per-call config dict (passed to `graph.stream(state, config=...)`),
+            # NOT on the compiled graph object. See `WORKFLOW_CONFIG` in §9.
             return graph
 
 
@@ -3107,16 +3128,14 @@ L2_CELLS: list[dict] = [
         the shape.
     """),
     py("""
-        # Render the compiled graph as Mermaid (renders inline if your renderer supports it).
+        # Render the compiled graph as Mermaid via show_mermaid (works in Colab).
         try:
             mermaid_src = graph.get_graph().draw_mermaid()
-            try:
-                from IPython.display import display, Markdown
-                display(Markdown("```mermaid\\n" + mermaid_src + "\\n```"))
-            except Exception:
-                print(mermaid_src)
+            show_mermaid(mermaid_src)
         except Exception as e:
-            print("(draw_mermaid unavailable:", e, ")")
+            # Fall back to a text listing if draw_mermaid is unavailable in this
+            # langgraph version, or if the source has chars mermaid.ink chokes on.
+            print("(could not render compiled graph:", e, ")")
             print("nodes:", list(graph.get_graph().nodes))
     """),
 
@@ -3152,6 +3171,14 @@ L2_CELLS: list[dict] = [
                    "strategySatisfied", "goalSatisfied", "strategyAborted",
                    "judgeConfidence", "finalAnswer", "workflowComplete")
 
+        # ── Per-call config we hand to graph.stream / graph.invoke ───────
+        # In LangGraph 1.0+ the recursion budget is read from this dict on
+        # every call, NOT from `compiled_graph.config`. We need enough headroom
+        # for ~7 strategies × ~15 graph steps each = ~105 worst-case super-
+        # steps before `node_strategy_plan` reaches its "all strategies
+        # exhausted" branch. 500 leaves plenty of slack.
+        WORKFLOW_CONFIG = {"recursion_limit": 500}
+
 
         def run_traced(query: str, *, forced_strategy: Optional[str] = None,
                        verbose_inner: bool = False) -> SessionState:
@@ -3164,11 +3191,12 @@ L2_CELLS: list[dict] = [
 
                 state = make_session_state(query, forced_strategy=forced_strategy)
                 last_seen: Dict[str, Any] = dict(state)
-                print(f"❓ query: {query}\\n")
+                print(f"❓ query: {query}")
+                print(f"   recursion_limit: {WORKFLOW_CONFIG['recursion_limit']}\\n")
                 t0 = time.time()
                 final: SessionState = state
 
-                for step, update in enumerate(graph.stream(state), start=1):
+                for step, update in enumerate(graph.stream(state, config=WORKFLOW_CONFIG), start=1):
                     for node_name, partial in update.items():
                         # Compute a diff vs the last full state so we only print what changed.
                         changed = {k: partial.get(k) for k in TRACKED
