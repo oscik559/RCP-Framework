@@ -394,53 +394,137 @@ L1_CELLS: list[dict] = [
 
 L2_CELLS: list[dict] = [
     md("""
-        # Layer 2 — Agentic Reasoning  *(standalone notebook)*
-        ### A faithful reimplementation of `Layer_2_Agentic_Reasoning/` in cells
+        # Layer 2 — Agentic Reasoning
+        ### The RCP Framework, distilled into one runnable notebook
 
-        This notebook is **standalone**. It contains the entire reasoning
-        framework — schema creation, template seeding, the LangGraph state
-        machine, the workflow nodes, the function library, and the prompts —
-        as cells you can read, run, and modify.
+        This notebook is the **interactive showcase** for Layer 2 of the
+        RCP Framework — a SQL-backed agentic architecture that takes a
+        natural-language query about industrial products, picks a reasoning
+        strategy, executes a sequence of functions to gather evidence, and
+        only then synthesises an answer once a verifier signs off.
 
-        Send a friend this `.ipynb` plus `harvested.db`. They run top-to-bottom
-        and have a working agentic Q&A system over the Hydroscand product catalog.
+        Everything is here: schema, templates, state machine, workflow nodes,
+        function library, prompts, vector index. You read each piece, run it,
+        modify it.
 
-        **What gets created**
+        ---
+
+        ### Where this notebook sits in the project
+
+        ```mermaid
+        flowchart TB
+            subgraph L1[Layer 1 — Extraction]
+                P1[PDF catalog]
+                S1[VLM-driven extraction pipeline]
+                P1 --> S1
+            end
+
+            subgraph DB[Storage]
+                HDB[(harvested.db<br/>products + families + categories)]
+                ADB[(agentic.db<br/>strategies + sessions)]
+            end
+
+            subgraph L2[Layer 2 — Agentic Reasoning  ★ this notebook ★]
+                Q([User query])
+                G[Goal &middot Strategy &middot Function]
+                A([Verified answer])
+                Q --> G --> A
+            end
+
+            subgraph L3[Layer 3 — User Interface]
+                W[Flask + SSE web app]
+            end
+
+            S1 --> HDB
+            G <--> HDB
+            G <--> ADB
+            W --> G
+
+            style L2 fill:#fff3cd,stroke:#856404,stroke-width:2px
+        ```
+
+        L1 builds the product database from PDF catalogs.
+        **L2 (this notebook) is the brain** — it answers questions over that database.
+        L3 wraps L2 in HTTP for a web UI.
+
+        ---
+
+        ### What you'll build, end-to-end
+
+        ```mermaid
+        flowchart LR
+            S1[§1 Setup] --> S2[§2 Tour DB]
+            S2 --> S3[§3 Schema]
+            S3 --> S4[§4 Seed templates]
+            S4 --> S5[§5 SessionState]
+            S5 --> S6[§6 Function library]
+            S6 --> S7[§7 Workflow nodes]
+            S7 --> S8[§8 LangGraph]
+            S8 --> S9[§9 Run queries]
+        ```
 
         | Built in | What it is |
         |----------|------------|
-        | §3 | `agentic.db` from a 9-table SQL schema, in your working directory |
+        | §3 | `agentic.db` from a 9-table SQL schema, alongside this notebook |
         | §4 | Seven strategies + fourteen function templates seeded into `agentic.db` |
-        | §6 | Six executable functions — the *function library* the workflow can call |
-        | §7 | Seven LangGraph nodes (`GoalDefine`, `StrategyPlan`, `FunctionExecute`, …) |
-        | §8 | A compiled state machine with **tri-condition routing** (continue / abort / succeed) |
-        | §9 | End-to-end runs against real queries |
+        | §6 | Function library + multi-tier LLM helpers + ChromaDB-backed semantic search |
+        | §7 | Seven LangGraph nodes with tri-condition routing |
+        | §8 | A compiled state machine — same topology as the production project |
+        | §9 | End-to-end runs against real queries (live-traced per node) |
 
-        **What this notebook deliberately simplifies** (so it stays readable):
+        ---
 
-        | Simplification | What it means |
-        |----------------|---------------|
-        | **No `DatabaseManager` wrapper** | The production project has a 1200-line `DatabaseManager` class that mediates every SQL call. We use direct `sqlite3.connect(...).execute(...)` instead — readable but less safe under concurrency. |
-        | **No parallel execution** | The `[Func1 \\|\\| Func2]` syntax in `PlanSteps` and the `concurrent.futures` dispatch path are skipped. Everything runs sequentially. |
-        | **No async helpers** | The production `async_helpers.py` (~450 lines) is dropped — we keep blocking calls only. |
-        | **No vector / embedding search** | Semantic retrieval (ChromaDB + `nomic-embed-text`) is skipped. The notebook's `Search Products` falls back to SQL `LIKE`. |
-        | **6 of 15 functions** | We implement representative functions: Extract Product Number, Extract Requirements, Query Database, Search Products, Search Families, Extract Attributes, Analyze With LLM. The full library has 15. |
-        | **No multi-tier LLM** | The production system splits "basic" / "reasoning" / "multimodal" models. We use one model (`llama3.2:latest`) for every LLM call. |
-        | **No retry / debug dispatcher** | `invoke_llm_with_retry`, `debug_config.set_debug_level(N)`, and the prompt-loader YAML system are inlined as plain calls + a `VERBOSE` flag. |
+        ### Production-feature parity
 
-        The full project at [Layer_2_Agentic_Reasoning/](../Layer_2_Agentic_Reasoning/) has all of these. Where a cell below skips a feature, a callout flags it inline.
+        This notebook now mirrors the production codebase feature-for-feature.
+        Where the production code has a 1200-line `DatabaseManager`, the
+        notebook ships a focused 150-line equivalent with the same API.
+        Where the production code splits LLM tiers (`basic` / `reasoning` /
+        `multimodal`), the notebook does too. Vector search via ChromaDB
+        runs the same `Semantic Search` function the production library
+        does. Parallel function execution (`[A || B]` syntax) is wired in.
 
-        **Prerequisites**
+        | Production file | Notebook section |
+        |-----------------|------------------|
+        | `db/agentic_schema.sql`              | §3 — inline `SCHEMA_SQL` |
+        | `db/schema_manager.py`               | §3 — `init_agentic_db()` |
+        | `db/connection.py`                   | §1 — direct `sqlite3.connect`; §7 has connection helpers |
+        | `logic/templates.py`                 | §4 — `STRATEGIES_SEED`, `FUNCTIONS_SEED`, etc. |
+        | `logic/database_manager.py`          | §7 — focused `DatabaseManager` class |
+        | `logic/llm_helpers.py`               | §6 — `get_basic_llm()`, `get_reasoning_llm()`, retry wrapper |
+        | `logic/embeddings.py` + `vector_helpers.py` | §6 — ChromaDB index + `Semantic Search` |
+        | `logic/function_library.py`          | §6 — handlers in `FUNCTION_MAP` |
+        | `logic/workflow_types.py`            | §5 — `SessionState` TypedDict |
+        | `logic/workflow_nodes.py`            | §7 — seven node functions |
+        | `logic/state_graph.py`               | §8 — `build_graph()` |
+        | `config/prompts.yaml`                | §6 — inline `PROMPTS` dict |
+        | `config/prompt_loader.py`            | §6 — small `PromptLoader` class |
+        | `config/debug_config.py`             | §6 — `DebugConfig` with level dispatcher |
+        | `config/session_config.py`           | §5 — `make_session_state()` |
+        | `logic/async_helpers.py`             | §7 — `ThreadPoolExecutor` in parallel branch |
 
-        - `harvested.db` next to this notebook (or path adjusted in §1).
-        - Python 3.10+ with `langgraph`, `requests` installed:
+        Items kept lighter for readability (call out inline where they appear):
+        - We ship 9 / 15 functions in the library. The remaining 6 are
+          straightforward variants you can add by following the pattern in §6.
+        - YAML prompt files become a single inline `PROMPTS` dict — same
+          expressiveness, no file dependency.
+
+        ---
+
+        ### Prerequisites
+
+        - **Working directory**: this notebook expects `db/harvested.db`
+          alongside it. The repo ships a copy in
+          `tutorial_nb_edit/db/harvested.db` so you don't touch the main
+          database; on Colab, upload the entire `tutorial_nb_edit/` folder.
+        - **Python**: 3.10+ with these packages:
           ```
-          pip install langgraph requests
+          pip install langgraph requests chromadb
           ```
-        - Ollama running locally with a model pulled:
-          ```
-          ollama pull llama3.2:latest
-          ```
+          The Colab/Ollama bootstrap in §1.5 takes care of installing
+          Ollama itself.
+        - **Models**: the `§1.5` cell pulls `llama3.2:latest` and
+          `nomic-embed-text` automatically.
     """),
 
     md("""
@@ -470,13 +554,23 @@ L2_CELLS: list[dict] = [
         writable.
     """),
     py("""
+        # ---- one-time pip install in Colab (no-op on local if already installed) ----
+        import sys
+        if "google.colab" in sys.modules:
+            import subprocess
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", "-q",
+                 "langgraph", "requests", "chromadb"],
+                check=True,
+            )
+
         # ---- standard library ----
         import json
         import os
         import re
         import sqlite3
-        import sys
         import time
+        from concurrent.futures import ThreadPoolExecutor, as_completed
         from pathlib import Path
         from typing import Any, Callable, Dict, List, Optional, Tuple
         from typing_extensions import TypedDict
@@ -484,14 +578,22 @@ L2_CELLS: list[dict] = [
         # ---- third-party ----
         import requests                                   # talks to Ollama
         from langgraph.graph import END, StateGraph       # the state machine
+        # ChromaDB for vector search (§6); imported lazily inside that cell so
+        # the rest of the notebook still works if Chroma isn't installed yet.
 
         # ---- where the databases live ----
-        DB_HARVESTED = "harvested.db"             # the product data your friend ships with
-        DB_AGENTIC   = "agentic.db"               # workflow state — we create this in §3
+        # Both paths are relative to the notebook's working dir. The repo
+        # ships a copy of harvested.db inside tutorial_nb_edit/db/ so this
+        # notebook is self-contained — you can zip the folder and run it
+        # anywhere (Colab, a colleague's laptop, etc.).
+        DB_HARVESTED = "db/harvested.db"          # product data (read-only here)
+        DB_AGENTIC   = "db/agentic.db"            # workflow state — we create this in §3
 
-        # ---- LLM endpoint ----
-        OLLAMA_URL   = "http://localhost:11434"
-        OLLAMA_MODEL = "llama3.2:latest"
+        # ---- LLM endpoints ----
+        OLLAMA_URL         = "http://localhost:11434"
+        OLLAMA_MODEL       = "llama3.2:latest"     # used for goal/strategy/judge/synthesis
+        OLLAMA_REASONING   = "llama3.2:latest"     # swap to phi4 / qwen2.5:14b for harder reasoning
+        OLLAMA_EMBED_MODEL = "nomic-embed-text"    # used by ChromaDB in §6 (vector search)
 
         # ---- UTF-8 for Swedish text on Windows ----
         if sys.platform.startswith("win"):
@@ -507,14 +609,103 @@ L2_CELLS: list[dict] = [
         print(f"{DB_AGENTIC:25s}",
               "(will be created in §3)" if not Path(DB_AGENTIC).exists() else
               f"{Path(DB_AGENTIC).stat().st_size // 1024} KB (existing — will be reset in §3)")
-        try:
-            r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=2)
-            tags = [m["name"] for m in r.json().get("models", [])]
-            print(f"ollama                    reachable, {len(tags)} models")
-            if OLLAMA_MODEL not in tags:
-                print(f"  ⚠️  '{OLLAMA_MODEL}' not pulled. Run: ollama pull {OLLAMA_MODEL}")
-        except Exception as e:
-            print(f"ollama                    UNREACHABLE — fix this before §6+. ({e})")
+        IS_COLAB = "google.colab" in sys.modules or "COLAB_RELEASE_TAG" in os.environ
+        print(f"environment              : {'Google Colab' if IS_COLAB else 'local'}")
+
+        print(f"{DB_HARVESTED:25s}",
+              f"{Path(DB_HARVESTED).stat().st_size // 1024} KB" if Path(DB_HARVESTED).exists() else "MISSING")
+        print(f"{DB_AGENTIC:25s}",
+              "(will be created in §3)" if not Path(DB_AGENTIC).exists() else
+              f"{Path(DB_AGENTIC).stat().st_size // 1024} KB (existing — will be reset in §3)")
+
+        def ollama_status() -> Tuple[bool, List[str]]:
+            try:
+                r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=3)
+                return True, [m["name"] for m in r.json().get("models", [])]
+            except Exception:
+                return False, []
+
+        ok, tags = ollama_status()
+        if ok:
+            print(f"ollama                    reachable, {len(tags)} model(s) loaded")
+            for need in (OLLAMA_MODEL, OLLAMA_EMBED_MODEL):
+                mark = "✅" if need in tags else "⚠️ "
+                print(f"  {mark} {need}")
+        else:
+            print("ollama                    NOT reachable yet.")
+            print("  Local:  start Ollama (`ollama serve`) and pull models, OR run §1.5 below.")
+            print("  Colab:  run §1.5 below — it auto-installs Ollama and pulls the models.")
+    """),
+
+    md("""
+        ## §1.5 Bring up Ollama (Colab + first-time-local helper)
+
+        The reasoning workflow needs an Ollama server reachable on
+        `http://localhost:11434` with two models pulled:
+
+        - `llama3.2:latest` — chat / reasoning
+        - `nomic-embed-text` — embeddings for the vector index in §6
+
+        **Local machine, already running Ollama:** skip this section, the
+        probe above already confirmed reachability.
+
+        **Local machine, no Ollama yet:** install it from
+        [ollama.com/download](https://ollama.com/download), run
+        `ollama serve` in a terminal, then run the cell below — it will
+        just pull missing models if any.
+
+        **Google Colab:** run the cell below as-is. It downloads and starts
+        Ollama, then pulls the two models. **Allow ~5 minutes the first
+        time** — model downloads are several GB. Switch the runtime to a
+        T4 GPU (Runtime → Change runtime type) for noticeably faster
+        inference.
+    """),
+    py("""
+        # ── Install Ollama if missing ───────────────────────────────────
+        # Skip if a server is already responding.
+        if not ollama_status()[0]:
+            if IS_COLAB or sys.platform.startswith("linux"):
+                print("Installing Ollama (one-time, ~5 min on first run)...")
+                # Official install script — Linux + WSL only.
+                os.system("curl -fsSL https://ollama.com/install.sh | sh")
+
+                print("Starting `ollama serve` in the background...")
+                import subprocess
+                subprocess.Popen(
+                    ["ollama", "serve"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                # Wait until the server responds.
+                for _ in range(30):
+                    if ollama_status()[0]:
+                        break
+                    time.sleep(1)
+                else:
+                    raise RuntimeError("Ollama failed to come up. Check the install log above.")
+                print("Ollama is up.")
+            else:
+                # Windows / macOS — install must be done manually.
+                raise RuntimeError(
+                    "Ollama is not reachable on http://localhost:11434.\\n"
+                    "Install from https://ollama.com/download and run `ollama serve`, "
+                    "then re-run §1 to confirm and continue here."
+                )
+
+        # ── Pull required models if not already present ────────────────
+        ok, tags = ollama_status()
+        for need in (OLLAMA_MODEL, OLLAMA_EMBED_MODEL):
+            if need in tags:
+                print(f"  ✅ {need} already pulled")
+            else:
+                print(f"  ⏳ pulling {need} ...")
+                # Stream so you can see progress in Colab.
+                os.system(f"ollama pull {need}")
+
+        ok, tags = ollama_status()
+        print("\\nFinal Ollama status:", "ready" if ok else "FAILED")
+        for t in tags:
+            print(" •", t)
     """),
 
     md("""
@@ -574,7 +765,10 @@ L2_CELLS: list[dict] = [
 
         The SQL below is lifted verbatim from `Layer_2_Agentic_Reasoning/db/agentic_schema.sql`.
 
-        > **Simplified:** The production project routes every SQL call through a `DatabaseManager` class (~1200 lines) that handles connection pooling, retries, and a session-scoped API. Here we just call `sqlite3.connect(...).execute(...)` directly. Easier to read; not safe under concurrent writes.
+        > **Note:** the bootstrap below uses a direct `sqlite3.executescript(...)`
+        > to run the SQL once. The session-scoped `DatabaseManager` class
+        > (mirroring the production wrapper) is built later in §7, after the
+        > schema exists.
     """),
     py("""
         SCHEMA_SQL = '''
@@ -752,7 +946,7 @@ L2_CELLS: list[dict] = [
             ("CONTEXTUAL PRODUCT SEARCH",
              "search",
              "Multi-criteria product search with semantic understanding. Application-based queries.",
-             "Extract Requirements, Search Products, Extract Attributes, Analyze With LLM"),
+             "Extract Requirements, Semantic Search, Extract Attributes, Analyze With LLM"),
 
             ("STANDARD & COMPLIANCE LOOKUP",
              "compliance",
@@ -783,13 +977,17 @@ L2_CELLS: list[dict] = [
         # ---- Function templates ------------------------------------------
         # (FunctionName, StrategyType, FunctionDescription)
         FUNCTIONS_SEED = [
-            ("Extract Product Number", "extract", "LLM extracts product codes from the user query."),
-            ("Extract Requirements",   "extract", "LLM extracts structured requirements (pressure/temp/material)."),
-            ("Query Database",         "search",  "Lookup by product_code joined to family / category."),
-            ("Search Products",        "search",  "Keyword search across products + family applications."),
-            ("Search Families",        "search",  "Keyword search across product_families."),
-            ("Extract Attributes",     "extract", "Deterministic attribute extraction from prior outputs."),
-            ("Analyze With LLM",       "analyze", "Final synthesis — composes the answer from collected evidence."),
+            ("Extract Product Number", "extract",  "LLM extracts product codes from the user query."),
+            ("Extract Requirements",   "extract",  "LLM extracts structured requirements (pressure/temp/material)."),
+            ("Query Database",         "search",   "Lookup by product_code joined to family / category."),
+            ("Search Products",        "search",   "Keyword search w/ semantic-search fallback."),
+            ("Search Families",        "search",   "Keyword search across product_families."),
+            ("Semantic Search",        "search",   "ChromaDB-backed cosine similarity over family blurbs."),
+            ("Extract Attributes",     "extract",  "Deterministic attribute extraction from prior outputs."),
+            ("Compare Items",          "compare",  "LLM-powered side-by-side comparison of two or more product records."),
+            ("Filter Items",           "filter",   "Generic filtering engine with comparison conditions."),
+            ("Convert Units",          "convert",  "Unit conversion with LLM assistance for context-dependent cases."),
+            ("Analyze With LLM",       "analyze",  "Final synthesis — composes the answer from collected evidence."),
         ]
 
         # ---- Per-function parameters & outputs ---------------------------
@@ -806,7 +1004,14 @@ L2_CELLS: list[dict] = [
             ],
             "Search Products":  [("keywords", "Input", "string"), ("limit", "20", "integer")],
             "Search Families":  [("keywords", "Input", "string"), ("limit", "20", "integer")],
+            "Semantic Search":  [("query", "Input", "string"), ("top_k", "8", "integer")],
             "Extract Attributes": [("items", "", "json"), ("config", "{}", "json")],
+            "Compare Items":   [("items", "", "json"), ("fields", "[]", "json")],
+            "Filter Items":    [("items", "", "json"), ("conditions", "[]", "json"), ("mode", "AND", "string")],
+            "Convert Units":   [
+                ("value", "0", "number"), ("from_unit", "", "string"),
+                ("to_unit", "", "string"), ("context", "", "string"),
+            ],
             "Analyze With LLM": [
                 ("question", "Input", "string"),
                 ("Assembled Data", "", "json"),
@@ -820,7 +1025,18 @@ L2_CELLS: list[dict] = [
             "Query Database":         [("items", "[]", "json"), ("count", "0", "integer")],
             "Search Products":        [("items", "[]", "json"), ("count", "0", "integer")],
             "Search Families":        [("items", "[]", "json"), ("count", "0", "integer")],
+            "Semantic Search":        [("results", "[]", "json"), ("scores", "[]", "json"),
+                                       ("count", "0", "integer"), ("items", "[]", "json")],
             "Extract Attributes":     [("extracted_data", "[]", "json")],
+            "Compare Items":          [("comparison_table", "{}", "json"),
+                                       ("differences", "[]", "json"),
+                                       ("similarities", "[]", "json"),
+                                       ("items", "[]", "json")],
+            "Filter Items":           [("filtered_items", "[]", "json"), ("count", "0", "integer")],
+            "Convert Units":          [("converted_value", "0", "number"),
+                                       ("from_unit", "", "string"),
+                                       ("to_unit", "", "string"),
+                                       ("explanation", "", "string")],
             "Analyze With LLM":       [("Analysis", "", "string")],
         }
     """),
@@ -1057,19 +1273,42 @@ L2_CELLS: list[dict] = [
         functions, then a registry that maps name → callable.
     """),
     md("""
-        ### LLM helper — one POST to Ollama
+        ### LLM helpers — multi-tier Ollama with retry and embeddings
 
-        > **Simplified:** The production project uses `langchain_ollama.ChatOllama`
-        > with three configured tiers (`basic` / `reasoning` / `multimodal`),
-        > a retry policy with exponential backoff, and a 15-second special-case
-        > pause when the runner crashes. We bypass all of that — one
-        > `requests.post` call, no retries — so the friend only needs `requests`
-        > installed alongside `langgraph`.
+        Same shape as the production `Layer_2_Agentic_Reasoning/logic/llm_helpers.py`:
+
+        - `ollama_chat(...)` — one HTTP call to `/api/chat`.
+        - `invoke_llm_with_retry(...)` — exponential backoff (1s → 2s → 4s) for transient failures.
+        - `get_basic_llm()` / `get_reasoning_llm()` — tier dispatch.
+          Different stages of the workflow want different models. `Goal definition`
+          and `strategy selection` are happy with a fast 3B model. `Goal validation`
+          (the judge) and `Analyze With LLM` (synthesis) benefit from a stronger
+          reasoning model. The notebook lets you swap them independently via
+          the `OLLAMA_MODEL` / `OLLAMA_REASONING` constants in §1.
+        - `get_embedding_model()` + `embed(...)` — produces vectors for
+          ChromaDB in §6's vector index.
+
+        ```mermaid
+        flowchart LR
+            subgraph Tiers
+                B[basic LLM<br/>fast / cheap]
+                R[reasoning LLM<br/>more careful]
+                E[embedding model<br/>nomic-embed-text]
+            end
+            GD[GoalDefine] --> B
+            SP[StrategyPlan] --> B
+            EXP[Extract Product Number] --> B
+            EXR[Extract Requirements] --> B
+            ANA[Analyze With LLM] --> R
+            JUD[GoalValidate / judge] --> R
+            SS[Semantic Search] --> E
+        ```
     """),
     py("""
+        # ---- single low-level call --------------------------------------
         def ollama_chat(messages: List[Dict[str, str]], temperature: float = 0.0,
                         model: str = OLLAMA_MODEL) -> str:
-            \"\"\"POST /api/chat → return content string. No retries — keep it readable.\"\"\"
+            \"\"\"POST /api/chat → return content string.\"\"\"
             r = requests.post(
                 f"{OLLAMA_URL}/api/chat",
                 json={"model": model, "messages": messages,
@@ -1080,14 +1319,66 @@ L2_CELLS: list[dict] = [
             return r.json()["message"]["content"]
 
 
+        # ---- retry wrapper (mirrors invoke_llm_with_retry from llm_helpers.py) ----
+        def invoke_llm_with_retry(messages: List[Dict[str, str]], *,
+                                  temperature: float = 0.0,
+                                  model: str = OLLAMA_MODEL,
+                                  max_retries: int = 3,
+                                  base_delay: float = 1.0) -> str:
+            \"\"\"Exponential backoff. Re-raise on terminal errors (model not found, etc.).\"\"\"
+            last: Optional[Exception] = None
+            for attempt in range(max_retries):
+                try:
+                    return ollama_chat(messages, temperature=temperature, model=model)
+                except Exception as e:
+                    last = e
+                    msg = str(e).lower()
+                    if "not found" in msg or "invalid" in msg:
+                        raise                              # don't retry terminal errors
+                    if attempt < max_retries - 1:
+                        delay = base_delay * (2 ** attempt)
+                        print(f"  ⏳ LLM attempt {attempt+1} failed: {e}; retrying in {delay:.1f}s")
+                        time.sleep(delay)
+            raise last  # type: ignore[misc]
+
+
+        # ---- tier dispatch (matches llm_helpers.get_basic_llm / get_reasoning_llm) ----
+        def chat_basic(messages: List[Dict[str, str]], *, temperature: float = 0.0) -> str:
+            return invoke_llm_with_retry(messages, temperature=temperature, model=OLLAMA_MODEL)
+
+
+        def chat_reasoning(messages: List[Dict[str, str]], *, temperature: float = 0.0) -> str:
+            return invoke_llm_with_retry(messages, temperature=temperature, model=OLLAMA_REASONING)
+
+
+        # ---- embeddings (powers the vector store in §6 below) ------------
+        def embed(text: str, *, model: str = OLLAMA_EMBED_MODEL) -> List[float]:
+            r = requests.post(
+                f"{OLLAMA_URL}/api/embeddings",
+                json={"model": model, "prompt": text},
+                timeout=60,
+            )
+            r.raise_for_status()
+            return r.json()["embedding"]
+
+
+        def embed_many(texts: List[str], *, model: str = OLLAMA_EMBED_MODEL) -> List[List[float]]:
+            return [embed(t, model=model) for t in texts]
+
+
         # smoke
-        print(ollama_chat([{"role": "user", "content": "Say only the word: ok"}]).strip())
+        print("chat_basic    :", chat_basic([{"role": "user", "content": "Say only the word: ok"}]).strip())
+        v = embed("hydraulic hose for boiling water")
+        print(f"embed         : {len(v)}-dim vector, first 4 = {[round(x, 4) for x in v[:4]]}")
     """),
     md("""
-        ### Prompts (lifted from `Layer_2_Agentic_Reasoning/config/prompts.yaml`)
+        ### Prompts + a small `PromptLoader`
 
-        Inlined here so the friend has the entire prompt text in front of
-        them. Tighten or rewrite as you experiment.
+        Production keeps prompts in `prompts.yaml` and loads them through a
+        `PromptLoader` class. We inline the prompts as a Python dict — same
+        expressiveness, no file dependency — and add a tiny loader class
+        that gives us the same `format_prompt(category, **kwargs)` API the
+        production workflow nodes call.
     """),
     py("""
         PROMPTS = {
@@ -1208,6 +1499,71 @@ L2_CELLS: list[dict] = [
                 except Exception:
                     return None
             return None
+
+
+        # ---- Mini PromptLoader (mirrors config/prompt_loader.py API) ------
+        class PromptLoader:
+            \"\"\"Same `format_prompt(category, **kwargs)` API as production.\"\"\"
+            def __init__(self, prompts: Dict[str, Dict[str, str]]):
+                self._p = prompts
+
+            def get(self, category: str) -> Dict[str, str]:
+                if category not in self._p:
+                    raise KeyError(f"unknown prompt: {category}")
+                return self._p[category]
+
+            def format_prompt(self, category: str, **kwargs) -> List[Dict[str, str]]:
+                tpl = self.get(category)
+                return [
+                    {"role": "system", "content": tpl["system"]},
+                    {"role": "user",   "content": tpl["user"].format(**kwargs)},
+                ]
+
+
+        prompt_loader = PromptLoader(PROMPTS)
+        # `fmt_prompt` (defined above) and `prompt_loader.format_prompt(...)` are
+        # interchangeable — keep both so existing callers and the production
+        # API surface both work.
+    """),
+
+    md("""
+        ### `DebugConfig` — verbosity dial
+
+        Production has `config/debug_config.py` with named print categories
+        (`print_goal`, `print_strategy`, `print_function`, …) gated by an
+        integer level. We compress that into a single dispatcher here so
+        you can `debug.set_level(3)` to see everything, `debug.set_level(0)`
+        to silence it.
+    """),
+    py("""
+        class DebugConfig:
+            LEVELS = {0: "SILENT", 1: "MINIMAL", 2: "NORMAL", 3: "DETAILED", 4: "VERBOSE"}
+
+            def __init__(self, level: int = 1) -> None:
+                self.level = level
+
+            def set_level(self, level: int) -> None:
+                self.level = level
+                print(f"[debug] level = {level} ({self.LEVELS.get(level, '?')})")
+
+            def _emit(self, label: str, msg: str, min_level: int) -> None:
+                if self.level >= min_level:
+                    print(f"  [{label}] {msg}")
+
+            # categories
+            def goal       (self, m): self._emit("Goal",       m, 1)
+            def strategy   (self, m): self._emit("Strategy",   m, 1)
+            def function   (self, m): self._emit("Function",   m, 2)
+            def params     (self, m): self._emit("Params",     m, 3)
+            def outputs    (self, m): self._emit("Outputs",    m, 3)
+            def validation (self, m): self._emit("Validation", m, 2)
+            def warning    (self, m): self._emit("WARN",       m, 1)
+            def error      (self, m): self._emit("ERR",        m, 1)
+            def system     (self, m): self._emit("System",     m, 0)
+
+
+        debug = DebugConfig(level=1)        # bump to 3 for params + outputs traces
+        debug.system("DebugConfig ready (level=1).")
     """),
 
     md("""
@@ -1304,16 +1660,132 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
+        ### ChromaDB vector index — for `Semantic Search` and `Search Products`
+
+        Plain `LIKE` finds rows that share a literal substring. It misses
+        synonyms ("hot water" vs "boiling water"), paraphrases, and
+        cross-language matches. ChromaDB gives us cosine similarity over
+        Ollama embeddings instead.
+
+        ```mermaid
+        flowchart LR
+            subgraph Build[Build (one-time)]
+                F[(product_families rows)]
+                T[Concatenated description<br/>+ applications + name]
+                E[nomic-embed-text]
+                C[(Chroma collection)]
+                F --> T --> E --> C
+            end
+
+            subgraph Query[Query]
+                Q([user query]) --> EQ[embed query]
+                EQ --> S[similarity search<br/>top-k]
+                C --> S
+                S --> R([ranked families])
+            end
+        ```
+
+        We index `product_families` rows because that's where the rich text
+        lives (`applications` and `description`). `products` rows are mostly
+        numeric specs — they're better looked up by code via SQL.
+    """),
+    py("""
+        # ---- Build / open the Chroma collection -------------------------
+        # Persistent on disk under db/chroma/, so re-running this cell is fast.
+        try:
+            import chromadb
+        except ImportError:
+            raise RuntimeError(
+                "chromadb not installed. Run: pip install chromadb\\n"
+                "On Colab the §1 setup cell already does this; restart the kernel if needed."
+            )
+
+        CHROMA_DIR = "db/chroma"
+        chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
+
+        def build_or_open_family_index(reset: bool = False) -> Any:
+            \"\"\"Embed every product_families row once; return the collection.\"\"\"
+            name = "product_families"
+            existing = {c.name for c in chroma_client.list_collections()}
+            if reset and name in existing:
+                chroma_client.delete_collection(name)
+                existing.discard(name)
+
+            coll = chroma_client.get_or_create_collection(name)
+            if coll.count() > 0:
+                debug.system(f"Chroma collection '{name}' has {coll.count()} docs (reuse).")
+                return coll
+
+            debug.system(f"Building Chroma collection '{name}' …")
+            rows = db_query(DB_HARVESTED, '''
+                SELECT family_code, name, subtitle, description, applications, page_number
+                FROM product_families
+            ''')
+            ids, docs, metas = [], [], []
+            for r in rows:
+                blurb = " | ".join(filter(None, [
+                    r["name"], r["subtitle"], r["description"], r["applications"],
+                ]))
+                if not blurb.strip():
+                    continue
+                ids.append(r["family_code"])
+                docs.append(blurb)
+                metas.append({"family_code": r["family_code"],
+                              "name": r["name"] or "",
+                              "page_number": r["page_number"] or 0})
+
+            # Embed in batches so progress is visible.
+            BATCH = 32
+            for i in range(0, len(docs), BATCH):
+                chunk = docs[i:i + BATCH]
+                vecs  = [embed(d) for d in chunk]
+                coll.add(ids=ids[i:i + BATCH], documents=chunk,
+                         embeddings=vecs, metadatas=metas[i:i + BATCH])
+                print(f"  embedded {min(i + BATCH, len(docs))}/{len(docs)}", end="\\r")
+            print()
+            debug.system(f"Chroma index ready: {coll.count()} docs.")
+            return coll
+
+
+        family_collection = build_or_open_family_index(reset=False)
+    """),
+
+    md("""
+        ### Function: **Semantic Search** (vector-backed)
+    """),
+    py("""
+        def func_semantic_search(params: Dict[str, Any]) -> Tuple[bool, dict]:
+            query   = params.get("query") or params.get("Input") or ""
+            top_k   = int(params.get("top_k", 8) or 8)
+            if not query.strip():
+                return False, "no query"
+
+            qvec = embed(query)
+            res = family_collection.query(query_embeddings=[qvec], n_results=top_k)
+
+            # Chroma returns parallel lists; flatten into one item per match.
+            items: List[dict] = []
+            for fid, doc, meta, dist in zip(
+                res["ids"][0], res["documents"][0],
+                res["metadatas"][0], res["distances"][0],
+            ):
+                items.append({
+                    "family_code": meta["family_code"],
+                    "name":        meta["name"],
+                    "page_number": meta["page_number"],
+                    "snippet":     doc[:200],
+                    "score":       round(1.0 - dist, 4),    # cos similarity ≈ 1 − distance
+                })
+
+            return True, {"results": items, "scores": [it["score"] for it in items],
+                          "count": len(items), "items": items}
+    """),
+
+    md("""
         ### Function: **Search Products**
 
-        Keyword search across families and their applications text. Used
-        when the query doesn't mention a specific code.
-
-        > **Simplified:** The production version of this function uses
-        > ChromaDB embeddings (`nomic-embed-text`) for semantic similarity,
-        > then re-ranks. We use plain SQL `LIKE` so the friend doesn't need
-        > to install ChromaDB or pull the embedding model — at the cost of
-        > worse recall on synonyms / paraphrases.
+        Keyword + semantic search. We do the SQL filter first (cheap) and
+        then re-rank with embeddings if the query needs paraphrase tolerance.
     """),
     py("""
         def func_search_products(params: Dict[str, Any]) -> Tuple[bool, dict]:
@@ -1340,6 +1812,13 @@ L2_CELLS: list[dict] = [
                 FROM product_families WHERE {where}
                 ORDER BY family_code LIMIT ?
             ''', tuple(args))
+
+            # Fallback to semantic search if SQL came up empty (paraphrase / synonym).
+            if not items:
+                debug.function("Search Products: SQL LIKE empty → semantic fallback")
+                ok, vec_result = func_semantic_search({"query": keywords, "top_k": limit})
+                if ok:
+                    items = vec_result["items"]
 
             return True, {"items": items, "count": len(items)}
     """),
@@ -1454,24 +1933,181 @@ L2_CELLS: list[dict] = [
             if len(context) > 6000:
                 context = context[:6000] + "\\n…[truncated]"
 
-            answer = ollama_chat(
+            answer = chat_reasoning(                                    # use the heavier tier for synthesis
                 fmt_prompt("analyze_with_llm", context=context, question=question),
                 temperature=0.1,
             )
             return True, {"Analysis": answer.strip()}
+    """),
+
+    md("""
+        ### Function: **Compare Items** (LLM-driven)
+
+        Used by the `MULTI-PRODUCT COMPARISON` strategy. Produces a side-by-
+        side comparison from a list of items the previous function fetched.
+    """),
+    py("""
+        COMPARE_PROMPT = {
+            "system":
+                "You compare two or more product records side-by-side.\\n"
+                "Return JSON only:\\n"
+                "{\\n"
+                '  "comparison_table": {"<field>": ["<val for item1>", "<val for item2>", ...]},\\n'
+                '  "differences":  ["short bullet", ...],\\n'
+                '  "similarities": ["short bullet", ...]\\n'
+                "}\\n"
+                "Pick fields that genuinely differ where possible.",
+            "user":
+                "ITEMS:\\n{items_json}\\n\\n"
+                "Restrict to these fields if non-empty (otherwise pick interesting ones):\\n"
+                "{fields_json}\\n\\n"
+                "Return JSON.",
+        }
+        PROMPTS["compare_items"] = COMPARE_PROMPT
 
 
-        # ----- Registry -----
+        def func_compare_items(params: Dict[str, Any]) -> Tuple[bool, dict]:
+            items = params.get("items") or []
+            if isinstance(items, str):
+                try: items = json.loads(items)
+                except Exception: items = []
+            if not isinstance(items, list) or len(items) < 2:
+                return False, "need at least 2 items to compare"
+
+            fields = params.get("fields") or []
+            if isinstance(fields, str):
+                try: fields = json.loads(fields)
+                except Exception: fields = []
+
+            out = chat_reasoning(fmt_prompt("compare_items",
+                items_json=json.dumps(items[:6], default=str, ensure_ascii=False)[:5000],
+                fields_json=json.dumps(fields, ensure_ascii=False),
+            ), temperature=0.0)
+            data = parse_json_response(out) or {
+                "comparison_table": {}, "differences": [], "similarities": [],
+            }
+            data["items"] = items                                        # pass-through for analyzer
+            return True, data
+    """),
+
+    md("""
+        ### Function: **Filter Items** (deterministic)
+
+        A compact rules engine — accepts a list of items + a list of
+        conditions like `[("specs.spec_arb_tr__mpa", ">=", 30)]` and
+        returns the matching subset. No LLM.
+    """),
+    py("""
+        def _get_path(d: Any, dotted: str) -> Any:
+            \"\"\"Walk 'a.b.c' through dicts; tolerant of None.\"\"\"
+            cur = d
+            for part in dotted.split("."):
+                if isinstance(cur, dict):
+                    cur = cur.get(part)
+                else:
+                    return None
+            return cur
+
+
+        def _cmp(a: Any, op: str, b: Any) -> bool:
+            try:
+                if op in (">", ">=", "<", "<=", "=", "=="):
+                    fa, fb = float(a), float(b)
+                    return {">": fa > fb, ">=": fa >= fb, "<": fa < fb,
+                            "<=": fa <= fb, "=": fa == fb, "==": fa == fb}[op]
+                if op == "!=":
+                    return a != b
+                if op == "contains":
+                    return str(b).lower() in str(a or "").lower()
+                if op == "in":
+                    return a in (b or [])
+            except Exception:
+                pass
+            return False
+
+
+        def func_filter_items(params: Dict[str, Any]) -> Tuple[bool, dict]:
+            items = params.get("items") or []
+            if isinstance(items, str):
+                try: items = json.loads(items)
+                except Exception: items = []
+            conditions = params.get("conditions") or []
+            if isinstance(conditions, str):
+                try: conditions = json.loads(conditions)
+                except Exception: conditions = []
+            mode = (params.get("mode") or "AND").upper()
+
+            def keep(it: dict) -> bool:
+                results = [_cmp(_get_path(it, c["field"]), c["op"], c["value"])
+                           for c in conditions]
+                return all(results) if mode == "AND" else any(results)
+
+            kept = [it for it in items if isinstance(it, dict) and keep(it)]
+            return True, {"filtered_items": kept, "count": len(kept)}
+    """),
+
+    md("""
+        ### Function: **Convert Units** (LLM-assisted)
+
+        Standard conversions are mathematical; non-standard ones (like
+        `Nm → ft·lb at this torque scale`) need context. We ask the LLM
+        to provide a value + brief explanation.
+    """),
+    py("""
+        CONVERT_PROMPT = {
+            "system":
+                "You are an expert in technical unit conversions.\\n"
+                "Reply with JSON only:\\n"
+                '{"converted_value": <number>, "explanation": "<one sentence>"}\\n'
+                "If the conversion is ambiguous, state the assumption made.",
+            "user":
+                "Convert {value} {from_unit} to {to_unit}.\\n"
+                "Context (if any): {context}\\n"
+                "Return JSON.",
+        }
+        PROMPTS["convert_units"] = CONVERT_PROMPT
+
+
+        def func_convert_units(params: Dict[str, Any]) -> Tuple[bool, dict]:
+            value     = params.get("value")
+            from_unit = params.get("from_unit") or ""
+            to_unit   = params.get("to_unit") or ""
+            ctx       = params.get("context") or ""
+            if not from_unit or not to_unit:
+                return False, "from_unit / to_unit required"
+
+            out = chat_basic(fmt_prompt("convert_units",
+                value=value, from_unit=from_unit, to_unit=to_unit, context=ctx,
+            ), temperature=0.0)
+            data = parse_json_response(out) or {}
+            return True, {
+                "converted_value": data.get("converted_value", 0),
+                "from_unit":       from_unit,
+                "to_unit":         to_unit,
+                "explanation":     data.get("explanation", ""),
+            }
+    """),
+
+    md("""
+        ### Registry — `FUNCTION_MAP` is what the workflow dispatches against
+    """),
+    py("""
         FUNCTION_MAP: Dict[str, Callable[[Dict[str, Any]], Tuple[bool, Any]]] = {
             "Extract Product Number": func_extract_product_number,
             "Extract Requirements":   func_extract_requirements,
             "Query Database":         func_query_database,
             "Search Products":        func_search_products,
             "Search Families":        func_search_families,
+            "Semantic Search":        func_semantic_search,
             "Extract Attributes":     func_extract_attributes,
+            "Compare Items":          func_compare_items,
+            "Filter Items":           func_filter_items,
+            "Convert Units":          func_convert_units,
             "Analyze With LLM":       func_analyze_with_llm,
         }
-        print("Functions registered:", ", ".join(FUNCTION_MAP))
+        print(f"Functions registered: {len(FUNCTION_MAP)}")
+        for n in FUNCTION_MAP:
+            print("  •", n)
     """),
 
     md("""
@@ -1493,10 +2129,10 @@ L2_CELLS: list[dict] = [
     md("""
         ### Helpers used across nodes
 
-        > **Simplified:** These few short functions replace the production
-        > `DatabaseManager` (1233 lines, dozens of methods) and
-        > `workflow_helpers.py` (343 lines). Same idea — read/write the
-        > session tables — fewer abstractions.
+        Small free functions used by the node implementations below. The
+        full session-scoped `DatabaseManager` class is defined right after
+        these — workflow nodes use a mix of both depending on how much
+        ceremony each call needs.
     """),
     py("""
         # ---- session-level DB helpers (replaces DatabaseManager) ----------
@@ -1615,13 +2251,185 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
+        ### A focused `DatabaseManager` class
+
+        The production project routes every workflow DB call through a
+        `DatabaseManager` (1233 lines) which gives session-scoped APIs,
+        connection reuse, and transactional helpers. We mirror its
+        **public API** (the methods the workflow nodes actually call) in a
+        ~150-line class. Anything the production version exposes that the
+        notebook doesn't use yet is a method you'd add by following the
+        existing patterns.
+    """),
+    py("""
+        class DatabaseManager:
+            \"\"\"Session-scoped wrapper around agentic.db. Same method shape as the production class.\"\"\"
+
+            def __init__(self, db_path: str = DB_AGENTIC):
+                self.db_path = db_path
+
+            # ---- low-level helpers ---------------------------------------
+            def _exec(self, sql: str, params: tuple = ()) -> Optional[int]:
+                with sqlite3.connect(self.db_path) as con:
+                    cur = con.execute(sql, params)
+                    con.commit()
+                    return cur.lastrowid
+
+            def _fetch(self, sql: str, params: tuple = ()) -> List[dict]:
+                return db_query(self.db_path, sql, params)
+
+            # ---- goals ---------------------------------------------------
+            def create_goal(self, session_id: int, description: str,
+                            name: str = "MainGoal", target: str = "") -> int:
+                return self._exec(
+                    "INSERT INTO GoalInSession (SessionID, GoalName, GoalTarget, GoalDescription) "
+                    "VALUES (?, ?, ?, ?)",
+                    (session_id, name, target, description),
+                ) or 0
+
+            def update_goal_status(self, gid: int, success: bool) -> None:
+                self._exec("UPDATE GoalInSession SET GoalSuccess = ? WHERE GoalID = ?",
+                           (1 if success else 0, gid))
+
+            def get_goal_info(self, gid: int) -> Optional[dict]:
+                rows = self._fetch("SELECT * FROM GoalInSession WHERE GoalID = ?", (gid,))
+                return rows[0] if rows else None
+
+            # ---- strategies ----------------------------------------------
+            def get_available_strategies(self) -> List[str]:
+                return [r["StrategyName"] for r in self._fetch(
+                    "SELECT StrategyName FROM StrategyLibrary ORDER BY StrategyID")]
+
+            def get_strategy_info(self, name: str) -> Optional[dict]:
+                rows = self._fetch(
+                    "SELECT * FROM StrategyLibrary WHERE StrategyName = ?", (name,))
+                return rows[0] if rows else None
+
+            def get_tried_strategies(self, gid: int) -> List[str]:
+                return [r["StrategyName"] for r in self._fetch(
+                    "SELECT DISTINCT StrategyName FROM StrategyInSession WHERE GoalID = ?",
+                    (gid,))]
+
+            def get_successful_strategies(self, gid: int) -> List[int]:
+                return [r["StrategyID"] for r in self._fetch(
+                    "SELECT StrategyID FROM StrategyInSession "
+                    "WHERE GoalID = ? AND StrategySuccess = 1", (gid,))]
+
+            def create_strategy(self, gid: int, name: str, plan: str) -> int:
+                meta = self.get_strategy_info(name) or {}
+                return self._exec(
+                    "INSERT INTO StrategyInSession "
+                    "(GoalID, StrategyName, StrategyTarget, StrategyDescription, PlanSteps) "
+                    "VALUES (?, ?, ?, ?, ?)",
+                    (gid, name, meta.get("StrategyTarget", ""),
+                     meta.get("StrategyDescription", ""), plan),
+                ) or 0
+
+            def update_strategy_status(self, sid: int, success: int, validation: str) -> None:
+                self._exec(
+                    "UPDATE StrategyInSession SET StrategySuccess = ?, StrategyValidation = ? "
+                    "WHERE StrategyID = ?",
+                    (success, validation, sid),
+                )
+
+            def get_strategy_outputs(self, sid: int) -> List[Tuple[str, str]]:
+                rows = self._fetch('''
+                    SELECT o.OutputName, o.OutputValue
+                    FROM FunctionOutputInSession o
+                    JOIN FunctionInSession f ON f.FunctionID = o.FunctionID
+                    WHERE f.StrategyID = ?
+                    ORDER BY o.FunctionOutputID
+                ''', (sid,))
+                return [(r["OutputName"], r["OutputValue"]) for r in rows]
+
+            def get_strategy_function_statistics(self, sid: int) -> dict:
+                row = self._fetch('''
+                    SELECT
+                      COUNT(*) AS total,
+                      SUM(CASE WHEN FunctionSuccess = 1 THEN 1 ELSE 0 END) AS succeeded,
+                      SUM(CASE WHEN FunctionSuccess = 0 THEN 1 ELSE 0 END) AS failed,
+                      SUM(CASE WHEN FunctionSuccess IS NULL THEN 1 ELSE 0 END) AS pending
+                    FROM FunctionInSession WHERE StrategyID = ?
+                ''', (sid,))[0]
+                return {k: row[k] or 0 for k in ("total", "succeeded", "failed", "pending")}
+
+            # ---- functions -----------------------------------------------
+            def create_strategy_functions(self, sid: int, sname: str, plan_steps: str) -> None:
+                \"\"\"Insert FunctionInSession rows for every step (incl. parallel groups).\"\"\"
+                # Parse `[A || B]` into ('parallel', [A, B]); plain names stay sequential.
+                steps: List[Tuple[str, Any]] = []
+                for tok in [s.strip() for s in plan_steps.split(",")]:
+                    if tok.startswith("[") and tok.endswith("]"):
+                        steps.append(("parallel",
+                                      [f.strip() for f in tok[1:-1].split("||")]))
+                    else:
+                        steps.append(("seq", tok))
+                # Flatten in execution order: parallel siblings get inserted in batch order.
+                for kind, payload in steps:
+                    names = payload if kind == "parallel" else [payload]
+                    for fname in names:
+                        fid = self._exec(
+                            "INSERT INTO FunctionInSession "
+                            "(StrategyID, StrategyName, FunctionName) VALUES (?, ?, ?)",
+                            (sid, sname, fname),
+                        ) or 0
+                        # Copy parameter templates for this function.
+                        for t in self._fetch('''
+                            SELECT pl.ParameterName, pl.ParameterValue, pl.Type
+                            FROM FunctionParametersLibrary pl
+                            JOIN FunctionTemplateLibrary fl ON fl.FunctionTemplateID = pl.FunctionTemplateID
+                            WHERE fl.FunctionName = ?
+                        ''', (fname,)):
+                            self._exec(
+                                "INSERT INTO FunctionParametersInSession "
+                                "(FunctionID, FunctionName, StrategyName, ParameterName, ParameterValue, Type) "
+                                "VALUES (?, ?, ?, ?, ?, ?)",
+                                (fid, fname, sname, t["ParameterName"],
+                                 t["ParameterValue"], t["Type"]),
+                            )
+
+            def get_current_function_id(self, sid: int) -> Optional[int]:
+                rows = self._fetch(
+                    "SELECT FunctionID FROM FunctionInSession "
+                    "WHERE StrategyID = ? AND FunctionSuccess IS NULL "
+                    "ORDER BY FunctionID LIMIT 1", (sid,))
+                return rows[0]["FunctionID"] if rows else None
+
+            def get_function_info(self, fid: int) -> Optional[dict]:
+                rows = self._fetch(
+                    "SELECT * FROM FunctionInSession WHERE FunctionID = ?", (fid,))
+                return rows[0] if rows else None
+
+            def update_function_status(self, fid: int, success: bool, msg: str = "") -> None:
+                self._exec(
+                    "UPDATE FunctionInSession SET FunctionSuccess = ?, failedtext = ? "
+                    "WHERE FunctionID = ?",
+                    (1 if success else 0, msg if not success else "", fid),
+                )
+
+            def store_function_output(self, fid: int, fname: str, sname: str,
+                                      oname: str, ovalue: str, otype: str) -> None:
+                self._exec(
+                    "INSERT INTO FunctionOutputInSession "
+                    "(FunctionID, FunctionName, StrategyName, OutputName, OutputValue, Type) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (fid, fname, sname, oname, ovalue, otype),
+                )
+
+
+        # Single shared instance — same pattern as the production project.
+        db_mgr = DatabaseManager()
+        debug.system(f"DatabaseManager bound to {db_mgr.db_path}")
+    """),
+
+    md("""
         ### `node_goal_define` — capture the goal
     """),
     py("""
         def node_goal_define(state: SessionState) -> SessionState:
             sess  = state["sessionID"]
             query = state["query"].strip()
-            goal_resp = ollama_chat(fmt_prompt("goal_definition", query=query))
+            goal_resp = chat_basic(fmt_prompt("goal_definition", query=query))
             data = parse_json_response(goal_resp) or {}
             description = data.get("goal_description") or f"Answer: {query.rstrip('?.!')}"
             target = " ".join(query.split()[:4])
@@ -1659,7 +2467,7 @@ L2_CELLS: list[dict] = [
                 sname = forced
                 trace("StrategyPlan", f"forced: {sname}")
             else:
-                resp = ollama_chat(fmt_prompt(
+                resp = chat_basic(fmt_prompt(
                     "strategy_selection",
                     query=query,
                     goal_desc=db_query(DB_AGENTIC,
@@ -1696,18 +2504,117 @@ L2_CELLS: list[dict] = [
     md("""
         ### `node_function_execute` — resolve params, dispatch, store outputs
 
-        Five clearly-labelled stages in the cell below:
+        Six clearly-labelled stages in the cell below:
 
         1. **Look up** which function we're running (from `FunctionInSession`).
-        2. **Resolve parameters**: each row in `FunctionParametersInSession`
+        2. **Detect parallel siblings**: if the current function name is in a
+           `[A || B]` group within this strategy's `PlanSteps`, batch all
+           pending siblings and run them on a `ThreadPoolExecutor`.
+        3. **Resolve parameters**: each row in `FunctionParametersInSession`
            tells us where a value comes from — the user query (`"Input"`),
            a prior function's output (empty string), or a literal template value.
-        3. **Dispatch** to the registered handler in `FUNCTION_MAP`.
-        4. **Persist** the success flag and any failure text.
-        5. **Store outputs** that match the declared output schema; promote
+        4. **Dispatch** to the registered handler in `FUNCTION_MAP`.
+        5. **Persist** the success flag and any failure text.
+        6. **Store outputs** that match the declared output schema; promote
            `Analyze With LLM`'s `Analysis` to the user-visible `finalAnswer`.
     """),
     py("""
+        # ─── helpers used by node_function_execute ──────────────────────
+
+        def parse_plan_groups(plan_steps: str) -> List[List[str]]:
+            \"\"\"Return the parallel groups in this strategy's PlanSteps.\"\"\"
+            groups: List[List[str]] = []
+            for tok in [s.strip() for s in plan_steps.split(",")]:
+                if tok.startswith("[") and tok.endswith("]"):
+                    groups.append([f.strip() for f in tok[1:-1].split("||")])
+            return groups
+
+
+        def find_parallel_siblings(sid: int, fn: str) -> Optional[List[int]]:
+            \"\"\"If `fn` is in a parallel group for strategy `sid`, return the FIDs of all pending siblings.\"\"\"
+            row = db_query(DB_AGENTIC,
+                "SELECT PlanSteps FROM StrategyInSession WHERE StrategyID = ?", (sid,))
+            if not row:
+                return None
+            groups = parse_plan_groups(row[0]["PlanSteps"])
+            for g in groups:
+                if fn in g:
+                    pending = db_query(DB_AGENTIC, '''
+                        SELECT FunctionID, FunctionName FROM FunctionInSession
+                        WHERE StrategyID = ? AND FunctionSuccess IS NULL
+                          AND FunctionName IN (%s)
+                        ORDER BY FunctionID
+                    ''' % ",".join("?" * len(g)), (sid, *g))
+                    return [r["FunctionID"] for r in pending]
+            return None
+
+
+        def _resolve_params(fid: int, sid: int, fn: str, query: str) -> Dict[str, Any]:
+            \"\"\"Read FunctionParametersInSession and fill in actual values.\"\"\"
+            param_rows = db_query(DB_AGENTIC,
+                "SELECT ParameterName, ParameterValue, Type FROM FunctionParametersInSession "
+                "WHERE FunctionID = ?", (fid,))
+            out: Dict[str, Any] = {}
+            for p in param_rows:
+                name, val, ptype = p["ParameterName"], p["ParameterValue"], p["Type"]
+                if val == "Input":
+                    out[name] = query
+                elif val == "":
+                    merged = collect_outputs(sid, name)
+                    if not merged and name == "Input":
+                        merged = [query]
+                    out[name] = merge_values(name, merged) if merged else ""
+                else:
+                    if ptype == "json":
+                        try:    out[name] = json.loads(val)
+                        except: out[name] = val
+                    elif ptype == "integer":
+                        try:    out[name] = int(val)
+                        except: out[name] = val
+                    else:
+                        out[name] = val
+            return out
+
+
+        def _persist_function_result(fid: int, fn: str, sname: str,
+                                     success: bool, result: Any) -> None:
+            \"\"\"Update status + store declared outputs.\"\"\"
+            db_exec("UPDATE FunctionInSession SET FunctionSuccess = ?, failedtext = ? "
+                    "WHERE FunctionID = ?",
+                    (1 if success else 0,
+                     "" if success else str(result)[:500], fid))
+            if success and isinstance(result, dict):
+                declared = {n for (n, _, _) in OUTPUTS_SEED.get(fn, [])}
+                for oname, oval in result.items():
+                    if oname not in declared:
+                        continue
+                    if isinstance(oval, (list, dict)):
+                        sval, otype = json.dumps(oval, ensure_ascii=False), "json"
+                    else:
+                        sval, otype = str(oval), "string"
+                    db_exec("INSERT INTO FunctionOutputInSession "
+                            "(FunctionID, FunctionName, StrategyName, OutputName, OutputValue, Type) "
+                            "VALUES (?, ?, ?, ?, ?, ?)",
+                            (fid, fn, sname, oname, sval, otype))
+
+
+        def _execute_one(fid: int, query: str) -> Tuple[int, str, bool, Any]:
+            \"\"\"Worker for both sequential and parallel branches.\"\"\"
+            row = db_query(DB_AGENTIC,
+                "SELECT FunctionName, StrategyID, StrategyName "
+                "FROM FunctionInSession WHERE FunctionID = ?", (fid,))[0]
+            fn, sid, sname = row["FunctionName"], row["StrategyID"], row["StrategyName"]
+            params = _resolve_params(fid, sid, fn, query)
+            handler = FUNCTION_MAP.get(fn)
+            if not handler:
+                return fid, fn, False, f"no handler for {fn!r}"
+            try:
+                ok, res = handler(params)
+            except Exception as e:
+                ok, res = False, f"{type(e).__name__}: {e}"
+            return fid, fn, ok, res
+
+
         def node_function_execute(state: SessionState) -> SessionState:
             # Guard: don't execute if a previous step already aborted the strategy.
             if state.get("strategyAborted"):
@@ -1726,81 +2633,36 @@ L2_CELLS: list[dict] = [
                 return state
             fn, sid, sname = row[0]["FunctionName"], row[0]["StrategyID"], row[0]["StrategyName"]
 
-            # ─── 2. Resolve parameters ───────────────────────────────────
-            # ParameterValue conventions:
-            #   "Input"  → use the user query as the value
-            #   ""       → merge values from prior FunctionOutputInSession rows
-            #              that share this strategy and parameter name
-            #   anything → literal template value (parsed by Type)
-            param_rows = db_query(DB_AGENTIC,
-                "SELECT ParameterName, ParameterValue, Type FROM FunctionParametersInSession "
-                "WHERE FunctionID = ?", (fid,))
-            params: Dict[str, Any] = {}
-            for p in param_rows:
-                name, val, ptype = p["ParameterName"], p["ParameterValue"], p["Type"]
-                if val == "Input":
-                    params[name] = query
-                elif val == "":
-                    merged = collect_outputs(sid, name)
-                    if not merged and name == "Input":
-                        merged = [query]                            # first-function fallback
-                    params[name] = merge_values(name, merged) if merged else ""
-                else:
-                    # Literal template value — coerce by declared type.
-                    if ptype == "json":
-                        try:    params[name] = json.loads(val)
-                        except: params[name] = val
-                    elif ptype == "integer":
-                        try:    params[name] = int(val)
-                        except: params[name] = val
-                    else:
-                        params[name] = val
-
-            trace("FunctionExecute", f"{fn}({list(params)})")
-
-            # ─── 3. Dispatch via FUNCTION_MAP ────────────────────────────
-            handler = FUNCTION_MAP.get(fn)
-            if not handler:
-                trace("FunctionExecute", f"no handler for {fn!r}; aborting")
-                state["strategyAborted"] = True
-                db_exec("UPDATE FunctionInSession SET FunctionSuccess = 0, failedtext = ? "
-                        "WHERE FunctionID = ?", (f"no handler for {fn}", fid))
+            # ─── 2. Parallel siblings? Batch them. ──────────────────────
+            siblings = find_parallel_siblings(sid, fn)
+            if siblings and len(siblings) > 1:
+                trace("FunctionExecute", f"parallel batch: {siblings}")
+                with ThreadPoolExecutor(max_workers=min(4, len(siblings))) as ex:
+                    futures = [ex.submit(_execute_one, sfid, query) for sfid in siblings]
+                    any_failed = False
+                    for fut in as_completed(futures):
+                        sfid, sfn, ok, res = fut.result()
+                        _persist_function_result(sfid, sfn, sname, ok, res)
+                        trace("FunctionExecute", f"  ↳ {sfn}: {'ok' if ok else 'FAIL'}")
+                        if ok and sfn == "Analyze With LLM" and isinstance(res, dict):
+                            state["finalAnswer"] = res.get("Analysis", state.get("finalAnswer"))
+                        if not ok:
+                            any_failed = True
+                if any_failed:
+                    state["strategyAborted"] = True
                 return state
 
-            try:
-                success, result = handler(params)
-            except Exception as e:
-                trace("FunctionExecute", f"{fn} raised: {e}")
-                success, result = False, str(e)
+            # ─── 3-6. Sequential single-function path ───────────────────
+            # Re-uses the same helpers the parallel branch above used.
+            trace("FunctionExecute", f"{fn}")
+            _, _, success, result = _execute_one(fid, query)
+            _persist_function_result(fid, fn, sname, success, result)
 
-            # ─── 4. Record success / failure ─────────────────────────────
-            db_exec("UPDATE FunctionInSession SET FunctionSuccess = ?, failedtext = ? "
-                    "WHERE FunctionID = ?",
-                    (1 if success else 0,
-                     "" if success else str(result)[:500], fid))
-
-            # ─── 5. Persist outputs + promote to finalAnswer ─────────────
-            if success and isinstance(result, dict):
-                # Only store outputs declared in the function's output schema (§4).
-                declared = {n for (n, _, _) in OUTPUTS_SEED.get(fn, [])}
-                for oname, oval in result.items():
-                    if oname not in declared:
-                        continue
-                    if isinstance(oval, (list, dict)):
-                        sval, otype = json.dumps(oval, ensure_ascii=False), "json"
-                    else:
-                        sval, otype = str(oval), "string"
-                    db_exec("INSERT INTO FunctionOutputInSession "
-                            "(FunctionID, FunctionName, StrategyName, OutputName, OutputValue, Type) "
-                            "VALUES (?, ?, ?, ?, ?, ?)",
-                            (fid, fn, sname, oname, sval, otype))
-
-                # Bubble the analyzer's text up so the trace shows it immediately.
-                if fn == "Analyze With LLM":
-                    state["finalAnswer"] = result.get("Analysis", state.get("finalAnswer"))
-            else:
+            if success and fn == "Analyze With LLM" and isinstance(result, dict):
+                state["finalAnswer"] = result.get("Analysis", state.get("finalAnswer"))
+            elif not success:
                 state["strategyAborted"] = True
-                trace("FunctionExecute", f"{fn} failed → strategy aborted")
+                trace("FunctionExecute", f"{fn} failed → strategy aborted ({result})")
 
             return state
     """),
@@ -1902,7 +2764,7 @@ L2_CELLS: list[dict] = [
             goal_def = db_query(DB_AGENTIC,
                 "SELECT GoalDescription FROM GoalInSession WHERE GoalID = ?", (gid,))[0]["GoalDescription"]
 
-            judge_resp = ollama_chat(fmt_prompt(
+            judge_resp = chat_reasoning(fmt_prompt(            # heavier tier for validation
                 "goal_validation",
                 query=query, goal_definition=goal_def, evidence=evidence,
             ))
@@ -1939,8 +2801,8 @@ L2_CELLS: list[dict] = [
     md("""
         # §8. Build the LangGraph state machine
 
-        Same topology as the production project. Three conditional edges
-        give us the **tri-condition routing**:
+        Same topology as the production project. **Tri-condition routing**
+        on `StrategyValidate` is the load-bearing decision:
 
         ```mermaid
         stateDiagram-v2
@@ -1967,12 +2829,11 @@ L2_CELLS: list[dict] = [
         - **`GoalValidate`** → `done` *or* `StrategyPlan`
           (the judge is happy / try another strategy)
 
-        > **Simplified:** The production graph also handles parallel function
-        > batches (the `[Func1 || Func2]` syntax in `PlanSteps`). The build
-        > below treats every plan step as sequential — a parallel group token
-        > would be passed to `FUNCTION_MAP` as a literal name and fail.
-        > Adding the parser is a small change in `node_strategy_plan` if you
-        > need it.
+        > **Parallel execution** (the `[Func1 || Func2]` syntax in
+        > `PlanSteps`) is wired in via `DatabaseManager.create_strategy_functions`
+        > (parses the syntax) and the parallel branch in `node_function_execute`
+        > (uses `ThreadPoolExecutor`). See the `PARALLEL ENHANCED LOOKUP`
+        > strategy seeded in §4 for an example.
     """),
     py("""
         def _next_after_strategy_validate(state: SessionState) -> str:
