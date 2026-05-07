@@ -3071,20 +3071,29 @@ L2_CELLS: list[dict] = [
     md("""
         ## You've finished Layer 2
 
-        You ran a real agentic loop end-to-end:
+        You ran the production reasoning architecture end-to-end:
 
-        - Schema, templates, prompts, function library — all defined in cells you can edit.
-        - LangGraph wired with seven nodes and tri-condition routing — same topology as the production project.
-        - The judge gates synthesis. Off-catalog queries fail explicitly rather than hallucinating.
+        - **Schema** — all 9 tables built from the same SQL the production system ships (§3).
+        - **Templates** — 7 strategies + 11 function templates seeded into `agentic.db` (§4).
+        - **Function library** — Extract Product Number, Extract Requirements, Query Database, Search Products, Search Families, Semantic Search (ChromaDB-backed), Extract Attributes, Compare Items, Filter Items, Convert Units, Analyze With LLM (§6).
+        - **Multi-tier LLM** — `chat_basic` for cheap stages, `chat_reasoning` for synthesis + the judge, `embed` for vector search; all wrapped in `invoke_llm_with_retry` (§6).
+        - **`DatabaseManager` / `PromptLoader` / `DebugConfig`** — same API surface as the production wrappers (§6, §7).
+        - **LangGraph** — seven nodes, tri-condition routing (§7, §8).
+        - **Parallel execution** — `[A \\|\\| B]` syntax in `PlanSteps` triggers a `ThreadPoolExecutor` batch in `node_function_execute` (§7).
+        - **The judge gate** — verify-then-summarise. Off-catalog queries fail explicitly rather than hallucinating (§9 failure-mode cell).
+
+        **Where this notebook stays lighter than production**
+
+        - 11 of 15 functions ship — adding the remaining four (Search Categories, Aggregate Results, Calculate, legacy variants) follows the patterns in §6.
+        - Prompts in a single inline `PROMPTS` dict instead of `config/prompts.yaml`. Same `format_prompt(...)` API.
+        - No multimodal LLM tier — Layer 1 owns the vision model. You'd add a `chat_multimodal()` peer to `chat_basic` / `chat_reasoning`.
 
         **Where to push next**
 
+        - Wire one of the failed-query traces back into `agentic.db` for permanent audit logs.
         - Add a new strategy or function: extend `STRATEGIES_SEED` / `FUNCTIONS_SEED` and re-run §4.
-        - Add semantic search: replace `func_search_products` with a ChromaDB-backed embedding lookup.
-        - Add parallel execution: parse `[A \\|\\| B]` syntax in `node_strategy_plan` and dispatch via `concurrent.futures`.
-        - Compare strategies side-by-side on the same query by setting `forcedStrategy` per run.
-
-        The full project at [Layer_2_Agentic_Reasoning/](../Layer_2_Agentic_Reasoning/) does all of this and more (15 functions, retry policies, multi-tier LLMs, async).
+        - Compare strategies side-by-side on the same query by setting `forced_strategy` per run.
+        - Switch `chat_reasoning` to a stronger model (`phi4`, `qwen2.5:14b`) and re-run the failure-mode cell — does the judge get sharper?
     """),
 ]
 
