@@ -397,7 +397,9 @@ L2_CELLS: list[dict] = [
         # Layer 2 — Agentic Reasoning
         ### The RCP Framework, distilled into one runnable notebook
 
-        This notebook is the **interactive showcase** for Layer 2 of the
+        > 🔗 **Companion repo**: [github.com/oscik559/RCP-Framework](https://github.com/oscik559/RCP-Framework) — the full source for the framework. This notebook is a self-contained walk-through; the repo has the complete implementation, additional cases, and evaluation suites.
+
+        This notebook is the **interactive walk-through** for Layer 2 of the
         RCP Framework — a SQL-backed agentic architecture that takes a
         natural-language query about industrial products, picks a reasoning
         strategy, executes a sequence of functions to gather evidence, and
@@ -409,40 +411,68 @@ L2_CELLS: list[dict] = [
 
         ---
 
+        ### One-time setup — the diagram-rendering helper
+
+        Mermaid diagrams (`flowchart`, `erDiagram`, etc.) render in some
+        tools but not others — Colab in particular shows them as raw text.
+        The cell below sends Mermaid source to **mermaid.ink** (a public
+        renderer) and embeds the resulting SVG inline, which works
+        **everywhere** that supports HTML output.
+
+        > **Run this cell first** — every diagram cell below calls `show_mermaid(...)`.
+    """),
+    py("""
+        def show_mermaid(graph: str) -> None:
+            \"\"\"Render a Mermaid diagram inline as an SVG (Colab-compatible).\"\"\"
+            import base64
+            from IPython.display import display, HTML
+            encoded = base64.urlsafe_b64encode(graph.strip().encode("utf-8")).decode("ascii")
+            display(HTML(
+                f'<img src="https://mermaid.ink/svg/{encoded}" '
+                f'alt="diagram" style="max-width:100%;border:1px solid #eee" />'
+            ))
+    """),
+
+    md("""
         ### Where this notebook sits in the project
 
-        ```mermaid
+        *(diagram below — rendered by `show_mermaid`)*
+    """),
+    py('''
+        show_mermaid(r"""
         flowchart TB
             subgraph L1[Layer 1 — Extraction]
                 P1[PDF catalog]
                 S1[VLM-driven extraction pipeline]
                 P1 --> S1
             end
-
+        
             subgraph DB[Storage]
                 HDB[(harvested.db<br/>products + families + categories)]
                 ADB[(agentic.db<br/>strategies + sessions)]
             end
-
+        
             subgraph L2[Layer 2 — Agentic Reasoning  ★ this notebook ★]
                 Q([User query])
                 G[Goal &middot Strategy &middot Function]
                 A([Verified answer])
                 Q --> G --> A
             end
-
+        
             subgraph L3[Layer 3 — User Interface]
                 W[Flask + SSE web app]
             end
-
+        
             S1 --> HDB
             G <--> HDB
             G <--> ADB
             W --> G
-
+        
             style L2 fill:#fff3cd,stroke:#856404,stroke-width:2px
-        ```
-
+        """)
+    '''),
+    md("""
+        
         L1 builds the product database from PDF catalogs.
         **L2 (this notebook) is the brain** — it answers questions over that database.
         L3 wraps L2 in HTTP for a web UI.
@@ -451,7 +481,10 @@ L2_CELLS: list[dict] = [
 
         ### What you'll build, end-to-end
 
-        ```mermaid
+        *(diagram below — rendered by `show_mermaid`)*
+    """),
+    py('''
+        show_mermaid(r"""
         flowchart LR
             S1[§1 Setup] --> S2[§2 Tour DB]
             S2 --> S3[§3 Schema]
@@ -461,53 +494,52 @@ L2_CELLS: list[dict] = [
             S6 --> S7[§7 Workflow nodes]
             S7 --> S8[§8 LangGraph]
             S8 --> S9[§9 Run queries]
-        ```
-
+        """)
+    '''),
+    md("""
+        
         | Built in | What it is |
         |----------|------------|
         | §3 | `agentic.db` from a 9-table SQL schema, alongside this notebook |
         | §4 | Seven strategies + fourteen function templates seeded into `agentic.db` |
         | §6 | Function library + multi-tier LLM helpers + ChromaDB-backed semantic search |
         | §7 | Seven LangGraph nodes with tri-condition routing |
-        | §8 | A compiled state machine — same topology as the production project |
+        | §8 | A compiled state machine — same topology as the source repo |
         | §9 | End-to-end runs against real queries (live-traced per node) |
 
         ---
 
-        ### Production-feature parity
+        ### How this notebook maps onto the source repo
 
-        This notebook now mirrors the production codebase feature-for-feature.
-        Where the production code has a 1200-line `DatabaseManager`, the
-        notebook ships a focused 150-line equivalent with the same API.
-        Where the production code splits LLM tiers (`basic` / `reasoning` /
-        `multimodal`), the notebook does too. Vector search via ChromaDB
-        runs the same `Semantic Search` function the production library
-        does. Parallel function execution (`[A || B]` syntax) is wired in.
+        Every cell here corresponds to a piece of the implementation in
+        [github.com/oscik559/RCP-Framework](https://github.com/oscik559/RCP-Framework).
+        If you want to dig deeper after running through the notebook, click
+        any link below to see the full implementation.
 
-        | Production file | Notebook section |
-        |-----------------|------------------|
-        | `db/agentic_schema.sql`              | §3 — inline `SCHEMA_SQL` |
-        | `db/schema_manager.py`               | §3 — `init_agentic_db()` |
-        | `db/connection.py`                   | §1 — direct `sqlite3.connect`; §7 has connection helpers |
-        | `logic/templates.py`                 | §4 — `STRATEGIES_SEED`, `FUNCTIONS_SEED`, etc. |
-        | `logic/database_manager.py`          | §7 — focused `DatabaseManager` class |
-        | `logic/llm_helpers.py`               | §6 — `get_basic_llm()`, `get_reasoning_llm()`, retry wrapper |
-        | `logic/embeddings.py` + `vector_helpers.py` | §6 — ChromaDB index + `Semantic Search` |
-        | `logic/function_library.py`          | §6 — handlers in `FUNCTION_MAP` |
-        | `logic/workflow_types.py`            | §5 — `SessionState` TypedDict |
-        | `logic/workflow_nodes.py`            | §7 — seven node functions |
-        | `logic/state_graph.py`               | §8 — `build_graph()` |
-        | `config/prompts.yaml`                | §6 — inline `PROMPTS` dict |
-        | `config/prompt_loader.py`            | §6 — small `PromptLoader` class |
-        | `config/debug_config.py`             | §6 — `DebugConfig` with level dispatcher |
-        | `config/session_config.py`           | §5 — `make_session_state()` |
-        | `logic/async_helpers.py`             | §7 — `ThreadPoolExecutor` in parallel branch |
+        | Source file | Notebook section |
+        |-------------|------------------|
+        | [`Layer_2_Agentic_Reasoning/db/agentic_schema.sql`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/agentic_schema.sql) | §3 — inline `SCHEMA_SQL` |
+        | [`Layer_2_Agentic_Reasoning/db/schema_manager.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/schema_manager.py) | §3 — `init_agentic_db()` |
+        | [`Layer_2_Agentic_Reasoning/db/connection.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/connection.py) | §1 — direct `sqlite3.connect`; §7 connection helpers |
+        | [`Layer_2_Agentic_Reasoning/logic/templates.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/templates.py) | §4 — `STRATEGIES_SEED`, `FUNCTIONS_SEED`, etc. |
+        | [`Layer_2_Agentic_Reasoning/logic/database_manager.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/database_manager.py) | §7 — focused `DatabaseManager` class |
+        | [`Layer_2_Agentic_Reasoning/logic/llm_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/llm_helpers.py) | §6 — `chat_basic`, `chat_reasoning`, retry wrapper |
+        | [`Layer_2_Agentic_Reasoning/logic/embeddings.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/embeddings.py) + [`vector_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/vector_helpers.py) | §6 — ChromaDB index + `Semantic Search` |
+        | [`Layer_2_Agentic_Reasoning/logic/function_library.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/function_library.py) | §6 — handlers in `FUNCTION_MAP` |
+        | [`Layer_2_Agentic_Reasoning/logic/workflow_types.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/workflow_types.py) | §5 — `SessionState` TypedDict |
+        | [`Layer_2_Agentic_Reasoning/logic/workflow_nodes.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/workflow_nodes.py) | §7 — seven node functions |
+        | [`Layer_2_Agentic_Reasoning/logic/state_graph.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/state_graph.py) | §8 — `build_graph()` |
+        | [`Layer_2_Agentic_Reasoning/config/prompts.yaml`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/prompts.yaml) | §6 — inline `PROMPTS` dict |
+        | [`Layer_2_Agentic_Reasoning/config/prompt_loader.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/prompt_loader.py) | §6 — small `PromptLoader` class |
+        | [`Layer_2_Agentic_Reasoning/config/debug_config.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/debug_config.py) | §6 — `DebugConfig` with level dispatcher |
+        | [`Layer_2_Agentic_Reasoning/config/session_config.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/session_config.py) | §5 — `make_session_state()` |
+        | [`Layer_2_Agentic_Reasoning/logic/async_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/async_helpers.py) | §7 — `ThreadPoolExecutor` in parallel branch |
 
-        Items kept lighter for readability (call out inline where they appear):
-        - We ship 9 / 15 functions in the library. The remaining 6 are
-          straightforward variants you can add by following the pattern in §6.
-        - YAML prompt files become a single inline `PROMPTS` dict — same
-          expressiveness, no file dependency.
+        What's lighter in the notebook compared to the repo (each one is called out inline where it appears):
+
+        - We ship 11 of the 15 functions; the missing four (Search Categories, Aggregate Results, Calculate, legacy variants) follow the same patterns shown in §6.
+        - Prompts live in a single inline `PROMPTS` dict instead of a YAML file. Same `format_prompt(...)` API.
+        - LLM helpers use one model tier; the repo splits `basic` / `reasoning` / `multimodal` and you can swap in those three by editing `OLLAMA_MODEL` / `OLLAMA_REASONING` in §1.
 
         ---
 
@@ -524,7 +556,7 @@ L2_CELLS: list[dict] = [
           The Colab/Ollama bootstrap in §1.5 takes care of installing
           Ollama itself.
         - **Models**: the `§1.5` cell pulls `llama3.2:latest` and
-          `nomic-embed-text` automatically.
+          `nomic-embed-text:latest` automatically.
     """),
 
     md("""
@@ -546,6 +578,7 @@ L2_CELLS: list[dict] = [
         > §9 *invokes the LLM* — those are the slow ones (a few seconds per
         > stage on a local model).
     """),
+
     md("""
         ## §1. Setup — paths, imports, environment probe
 
@@ -593,7 +626,7 @@ L2_CELLS: list[dict] = [
         OLLAMA_URL         = "http://localhost:11434"
         OLLAMA_MODEL       = "llama3.2:latest"     # used for goal/strategy/judge/synthesis
         OLLAMA_REASONING   = "llama3.2:latest"     # swap to phi4 / qwen2.5:14b for harder reasoning
-        OLLAMA_EMBED_MODEL = "nomic-embed-text"    # used by ChromaDB in §6 (vector search)
+        OLLAMA_EMBED_MODEL = "nomic-embed-text:latest"    # used by ChromaDB in §6 (vector search)
 
         # ---- UTF-8 for Swedish text on Windows ----
         if sys.platform.startswith("win"):
@@ -633,37 +666,45 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ## §1.5 Bring up Ollama  *(Colab + first-time-local helper)*
+        ## §1.5 Bring up Ollama
 
-        The reasoning workflow needs an Ollama server reachable on
+        The reasoning workflow needs an **Ollama server** reachable on
         `http://localhost:11434` with two models pulled:
 
         - **`llama3.2:latest`** — chat / reasoning
-        - **`nomic-embed-text`** — embeddings for the vector index in §6
+        - **`nomic-embed-text:latest`** — embeddings for the vector index in §6
 
-        Three small cells follow — `install`, `start`, `pull`. Each prints
-        what it's doing so you can see exactly where it fails on first run.
+        ### Decision tree — which cells should you run?
 
-        | Environment | What to do |
-        |-------------|------------|
-        | **Local, Ollama already running** | The §1 probe will say `reachable` — skip §1.5 entirely. |
-        | **Local, no Ollama yet** *(macOS / Windows)* | Install from [ollama.com/download](https://ollama.com/download) and start it manually (`ollama serve` in a terminal); the §1.5b "start" cell will detect it's already up and the §1.5c "pull" cell will fetch the two models. |
-        | **Local, no Ollama yet** *(Linux)* | Run all three cells. |
-        | **Google Colab** | Run all three cells. **Switch the runtime to a T4 GPU** first (Runtime → Change runtime type) — CPU inference for an LLM is painfully slow. The first model pull is ~2 GB. |
+        First, look at the §1 probe output above. Then follow the row that matches your situation:
 
-        ### Known Colab gotchas the cells handle
+        | Your situation | What to do |
+        |----------------|------------|
+        | §1 probe said **"ollama reachable, both models ✅"** | **Skip all of §1.5** — you're already set up. Jump to §2. |
+        | §1 probe said **"ollama reachable, models missing ⚠️"** | Run **only §1.5c** (pull). Skip §1.5a / §1.5b. |
+        | **Local Linux** with no Ollama yet | Run **§1.5a → §1.5b → §1.5c** in order. |
+        | **Local macOS / Windows** with no Ollama yet | Stop here. Install from [ollama.com/download](https://ollama.com/download), start it (auto-starts on macOS / from system tray on Windows), then **re-run §1**. After that, run **§1.5c** for the model pulls. The shell-based installer in §1.5a is Linux-only. |
+        | **Google Colab** | First **switch the runtime to a T4 GPU** (Runtime → Change runtime type). CPU inference for an LLM is painfully slow. Then run **§1.5a → §1.5b → §1.5c** in order. Allow ~5 minutes total — model downloads are several GB. |
 
-        - **`systemctl` failure during install.** The official Ollama installer
-          tries to register a systemd service. Colab has no systemd, so this
-          step fails and the script exits non-zero — but the binary
-          `/usr/local/bin/ollama` is installed correctly and that's all we
-          need. The cell ignores the script's exit code and verifies the
-          binary exists separately.
-        - **`ollama serve` background process.** We start it via `Popen` and
-          poll `/api/tags` until it responds. If it dies, we surface its
-          stderr instead of just hanging.
-        - **Pulls can be slow.** Output streams live; if you don't see
-          progress for ~60s, your runtime may be paused — re-engage it.
+        ### Why the install is split into three cells
+
+        Each cell does one thing and prints what it's doing. If something
+        breaks, you know exactly which step failed and what its output was.
+        Three known gotchas the cells handle:
+
+        - **`zstd` missing on Colab.** Recent Ollama installers ship the
+          binary inside a `.tar.zst` archive; without `zstd` installed,
+          extraction fails silently. §1.5a installs `zstd` first if it's
+          not already there.
+        - **`systemctl` not on Colab.** The installer tries to register a
+          systemd service. Colab has no systemd, so this step exits non-zero
+          — but the binary `/usr/local/bin/ollama` is installed correctly,
+          which is all we need. §1.5a ignores the exit code and verifies the
+          binary independently.
+        - **Background `ollama serve` can die quietly.** §1.5b starts it via
+          `Popen` with stderr piped to `db/ollama_serve.log`, then polls
+          `/api/tags` until it responds. If the process dies, the cell
+          surfaces the log tail instead of hanging.
     """),
     md("""
         ### §1.5a — Install the binary
@@ -676,7 +717,22 @@ L2_CELLS: list[dict] = [
         if OLLAMA_BIN:
             print(f"  ✅ ollama binary already present at {OLLAMA_BIN}")
         elif IS_COLAB or sys.platform.startswith("linux"):
-            print("Running official install script (this may take 1–3 min)...")
+            # ── Pre-req: zstd ─────────────────────────────────────────────
+            # Recent Ollama installers ship the binary inside a `.tar.zst`
+            # archive. The install script extracts it with `tar --zstd`,
+            # which needs the `zstd` userland tool. Standard Colab images
+            # don't include `zstd` — without it the script silently fails
+            # to write `/usr/local/bin/ollama` and the next cell errors out.
+            if shutil.which("zstd") is None:
+                print("Installing `zstd` (required by the Ollama installer)...")
+                subprocess.run(["sudo", "apt-get", "update", "-qq"], check=False)
+                subprocess.run(["sudo", "apt-get", "install", "-y", "-qq", "zstd"],
+                               check=True)
+                print("  ✅ zstd installed")
+            else:
+                print("  ✅ zstd already present")
+
+            print("Running official Ollama install script (this may take 1–3 min)...")
             # We DO NOT raise on non-zero return: systemctl errors are expected on Colab
             # and don't prevent the binary from being installed.
             ret = subprocess.run(
@@ -823,19 +879,24 @@ L2_CELLS: list[dict] = [
         two halves: `*InSession` tables (per-run execution traces) and `*Library`
         tables (reusable templates).
 
-        ```mermaid
+        *(diagram below — rendered by `show_mermaid`)*
+    """),
+    py('''
+        show_mermaid(r"""
         erDiagram
             GoalInSession                ||--o{ StrategyInSession           : "has many"
             StrategyInSession            ||--o{ FunctionInSession           : "has many"
             FunctionInSession            ||--o{ FunctionOutputInSession     : "produces"
             FunctionInSession            ||--o{ FunctionParametersInSession : "consumes"
-
+        
             StrategyLibrary              }o..o| StrategyInSession           : "template for"
             FunctionTemplateLibrary      }o..o| FunctionInSession           : "template for"
             FunctionTemplateLibrary      ||--o{ FunctionParametersLibrary   : "declares"
             FunctionTemplateLibrary      ||--o{ FunctionOutputLibrary       : "declares"
-        ```
-
+        """)
+    '''),
+    md("""
+        
         Two halves, same shape:
         - **`*Library`** rows are the *catalog* — what strategies and functions exist.
         - **`*InSession`** rows are the *log* — what actually ran for each query, with what params, what outputs, and what success status.
@@ -844,7 +905,7 @@ L2_CELLS: list[dict] = [
 
         > **Note:** the bootstrap below uses a direct `sqlite3.executescript(...)`
         > to run the SQL once. The session-scoped `DatabaseManager` class
-        > (mirroring the production wrapper) is built later in §7, after the
+        > (mirroring the wrapper in the repo) is built later in §7, after the
         > schema exists.
     """),
     py("""
@@ -1189,15 +1250,20 @@ L2_CELLS: list[dict] = [
         separated string `Extract Product Number, Query Database, Extract Attributes, Analyze With LLM`.
         The planner parses that into a sequence of function calls:
 
-        ```mermaid
+        *(diagram below — rendered by `show_mermaid`)*
+    """),
+    py('''
+        show_mermaid(r"""
         flowchart LR
             Q([User query]) --> EPN[Extract Product Number]
             EPN -->|Keyword Output| QDB[Query Database]
             QDB -->|items| EA[Extract Attributes]
             EA -->|extracted_data| ANA[Analyze With LLM]
             ANA --> A([Final answer])
-        ```
-
+        """)
+    '''),
+    md("""
+        
         Each arrow is data flowing through `FunctionOutputInSession` — one
         function's output becomes the next function's input slot. Slot
         names are declared in `OUTPUTS_SEED` / `PARAMS_SEED` (§4 above).
@@ -1225,7 +1291,7 @@ L2_CELLS: list[dict] = [
 
         A query enters the workflow as a `SessionState` dict — every node
         reads and writes fields on it. Below is a `TypedDict` matching the
-        production project's shape.
+        source repo's shape.
 
         Only a few fields really matter on first read: `query`, `currentGoalID`,
         `currentStrategyID`, `currentFunctionID`, the three `*Satisfied`
@@ -1333,7 +1399,7 @@ L2_CELLS: list[dict] = [
         # §6. The function library
 
         Six callable functions, plus the helpers and prompts they need. Each
-        function follows the same interface used in the production project:
+        function follows the same interface used in the source repo:
 
         ```
         handler(params: dict) -> (success: bool, result: dict | str)
@@ -1352,7 +1418,7 @@ L2_CELLS: list[dict] = [
     md("""
         ### LLM helpers — multi-tier Ollama with retry and embeddings
 
-        Same shape as the production `Layer_2_Agentic_Reasoning/logic/llm_helpers.py`:
+        Same shape as the implementation in the repo `Layer_2_Agentic_Reasoning/logic/llm_helpers.py`:
 
         - `ollama_chat(...)` — one HTTP call to `/api/chat`.
         - `invoke_llm_with_retry(...)` — exponential backoff (1s → 2s → 4s) for transient failures.
@@ -1365,12 +1431,15 @@ L2_CELLS: list[dict] = [
         - `get_embedding_model()` + `embed(...)` — produces vectors for
           ChromaDB in §6's vector index.
 
-        ```mermaid
+        *(diagram below — rendered by `show_mermaid`)*
+    """),
+    py('''
+        show_mermaid(r"""
         flowchart LR
             subgraph Tiers
                 B[basic LLM<br/>fast / cheap]
                 R[reasoning LLM<br/>more careful]
-                E[embedding model<br/>nomic-embed-text]
+                E[embedding model<br/>nomic-embed-text:latest]
             end
             GD[GoalDefine] --> B
             SP[StrategyPlan] --> B
@@ -1379,8 +1448,10 @@ L2_CELLS: list[dict] = [
             ANA[Analyze With LLM] --> R
             JUD[GoalValidate / judge] --> R
             SS[Semantic Search] --> E
-        ```
-    """),
+        """)
+    '''),
+    md("""
+            """),
     py("""
         # ---- single low-level call --------------------------------------
         def ollama_chat(messages: List[Dict[str, str]], temperature: float = 0.0,
@@ -1451,11 +1522,11 @@ L2_CELLS: list[dict] = [
     md("""
         ### Prompts + a small `PromptLoader`
 
-        Production keeps prompts in `prompts.yaml` and loads them through a
+        The repo keeps prompts in `prompts.yaml` and loads them through a
         `PromptLoader` class. We inline the prompts as a Python dict — same
         expressiveness, no file dependency — and add a tiny loader class
         that gives us the same `format_prompt(category, **kwargs)` API the
-        production workflow nodes call.
+        workflow nodes in the repo call.
     """),
     py("""
         PROMPTS = {
@@ -1580,7 +1651,7 @@ L2_CELLS: list[dict] = [
 
         # ---- Mini PromptLoader (mirrors config/prompt_loader.py API) ------
         class PromptLoader:
-            \"\"\"Same `format_prompt(category, **kwargs)` API as production.\"\"\"
+            \"\"\"Same `format_prompt(category, **kwargs)` API as the loader in the repo.\"\"\"
             def __init__(self, prompts: Dict[str, Dict[str, str]]):
                 self._p = prompts
 
@@ -1599,14 +1670,14 @@ L2_CELLS: list[dict] = [
 
         prompt_loader = PromptLoader(PROMPTS)
         # `fmt_prompt` (defined above) and `prompt_loader.format_prompt(...)` are
-        # interchangeable — keep both so existing callers and the production
-        # API surface both work.
+        # interchangeable — keep both so existing callers and the API surface
+        # used by code in the repo both work.
     """),
 
     md("""
         ### `DebugConfig` — verbosity dial
 
-        Production has `config/debug_config.py` with named print categories
+        The repo has [`config/debug_config.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/debug_config.py) with named print categories
         (`print_goal`, `print_strategy`, `print_function`, …) gated by an
         integer level. We compress that into a single dispatcher here so
         you can `debug.set_level(3)` to see everything, `debug.set_level(0)`
@@ -1647,7 +1718,7 @@ L2_CELLS: list[dict] = [
         ### Function: **Extract Product Number**
 
         Pulls product codes out of the user query via LLM. Output goes into
-        `Keyword Output` (the canonical name from the production project) so
+        `Keyword Output` (the canonical name from the source repo) so
         downstream functions like `Query Database` can pick it up.
     """),
     py("""
@@ -1744,24 +1815,29 @@ L2_CELLS: list[dict] = [
         cross-language matches. ChromaDB gives us cosine similarity over
         Ollama embeddings instead.
 
-        ```mermaid
+        *(diagram below — rendered by `show_mermaid`)*
+    """),
+    py('''
+        show_mermaid(r"""
         flowchart LR
-            subgraph Build[Build (one-time)]
+            subgraph Build["Build (one-time)"]
                 F[(product_families rows)]
-                T[Concatenated description<br/>+ applications + name]
-                E[nomic-embed-text]
+                T["Concatenated description<br/>+ applications + name"]
+                E[nomic-embed-text:latest]
                 C[(Chroma collection)]
                 F --> T --> E --> C
             end
-
+        
             subgraph Query[Query]
                 Q([user query]) --> EQ[embed query]
-                EQ --> S[similarity search<br/>top-k]
+                EQ --> S["similarity search<br/>top-k"]
                 C --> S
                 S --> R([ranked families])
             end
-        ```
-
+        """)
+    '''),
+    md("""
+        
         We index `product_families` rows because that's where the rich text
         lives (`applications` and `description`). `products` rows are mostly
         numeric specs — they're better looked up by code via SQL.
@@ -1798,18 +1874,37 @@ L2_CELLS: list[dict] = [
                 SELECT family_code, name, subtitle, description, applications, page_number
                 FROM product_families
             ''')
+            # Chroma requires unique ids. The shipped harvested.db has a few
+            # duplicate family_codes (4 of 168 rows) — we de-duplicate by
+            # family_code, keeping the first non-empty blurb we see, and skip
+            # rows where family_code is missing.
             ids, docs, metas = [], [], []
+            seen: set[str] = set()
+            skipped_dupes = 0
+            skipped_blank = 0
             for r in rows:
+                code = (r.get("family_code") or "").strip()
+                if not code:
+                    skipped_blank += 1
+                    continue
+                if code in seen:
+                    skipped_dupes += 1
+                    continue
                 blurb = " | ".join(filter(None, [
                     r["name"], r["subtitle"], r["description"], r["applications"],
                 ]))
                 if not blurb.strip():
+                    skipped_blank += 1
                     continue
-                ids.append(r["family_code"])
+                seen.add(code)
+                ids.append(code)
                 docs.append(blurb)
-                metas.append({"family_code": r["family_code"],
+                metas.append({"family_code": code,
                               "name": r["name"] or "",
                               "page_number": r["page_number"] or 0})
+
+            if skipped_dupes or skipped_blank:
+                debug.system(f"  skipped {skipped_dupes} duplicate, {skipped_blank} blank/empty rows")
 
             # Embed in batches so progress is visible.
             BATCH = 32
@@ -1939,7 +2034,7 @@ L2_CELLS: list[dict] = [
         is what `Analyze With LLM` consumes as `extracted_data`.
     """),
     py("""
-        # Field-label aliases (truncated subset of the production glossary).
+        # Field-label aliases (truncated subset of the glossary in the repo).
         FIELD_LABELS = {
             "spec_arb_tr__mpa": "Working pressure (MPa)",
             "spec_arb_tr__bar": "Working pressure (bar)",
@@ -2190,7 +2285,7 @@ L2_CELLS: list[dict] = [
     md("""
         # §7. Workflow nodes — the LangGraph state machine
 
-        Seven nodes mirroring the production project's
+        Seven nodes mirroring the source repo's
         `Layer_2_Agentic_Reasoning/logic/workflow_nodes.py`:
 
         | Node | Purpose |
@@ -2330,17 +2425,17 @@ L2_CELLS: list[dict] = [
     md("""
         ### A focused `DatabaseManager` class
 
-        The production project routes every workflow DB call through a
+        The source repo routes every workflow DB call through a
         `DatabaseManager` (1233 lines) which gives session-scoped APIs,
         connection reuse, and transactional helpers. We mirror its
         **public API** (the methods the workflow nodes actually call) in a
-        ~150-line class. Anything the production version exposes that the
+        ~150-line class. Anything the version in the repo exposes that the
         notebook doesn't use yet is a method you'd add by following the
         existing patterns.
     """),
     py("""
         class DatabaseManager:
-            \"\"\"Session-scoped wrapper around agentic.db. Same method shape as the production class.\"\"\"
+            \"\"\"Session-scoped wrapper around agentic.db. Same method shape as the class in the repo.\"\"\"
 
             def __init__(self, db_path: str = DB_AGENTIC):
                 self.db_path = db_path
@@ -2494,13 +2589,19 @@ L2_CELLS: list[dict] = [
                 )
 
 
-        # Single shared instance — same pattern as the production project.
+        # Single shared instance — same pattern as the source repo.
         db_mgr = DatabaseManager()
         debug.system(f"DatabaseManager bound to {db_mgr.db_path}")
     """),
 
     md("""
         ### `node_goal_define` — capture the goal
+
+        **Why this node exists**: before we can pick a strategy, we need a
+        clear, structured statement of *what the user is asking for*. The
+        LLM produces a short JSON blob (description + expected content
+        types + key terms) which `node_goal_validate` later uses as the
+        rubric for "did we actually answer this?".
     """),
     py("""
         def node_goal_define(state: SessionState) -> SessionState:
@@ -2518,6 +2619,17 @@ L2_CELLS: list[dict] = [
 
     md("""
         ### `node_strategy_plan` — pick (or terminate)
+
+        **Why this node exists**: every strategy is a different *recipe*
+        for answering the query — `DIRECT SPECIFICATION LOOKUP` works for
+        "what's the pressure of code X?", `CONTEXTUAL PRODUCT SEARCH` works
+        for "find me a hose that handles boiling water". This node asks
+        the LLM to pick the right recipe given the goal, then materialises
+        it into actual `FunctionInSession` rows the executor will run.
+
+        It also handles the **strategy-exhausted** case — if every strategy
+        has been tried and none worked, the workflow bails out gracefully
+        with `workflowComplete = True` instead of looping forever.
     """),
     py("""
         def node_strategy_plan(state: SessionState) -> SessionState:
@@ -2813,9 +2925,16 @@ L2_CELLS: list[dict] = [
     md("""
         ### `node_goal_validate` — the LLM judge
 
-        The verify-then-summarise gate. We collect the strategy's `Analysis`
-        outputs and ask an LLM judge whether they satisfy the original
-        query. Confidence ≥ 0.5 → goal satisfied; otherwise re-plan.
+        **Why this node exists**: this is the load-bearing safety mechanism
+        of the whole framework. Without it, any strategy that "looks
+        plausible" would be accepted and we'd cheerfully hallucinate. With
+        it, the LLM has to score the synthesised answer against the
+        original query and goal definition, and only confidence ≥ 0.5 wins.
+
+        Below 0.5 the workflow re-enters `node_strategy_plan`, picks a
+        different strategy, and tries again. If every strategy fails,
+        `workflowComplete` flips and the user gets an explicit "no answer"
+        instead of fabrication.
     """),
     py("""
         def node_goal_validate(state: SessionState) -> SessionState:
@@ -2878,10 +2997,13 @@ L2_CELLS: list[dict] = [
     md("""
         # §8. Build the LangGraph state machine
 
-        Same topology as the production project. **Tri-condition routing**
+        Same topology as the source repo. **Tri-condition routing**
         on `StrategyValidate` is the load-bearing decision:
 
-        ```mermaid
+        *(diagram below — rendered by `show_mermaid`)*
+    """),
+    py('''
+        show_mermaid(r"""
         stateDiagram-v2
             [*] --> GoalDefine
             GoalDefine --> StrategyPlan
@@ -2895,8 +3017,10 @@ L2_CELLS: list[dict] = [
             GoalValidate --> done : satisfied (judge ≥ 0.5)
             GoalValidate --> StrategyPlan : retry (judge < 0.5)
             done --> [*]
-        ```
-
+        """)
+    '''),
+    md("""
+        
         Three places routing branches:
 
         - **`StrategyPlan`** → `done` *or* `FunctionExecute`
@@ -3148,18 +3272,18 @@ L2_CELLS: list[dict] = [
     md("""
         ## You've finished Layer 2
 
-        You ran the production reasoning architecture end-to-end:
+        You ran the RCP framework end-to-end:
 
-        - **Schema** — all 9 tables built from the same SQL the production system ships (§3).
+        - **Schema** — all 9 tables built from the same SQL the source repo ships (§3).
         - **Templates** — 7 strategies + 11 function templates seeded into `agentic.db` (§4).
         - **Function library** — Extract Product Number, Extract Requirements, Query Database, Search Products, Search Families, Semantic Search (ChromaDB-backed), Extract Attributes, Compare Items, Filter Items, Convert Units, Analyze With LLM (§6).
         - **Multi-tier LLM** — `chat_basic` for cheap stages, `chat_reasoning` for synthesis + the judge, `embed` for vector search; all wrapped in `invoke_llm_with_retry` (§6).
-        - **`DatabaseManager` / `PromptLoader` / `DebugConfig`** — same API surface as the production wrappers (§6, §7).
+        - **`DatabaseManager` / `PromptLoader` / `DebugConfig`** — same API surface as the wrappers in the repo (§6, §7).
         - **LangGraph** — seven nodes, tri-condition routing (§7, §8).
         - **Parallel execution** — `[A \\|\\| B]` syntax in `PlanSteps` triggers a `ThreadPoolExecutor` batch in `node_function_execute` (§7).
         - **The judge gate** — verify-then-summarise. Off-catalog queries fail explicitly rather than hallucinating (§9 failure-mode cell).
 
-        **Where this notebook stays lighter than production**
+        **Where this notebook stays lighter than the repo**
 
         - 11 of 15 functions ship — adding the remaining four (Search Categories, Aggregate Results, Calculate, legacy variants) follows the patterns in §6.
         - Prompts in a single inline `PROMPTS` dict instead of `config/prompts.yaml`. Same `format_prompt(...)` API.
