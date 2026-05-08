@@ -107,6 +107,8 @@ L2_CELLS: list[dict] = [
 
         ### Prerequisites
 
+        <div class="alert alert-warning"><b>Action Required:</b> Ensure these dependencies are met.</div>
+
         - `db/harvested.db` next to the notebook (shipped in `RCP_notebook/db/`).
         - Python 3.10+ with `pip install langgraph requests chromadb`. §1.5
           handles Ollama itself and pulls `llama3.2:latest` + `nomic-embed-text:latest`.
@@ -118,16 +120,16 @@ L2_CELLS: list[dict] = [
 
         | § | Title | What you do |
         |---|-------|-------------|
-        | §1 | Setup | Paths, imports, environment probe |
-        | §1.5 | Bring up Ollama | Install / start / pull models (skippable if already running) |
-        | §2 | Tour `harvested.db` | Sanity-check the product data |
-        | §3 | Build `agentic.db` | Create the 9-table workflow schema |
-        | §4 | Seed templates | Strategies, function templates, params, outputs |
-        | §5 | Session state | The dict that flows through the graph |
-        | §6 | Function library | Ten executable functions + LLM helpers + prompts |
-        | §7 | Workflow nodes | Seven node functions + small DB helpers |
-        | §8 | Build LangGraph | Compile the state machine |
-        | §9 | Run queries | End-to-end runs, traced per node |
+        | [§1](#1-Setup-—-imports-paths-databases) | Setup | Paths, imports, environment probe |
+        | [§1.5](#15-Bring-up-Ollama-(Google-Colab-or-clean-start)) | Bring up Ollama | Install / start / pull models (skippable if already running) |
+        | [§2](#2-Quick-tour-of-harvesteddb) | Tour `harvested.db` | Sanity-check the product data |
+        | [§3](#3-Build-agenticdb-—-Agentic-Reasoning-Layer) | Build `agentic.db` | Create the 9-table workflow schema |
+        | [§4](#4-Seed-templates) | Seed templates | Strategies, function templates, params, outputs |
+        | [§5](#5-Session-state-—-the-dict-that-flows-through-the-graph) | Session state | The dict that flows through the graph |
+        | [§6](#6-Function-library-—-10-utilities-+-prompts) | Function library | Ten executable functions + LLM helpers + prompts |
+        | [§7](#7-Workflow-nodes) | Workflow nodes | Seven node functions + small DB helpers |
+        | [§8](#8-Build-LangGraph) | Build LangGraph | Compile the state machine |
+        | [§9](#9-Run-a-query-end-to-end-—-with-live-tracing) | Run queries | End-to-end runs, traced per node |
 
         > §3/§4/§7 just *define*; fast. §6 first-run embeds ~168 family rows
         > into Chroma via Ollama — a few minutes; subsequent runs reuse the
@@ -142,6 +144,37 @@ L2_CELLS: list[dict] = [
         | Used by seeded strategies | **8** | (above minus `Search Products` and `Filter Items` — defined-but-unscheduled; wire them in as the §4 extension exercise) |
         | Workflow nodes (§7) | **7** | GoalDefine, StrategyPlan, FunctionExecute, FunctionValidate, StrategyValidate, GoalValidate, done |
         | Tables in `agentic.db` (§3) | **9** | 5 `*InSession` (trace) + 4 `*Library` (templates) |
+    """),
+
+    md("""
+        ### Colab only — mount Google Drive (skip on local)
+
+        If you've put `RCP_notebook/` in your Google Drive, run the next cell
+        to mount Drive and `cd` into the folder so the relative paths in §1
+        resolve. On a local Jupyter / VS Code session this is a no-op — skip it.
+    """),
+    py("""
+        # Mount Google Drive and cd into the notebook folder when on Colab.
+        # On local kernels this prints a one-line note and does nothing else.
+        import os
+        import sys
+
+        if "google.colab" in sys.modules:
+            from google.colab import drive
+            drive.mount("/content/drive")
+
+            # Edit this if you put `RCP_notebook/` somewhere other than the
+            # Drive root (e.g. inside a subfolder).
+            DRIVE_PATH = "/content/drive/MyDrive/RCP_notebook"
+
+            if os.path.isdir(DRIVE_PATH):
+                os.chdir(DRIVE_PATH)
+                print(f"cwd → {DRIVE_PATH}")
+            else:
+                print(f"⚠️  Not found: {DRIVE_PATH}")
+                print("   Edit DRIVE_PATH above, or upload RCP_notebook/ to the Drive root.")
+        else:
+            print("Not on Colab — Drive mount skipped.")
     """),
 
     md("""
@@ -231,7 +264,9 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ## §1.5 Bring up Ollama
+        ## §1.5 Bring up Ollama (Google Colab or clean start)
+
+        <div class="alert alert-info"><b>Tip:</b> Make sure Ollama is running before proceeding past this section.</div>
 
         Need an Ollama server on `http://localhost:11434` with `llama3.2:latest`
         (chat/reasoning) and `nomic-embed-text:latest` (embeddings for §6) pulled.
@@ -414,6 +449,8 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
+        <div class="alert alert-success"><b>Checkpoint:</b> You should see non-zero row counts for categories, product_families, and products above. If not, `harvested.db` is missing or empty.</div>
+
         ## §3. Build `agentic.db` from scratch
 
         The framework keeps two databases:
@@ -2542,7 +2579,7 @@ L2_CELLS: list[dict] = [
           finalAnswer        All strategies exhausted; no satisfactory answer.
         ```
 
-        If the judge falsely approves, tighten `PROMPTS["goal_validation"]`
+        if the judge falsely approves, tighten `PROMPTS["goal_validation"]`
         or use a stronger `OLLAMA_REASONING` model.
     """),
     py("""
@@ -2576,6 +2613,70 @@ L2_CELLS: list[dict] = [
             ok_f = {1: "✓", 0: "✗", None: "·"}[r["FunctionSuccess"]]
             print(f"  S{r['StrategyID']:>2} {ok_s} {r['StrategyName']:30s}  "
                   f"F{r['FunctionID'] or 0:>2} {ok_f} {r['FunctionName'] or ''}")
+    """),
+
+    md("""
+        ### §9.4 Interactive Query Widget
+
+        <div class="alert alert-info"><b>Tip:</b> Instead of editing Python variables, use these interactive widgets to test multiple queries seamlessly. It simulates the Layer 3 UI right inside the notebook.</div>
+    """),
+    py("""
+        import ipywidgets as widgets
+        from IPython.display import display, clear_output
+
+        # Grab list of strategy names for dropdown
+        strategy_names = [s[0] for s in STRATEGIES_SEED]
+
+        query_input = widgets.Textarea(
+            value='What is the max working pressure of hose 1071-00-16?',
+            placeholder='Type your query...',
+            description='Query:',
+            disabled=False,
+            layout=widgets.Layout(width='80%', height='50px')
+        )
+        
+        strategy_dropdown = widgets.Dropdown(
+            options=['Auto (LLM Picks)'] + strategy_names,
+            value='Auto (LLM Picks)',
+            description='Strategy:',
+            disabled=False,
+            layout=widgets.Layout(width='50%')
+        )
+
+        run_button = widgets.Button(
+            description='Run Workflow',
+            button_style='primary',
+            icon='play'
+        )
+
+        output_area = widgets.Output()
+
+        def on_run_clicked(b):
+            with output_area:
+                clear_output()
+                q = query_input.value
+                forced_strat = None if strategy_dropdown.value == 'Auto (LLM Picks)' else strategy_dropdown.value
+                
+                print(f"Running query: {q}")
+                if forced_strat:
+                    print(f"Forced strategy: {forced_strat}")
+                print("-" * 50)
+                
+                res = run_traced(q, forced_strategy=forced_strat)
+                print("\\n" + "=" * 50)
+                print("🏁 FINAL ANSWER:")
+                print("=" * 50)
+                ans = res.get("finalAnswer")
+                print(ans if ans else "(no answer — judge rejected)")
+
+        run_button.on_click(on_run_clicked)
+
+        display(widgets.VBox([
+            query_input, 
+            strategy_dropdown, 
+            run_button, 
+            output_area
+        ]))
     """),
 
     md("""
