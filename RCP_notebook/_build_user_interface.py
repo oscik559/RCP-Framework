@@ -3,7 +3,7 @@ Build Layer 3 (User Interface) tutorial notebook.
 
 Run:
 
-    python tutorial_nb_edit/_build_user_interface.py
+    python RCP_notebook/_build_user_interface.py
 """
 from __future__ import annotations
 from pathlib import Path

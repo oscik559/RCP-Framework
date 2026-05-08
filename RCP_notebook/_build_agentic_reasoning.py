@@ -3,7 +3,7 @@ Build Layer 2 (Agentic Reasoning) tutorial notebook.
 
 Run:
 
-    python tutorial_nb_edit/_build_agentic_reasoning.py
+    python RCP_notebook/_build_agentic_reasoning.py
 """
 from __future__ import annotations
 from pathlib import Path
@@ -107,10 +107,10 @@ L2_CELLS: list[dict] = [
 
         ### Prerequisites
 
-        - `db/harvested.db` next to the notebook (shipped in `tutorial_nb_edit/db/`).
+        - `db/harvested.db` next to the notebook (shipped in `RCP_notebook/db/`).
         - Python 3.10+ with `pip install langgraph requests chromadb`. §1.5
           handles Ollama itself and pulls `llama3.2:latest` + `nomic-embed-text:latest`.
-        - On Colab, upload the entire `tutorial_nb_edit/` folder.
+        - On Colab, upload the entire `RCP_notebook/` folder.
     """),
 
     md("""
@@ -181,7 +181,7 @@ L2_CELLS: list[dict] = [
 
         # ---- where the databases live ----
         # Both paths are relative to the notebook's working dir. The repo
-        # ships a copy of harvested.db inside tutorial_nb_edit/db/ so this
+        # ships a copy of harvested.db inside RCP_notebook/db/ so this
         # notebook is self-contained — you can zip the folder and run it
         # anywhere (Colab, a colleague's laptop, etc.).
         DB_HARVESTED = "db/harvested.db"          # product data (read-only here)

@@ -2,7 +2,7 @@
 
 Three step-by-step notebooks, one per layer, that turn the RCP repo into something a new user can read top-to-bottom, run cell-by-cell, and poke at intermediate state. The goal is **discovery and interaction**, not a passive walkthrough — every long-running step should expose something inspectable (a DataFrame, a JSON dump, a saved image, a workflow trace) so the user can stop, look, change, and re-run.
 
-This is a planning document. Once we agree on scope and structure, the actual `.ipynb` files get authored in `tutorial_nb_edit/`.
+This is a planning document. Once we agree on scope and structure, the actual `.ipynb` files get authored in `RCP_notebook/`.
 
 ---
 
@@ -16,7 +16,7 @@ These are the choices that shape every notebook — please confirm or redirect o
 4. **Database safety.** The shipped [database/harvested.db](../database/harvested.db) and [database/agentic.db](../database/agentic.db) are part of the published artefact. Notebook cells that mutate state must either (a) operate on a copy in a tutorial scratch dir, or (b) be clearly gated. Layer 2's `db.clear_all_sessions()` from [main.py](../main.py) is the obvious sharp edge — wrap it.
 5. **Execution outputs.** Decide whether committed notebooks ship **with** outputs (heavier diffs, but readers see results without running) or **without** (clean diffs, reader must run). Recommendation: ship *with* outputs for the extraction notebook (slow, requires Ollama) and *without* for L2/L3 (fast enough to run live). Confirm.
 6. **LLM dependency for Layer 2.** L2 cells need a working LLM. Default to local Ollama (`llama3.2:latest` + `nomic-embed-text` per [SETUP.md](../SETUP.md)). Add a small "verify Ollama is reachable" cell up front and abort gracefully if not.
-7. **Where to put helper code.** Tutorial-only utilities (pretty-printers, DB previewers, image grids) live in a small `tutorial_nb_edit/_helpers.py` so notebook cells stay short and don't drown the narrative. Confirm you want this rather than inlining everything.
+7. **Where to put helper code.** Tutorial-only utilities (pretty-printers, DB previewers, image grids) live in a small `RCP_notebook/_helpers.py` so notebook cells stay short and don't drown the narrative. Confirm you want this rather than inlining everything.
 8. **Naming.** Suggested filenames:
    - `01_layer1_extraction.ipynb`
    - `02_layer2_agentic_reasoning.ipynb`
@@ -31,7 +31,7 @@ Every notebook opens with the same scaffolding so the experience is consistent:
 
 - **Banner cell.** Title, layer in the architecture diagram, what the reader will produce by the end.
 - **Prerequisites cell.** Markdown checklist linking to [SETUP.md](../SETUP.md) and the previous notebook in the chain.
-- **Working directory pin.** `os.chdir` to project root if running from `tutorial_nb_edit/`, so all relative paths in the codebase resolve the same way [main.py](../main.py) expects.
+- **Working directory pin.** `os.chdir` to project root if running from `RCP_notebook/`, so all relative paths in the codebase resolve the same way [main.py](../main.py) expects.
 - **Environment probe.** Print Python version, key packages (`langgraph`, `chromadb`, `flask`), DB existence, Ollama reachability. One cell, fail-loud if anything's missing.
 - **Section headers.** Bold markdown sections matched to a heading in the architecture so the reader can locate "where am I in the pipeline" at a glance.
 - **"Try it" callouts.** Every major concept gets a follow-up cell labelled `# Try it:` with one-line tweaks the reader is invited to change (e.g., swap a query, change the debug level, alter a SQL filter). This is the discovery-mode anchor — without these, the notebook becomes a wall of read-only output.
@@ -86,7 +86,7 @@ Every notebook opens with the same scaffolding so the experience is consistent:
 | Cleanup | Call the wrapped `clear_all_sessions()` only on a tutorial-scoped session DB copy | Safe by construction |
 
 **Things to consider**:
-- The `clear_all_sessions()` call in [main.py:103](../main.py#L103) wipes `agentic.db`. In a tutorial context this is hostile to "stop, look, re-run" — wrap it so it only clears sessions tagged with the tutorial's session prefix, or operate on a copy of `agentic.db` placed in `tutorial_nb_edit/scratch/`.
+- The `clear_all_sessions()` call in [main.py:103](../main.py#L103) wipes `agentic.db`. In a tutorial context this is hostile to "stop, look, re-run" — wrap it so it only clears sessions tagged with the tutorial's session prefix, or operate on a copy of `agentic.db` placed in `RCP_notebook/scratch/`.
 - LangGraph's `recursion_limit: 1000000` from [session_config.py:106](../Layer_2_Agentic_Reasoning/config/session_config.py#L106) is fine for prod but means a buggy strategy could spin forever in a notebook. Consider lowering for tutorial cells.
 - Streaming intermediate state is the most important interactive payoff in this notebook. If LangGraph's stream API doesn't expose what we want, fall back to a small custom callback / patched node wrapper.
 - Many of the nodes log via the `debug_config` module — surface that as a "turn the dial up" cell rather than burying it.
@@ -126,7 +126,7 @@ Please answer or redirect on each before I author the notebooks:
 
 1. **Case scope** — confirm "Case I only, Case II as a pointer" (§0.2)? --use case 1 since the data is available online also. but use already extracted db as backup.
 2. **Outputs in committed notebooks** — ship L1 with outputs, L2 + L3 without (§0.5)? yes
-3. **Helper module** — OK to add `tutorial_nb_edit/_helpers.py` (§0.7)? - everything should be in the respective notbooks. yes -helpers is fine
+3. **Helper module** — OK to add `RCP_notebook/_helpers.py` (§0.7)? - everything should be in the respective notbooks. yes -helpers is fine
 4. **Filenames** — `01_…`, `02_…`, `03_…` as proposed (§0.8)? yes
 5. **Layer 1 re-run section** — is the gated `RERUN_EXTRACTION = False` opt-in the right default (§2)? decide
 6. **Streaming intermediate state in L2** — is this the most important payoff for you, or would you rather emphasise something else (e.g., comparing strategies side-by-side, or the function library)? we are using one case 1

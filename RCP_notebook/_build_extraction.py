@@ -3,7 +3,7 @@ Build Layer 1 (Extraction) tutorial notebook.
 
 Run:
 
-    python tutorial_nb_edit/_build_extraction.py
+    python RCP_notebook/_build_extraction.py
 """
 from __future__ import annotations
 from pathlib import Path
@@ -43,7 +43,7 @@ L1_CELLS: list[dict] = [
     md("""
         ## 0. Open the project from the right place
 
-        Notebooks live in `tutorial_nb_edit/` but the project's relative paths
+        Notebooks live in `RCP_notebook/` but the project's relative paths
         (e.g. `database/harvested.db`) assume CWD == project root. The first
         cell pins us there and configures UTF-8 stdout — Swedish characters in
         the catalog will mangle on Windows otherwise.

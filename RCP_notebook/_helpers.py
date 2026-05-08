@@ -21,7 +21,7 @@ def pin_project_root() -> Path:
     """
     Walk up from CWD until we find pyproject.toml, then chdir there.
 
-    Notebooks are run from tutorial_nb_edit/ but the project's relative paths
+    Notebooks are run from RCP_notebook/ but the project's relative paths
     (database/harvested.db, Layer_*/...) are written assuming CWD == project
     root. This makes both work.
     """
