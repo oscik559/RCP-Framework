@@ -1,0 +1,118 @@
+Critique — 02_agentic_reasoning.ipynb
+113 cells, 9 numbered sections plus front-matter and back-matter. I read every cell in the order it appears.
+
+1. Structure
+Strong
+Progressive build (setup → schema → templates → state → functions → nodes → graph → run) is defensible and matches how someone would actually construct this system.
+Diagrams arrive before the code they describe (architecture, ER, plan-decomposition, embeddings, state machine).
+Source-repo crosswalk table (cell 006) is excellent — rare in tutorials and very useful.
+Cell 100 renders the real compiled graph next to the hand-drawn one — a nice "verify-yourself" gesture.
+Weak
+Heading levels are inconsistent. §1 / §1.5 / §2 are ## (h2). §3 onward jump to # (h1). This breaks any TOC tooling that builds an outline from heading levels and visually flattens sub-section boundaries (e.g., the "🔍 Inspect" sub-blocks in §3, §4, §6 are h3 under h1, while in §1/§2 they are h3 under h2).
+
+§1.5 is a section that the notebook map pretends doesn't exist. Cells 007–008 advertise "§1 through §9". But §1.5 has 4 substantive cells with its own decision tree, gotchas table, and three sub-cells (§1.5a/b/c). Either renumber to §2 or list it explicitly.
+
+Front-matter is heavy (cells 000–008: nine cells before §1 starts). Two architecture diagrams, one section-flow diagram, two section maps, a source crosswalk, a "what's lighter" callout, and a notebook map. Cells 005 + 007 say similar things twice.
+
+Cell 040 is empty. A markdown cell with zero content sitting between two real cells. Delete it.
+
+§9's back-matter is unnumbered. "Forced-strategy debug knob", "Failure mode", "Inspecting the persisted execution trace", "You've finished Layer 2" all appear at ## level — peer to §1–§9 — instead of as ### §9.1, ### §9.2 etc. The TOC reads like the notebook ends three times.
+
+The DatabaseManager class (cell 080) is dead code. Cell 078 defines free helpers (create_goal, create_strategy, create_strategy_functions, tried_strategies, get_current_function_id, collect_outputs); the workflow nodes call those free helpers, not the class. Yet cell 079's narrative says "workflow nodes use a mix of both depending on how much ceremony each call needs" — that's not true of the code as written. Either delete the class, or refactor the nodes to use it (the better option, since the narrative wants to mirror the repo).
+
+Strategy seed includes a self-acknowledged dead row. TECHNICAL CALCULATION in STRATEGIES_SEED (cell 027) has description "Skipped in this notebook." Yet its PlanSteps is Extract Requirements, Analyze With LLM — both implemented — so it will run if selected, contradicting the "skipped" label.
+
+Front-loading of multi-minute work is buried. §6's Chroma cell (057) embeds ~168 family rows sequentially via Ollama — minutes on first run — but the §1 "Notebook map" tip says "§3, §4, §6, §7 just define things — running them is fast." False for §6 first run.
+
+Two co-equal prompt APIs. fmt_prompt(...) (function) and prompt_loader.format_prompt(...) (class). Cell 043 acknowledges they're interchangeable. Pick one.
+
+PROMPTS["compare_items"] and PROMPTS["convert_units"] are added at cells 069 and 073 by mutation instead of being part of the main PROMPTS dict in cell 044. Surprises a reader who searches for "convert_units" in the prompt block.
+
+2. Content
+Correctness
+Function-count claims contradict each other.
+
+Cell 005: "Seven strategies + fourteen function templates"
+Cell 037: "Six callable functions"
+Cell 027 (FUNCTIONS_SEED): 11 templates
+Cell 075 (FUNCTION_MAP): 11 functions
+Cell 111 recap: 11 templates
+The "fourteen" and "Six" are stale. Reconcile to 11 everywhere.
+Parallel execution is documented, advertised, and never exercised. Cell 097 says "See the PARALLEL ENHANCED LOOKUP strategy seeded in §4 for an example." There is no such strategy in STRATEGIES_SEED. None of the seven seeded strategies use the [A || B] syntax. Worse, the free function create_strategy_functions in cell 078 (the one nodes actually call) splits on , and would treat [A || B] as a literal step name — only the dead-code DatabaseManager.create_strategy_functions parses parallel groups. So the parallel branch in node_function_execute (cell 086) is unreachable as wired. Either ship a strategy that uses it (and have nodes call the manager) or remove the parallel code + narrative.
+
+func_search_families regex bug. r"\b(\d{4}(?:-\d+)?)\b" matches 1071-00 and stops, missing the trailing -16 of a real product code like 1071-00-16. The catalog uses 4-2-2 codes throughout. Use something like r"\b(\d{4}(?:-\d+){0,3})\b" or split the regex.
+
+func_extract_product_number only takes the first line of the LLM response. The prompt requests comma-separated codes, but a helpful model will newline-separate them. out.strip().splitlines()[0] then drops the rest. Either join lines first, or normalise to commas before parsing.
+
+Convert Units is dead in the workflow. Its template params (from_unit, to_unit, value, context) are all empty-template strings. Nothing in any seeded strategy produces those output names. So the function always hits if not from_unit or not to_unit: return False, "from_unit / to_unit required". It can only be exercised by direct call, not via the graph.
+
+Analyze With LLM's Assembled Data slot is a phantom. The param exists in PARAMS_SEED but no function declares Assembled Data as an output, so it's always empty. Either remove the param or define a producer.
+
+_next_after_strategy_validate first branch is unreachable.
+
+
+if state.get("strategySatisfied") and state.get("strategyAborted"):
+    return "StrategyPlan"
+node_strategy_validate does set both to True together when a function failed (cell 090) — OK so it is reachable. The narrative is also fine. But the branch order makes the truth table hard to read; a comment listing the (satisfied, aborted) states each branch covers would help.
+
+run_traced reinitialises agentic.db on every run, but cell 110's "Inspecting the persisted execution trace" then claims "Everything the workflow did is in agentic.db." Only the last run is. That undermines the "Relational Control Plane" framing one cell earlier.
+
+func_extract_attributes silently truncates to 10 items (for it in items[:10]). If Search Products returns 20, half the catalog is lost before synthesis. Document this or expose a max_items param.
+
+func_analyze_with_llm truncates context to 6000 chars silently. Same concern.
+
+init_agentic_db's PRAGMA foreign_keys toggling is per-connection and gets reset when the with block closes. Harmless because SQLite default is OFF anyway, but the code reads as if it's setting a durable flag.
+
+STRATEGIES_SEED has two strategies whose PlanSteps are identical: DIRECT SPECIFICATION LOOKUP and MULTI-PRODUCT COMPARISON are both Extract Product Number, Query Database, Extract Attributes, Analyze With LLM. The latter should arguably include Compare Items — otherwise what makes it "multi-product"? Right now they're literally the same recipe.
+
+No teardown for ollama_proc. If a Colab user re-runs §1.5b without restarting the kernel, multiple ollama serve processes pile up. Even just a final cell try: ollama_proc.terminate() would help.
+
+Coverage gaps
+No expected-output snippet for the failure-mode demo (cell 108). The narrative tells the reader what to watch for, but doesn't show a sample trace. Without a baseline they can't tell whether their local model is "too eager to please" (the very caveat the cell warns about).
+
+No discussion of why the judge can self-approve a hallucinated answer. Cell 091 calls the judge "load-bearing safety". Cell 107 acknowledges in passing that the judge can fail. But the same model family is generating and judging — that's a known weakness worth a paragraph rather than an aside.
+
+No coverage of Chroma incremental updates. First-run build is fine; what about when harvested.db changes? The cell hard-checks coll.count() > 0 and re-uses, which means stale data after a Layer-1 re-extraction. Mention it.
+
+forcedStrategy's plumbing is undocumented. It's set in make_session_state, read in node_strategy_plan, listed in STATE_FIELDS — but no narrative explains how it bypasses LLM selection, only that it does.
+
+3. Clarity
+Emoji density — 🔗 ✅ ⚠️ ⏳ ❌ 📂 📄 🛠 🎯 🧠 ⚙️ 🧪 📐 ⚖️ 🏁 ❓ ⏱ 📦 🔍 all appear. Some terminals/PDF exports won't render half of them. Status icons (✅/⚠️/❌) earn their keep; the topic icons (🛠 Try it, 🔍 Inspect) are decorative.
+
+"Load-bearing" appears four times — load-bearing decision (§8), load-bearing demo (§9), load-bearing safety mechanism (§7), load-bearing node (§7). Either lean into it as a deliberate motif (define it once up front) or replace some with plainer wording.
+
+node_function_validate has no "Why this node exists" callout while every other node does (cells 081, 083, 085, 089, 091). Either add one or admit it's a stub.
+
+"Six callable functions" / "fourteen function templates" / "Seven nodes" — the headline numbers are scattered and stale. A single up-front "Inventory" table would prevent the drift.
+
+show_state's rich HTML printer (cell 036, ~30 lines) is great UX but obscures the conceptual point of SessionState. Move the renderer below the example, or hide it in a collapsed cell.
+
+The §1 environment probe and §1.5 install print useful status but use ad-hoc spacing (f"{x:25s}" columns, then print(f" • {t}"), then [debug] brackets later). One coherent log style across the notebook would make traces easier to skim.
+
+run_traced(..., verbose_inner=False) — the parameter name is opaque. A one-line docstring explaining "if True, print the inner trace() calls each node makes" would resolve it.
+
+📂 vs 📄 distinction is used once in inspect_db (cell 025) and never explained. Either label them in the legend or drop them.
+
+Repeated phrase "Same shape as the implementation in the repo" appears verbatim several times. Each instance is an opportunity to say what specifically is preserved and what's simplified — currently the assertion is generic.
+
+§5's STATE_FIELDS descriptions mix imperative and noun-phrase styles ("the user's question (input)" vs "→ GoalInSession row"). Pick one register.
+
+"Where this notebook stays lighter than the repo" is duplicated near-verbatim in cells 005 and 111. Once is enough — the closing recap is the natural home.
+
+Cell 005's "What you'll build" flowchart (S1 → S2 → ... → S9) adds nothing the table next to it doesn't already convey. Drop it.
+
+The Mermaid renderer cell (001) is presented as the very first thing the reader runs, but it's unmotivated until cell 003 calls it. A one-line "we'll need this for every diagram below" hint inside the function comment would help.
+
+Cell 023's SCHEMA_SQL is 95 lines — fine, but no preview of the relationships before the wall of DDL. The ER diagram is in cell 020 just above, which helps; consider a one-line list of "tables in two halves: 5 *InSession + 4 *Library" before the SQL.
+
+Cell 097 "Three places routing branches" is the single best concept summary in the notebook. Promote a short version of it to a callout inside build_graph (cell 098) so a reader following code-first sees it without scrolling back.
+
+Suggested fix order (highest leverage first)
+Reconcile function/template counts everywhere (one table, no drift).
+Either add a parallel-execution seed strategy (and have nodes use DatabaseManager.create_strategy_functions) or delete the parallel branch + the misleading callout.
+Delete DatabaseManager (dead code) or route nodes through it. Don't keep both.
+Fix func_search_families regex and func_extract_product_number newline handling.
+Wire Convert Units into a strategy or remove it from the seed.
+Renumber headings to a single consistent level scheme; absorb §9.1–9.4 under §9 explicitly.
+Drop/merge duplicate front-matter (cells 005 + 007 + 008; cells 005 + 111).
+Add an expected-output excerpt for the failure-mode demo so readers can self-calibrate.

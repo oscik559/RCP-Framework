@@ -1,429 +1,44 @@
 """
-Generator for the three tutorial notebooks.
+Build Layer 2 (Agentic Reasoning) tutorial notebook.
 
-We build .ipynb files as plain JSON dicts so this script doesn't add a
-nbformat / jupyter dependency. Re-run this script any time you tweak content
-below — it overwrites the .ipynb files in place.
+Run:
 
-    python tutorial_nb_edit/_build.py
-
-The notebooks themselves carry the narrative; this file is purely scaffolding.
-Cells are added via:
-    md("...")  -> markdown cell
-    py("...")  -> code cell
-
-Cell payloads accept either a string or a list of strings (joined with "\n").
+    python tutorial_nb_edit/_build_agentic_reasoning.py
 """
-
 from __future__ import annotations
-
-import json
-import textwrap
 from pathlib import Path
-from typing import Iterable
+
+from _nb_helpers import md, py, write_nb
 
 HERE = Path(__file__).resolve().parent
-KERNELSPEC = {
-    "display_name": "Python 3 (.venv)",
-    "language": "python",
-    "name": "python3",
-}
-LANG_INFO = {
-    "name": "python",
-    "version": "3.12",
-    "mimetype": "text/x-python",
-    "file_extension": ".py",
-    "pygments_lexer": "ipython3",
-    "codemirror_mode": {"name": "ipython", "version": 3},
-}
 
-
-def _src(payload: str | Iterable[str]) -> list[str]:
-    """Normalize cell source to nbformat's list-of-lines convention."""
-    if isinstance(payload, str):
-        text = textwrap.dedent(payload).strip("\n")
-    else:
-        text = textwrap.dedent("\n".join(payload)).strip("\n")
-    lines = text.split("\n")
-    return [ln + ("\n" if i < len(lines) - 1 else "") for i, ln in enumerate(lines)]
-
-
-def md(payload: str | Iterable[str]) -> dict:
-    return {"cell_type": "markdown", "metadata": {}, "source": _src(payload)}
-
-
-def py(payload: str | Iterable[str]) -> dict:
-    return {
-        "cell_type": "code",
-        "execution_count": None,
-        "metadata": {},
-        "outputs": [],
-        "source": _src(payload),
-    }
-
-
-def write_nb(path: Path, cells: list[dict]) -> None:
-    nb = {
-        "cells": cells,
-        "metadata": {
-            "kernelspec": KERNELSPEC,
-            "language_info": LANG_INFO,
-        },
-        "nbformat": 4,
-        "nbformat_minor": 5,
-    }
-    path.write_text(json.dumps(nb, indent=1, ensure_ascii=False), encoding="utf-8")
-    print(f"wrote {path.relative_to(HERE.parent)}  ({len(cells)} cells)")
-
-
-# =====================================================================
-# Notebook 1 — Layer 1: Extraction
-# =====================================================================
-
-L1_CELLS: list[dict] = [
-    md("""
-        # Layer 1 — Extraction
-        ### From PDF catalog to a queryable SQLite database
-
-        This notebook walks the **extraction pipeline** that turns the Hydroscand
-        product catalog (Swedish-language PDFs) into the structured database
-        `database/harvested.db` that the rest of the framework queries.
-
-        **What you'll see**
-
-        | Stage | Output                            | Cell focus                        |
-        |-------|-----------------------------------|-----------------------------------|
-        | 0     | `product_knowledge` rows          | Intro pages → assembly text       |
-        | 1     | `Layer_1b/data/png_pages/*.png`   | PDF pages rendered as images      |
-        | 2     | `page_regions` rows               | Header/footer detection           |
-        | 2b/3a | `categories`, `product_families`  | VLM-extracted hierarchy           |
-        | 3b    | `products` rows                   | Per-SKU specs (full-text indexed) |
-
-        **Default mode is read-only.** The shipped `harvested.db` is already
-        populated, so cells below *inspect* what each stage produced. To re-run
-        the full pipeline against a fresh PDF, flip the `RERUN_EXTRACTION` flag
-        in the optional section near the bottom.
-
-        **Prerequisites** — see [SETUP.md](../SETUP.md). You only need full
-        re-extraction (Ollama + `qwen2-vl`) if you flip the flag.
-    """),
-    md("""
-        ## 0. Open the project from the right place
-
-        Notebooks live in `tutorial_nb_edit/` but the project's relative paths
-        (e.g. `database/harvested.db`) assume CWD == project root. The first
-        cell pins us there and configures UTF-8 stdout — Swedish characters in
-        the catalog will mangle on Windows otherwise.
-    """),
-    py("""
-        # Pin CWD to project root and make stdout safe for Swedish text.
-        import sys
-        sys.path.insert(0, str(__import__("pathlib").Path.cwd()))  # so _helpers.py imports
-        from _helpers import pin_project_root, configure_utf8_stdout, env_probe
-
-        ROOT = pin_project_root()
-        configure_utf8_stdout()
-        print("project root:", ROOT)
-    """),
-    py("""
-        # Probe the environment. Anything marked MISSING means a later cell
-        # may fail — fix it before continuing.
-        for k, v in env_probe(check_ollama=False).items():
-            print(f"{k:30s} {v}")
-    """),
-    md("""
-        ## 1. The source PDFs
-
-        Three Swedish-language Hydroscand PDFs live alongside the extraction
-        scripts. They are publicly available (Hydroscand publishes them on
-        their site), so you can swap in your own copy if these change.
-    """),
-    py("""
-        from pathlib import Path
-
-        PDF_DIR = Path("Layer_1_Extraction/Case_I/Layer_1b")
-        for pdf in sorted(PDF_DIR.glob("*.pdf")):
-            kb = pdf.stat().st_size // 1024
-            print(f"{pdf.name:30s} {kb:>6} KB")
-    """),
-    md("""
-        ### Render a page inline
-
-        PyMuPDF (`fitz`) is already in the project's deps. We use it as a
-        lightweight visual sanity check before any extraction logic runs.
-    """),
-    py("""
-        # Try it: change PAGE_INDEX or PDF_NAME below and re-run.
-        from _helpers import pdf_page_image
-
-        PDF_NAME   = "Produktbok_2020.pdf"
-        PAGE_INDEX = 8        # 0-based — flip this to look at other pages
-
-        pdf_page_image(PDF_DIR / PDF_NAME, PAGE_INDEX, dpi=120)
-    """),
-    md("""
-        ## 2. Stage 0 — knowledge extraction
-
-        `0_extract_knowledge.py` reads catalog intro pages (assembly
-        instructions, standards, ToCs) into `product_knowledge`. These rows
-        carry **prose** — the kind of text the reasoning agent later cites
-        when an answer needs context beyond a row of numbers.
-
-        > Heads-up: in the shipped `harvested.db`, `product_knowledge` is
-        > **empty** — the prose layer was set aside in the published
-        > artefact. The cells below will report 0 rows. Re-run Stage 0
-        > (see §8 below) to populate it.
-    """),
-    py("""
-        from _helpers import show_query
-
-        DB = "database/harvested.db"
-        show_query(DB, '''
-            SELECT knowledge_type, COUNT(*) AS n, content_language
-            FROM product_knowledge
-            GROUP BY knowledge_type, content_language
-            ORDER BY n DESC
-        ''')
-    """),
-    py("""
-        # Once Stage 0 has been re-run, this prints one full prose record.
-        # Try it: change knowledge_type to ASSEMBLY / STANDARDS / TOC.
-        from _helpers import query
-
-        cols, rows = query(DB, '''
-            SELECT pdf_name, page_number, section_title, content
-            FROM product_knowledge
-            WHERE knowledge_type = ?
-            LIMIT 1
-        ''', ("DESCRIPTION",))
-        if rows:
-            r = dict(zip(cols, rows[0]))
-            print(f"[{r['pdf_name']} p.{r['page_number']}]  {r['section_title']}\\n")
-            print(r["content"][:1200], "..." if len(r["content"]) > 1200 else "")
-        else:
-            print("(no rows — re-run Stage 0; see §8)")
-    """),
-    md("""
-        ## 3. Stage 1 — PDF → PNG
-
-        `1_pdf_to_png.py` rasterises every page so downstream stages can run
-        a Vision Language Model on them. Rendered PNGs are gitignored — if
-        the folder is empty, that's expected; the cell handles it gracefully.
-    """),
-    py("""
-        from pathlib import Path
-        png_dir = Path("Layer_1_Extraction/Case_I/Layer_1b/data/png_pages")
-        if not png_dir.exists():
-            print(f"{png_dir} not present — re-run Stage 1 to populate.")
-        else:
-            pngs = sorted(png_dir.glob("*.png"))
-            print(f"{len(pngs)} rendered pages.")
-            for p in pngs[:5]:
-                print(" -", p.name)
-    """),
-    md("""
-        ## 4. Stage 2 — page regions
-
-        `2_detect_headers_footers.py` records header/footer bounding boxes
-        per page so later VLM prompts can ignore boilerplate. One row per
-        page, per source PDF.
-    """),
-    py("""
-        # Counts per PDF.
-        show_query(DB, '''
-            SELECT pdf_name, COUNT(*) AS pages
-            FROM page_regions
-            GROUP BY pdf_name
-            ORDER BY pages DESC
-        ''')
-    """),
-    py("""
-        # Sample row — bounding boxes are normalized page coords.
-        show_query(DB, '''
-            SELECT pdf_name, page_number,
-                   header_x0, header_y0, header_x1, header_y1,
-                   footer_x0, footer_y0, footer_x1, footer_y1
-            FROM page_regions
-            ORDER BY pdf_name, page_number
-            LIMIT 5
-        ''', max_col=14)
-    """),
-    md("""
-        ## 5. Stages 2b / 3a — categories and families
-
-        Stage 2b extracts top-level categories (e.g. SPIRALSLANG). Stage 3a
-        groups products into families that share specs (e.g. hose family
-        4201). Together they're the "shape" of the catalog.
-    """),
-    py("""
-        show_query(DB, "SELECT id, name, chapter, page_number FROM categories ORDER BY name LIMIT 20", max_col=80)
-    """),
-    py("""
-        # Try it: change CAT to one of the names printed above
-        # (the shipped DB has HÖGTRYCKSSLANG and PRESSKOPPLINGAR).
-        CAT = "HÖGTRYCKSSLANG"
-        show_query(DB, '''
-            SELECT pf.family_code, pf.name AS family_name, pf.description
-            FROM product_families pf
-            JOIN categories c ON c.id = pf.category_id
-            WHERE c.name = ?
-            ORDER BY pf.family_code
-            LIMIT 15
-        ''', (CAT,))
-    """),
-    md("""
-        ## 6. Stage 3b — products (the actual SKUs)
-
-        Each row in `products` is one SKU with a JSON spec blob. The blob is
-        what the reasoning engine ultimately quotes from when it answers a
-        natural-language query.
-    """),
-    py("""
-        # Counts by family, top 10.
-        show_query(DB, '''
-            SELECT pf.family_code, COUNT(p.id) AS n
-            FROM products p
-            JOIN product_families pf ON pf.id = p.family_id
-            GROUP BY pf.family_code
-            ORDER BY n DESC
-            LIMIT 10
-        ''')
-    """),
-    py("""
-        # One full record so you see the JSON spec.
-        # Try it: change PRODUCT_CODE to anything that appeared above.
-        import json as _json
-        from _helpers import query
-
-        PRODUCT_CODE = "1071-00-16"
-        cols, rows = query(DB, "SELECT * FROM products WHERE product_code = ?", (PRODUCT_CODE,))
-        if rows:
-            row = dict(zip(cols, rows[0]))
-            for k, v in row.items():
-                if k.endswith("_json") or (isinstance(v, str) and v.startswith("{")):
-                    try:
-                        v = _json.dumps(_json.loads(v), indent=2, ensure_ascii=False)
-                    except Exception:
-                        pass
-                print(f"--- {k} ---\\n{v}\\n")
-        else:
-            print(f"no row for {PRODUCT_CODE} — pick a product_code from the table above.")
-    """),
-    md("""
-        ## 7. Lexical search over family applications
-
-        The extraction pipeline also builds FTS5 indexes (`product_families_fts`,
-        `product_knowledge_fts`) — these are what Layer 2 strategies hit when
-        a query needs keyword search before semantic re-ranking. We don't
-        exercise FTS5 directly here (the shipped index is contentless; doing
-        so cleanly takes a couple of cells). For a quick demo, a `LIKE` over
-        the same content works fine.
-    """),
-    py("""
-        # Try it: change Q to a Swedish or English term that might appear
-        # in family descriptions (e.g. "tryck", "boiling", "marin").
-        Q = "tryck"
-        show_query(DB, '''
-            SELECT family_code, name, applications
-            FROM product_families
-            WHERE applications LIKE ?
-            ORDER BY family_code
-            LIMIT 5
-        ''', (f"%{Q}%",), max_col=80)
-    """),
-    md("""
-        ## 8. Optional — re-run extraction on a fresh PDF
-
-        Everything above was read-only. Flip the flag below to actually run
-        the extraction scripts. You need:
-
-        - **Ollama** running locally (`ollama serve`)
-        - The vision model: `ollama pull qwen2-vl`
-        - Plenty of patience — Stage 3b alone runs the VLM on every page
-
-        > ⚠️ Re-running overwrites the **shipped** `database/harvested.db`.
-        > If you want to keep the original, copy it aside first:
-        > `cp database/harvested.db database/harvested.db.backup`
-    """),
-    py("""
-        RERUN_EXTRACTION = False     # flip to True to actually execute
-
-        if RERUN_EXTRACTION:
-            import subprocess, sys
-            scripts = [
-                "Layer_1_Extraction/Case_I/Layer_1b/0_extract_knowledge.py",
-                "Layer_1_Extraction/Case_I/Layer_1b/1_pdf_to_png.py",
-                "Layer_1_Extraction/Case_I/Layer_1b/2_detect_headers_footers.py",
-                "Layer_1_Extraction/Case_I/Layer_1b/2b_extract_categories.py",
-                "Layer_1_Extraction/Case_I/Layer_1b/3a_extract_families.py",
-                "Layer_1_Extraction/Case_I/Layer_1b/3b_extract_products_vlm.py",
-            ]
-            for s in scripts:
-                print(f"\\n=== {s} ===")
-                subprocess.run([sys.executable, s], check=True)
-        else:
-            print("RERUN_EXTRACTION is False — skipping. The shipped DB is intact.")
-    """),
-    md("""
-        ## 9. Validate the database
-
-        `db_utils.py --verify` prints row counts per table. Treat it as the
-        canonical "is the DB sane?" check.
-    """),
-    py("""
-        import subprocess, sys
-        subprocess.run([sys.executable, "database/db_utils.py", "--verify"], check=False)
-    """),
-    md("""
-        ## You've finished Layer 1
-
-        - The PDF → DB pipeline is six stages, each writing into a specific table.
-        - The shipped database is enough to drive every Layer 2 / Layer 3 demo.
-        - Re-extraction is opt-in; the default is read-only inspection.
-
-        **Next:** [02_agentic_reasoning.ipynb](./02_agentic_reasoning.ipynb) — how the
-        reasoning engine queries this database to answer natural-language
-        questions.
-    """),
-]
-
-
-# =====================================================================
-# Notebook 2 — Layer 2: Agentic Reasoning
-# =====================================================================
 
 L2_CELLS: list[dict] = [
     md("""
         # Layer 2 — Agentic Reasoning
         ### The RCP Framework, distilled into one runnable notebook
 
-        > 🔗 **Companion repo**: [github.com/oscik559/RCP-Framework](https://github.com/oscik559/RCP-Framework) — the full source for the framework. This notebook is a self-contained walk-through; the repo has the complete implementation, additional cases, and evaluation suites.
+        > 🔗 [github.com/oscik559/RCP-Framework](https://github.com/oscik559/RCP-Framework) — full source, additional cases, eval suites.
 
-        This notebook is the **interactive walk-through** for Layer 2 of the
-        RCP Framework — a SQL-backed agentic architecture that takes a
-        natural-language query about industrial products, picks a reasoning
-        strategy, executes a sequence of functions to gather evidence, and
-        only then synthesises an answer once a verifier signs off.
+        A SQL-backed agentic architecture: takes a natural-language query, picks
+        a reasoning **strategy**, runs a sequence of **functions** to gather
+        evidence, and synthesises an answer only after a verifier signs off.
 
-        Everything is here: schema, templates, state machine, workflow nodes,
-        function library, prompts, vector index. You read each piece, run it,
-        modify it.
+        **Target**: technical documentation that fits a *Categories → Families
+        → Items* shape (manuals, parts catalogs, SOPs, regulatory texts). We
+        use a **product catalog as the sample documentation** here — concrete
+        and easy to query — but the framework is generic. Layer 1 produced
+        `harvested.db`; this notebook is the brain that queries it.
 
-        ---
-
-        ### One-time setup — the diagram-rendering helper
-
-        Mermaid diagrams (`flowchart`, `erDiagram`, etc.) render in some
-        tools but not others — Colab in particular shows them as raw text.
-        The cell below sends Mermaid source to **mermaid.ink** (a public
-        renderer) and embeds the resulting SVG inline, which works
-        **everywhere** that supports HTML output.
-
-        > **Run this cell first** — every diagram cell below calls `show_mermaid(...)`.
+        > **Run the next cell first** — every diagram below calls `show_mermaid(...)` (mermaid.ink renders the SVG inline; works in Jupyter, VS Code, and Colab).
     """),
     py("""
         def show_mermaid(graph: str) -> None:
-            \"\"\"Render a Mermaid diagram inline as an SVG (Colab-compatible).\"\"\"
+            \"\"\"Render a Mermaid diagram inline as an SVG (Colab-compatible).
+
+            We render via mermaid.ink rather than a notebook extension so
+            diagrams display the same way on local Jupyter, VS Code, and Colab.
+            \"\"\"
             import base64
             from IPython.display import display, HTML
             encoded = base64.urlsafe_b64encode(graph.strip().encode("utf-8")).decode("ascii")
@@ -433,11 +48,6 @@ L2_CELLS: list[dict] = [
             ))
     """),
 
-    md("""
-        ### Where this notebook sits in the project
-
-        *(diagram below — rendered by `show_mermaid`)*
-    """),
     py('''
         show_mermaid(r"""
         flowchart TB
@@ -472,111 +82,66 @@ L2_CELLS: list[dict] = [
         """)
     '''),
     md("""
-        
-        L1 builds the product database from PDF catalogs.
-        **L2 (this notebook) is the brain** — it answers questions over that database.
+        L1 builds the database from PDFs. **L2 (this notebook) is the brain.**
         L3 wraps L2 in HTTP for a web UI.
 
         ---
 
-        ### What you'll build, end-to-end
-
-        *(diagram below — rendered by `show_mermaid`)*
-    """),
-    py('''
-        show_mermaid(r"""
-        flowchart LR
-            S1[§1 Setup] --> S2[§2 Tour DB]
-            S2 --> S3[§3 Schema]
-            S3 --> S4[§4 Seed templates]
-            S4 --> S5[§5 SessionState]
-            S5 --> S6[§6 Function library]
-            S6 --> S7[§7 Workflow nodes]
-            S7 --> S8[§8 LangGraph]
-            S8 --> S9[§9 Run queries]
-        """)
-    '''),
-    md("""
-        
-        | Built in | What it is |
-        |----------|------------|
-        | §3 | `agentic.db` from a 9-table SQL schema, alongside this notebook |
-        | §4 | Seven strategies + fourteen function templates seeded into `agentic.db` |
-        | §6 | Function library + multi-tier LLM helpers + ChromaDB-backed semantic search |
-        | §7 | Seven LangGraph nodes with tri-condition routing |
-        | §8 | A compiled state machine — same topology as the source repo |
-        | §9 | End-to-end runs against real queries (live-traced per node) |
-
-        ---
-
-        ### How this notebook maps onto the source repo
-
-        Every cell here corresponds to a piece of the implementation in
-        [github.com/oscik559/RCP-Framework](https://github.com/oscik559/RCP-Framework).
-        If you want to dig deeper after running through the notebook, click
-        any link below to see the full implementation.
+        ### Source-repo crosswalk
 
         | Source file | Notebook section |
         |-------------|------------------|
-        | [`Layer_2_Agentic_Reasoning/db/agentic_schema.sql`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/agentic_schema.sql) | §3 — inline `SCHEMA_SQL` |
-        | [`Layer_2_Agentic_Reasoning/db/schema_manager.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/schema_manager.py) | §3 — `init_agentic_db()` |
-        | [`Layer_2_Agentic_Reasoning/db/connection.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/connection.py) | §1 — direct `sqlite3.connect`; §7 connection helpers |
-        | [`Layer_2_Agentic_Reasoning/logic/templates.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/templates.py) | §4 — `STRATEGIES_SEED`, `FUNCTIONS_SEED`, etc. |
-        | [`Layer_2_Agentic_Reasoning/logic/database_manager.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/database_manager.py) | §7 — focused `DatabaseManager` class |
-        | [`Layer_2_Agentic_Reasoning/logic/llm_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/llm_helpers.py) | §6 — `chat_basic`, `chat_reasoning`, retry wrapper |
-        | [`Layer_2_Agentic_Reasoning/logic/embeddings.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/embeddings.py) + [`vector_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/vector_helpers.py) | §6 — ChromaDB index + `Semantic Search` |
-        | [`Layer_2_Agentic_Reasoning/logic/function_library.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/function_library.py) | §6 — handlers in `FUNCTION_MAP` |
-        | [`Layer_2_Agentic_Reasoning/logic/workflow_types.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/workflow_types.py) | §5 — `SessionState` TypedDict |
-        | [`Layer_2_Agentic_Reasoning/logic/workflow_nodes.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/workflow_nodes.py) | §7 — seven node functions |
-        | [`Layer_2_Agentic_Reasoning/logic/state_graph.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/state_graph.py) | §8 — `build_graph()` |
-        | [`Layer_2_Agentic_Reasoning/config/prompts.yaml`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/prompts.yaml) | §6 — inline `PROMPTS` dict |
-        | [`Layer_2_Agentic_Reasoning/config/prompt_loader.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/prompt_loader.py) | §6 — small `PromptLoader` class |
-        | [`Layer_2_Agentic_Reasoning/config/debug_config.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/debug_config.py) | §6 — `DebugConfig` with level dispatcher |
-        | [`Layer_2_Agentic_Reasoning/config/session_config.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/session_config.py) | §5 — `make_session_state()` |
-        | [`Layer_2_Agentic_Reasoning/logic/async_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/async_helpers.py) | §7 — `ThreadPoolExecutor` in parallel branch |
-
-        What's lighter in the notebook compared to the repo (each one is called out inline where it appears):
-
-        - We ship 11 of the 15 functions; the missing four (Search Categories, Aggregate Results, Calculate, legacy variants) follow the same patterns shown in §6.
-        - Prompts live in a single inline `PROMPTS` dict instead of a YAML file. Same `format_prompt(...)` API.
-        - LLM helpers use one model tier; the repo splits `basic` / `reasoning` / `multimodal` and you can swap in those three by editing `OLLAMA_MODEL` / `OLLAMA_REASONING` in §1.
-
-        ---
+        | [`db/agentic_schema.sql`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/agentic_schema.sql) | §3 — inline `SCHEMA_SQL` |
+        | [`db/schema_manager.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/db/schema_manager.py) | §3 — `init_agentic_db()` |
+        | [`logic/templates.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/templates.py) | §4 — `STRATEGIES_SEED` / `FUNCTIONS_SEED` |
+        | [`logic/database_manager.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/database_manager.py) | §7 — free-function helpers |
+        | [`logic/llm_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/llm_helpers.py) | §6 — `chat_basic` / `chat_reasoning` / retry |
+        | [`logic/embeddings.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/embeddings.py) + [`vector_helpers.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/vector_helpers.py) | §6 — Chroma index + `Semantic Search` |
+        | [`logic/function_library.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/function_library.py) | §6 — `FUNCTION_MAP` handlers |
+        | [`logic/workflow_types.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/workflow_types.py) | §5 — `SessionState` |
+        | [`logic/workflow_nodes.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/workflow_nodes.py) | §7 — node functions |
+        | [`logic/state_graph.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/logic/state_graph.py) | §8 — `build_graph()` |
+        | [`config/prompts.yaml`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/prompts.yaml) | §6 — inline `PROMPTS` dict |
+        | [`config/debug_config.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/debug_config.py) | §6 — `DebugConfig` |
+        | [`config/session_config.py`](https://github.com/oscik559/RCP-Framework/blob/main/Layer_2_Agentic_Reasoning/config/session_config.py) | §5 — `make_session_state()` |
 
         ### Prerequisites
 
-        - **Working directory**: this notebook expects `db/harvested.db`
-          alongside it. The repo ships a copy in
-          `tutorial_nb_edit/db/harvested.db` so you don't touch the main
-          database; on Colab, upload the entire `tutorial_nb_edit/` folder.
-        - **Python**: 3.10+ with these packages:
-          ```
-          pip install langgraph requests chromadb
-          ```
-          The Colab/Ollama bootstrap in §1.5 takes care of installing
-          Ollama itself.
-        - **Models**: the `§1.5` cell pulls `llama3.2:latest` and
-          `nomic-embed-text:latest` automatically.
+        - `db/harvested.db` next to the notebook (shipped in `tutorial_nb_edit/db/`).
+        - Python 3.10+ with `pip install langgraph requests chromadb`. §1.5
+          handles Ollama itself and pulls `llama3.2:latest` + `nomic-embed-text:latest`.
+        - On Colab, upload the entire `tutorial_nb_edit/` folder.
     """),
 
     md("""
-        ### Notebook map
+        ### Notebook map and inventory
 
         | § | Title | What you do |
         |---|-------|-------------|
         | §1 | Setup | Paths, imports, environment probe |
+        | §1.5 | Bring up Ollama | Install / start / pull models (skippable if already running) |
         | §2 | Tour `harvested.db` | Sanity-check the product data |
         | §3 | Build `agentic.db` | Create the 9-table workflow schema |
         | §4 | Seed templates | Strategies, function templates, params, outputs |
         | §5 | Session state | The dict that flows through the graph |
-        | §6 | Function library | Six executable functions + LLM helper + prompts |
+        | §6 | Function library | Ten executable functions + LLM helpers + prompts |
         | §7 | Workflow nodes | Seven node functions + small DB helpers |
-        | §8 | Build LangGraph | Compile the state machine, render its shape |
+        | §8 | Build LangGraph | Compile the state machine |
         | §9 | Run queries | End-to-end runs, traced per node |
 
-        > **Tip:** §3, §4, §6, §7 just *define* things — running them is fast.
-        > §9 *invokes the LLM* — those are the slow ones (a few seconds per
-        > stage on a local model).
+        > §3/§4/§7 just *define*; fast. §6 first-run embeds ~168 family rows
+        > into Chroma via Ollama — a few minutes; subsequent runs reuse the
+        > on-disk index. §9 invokes the LLM — seconds per stage.
+
+        Counts referenced throughout the notebook:
+
+        | Kind | Count | Names |
+        |------|-------|-------|
+        | Strategies (§4) | **6** | DIRECT SPECIFICATION LOOKUP, CONTEXTUAL PRODUCT SEARCH, STANDARD & COMPLIANCE LOOKUP, KNOWLEDGE BASE & RAG, MULTI-PRODUCT COMPARISON, FAMILY DEEP-DIVE |
+        | `FUNCTION_MAP` entries (§6) | **10** | Extract Product Number, Extract Requirements, Query Database, Search Products, Search Families, Semantic Search, Extract Attributes, Compare Items, Filter Items, Analyze With LLM |
+        | Used by seeded strategies | **8** | (above minus `Search Products` and `Filter Items` — defined-but-unscheduled; wire them in as the §4 extension exercise) |
+        | Workflow nodes (§7) | **7** | GoalDefine, StrategyPlan, FunctionExecute, FunctionValidate, StrategyValidate, GoalValidate, done |
+        | Tables in `agentic.db` (§3) | **9** | 5 `*InSession` (trace) + 4 `*Library` (templates) |
     """),
 
     md("""
@@ -668,43 +233,23 @@ L2_CELLS: list[dict] = [
     md("""
         ## §1.5 Bring up Ollama
 
-        The reasoning workflow needs an **Ollama server** reachable on
-        `http://localhost:11434` with two models pulled:
+        Need an Ollama server on `http://localhost:11434` with `llama3.2:latest`
+        (chat/reasoning) and `nomic-embed-text:latest` (embeddings for §6) pulled.
 
-        - **`llama3.2:latest`** — chat / reasoning
-        - **`nomic-embed-text:latest`** — embeddings for the vector index in §6
+        ### Which cells to run?
 
-        ### Decision tree — which cells should you run?
+        | Situation (per §1 probe) | Action |
+        |--------------------------|--------|
+        | Reachable, both models ✅ | Skip §1.5; jump to §2. |
+        | Reachable, models missing ⚠️ | Run only §1.5c (pull). |
+        | Local Linux, no Ollama | §1.5a → §1.5b → §1.5c. |
+        | Local macOS / Windows, no Ollama | Install from [ollama.com/download](https://ollama.com/download), start it, re-run §1, then §1.5c. (§1.5a's shell installer is Linux-only.) |
+        | Google Colab | Switch to T4 GPU (Runtime → Change runtime type) first, then §1.5a → §1.5b → §1.5c. ~5 min, several GB. |
 
-        First, look at the §1 probe output above. Then follow the row that matches your situation:
-
-        | Your situation | What to do |
-        |----------------|------------|
-        | §1 probe said **"ollama reachable, both models ✅"** | **Skip all of §1.5** — you're already set up. Jump to §2. |
-        | §1 probe said **"ollama reachable, models missing ⚠️"** | Run **only §1.5c** (pull). Skip §1.5a / §1.5b. |
-        | **Local Linux** with no Ollama yet | Run **§1.5a → §1.5b → §1.5c** in order. |
-        | **Local macOS / Windows** with no Ollama yet | Stop here. Install from [ollama.com/download](https://ollama.com/download), start it (auto-starts on macOS / from system tray on Windows), then **re-run §1**. After that, run **§1.5c** for the model pulls. The shell-based installer in §1.5a is Linux-only. |
-        | **Google Colab** | First **switch the runtime to a T4 GPU** (Runtime → Change runtime type). CPU inference for an LLM is painfully slow. Then run **§1.5a → §1.5b → §1.5c** in order. Allow ~5 minutes total — model downloads are several GB. |
-
-        ### Why the install is split into three cells
-
-        Each cell does one thing and prints what it's doing. If something
-        breaks, you know exactly which step failed and what its output was.
-        Three known gotchas the cells handle:
-
-        - **`zstd` missing on Colab.** Recent Ollama installers ship the
-          binary inside a `.tar.zst` archive; without `zstd` installed,
-          extraction fails silently. §1.5a installs `zstd` first if it's
-          not already there.
-        - **`systemctl` not on Colab.** The installer tries to register a
-          systemd service. Colab has no systemd, so this step exits non-zero
-          — but the binary `/usr/local/bin/ollama` is installed correctly,
-          which is all we need. §1.5a ignores the exit code and verifies the
-          binary independently.
-        - **Background `ollama serve` can die quietly.** §1.5b starts it via
-          `Popen` with stderr piped to `db/ollama_serve.log`, then polls
-          `/api/tags` until it responds. If the process dies, the cell
-          surfaces the log tail instead of hanging.
+        Cells are split so a failure tells you which step broke and what its
+        output was. The three known gotchas (Colab missing `zstd`, `systemctl`
+        on a non-systemd image, background `serve` dying quietly) are handled
+        inline — see the comments in each cell below.
     """),
     md("""
         ### §1.5a — Install the binary
@@ -769,9 +314,9 @@ L2_CELLS: list[dict] = [
     md("""
         ### §1.5b — Start `ollama serve` in the background
 
-        We keep a handle to the process (`ollama_proc`) so a later cell can
-        read its stderr if anything goes wrong, and so you can `.terminate()`
-        it manually if you want to restart cleanly.
+        Keep the `Popen` handle (`ollama_proc`) so the teardown cell at the
+        end can `.terminate()` it; stderr goes to `db/ollama_serve.log` so
+        we can tail it if startup fails.
     """),
     py("""
         import subprocess
@@ -869,7 +414,7 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        # §3. Build `agentic.db` from scratch
+        ## §3. Build `agentic.db` from scratch
 
         The framework keeps two databases:
         - `harvested.db` — **product** data (read-only here).
@@ -1015,6 +560,8 @@ L2_CELLS: list[dict] = [
             with sqlite3.connect(DB_AGENTIC) as con:
                 cur = con.cursor()
                 if drop_and_recreate:
+                    # FK_OFF lets us drop tables in any order — otherwise SQLite
+                    # would refuse on referenced parents. We re-enable below.
                     cur.execute("PRAGMA foreign_keys = OFF")
                     for (name,) in cur.execute(
                         "SELECT name FROM sqlite_master "
@@ -1035,7 +582,7 @@ L2_CELLS: list[dict] = [
             print(" ", t["name"])
     """),
     md("""
-        ### 🔍 Inspect — what's inside `agentic.db` right now
+        ### Inspect — what's inside `agentic.db` right now
 
         The cell below shows every table's columns and current row count.
         After §3 the libraries and session tables both exist but are empty;
@@ -1053,23 +600,23 @@ L2_CELLS: list[dict] = [
                 cnt = db_query(db_path, f"SELECT COUNT(*) AS n FROM {tname}")[0]["n"]
                 cols = db_query(db_path, f"PRAGMA table_info({tname})")
                 col_str = ", ".join(c["name"] for c in cols)
-                bullet = "📂" if cnt else "📄"
-                print(f"  {bullet} {tname:32s} {cnt:>4} rows  ({col_str})")
+                marker = "*" if cnt else " "
+                print(f"  {marker} {tname:32s} {cnt:>4} rows  ({col_str})")
 
 
         inspect_db(DB_AGENTIC)
     """),
 
     md("""
-        # §4. Seed the template libraries
+        ## §4. Seed the template libraries
 
         The planner picks strategies and functions by **reading from `agentic.db`**,
         not from hardcoded Python. So before we can run anything, the library
         tables need rows.
 
-        The data below is lifted verbatim from
-        `Layer_2_Agentic_Reasoning/logic/templates.py` — seven strategies and
-        fourteen function templates. Each strategy's `PlanSteps` is a comma-
+        The data below is lifted from
+        `Layer_2_Agentic_Reasoning/logic/templates.py` — six strategies and
+        ten function templates. Each strategy's `PlanSteps` is a comma-
         separated list of function names; the planner parses this string.
     """),
     py("""
@@ -1099,17 +646,12 @@ L2_CELLS: list[dict] = [
             ("MULTI-PRODUCT COMPARISON",
              "compare",
              "Side-by-side comparison of two or more products identified by code.",
-             "Extract Product Number, Query Database, Extract Attributes, Analyze With LLM"),
+             "Extract Product Number, Query Database, Compare Items, Extract Attributes, Analyze With LLM"),
 
             ("FAMILY DEEP-DIVE",
              "family",
              "Look up everything about a product family (e.g. KAPPAFLEX, 4201).",
              "Search Families, Extract Attributes, Analyze With LLM"),
-
-            ("TECHNICAL CALCULATION",
-             "calculate",
-             "Hydraulic engineering calculations (flow rate, pressure drop). Skipped in this notebook.",
-             "Extract Requirements, Analyze With LLM"),
         ]
 
         # ---- Function templates ------------------------------------------
@@ -1124,7 +666,6 @@ L2_CELLS: list[dict] = [
             ("Extract Attributes",     "extract",  "Deterministic attribute extraction from prior outputs."),
             ("Compare Items",          "compare",  "LLM-powered side-by-side comparison of two or more product records."),
             ("Filter Items",           "filter",   "Generic filtering engine with comparison conditions."),
-            ("Convert Units",          "convert",  "Unit conversion with LLM assistance for context-dependent cases."),
             ("Analyze With LLM",       "analyze",  "Final synthesis — composes the answer from collected evidence."),
         ]
 
@@ -1146,13 +687,8 @@ L2_CELLS: list[dict] = [
             "Extract Attributes": [("items", "", "json"), ("config", "{}", "json")],
             "Compare Items":   [("items", "", "json"), ("fields", "[]", "json")],
             "Filter Items":    [("items", "", "json"), ("conditions", "[]", "json"), ("mode", "AND", "string")],
-            "Convert Units":   [
-                ("value", "0", "number"), ("from_unit", "", "string"),
-                ("to_unit", "", "string"), ("context", "", "string"),
-            ],
             "Analyze With LLM": [
                 ("question", "Input", "string"),
-                ("Assembled Data", "", "json"),
                 ("extracted_data", "", "json"),
             ],
         }
@@ -1171,10 +707,6 @@ L2_CELLS: list[dict] = [
                                        ("similarities", "[]", "json"),
                                        ("items", "[]", "json")],
             "Filter Items":           [("filtered_items", "[]", "json"), ("count", "0", "integer")],
-            "Convert Units":          [("converted_value", "0", "number"),
-                                       ("from_unit", "", "string"),
-                                       ("to_unit", "", "string"),
-                                       ("explanation", "", "string")],
             "Analyze With LLM":       [("Analysis", "", "string")],
         }
     """),
@@ -1269,7 +801,7 @@ L2_CELLS: list[dict] = [
         names are declared in `OUTPUTS_SEED` / `PARAMS_SEED` (§4 above).
     """),
     md("""
-        ### 🛠 Try it — peek at any strategy's plan
+        ### Try it — peek at any strategy's plan
     """),
     py("""
         # Try it: change PICK to any name from the table above.
@@ -1287,16 +819,15 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        # §5. The session state
+        ## §5. The session state
 
-        A query enters the workflow as a `SessionState` dict — every node
-        reads and writes fields on it. Below is a `TypedDict` matching the
-        source repo's shape.
+        Every node reads and writes a single `SessionState` dict. The `TypedDict`
+        below documents the shape; the routing logic in §8 keys off the
+        `*Satisfied` flags + `judgeConfidence`.
 
-        Only a few fields really matter on first read: `query`, `currentGoalID`,
-        `currentStrategyID`, `currentFunctionID`, the three `*Satisfied`
-        booleans, `judgeConfidence`, and `finalAnswer`. The rest are
-        bookkeeping for tri-condition routing.
+        > `forcedStrategy` (debug knob): if set, `node_strategy_plan` skips
+        > LLM-based strategy selection and uses this one instead. Useful for
+        > iterating on a single strategy in isolation (see §9.1).
     """),
     py("""
         class SessionState(TypedDict, total=False):
@@ -1342,8 +873,9 @@ L2_CELLS: list[dict] = [
 
 
         # Field meta — used by the rich printer below to label what each field does.
+        # Descriptions are noun-phrase short labels, all in the same register.
         STATE_FIELDS: List[Tuple[str, str]] = [
-            ("query",              "the user's question (input)"),
+            ("query",              "user question (input)"),
             ("sessionID",          "unique per run, scopes session tables"),
             ("currentGoalID",      "→ GoalInSession row"),
             ("currentStrategyID",  "→ StrategyInSession row"),
@@ -1352,7 +884,7 @@ L2_CELLS: list[dict] = [
             ("goalSatisfied",      "judge approved an answer"),
             ("strategyAborted",    "current strategy failed → re-plan"),
             ("workflowComplete",   "all strategies tried OR success"),
-            ("judgeConfidence",    "0.0–1.0 from goal_validation"),
+            ("judgeConfidence",    "confidence score in [0.0, 1.0]"),
             ("finalAnswer",        "synthesised text once goal is satisfied"),
             ("forcedStrategy",     "debug knob: bypass LLM strategy selection"),
         ]
@@ -1396,42 +928,32 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        # §6. The function library
+        ## §6. The function library
 
-        Six callable functions, plus the helpers and prompts they need. Each
-        function follows the same interface used in the source repo:
+        Ten callable functions plus the LLM/embedding helpers they use. Each
+        handler follows the repo's interface:
 
         ```
         handler(params: dict) -> (success: bool, result: dict | str)
         ```
 
-        - `params` is a dict the planner builds at runtime, populating values
-          from the user query (`"Input"` → `query`) or from previously-stored
-          outputs (empty string → merge from `FunctionOutputInSession`).
-        - On success, `result` is a dict whose keys are the **declared outputs**
-          for that function (see `OUTPUTS_SEED` in §4). The executor stores
-          each one in `FunctionOutputInSession`.
-
-        The next several cells define helpers, prompts, then the six
-        functions, then a registry that maps name → callable.
+        Param values come from `FunctionParametersInSession`: `"Input"` resolves
+        to the user query, `""` merges from a prior function's output (matched
+        by slot name in `FunctionOutputInSession`), anything else is a literal
+        from §4. On success, `result` keys must be the **declared outputs** in
+        `OUTPUTS_SEED` (§4) — the executor persists those into the trace.
     """),
     md("""
         ### LLM helpers — multi-tier Ollama with retry and embeddings
 
-        Same shape as the implementation in the repo `Layer_2_Agentic_Reasoning/logic/llm_helpers.py`:
-
-        - `ollama_chat(...)` — one HTTP call to `/api/chat`.
-        - `invoke_llm_with_retry(...)` — exponential backoff (1s → 2s → 4s) for transient failures.
-        - `get_basic_llm()` / `get_reasoning_llm()` — tier dispatch.
-          Different stages of the workflow want different models. `Goal definition`
-          and `strategy selection` are happy with a fast 3B model. `Goal validation`
-          (the judge) and `Analyze With LLM` (synthesis) benefit from a stronger
-          reasoning model. The notebook lets you swap them independently via
-          the `OLLAMA_MODEL` / `OLLAMA_REASONING` constants in §1.
-        - `get_embedding_model()` + `embed(...)` — produces vectors for
-          ChromaDB in §6's vector index.
-
-        *(diagram below — rendered by `show_mermaid`)*
+        - `ollama_chat` — one POST to `/api/chat`.
+        - `invoke_llm_with_retry` — 1s → 2s → 4s backoff for transient
+          errors; re-raises immediately on terminal errors (model not found),
+          so misconfiguration fails fast.
+        - `chat_basic` / `chat_reasoning` — tier dispatch. Cheap tier for
+          goal/strategy/extract; heavier tier for the judge and final
+          synthesis. Swap via `OLLAMA_MODEL` / `OLLAMA_REASONING` in §1.
+        - `embed` — vector for ChromaDB.
     """),
     py('''
         show_mermaid(r"""
@@ -1450,8 +972,6 @@ L2_CELLS: list[dict] = [
             SS[Semantic Search] --> E
         """)
     '''),
-    md("""
-            """),
     py("""
         # ---- single low-level call --------------------------------------
         def ollama_chat(messages: List[Dict[str, str]], temperature: float = 0.0,
@@ -1520,13 +1040,13 @@ L2_CELLS: list[dict] = [
         print(f"embed         : {len(v)}-dim vector, first 4 = {[round(x, 4) for x in v[:4]]}")
     """),
     md("""
-        ### Prompts + a small `PromptLoader`
+        ### Prompts
 
         The repo keeps prompts in `prompts.yaml` and loads them through a
-        `PromptLoader` class. We inline the prompts as a Python dict — same
-        expressiveness, no file dependency — and add a tiny loader class
-        that gives us the same `format_prompt(category, **kwargs)` API the
-        workflow nodes in the repo call.
+        `PromptLoader` class. Inlining them as a Python dict here keeps the
+        walk-through self-contained — the same `format_prompt(...)` call shape
+        that the workflow nodes in the repo use is exposed below as the
+        function `fmt_prompt(...)`.
     """),
     py("""
         PROMPTS = {
@@ -1618,6 +1138,23 @@ L2_CELLS: list[dict] = [
                     "ANALYSIS OUTPUT:\\n{evidence}\\n\\n"
                     "Required JSON: {{\\\"confidence\\\": 0.0..1.0}}",
             },
+
+            "compare_items": {
+                "system":
+                    "You compare two or more product records side-by-side.\\n"
+                    "Return JSON only:\\n"
+                    "{\\n"
+                    '  "comparison_table": {"<field>": ["<val for item1>", "<val for item2>", ...]},\\n'
+                    '  "differences":  ["short bullet", ...],\\n'
+                    '  "similarities": ["short bullet", ...]\\n'
+                    "}\\n"
+                    "Pick fields that genuinely differ where possible.",
+                "user":
+                    "ITEMS:\\n{items_json}\\n\\n"
+                    "Restrict to these fields if non-empty (otherwise pick interesting ones):\\n"
+                    "{fields_json}\\n\\n"
+                    "Return JSON.",
+            },
         }
 
 
@@ -1647,31 +1184,6 @@ L2_CELLS: list[dict] = [
                 except Exception:
                     return None
             return None
-
-
-        # ---- Mini PromptLoader (mirrors config/prompt_loader.py API) ------
-        class PromptLoader:
-            \"\"\"Same `format_prompt(category, **kwargs)` API as the loader in the repo.\"\"\"
-            def __init__(self, prompts: Dict[str, Dict[str, str]]):
-                self._p = prompts
-
-            def get(self, category: str) -> Dict[str, str]:
-                if category not in self._p:
-                    raise KeyError(f"unknown prompt: {category}")
-                return self._p[category]
-
-            def format_prompt(self, category: str, **kwargs) -> List[Dict[str, str]]:
-                tpl = self.get(category)
-                return [
-                    {"role": "system", "content": tpl["system"]},
-                    {"role": "user",   "content": tpl["user"].format(**kwargs)},
-                ]
-
-
-        prompt_loader = PromptLoader(PROMPTS)
-        # `fmt_prompt` (defined above) and `prompt_loader.format_prompt(...)` are
-        # interchangeable — keep both so existing callers and the API surface
-        # used by code in the repo both work.
     """),
 
     md("""
@@ -1729,15 +1241,20 @@ L2_CELLS: list[dict] = [
             # Single LLM call — see PROMPTS['product_code_extraction'] for the prompt.
             out = ollama_chat(fmt_prompt("product_code_extraction", query=query))
 
-            # Robustness: take just the first line, strip a leading "Product codes:" if present.
-            codes = out.strip().splitlines()[0] if out.strip() else ""
-            codes = re.sub(r"^[Pp]roduct codes?:\\s*", "", codes).strip().strip('"').strip("'")
+            # The prompt asks for comma-separated codes, but small models often
+            # newline-separate them. Normalise newlines→commas, strip a leading
+            # "Product codes:" label, then keep just the codes.
+            text = out.strip()
+            text = re.sub(r"^[Pp]roduct codes?:\\s*", "", text)
+            text = text.replace("\\n", ", ").replace(";", ", ")
+            codes = ", ".join(p.strip().strip('"').strip("'")
+                              for p in text.split(",") if p.strip())
 
             # Output slot name MUST match what's declared in OUTPUTS_SEED for this function.
             return True, {"Keyword Output": codes}
     """),
     md("""
-        ### 🛠 Try it — one function in isolation
+        ### Try it — one function in isolation
 
         Each handler takes a `params` dict and returns `(success, dict)`.
         That's it. The rest of the framework just plumbs the right values
@@ -1810,12 +1327,13 @@ L2_CELLS: list[dict] = [
     md("""
         ### ChromaDB vector index — for `Semantic Search` and `Search Products`
 
-        Plain `LIKE` finds rows that share a literal substring. It misses
-        synonyms ("hot water" vs "boiling water"), paraphrases, and
-        cross-language matches. ChromaDB gives us cosine similarity over
-        Ollama embeddings instead.
+        `LIKE` misses synonyms ("hot water" vs "boiling water"), paraphrases,
+        and cross-language matches. Chroma gives us cosine similarity over
+        Ollama embeddings.
 
-        *(diagram below — rendered by `show_mermaid`)*
+        > **Stale-after-Layer-1**: this cell reuses the on-disk index if it
+        > has rows. After regenerating `harvested.db`, call
+        > `build_or_open_family_index(reset=True)` once.
     """),
     py('''
         show_mermaid(r"""
@@ -1927,6 +1445,8 @@ L2_CELLS: list[dict] = [
     """),
     py("""
         def func_semantic_search(params: Dict[str, Any]) -> Tuple[bool, dict]:
+            # Slot "query" preferred; fall back to "Input" so this also works when
+            # called directly with a raw user query (handy for unit tests).
             query   = params.get("query") or params.get("Input") or ""
             top_k   = int(params.get("top_k", 8) or 8)
             if not query.strip():
@@ -1935,7 +1455,9 @@ L2_CELLS: list[dict] = [
             qvec = embed(query)
             res = family_collection.query(query_embeddings=[qvec], n_results=top_k)
 
-            # Chroma returns parallel lists; flatten into one item per match.
+            # Chroma returns parallel lists (ids[0] is the first query's hits, etc.).
+            # Flatten into one item per match. score = 1 - cosine distance ≈ similarity
+            # in [0,1] where 1 is identical, so it's friendlier to display than `dist`.
             items: List[dict] = []
             for fid, doc, meta, dist in zip(
                 res["ids"][0], res["documents"][0],
@@ -1946,7 +1468,7 @@ L2_CELLS: list[dict] = [
                     "name":        meta["name"],
                     "page_number": meta["page_number"],
                     "snippet":     doc[:200],
-                    "score":       round(1.0 - dist, 4),    # cos similarity ≈ 1 − distance
+                    "score":       round(1.0 - dist, 4),
                 })
 
             return True, {"results": items, "scores": [it["score"] for it in items],
@@ -2003,8 +1525,9 @@ L2_CELLS: list[dict] = [
             keywords = params.get("keywords", "") or ""
             limit = int(params.get("limit", 20) or 20)
 
-            # Try exact family_code first.
-            code_match = re.search(r"\\b(\\d{4}(?:-\\d+)?)\\b", keywords)
+            # Try exact family_code first. Catalog codes are like '1071-00-16'
+            # (4-2-2); we accept up to three -N suffixes.
+            code_match = re.search(r"\\b(\\d{4}(?:-\\d+){0,3})\\b", keywords)
             if code_match:
                 items = db_query(DB_HARVESTED, '''
                     SELECT family_code, name, subtitle, description, applications,
@@ -2029,9 +1552,10 @@ L2_CELLS: list[dict] = [
     md("""
         ### Function: **Extract Attributes** (deterministic, no LLM)
 
-        Takes whatever `items` the previous function produced and flattens
-        each one into a list of `(label, value, source_field)` tuples. This
-        is what `Analyze With LLM` consumes as `extracted_data`.
+        Flattens upstream `items` into rows of `{product_code, family_code,
+        specs: [{label, value, raw_field}, …]}` for the synthesis step.
+        Capped at `MAX_ATTRIBUTE_ITEMS` (default 10) — bump it if a search
+        returns more hits and you want them all to reach the LLM.
     """),
     py("""
         # Field-label aliases (truncated subset of the glossary in the repo).
@@ -2044,6 +1568,8 @@ L2_CELLS: list[dict] = [
             "spec_vikt_kg_m":   "Weight (kg/m)",
             "spec_b_jningsradie_mm": "Min bend radius (mm)",
         }
+
+        MAX_ATTRIBUTE_ITEMS = 10                        # see the markdown note above
 
 
         def func_extract_attributes(params: Dict[str, Any]) -> Tuple[bool, dict]:
@@ -2058,7 +1584,7 @@ L2_CELLS: list[dict] = [
                 items = [items] if items else []
 
             extracted: List[dict] = []
-            for it in items[:10]:                              # cap to keep prompts small
+            for it in items[:MAX_ATTRIBUTE_ITEMS]:              # cap to keep prompts small
                 if not isinstance(it, dict):
                     continue
                 row = {
@@ -2083,18 +1609,21 @@ L2_CELLS: list[dict] = [
     md("""
         ### Function: **Analyze With LLM** (final synthesis)
 
-        The terminal function in every strategy. Feeds collected evidence to
-        the LLM with the answer-formatting prompt. Output goes to
-        `Analysis`, which the workflow promotes to `finalAnswer`.
+        Terminal function for every strategy: feeds the collected evidence
+        to the LLM with the answer-formatting prompt. Its `Analysis` output
+        becomes `state.finalAnswer`. Context truncated to
+        `MAX_ANALYSIS_CONTEXT_CHARS` chars (default 6000); raise it if you
+        need bigger prompts.
     """),
     py("""
+        MAX_ANALYSIS_CONTEXT_CHARS = 6000               # see the markdown note above
+
+
         def func_analyze_with_llm(params: Dict[str, Any]) -> Tuple[bool, dict]:
             question = params.get("question") or ""
             extracted = params.get("extracted_data")
-            assembled = params.get("Assembled Data")
 
-            # Either of the two upstream slots may carry the data.
-            ctx_obj = extracted or assembled
+            ctx_obj = extracted
             if isinstance(ctx_obj, str):
                 try:
                     ctx_obj = json.loads(ctx_obj)
@@ -2102,8 +1631,8 @@ L2_CELLS: list[dict] = [
                     pass
 
             context = json.dumps(ctx_obj, indent=2, ensure_ascii=False, default=str)
-            if len(context) > 6000:
-                context = context[:6000] + "\\n…[truncated]"
+            if len(context) > MAX_ANALYSIS_CONTEXT_CHARS:
+                context = context[:MAX_ANALYSIS_CONTEXT_CHARS] + "\\n…[truncated]"
 
             answer = chat_reasoning(                                    # use the heavier tier for synthesis
                 fmt_prompt("analyze_with_llm", context=context, question=question),
@@ -2119,25 +1648,6 @@ L2_CELLS: list[dict] = [
         side comparison from a list of items the previous function fetched.
     """),
     py("""
-        COMPARE_PROMPT = {
-            "system":
-                "You compare two or more product records side-by-side.\\n"
-                "Return JSON only:\\n"
-                "{\\n"
-                '  "comparison_table": {"<field>": ["<val for item1>", "<val for item2>", ...]},\\n'
-                '  "differences":  ["short bullet", ...],\\n'
-                '  "similarities": ["short bullet", ...]\\n'
-                "}\\n"
-                "Pick fields that genuinely differ where possible.",
-            "user":
-                "ITEMS:\\n{items_json}\\n\\n"
-                "Restrict to these fields if non-empty (otherwise pick interesting ones):\\n"
-                "{fields_json}\\n\\n"
-                "Return JSON.",
-        }
-        PROMPTS["compare_items"] = COMPARE_PROMPT
-
-
         def func_compare_items(params: Dict[str, Any]) -> Tuple[bool, dict]:
             items = params.get("items") or []
             if isinstance(items, str):
@@ -2219,48 +1729,6 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ### Function: **Convert Units** (LLM-assisted)
-
-        Standard conversions are mathematical; non-standard ones (like
-        `Nm → ft·lb at this torque scale`) need context. We ask the LLM
-        to provide a value + brief explanation.
-    """),
-    py("""
-        CONVERT_PROMPT = {
-            "system":
-                "You are an expert in technical unit conversions.\\n"
-                "Reply with JSON only:\\n"
-                '{"converted_value": <number>, "explanation": "<one sentence>"}\\n'
-                "If the conversion is ambiguous, state the assumption made.",
-            "user":
-                "Convert {value} {from_unit} to {to_unit}.\\n"
-                "Context (if any): {context}\\n"
-                "Return JSON.",
-        }
-        PROMPTS["convert_units"] = CONVERT_PROMPT
-
-
-        def func_convert_units(params: Dict[str, Any]) -> Tuple[bool, dict]:
-            value     = params.get("value")
-            from_unit = params.get("from_unit") or ""
-            to_unit   = params.get("to_unit") or ""
-            ctx       = params.get("context") or ""
-            if not from_unit or not to_unit:
-                return False, "from_unit / to_unit required"
-
-            out = chat_basic(fmt_prompt("convert_units",
-                value=value, from_unit=from_unit, to_unit=to_unit, context=ctx,
-            ), temperature=0.0)
-            data = parse_json_response(out) or {}
-            return True, {
-                "converted_value": data.get("converted_value", 0),
-                "from_unit":       from_unit,
-                "to_unit":         to_unit,
-                "explanation":     data.get("explanation", ""),
-            }
-    """),
-
-    md("""
         ### Registry — `FUNCTION_MAP` is what the workflow dispatches against
     """),
     py("""
@@ -2274,7 +1742,6 @@ L2_CELLS: list[dict] = [
             "Extract Attributes":     func_extract_attributes,
             "Compare Items":          func_compare_items,
             "Filter Items":           func_filter_items,
-            "Convert Units":          func_convert_units,
             "Analyze With LLM":       func_analyze_with_llm,
         }
         print(f"Functions registered: {len(FUNCTION_MAP)}")
@@ -2283,31 +1750,30 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        # §7. Workflow nodes — the LangGraph state machine
+        ## §7. Workflow nodes — the LangGraph state machine
 
-        Seven nodes mirroring the source repo's
-        `Layer_2_Agentic_Reasoning/logic/workflow_nodes.py`:
+        Seven nodes (mirroring `logic/workflow_nodes.py`):
 
         | Node | Purpose |
         |------|---------|
-        | `GoalDefine`        | Persist the goal in `GoalInSession`, capture goal-definition metadata |
-        | `StrategyPlan`      | Pick a strategy (LLM or `forcedStrategy`), instantiate it + its functions |
-        | `FunctionExecute`   | Run the next pending function via `FUNCTION_MAP` |
-        | `FunctionValidate`  | Sanity-check the function's outputs |
-        | `StrategyValidate`  | Tri-condition routing: continue / abort / succeed |
-        | `GoalValidate`      | LLM judge — sets `finalAnswer` if confidence ≥ 0.5 |
-        | `done`              | Terminal node |
+        | `GoalDefine`        | Persist goal, capture goal-definition metadata |
+        | `StrategyPlan`      | Pick a strategy (LLM or `forcedStrategy`), instantiate functions |
+        | `FunctionExecute`   | Dispatch the next pending function via `FUNCTION_MAP` |
+        | `FunctionValidate`  | Sanity-check function outputs |
+        | `StrategyValidate`  | Continue / abort / succeed |
+        | `GoalValidate`      | LLM judge — promote `Analysis` to `finalAnswer` if confidence ≥ 0.5 |
+        | `done`              | Terminal |
     """),
     md("""
         ### Helpers used across nodes
 
-        Small free functions used by the node implementations below. The
-        full session-scoped `DatabaseManager` class is defined right after
-        these — workflow nodes use a mix of both depending on how much
-        ceremony each call needs.
+        Small free functions used by the node implementations below. They are
+        the in-notebook equivalent of the public API exposed by the source
+        repo's `DatabaseManager` class — same call shapes, same return types,
+        just inlined for readability.
     """),
     py("""
-        # ---- session-level DB helpers (replaces DatabaseManager) ----------
+        # ---- session-level DB helpers ----------
 
         def db_exec(sql: str, params: tuple = ()) -> Optional[int]:
             \"\"\"Run a write against agentic.db; return lastrowid for inserts.\"\"\"
@@ -2423,178 +1889,6 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ### A focused `DatabaseManager` class
-
-        The source repo routes every workflow DB call through a
-        `DatabaseManager` (1233 lines) which gives session-scoped APIs,
-        connection reuse, and transactional helpers. We mirror its
-        **public API** (the methods the workflow nodes actually call) in a
-        ~150-line class. Anything the version in the repo exposes that the
-        notebook doesn't use yet is a method you'd add by following the
-        existing patterns.
-    """),
-    py("""
-        class DatabaseManager:
-            \"\"\"Session-scoped wrapper around agentic.db. Same method shape as the class in the repo.\"\"\"
-
-            def __init__(self, db_path: str = DB_AGENTIC):
-                self.db_path = db_path
-
-            # ---- low-level helpers ---------------------------------------
-            def _exec(self, sql: str, params: tuple = ()) -> Optional[int]:
-                with sqlite3.connect(self.db_path) as con:
-                    cur = con.execute(sql, params)
-                    con.commit()
-                    return cur.lastrowid
-
-            def _fetch(self, sql: str, params: tuple = ()) -> List[dict]:
-                return db_query(self.db_path, sql, params)
-
-            # ---- goals ---------------------------------------------------
-            def create_goal(self, session_id: int, description: str,
-                            name: str = "MainGoal", target: str = "") -> int:
-                return self._exec(
-                    "INSERT INTO GoalInSession (SessionID, GoalName, GoalTarget, GoalDescription) "
-                    "VALUES (?, ?, ?, ?)",
-                    (session_id, name, target, description),
-                ) or 0
-
-            def update_goal_status(self, gid: int, success: bool) -> None:
-                self._exec("UPDATE GoalInSession SET GoalSuccess = ? WHERE GoalID = ?",
-                           (1 if success else 0, gid))
-
-            def get_goal_info(self, gid: int) -> Optional[dict]:
-                rows = self._fetch("SELECT * FROM GoalInSession WHERE GoalID = ?", (gid,))
-                return rows[0] if rows else None
-
-            # ---- strategies ----------------------------------------------
-            def get_available_strategies(self) -> List[str]:
-                return [r["StrategyName"] for r in self._fetch(
-                    "SELECT StrategyName FROM StrategyLibrary ORDER BY StrategyID")]
-
-            def get_strategy_info(self, name: str) -> Optional[dict]:
-                rows = self._fetch(
-                    "SELECT * FROM StrategyLibrary WHERE StrategyName = ?", (name,))
-                return rows[0] if rows else None
-
-            def get_tried_strategies(self, gid: int) -> List[str]:
-                return [r["StrategyName"] for r in self._fetch(
-                    "SELECT DISTINCT StrategyName FROM StrategyInSession WHERE GoalID = ?",
-                    (gid,))]
-
-            def get_successful_strategies(self, gid: int) -> List[int]:
-                return [r["StrategyID"] for r in self._fetch(
-                    "SELECT StrategyID FROM StrategyInSession "
-                    "WHERE GoalID = ? AND StrategySuccess = 1", (gid,))]
-
-            def create_strategy(self, gid: int, name: str, plan: str) -> int:
-                meta = self.get_strategy_info(name) or {}
-                return self._exec(
-                    "INSERT INTO StrategyInSession "
-                    "(GoalID, StrategyName, StrategyTarget, StrategyDescription, PlanSteps) "
-                    "VALUES (?, ?, ?, ?, ?)",
-                    (gid, name, meta.get("StrategyTarget", ""),
-                     meta.get("StrategyDescription", ""), plan),
-                ) or 0
-
-            def update_strategy_status(self, sid: int, success: int, validation: str) -> None:
-                self._exec(
-                    "UPDATE StrategyInSession SET StrategySuccess = ?, StrategyValidation = ? "
-                    "WHERE StrategyID = ?",
-                    (success, validation, sid),
-                )
-
-            def get_strategy_outputs(self, sid: int) -> List[Tuple[str, str]]:
-                rows = self._fetch('''
-                    SELECT o.OutputName, o.OutputValue
-                    FROM FunctionOutputInSession o
-                    JOIN FunctionInSession f ON f.FunctionID = o.FunctionID
-                    WHERE f.StrategyID = ?
-                    ORDER BY o.FunctionOutputID
-                ''', (sid,))
-                return [(r["OutputName"], r["OutputValue"]) for r in rows]
-
-            def get_strategy_function_statistics(self, sid: int) -> dict:
-                row = self._fetch('''
-                    SELECT
-                      COUNT(*) AS total,
-                      SUM(CASE WHEN FunctionSuccess = 1 THEN 1 ELSE 0 END) AS succeeded,
-                      SUM(CASE WHEN FunctionSuccess = 0 THEN 1 ELSE 0 END) AS failed,
-                      SUM(CASE WHEN FunctionSuccess IS NULL THEN 1 ELSE 0 END) AS pending
-                    FROM FunctionInSession WHERE StrategyID = ?
-                ''', (sid,))[0]
-                return {k: row[k] or 0 for k in ("total", "succeeded", "failed", "pending")}
-
-            # ---- functions -----------------------------------------------
-            def create_strategy_functions(self, sid: int, sname: str, plan_steps: str) -> None:
-                \"\"\"Insert FunctionInSession rows for every step (incl. parallel groups).\"\"\"
-                # Parse `[A || B]` into ('parallel', [A, B]); plain names stay sequential.
-                steps: List[Tuple[str, Any]] = []
-                for tok in [s.strip() for s in plan_steps.split(",")]:
-                    if tok.startswith("[") and tok.endswith("]"):
-                        steps.append(("parallel",
-                                      [f.strip() for f in tok[1:-1].split("||")]))
-                    else:
-                        steps.append(("seq", tok))
-                # Flatten in execution order: parallel siblings get inserted in batch order.
-                for kind, payload in steps:
-                    names = payload if kind == "parallel" else [payload]
-                    for fname in names:
-                        fid = self._exec(
-                            "INSERT INTO FunctionInSession "
-                            "(StrategyID, StrategyName, FunctionName) VALUES (?, ?, ?)",
-                            (sid, sname, fname),
-                        ) or 0
-                        # Copy parameter templates for this function.
-                        for t in self._fetch('''
-                            SELECT pl.ParameterName, pl.ParameterValue, pl.Type
-                            FROM FunctionParametersLibrary pl
-                            JOIN FunctionTemplateLibrary fl ON fl.FunctionTemplateID = pl.FunctionTemplateID
-                            WHERE fl.FunctionName = ?
-                        ''', (fname,)):
-                            self._exec(
-                                "INSERT INTO FunctionParametersInSession "
-                                "(FunctionID, FunctionName, StrategyName, ParameterName, ParameterValue, Type) "
-                                "VALUES (?, ?, ?, ?, ?, ?)",
-                                (fid, fname, sname, t["ParameterName"],
-                                 t["ParameterValue"], t["Type"]),
-                            )
-
-            def get_current_function_id(self, sid: int) -> Optional[int]:
-                rows = self._fetch(
-                    "SELECT FunctionID FROM FunctionInSession "
-                    "WHERE StrategyID = ? AND FunctionSuccess IS NULL "
-                    "ORDER BY FunctionID LIMIT 1", (sid,))
-                return rows[0]["FunctionID"] if rows else None
-
-            def get_function_info(self, fid: int) -> Optional[dict]:
-                rows = self._fetch(
-                    "SELECT * FROM FunctionInSession WHERE FunctionID = ?", (fid,))
-                return rows[0] if rows else None
-
-            def update_function_status(self, fid: int, success: bool, msg: str = "") -> None:
-                self._exec(
-                    "UPDATE FunctionInSession SET FunctionSuccess = ?, failedtext = ? "
-                    "WHERE FunctionID = ?",
-                    (1 if success else 0, msg if not success else "", fid),
-                )
-
-            def store_function_output(self, fid: int, fname: str, sname: str,
-                                      oname: str, ovalue: str, otype: str) -> None:
-                self._exec(
-                    "INSERT INTO FunctionOutputInSession "
-                    "(FunctionID, FunctionName, StrategyName, OutputName, OutputValue, Type) "
-                    "VALUES (?, ?, ?, ?, ?, ?)",
-                    (fid, fname, sname, oname, ovalue, otype),
-                )
-
-
-        # Single shared instance — same pattern as the source repo.
-        db_mgr = DatabaseManager()
-        debug.system(f"DatabaseManager bound to {db_mgr.db_path}")
-    """),
-
-    md("""
         ### `node_goal_define` — capture the goal
 
         **Why this node exists**: before we can pick a strategy, we need a
@@ -2620,16 +1914,13 @@ L2_CELLS: list[dict] = [
     md("""
         ### `node_strategy_plan` — pick (or terminate)
 
-        **Why this node exists**: every strategy is a different *recipe*
-        for answering the query — `DIRECT SPECIFICATION LOOKUP` works for
-        "what's the pressure of code X?", `CONTEXTUAL PRODUCT SEARCH` works
-        for "find me a hose that handles boiling water". This node asks
-        the LLM to pick the right recipe given the goal, then materialises
-        it into actual `FunctionInSession` rows the executor will run.
+        Each strategy is a different recipe (LOOKUP for code-keyed queries,
+        SEARCH for application-keyed ones, etc.). This node asks the LLM
+        which recipe fits the goal, then materialises it into
+        `FunctionInSession` rows for the executor.
 
-        It also handles the **strategy-exhausted** case — if every strategy
-        has been tried and none worked, the workflow bails out gracefully
-        with `workflowComplete = True` instead of looping forever.
+        If every strategy has been tried, sets `workflowComplete=True` and
+        terminates — no infinite loop.
     """),
     py("""
         def node_strategy_plan(state: SessionState) -> SessionState:
@@ -2693,53 +1984,22 @@ L2_CELLS: list[dict] = [
     md("""
         ### `node_function_execute` — resolve params, dispatch, store outputs
 
-        Six clearly-labelled stages in the cell below:
-
-        1. **Look up** which function we're running (from `FunctionInSession`).
-        2. **Detect parallel siblings**: if the current function name is in a
-           `[A || B]` group within this strategy's `PlanSteps`, batch all
-           pending siblings and run them on a `ThreadPoolExecutor`.
-        3. **Resolve parameters**: each row in `FunctionParametersInSession`
-           tells us where a value comes from — the user query (`"Input"`),
-           a prior function's output (empty string), or a literal template value.
-        4. **Dispatch** to the registered handler in `FUNCTION_MAP`.
-        5. **Persist** the success flag and any failure text.
-        6. **Store outputs** that match the declared output schema; promote
-           `Analyze With LLM`'s `Analysis` to the user-visible `finalAnswer`.
+        Look up the row, resolve params (query / merged upstream output /
+        literal), dispatch to `FUNCTION_MAP`, persist success + outputs.
+        `Analyze With LLM`'s `Analysis` is promoted to `state.finalAnswer`.
     """),
     py("""
         # ─── helpers used by node_function_execute ──────────────────────
 
-        def parse_plan_groups(plan_steps: str) -> List[List[str]]:
-            \"\"\"Return the parallel groups in this strategy's PlanSteps.\"\"\"
-            groups: List[List[str]] = []
-            for tok in [s.strip() for s in plan_steps.split(",")]:
-                if tok.startswith("[") and tok.endswith("]"):
-                    groups.append([f.strip() for f in tok[1:-1].split("||")])
-            return groups
-
-
-        def find_parallel_siblings(sid: int, fn: str) -> Optional[List[int]]:
-            \"\"\"If `fn` is in a parallel group for strategy `sid`, return the FIDs of all pending siblings.\"\"\"
-            row = db_query(DB_AGENTIC,
-                "SELECT PlanSteps FROM StrategyInSession WHERE StrategyID = ?", (sid,))
-            if not row:
-                return None
-            groups = parse_plan_groups(row[0]["PlanSteps"])
-            for g in groups:
-                if fn in g:
-                    pending = db_query(DB_AGENTIC, '''
-                        SELECT FunctionID, FunctionName FROM FunctionInSession
-                        WHERE StrategyID = ? AND FunctionSuccess IS NULL
-                          AND FunctionName IN (%s)
-                        ORDER BY FunctionID
-                    ''' % ",".join("?" * len(g)), (sid, *g))
-                    return [r["FunctionID"] for r in pending]
-            return None
-
-
         def _resolve_params(fid: int, sid: int, fn: str, query: str) -> Dict[str, Any]:
-            \"\"\"Read FunctionParametersInSession and fill in actual values.\"\"\"
+            \"\"\"Read FunctionParametersInSession and fill in actual values.
+
+            Three resolution rules, keyed off `ParameterValue`:
+              "Input"  → use the user query directly
+              ""       → merge from upstream function outputs in the same strategy
+                          (matched by slot name, e.g. "Keyword Output")
+              <other>  → literal from §4 (cast to int/json per `Type`)
+            \"\"\"
             param_rows = db_query(DB_AGENTIC,
                 "SELECT ParameterName, ParameterValue, Type FROM FunctionParametersInSession "
                 "WHERE FunctionID = ?", (fid,))
@@ -2749,7 +2009,10 @@ L2_CELLS: list[dict] = [
                 if val == "Input":
                     out[name] = query
                 elif val == "":
+                    # Pull every prior output named `name` in this strategy.
                     merged = collect_outputs(sid, name)
+                    # Fallback: a slot literally called "Input" with no upstream
+                    # producer should still yield the user query.
                     if not merged and name == "Input":
                         merged = [query]
                     out[name] = merge_values(name, merged) if merged else ""
@@ -2787,23 +2050,6 @@ L2_CELLS: list[dict] = [
                             (fid, fn, sname, oname, sval, otype))
 
 
-        def _execute_one(fid: int, query: str) -> Tuple[int, str, bool, Any]:
-            \"\"\"Worker for both sequential and parallel branches.\"\"\"
-            row = db_query(DB_AGENTIC,
-                "SELECT FunctionName, StrategyID, StrategyName "
-                "FROM FunctionInSession WHERE FunctionID = ?", (fid,))[0]
-            fn, sid, sname = row["FunctionName"], row["StrategyID"], row["StrategyName"]
-            params = _resolve_params(fid, sid, fn, query)
-            handler = FUNCTION_MAP.get(fn)
-            if not handler:
-                return fid, fn, False, f"no handler for {fn!r}"
-            try:
-                ok, res = handler(params)
-            except Exception as e:
-                ok, res = False, f"{type(e).__name__}: {e}"
-            return fid, fn, ok, res
-
-
         def node_function_execute(state: SessionState) -> SessionState:
             # Guard: don't execute if a previous step already aborted the strategy.
             if state.get("strategyAborted"):
@@ -2822,29 +2068,18 @@ L2_CELLS: list[dict] = [
                 return state
             fn, sid, sname = row[0]["FunctionName"], row[0]["StrategyID"], row[0]["StrategyName"]
 
-            # ─── 2. Parallel siblings? Batch them. ──────────────────────
-            siblings = find_parallel_siblings(sid, fn)
-            if siblings and len(siblings) > 1:
-                trace("FunctionExecute", f"parallel batch: {siblings}")
-                with ThreadPoolExecutor(max_workers=min(4, len(siblings))) as ex:
-                    futures = [ex.submit(_execute_one, sfid, query) for sfid in siblings]
-                    any_failed = False
-                    for fut in as_completed(futures):
-                        sfid, sfn, ok, res = fut.result()
-                        _persist_function_result(sfid, sfn, sname, ok, res)
-                        trace("FunctionExecute", f"  ↳ {sfn}: {'ok' if ok else 'FAIL'}")
-                        if ok and sfn == "Analyze With LLM" and isinstance(res, dict):
-                            state["finalAnswer"] = res.get("Analysis", state.get("finalAnswer"))
-                        if not ok:
-                            any_failed = True
-                if any_failed:
-                    state["strategyAborted"] = True
-                return state
-
-            # ─── 3-6. Sequential single-function path ───────────────────
-            # Re-uses the same helpers the parallel branch above used.
+            # ─── 2-5. Resolve, dispatch, persist, store outputs ──────────
             trace("FunctionExecute", f"{fn}")
-            _, _, success, result = _execute_one(fid, query)
+            params  = _resolve_params(fid, sid, fn, query)
+            handler = FUNCTION_MAP.get(fn)
+            if not handler:
+                _persist_function_result(fid, fn, sname, False, f"no handler for {fn!r}")
+                state["strategyAborted"] = True
+                return state
+            try:
+                success, result = handler(params)
+            except Exception as e:
+                success, result = False, f"{type(e).__name__}: {e}"
             _persist_function_result(fid, fn, sname, success, result)
 
             if success and fn == "Analyze With LLM" and isinstance(result, dict):
@@ -2858,6 +2093,11 @@ L2_CELLS: list[dict] = [
 
     md("""
         ### `node_function_validate` — minimal output sanity
+
+        A function can return `success=True` and still write zero output
+        rows (e.g. an empty `{}` from a noisy LLM). This node aborts the
+        strategy in that case so downstream functions don't chain off
+        nothing. Thin by design — strategy-level validation is the next node.
     """),
     py("""
         def node_function_validate(state: SessionState) -> SessionState:
@@ -2881,17 +2121,21 @@ L2_CELLS: list[dict] = [
     md("""
         ### `node_strategy_validate` — tri-condition routing
 
-        This is the load-bearing node. It looks at the strategy's function rows and decides:
+        This is the routing decision for the strategy in flight. It looks at
+        the strategy's function rows and decides:
+
         - any failed → **abort** → re-plan
-        - all done   → **succeed** → goal validation
+        - all done → **succeed** → goal validation
         - more pending → **continue** → next function
     """),
     py("""
         def node_strategy_validate(state: SessionState) -> SessionState:
             sid = state["currentStrategyID"]
+            # One pass over FunctionInSession gives us all four counts —
+            # cheaper than four separate COUNT queries.
             stats = db_query(DB_AGENTIC, '''
                 SELECT
-                  COUNT(*)                                   AS total,
+                  COUNT(*)                                            AS total,
                   SUM(CASE WHEN FunctionSuccess = 1 THEN 1 ELSE 0 END) AS succeeded,
                   SUM(CASE WHEN FunctionSuccess = 0 THEN 1 ELSE 0 END) AS failed,
                   SUM(CASE WHEN FunctionSuccess IS NULL THEN 1 ELSE 0 END) AS pending
@@ -2901,6 +2145,9 @@ L2_CELLS: list[dict] = [
                                                  stats["failed"] or 0, stats["pending"] or 0)
             trace("StrategyValidate", f"strategy {sid}: {succeeded}/{total} ok, {pending} pending, {failed} failed")
 
+            # Case 1: any failure aborts the strategy → re-enter StrategyPlan.
+            # `strategySatisfied=True` here means "done with this strategy",
+            # not "answered the goal" — the abort flag distinguishes them.
             if failed > 0:
                 db_exec("UPDATE StrategyInSession SET StrategySuccess = 0, StrategyValidation = ? "
                         "WHERE StrategyID = ?", (f"{failed} function(s) failed", sid))
@@ -2908,6 +2155,7 @@ L2_CELLS: list[dict] = [
                 state["strategyAborted"]   = True
                 return state
 
+            # Case 2: every function done, no failures → forward to GoalValidate.
             if pending == 0:
                 db_exec("UPDATE StrategyInSession SET StrategySuccess = 1, StrategyValidation = ? "
                         "WHERE StrategyID = ?", ("all functions ok", sid))
@@ -2915,7 +2163,7 @@ L2_CELLS: list[dict] = [
                 state["strategyAborted"]   = False
                 return state
 
-            # still pending — continue
+            # Case 3: still functions to run → loop back to FunctionExecute.
             state["currentFunctionID"] = get_current_function_id(sid)
             state["strategySatisfied"] = False
             state["strategyAborted"]   = False
@@ -2925,16 +2173,16 @@ L2_CELLS: list[dict] = [
     md("""
         ### `node_goal_validate` — the LLM judge
 
-        **Why this node exists**: this is the load-bearing safety mechanism
-        of the whole framework. Without it, any strategy that "looks
-        plausible" would be accepted and we'd cheerfully hallucinate. With
-        it, the LLM has to score the synthesised answer against the
-        original query and goal definition, and only confidence ≥ 0.5 wins.
+        The safety gate. The LLM scores the synthesised answer against the
+        query + goal definition; only confidence ≥ 0.5 passes. Below that,
+        re-enter `node_strategy_plan` and try a different strategy. If all
+        strategies fail, the user gets an explicit "no answer" instead of a
+        hallucination.
 
-        Below 0.5 the workflow re-enters `node_strategy_plan`, picks a
-        different strategy, and tries again. If every strategy fails,
-        `workflowComplete` flips and the user gets an explicit "no answer"
-        instead of fabrication.
+        > **Self-judging caveat**: same model family generates and judges by
+        > default; small open models can over-approve. Point
+        > `OLLAMA_REASONING` at a stronger model or tighten
+        > `PROMPTS["goal_validation"]` if §9.2 shows false approvals.
     """),
     py("""
         def node_goal_validate(state: SessionState) -> SessionState:
@@ -3016,10 +2264,11 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        # §8. Build the LangGraph state machine
+        ## §8. Build the LangGraph state machine
 
-        Same topology as the source repo. **Tri-condition routing**
-        on `StrategyValidate` is the load-bearing decision:
+        Same topology as the source repo. The conditional edge out of
+        `StrategyValidate` is the heart of the loop — three possible next
+        nodes depending on the strategy state.
 
         *(diagram below — rendered by `show_mermaid`)*
     """),
@@ -3041,7 +2290,7 @@ L2_CELLS: list[dict] = [
         """)
     '''),
     md("""
-        
+
         Three places routing branches:
 
         - **`StrategyPlan`** → `done` *or* `FunctionExecute`
@@ -3050,12 +2299,6 @@ L2_CELLS: list[dict] = [
           (continue the strategy / give up on it / it's complete)
         - **`GoalValidate`** → `done` *or* `StrategyPlan`
           (the judge is happy / try another strategy)
-
-        > **Parallel execution** (the `[Func1 || Func2]` syntax in
-        > `PlanSteps`) is wired in via `DatabaseManager.create_strategy_functions`
-        > (parses the syntax) and the parallel branch in `node_function_execute`
-        > (uses `ThreadPoolExecutor`). See the `PARALLEL ENHANCED LOOKUP`
-        > strategy seeded in §4 for an example.
     """),
     py("""
         def _next_after_strategy_validate(state: SessionState) -> str:
@@ -3071,6 +2314,17 @@ L2_CELLS: list[dict] = [
 
 
         def build_graph():
+            \"\"\"Wire seven nodes into the state machine.
+
+            Three places where routing branches:
+
+            - StrategyPlan        → done | FunctionExecute
+                (any strategies left to try?)
+            - StrategyValidate    → FunctionExecute | StrategyPlan | GoalValidate
+                (continue / give up on it / strategy complete)
+            - GoalValidate        → done | StrategyPlan
+                (the judge is happy / try another strategy)
+            \"\"\"
             builder = StateGraph(state_schema=SessionState)
 
             for name, fn in (
@@ -3122,10 +2376,9 @@ L2_CELLS: list[dict] = [
     md("""
         ### Render the *actual* compiled graph
 
-        The Mermaid block above is hand-drawn so it stays readable. The cell
-        below dumps the **real** topology straight from LangGraph. They
-        should match — if they don't, your edits to `build_graph()` changed
-        the shape.
+        The hand-drawn diagram above stays readable on purpose; the cell below
+        dumps the real topology from LangGraph. If they diverge, your edits
+        to `build_graph()` changed the shape.
     """),
     py("""
         # Render the compiled graph as Mermaid via show_mermaid (works in Colab).
@@ -3140,19 +2393,13 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        # §9. Run a query, end-to-end — with live tracing
+        ## §9. Run a query, end-to-end — with live tracing
 
-        We use `graph.stream(...)` instead of `graph.invoke(...)` so we can
-        watch state evolve **between** nodes instead of just seeing the final
-        answer. Each emitted update is `{node_name: state_after_node}`.
-
-        The `run_traced(...)` helper below:
-
-        1. Re-initialises `agentic.db` so each run starts clean.
-        2. Streams the graph, prints which node just fired and which state
-           fields it touched.
-        3. Times each node so you can see where time goes.
-        4. Returns the final state for inspection.
+        `graph.stream(...)` emits `{node_name: state_after_node}` between
+        nodes — useful for watching the workflow evolve. `run_traced(...)`
+        wraps that: re-initialises `agentic.db`, streams the graph, prints
+        each node that fires (with elapsed time + which `state` fields
+        changed), and returns the final state.
     """),
     py("""
         # Build a small icon palette for the trace output.
@@ -3182,7 +2429,22 @@ L2_CELLS: list[dict] = [
 
         def run_traced(query: str, *, forced_strategy: Optional[str] = None,
                        verbose_inner: bool = False) -> SessionState:
-            \"\"\"Stream the graph for one query, print per-node trace, return final state.\"\"\"
+            \"\"\"Stream the graph for one query, print a per-node trace, return the final state.
+
+            Args:
+                query: the natural-language question to answer.
+                forced_strategy: if set, bypass `node_strategy_plan`'s LLM
+                    selection and force this strategy by name. Useful for
+                    debugging a single strategy in isolation (see §9.1).
+                verbose_inner: if True, the per-node `trace(...)` calls inside
+                    each node also print, on top of the per-node summary line
+                    this function emits. Default is `False`, so only the outer
+                    (per-node) trace is shown — chatty enough to follow the
+                    workflow, quiet enough to read.
+
+            Side effects: re-initialises `agentic.db` at the start of every
+            call, so each run begins from a clean slate.
+            \"\"\"
             global VERBOSE
             saved, VERBOSE = VERBOSE, verbose_inner          # quieten inner trace() calls
             try:
@@ -3230,7 +2492,7 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ## Forced-strategy debug knob
+        ### §9.1 Forced-strategy debug knob
 
         Skip the LLM strategy selection by setting `forcedStrategy`. Useful
         when iterating on a single strategy.
@@ -3246,26 +2508,42 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ## Failure mode — verify-then-summarise (the load-bearing demo)
+        ### §9.2 Failure mode — verify-then-summarise (the safety gate in action)
 
-        Ask for something the catalog doesn't contain. What *should* happen:
+        Ask for something the catalog doesn't contain. Each strategy retrieves
+        real data, the LLM speculates, the judge scores below 0.5,
+        `node_strategy_plan` tries another, and once all strategies are
+        exhausted the workflow returns "no answer" instead of hallucinating.
+        Watch `judgeConfidence < 0.5` and `finalAnswer` flipping to `None`.
 
-        1. A strategy runs, retrieves real product data.
-        2. `Analyze With LLM` produces *some* synthesised text — but it's
-           necessarily speculative, since the answer isn't in the data.
-        3. **The judge catches this**: confidence drops below 0.5, so
-           `goalSatisfied` stays False.
-        4. `node_strategy_plan` re-enters, picks a different strategy, the
-           loop repeats. Eventually all strategies are exhausted and the
-           workflow terminates with no answer rather than a hallucinated one.
+        **Expected output** (`llama3.2:3b`, default seeds — your numbers will vary):
 
-        > 🔍 **Watch in the trace below**: a `judgeConfidence` value below
-        > `0.5`, and `finalAnswer` flipping back to `None` after each rejected
-        > attempt.
+        ```
+        [01] 🎯 GoalDefine          (+ 1.4s)
+               ↳ currentGoalID         = 1
+        [02] 🧠 StrategyPlan         (+ 2.7s)
+               ↳ currentStrategyID     = 1
+               ↳ currentFunctionID     = 1
+        …
+        [NN] ⚖️  GoalValidate         (+19.8s)
+               ↳ judgeConfidence       = 0.20
+               ↳ goalSatisfied         = False
+               ↳ finalAnswer           = None
+        … (re-plan, try a different strategy, judge again, repeat)
+        [NN] 🧠 StrategyPlan         (+71.4s)
+               ↳ workflowComplete      = True
+               ↳ finalAnswer           = 'All strategies exhausted; no satisfactory answer.'
+        [NN] 🏁 done                 (+71.4s)
 
-        > **Caveat:** if your local model is too eager to please, the judge
-        > may falsely approve. Tighten the prompt in `PROMPTS["goal_validation"]`
-        > if you see this — that's the right exercise.
+        --- Result ---
+          judgeConfidence    0.20
+          goalSatisfied      False
+          workflowComplete   True
+          finalAnswer        All strategies exhausted; no satisfactory answer.
+        ```
+
+        If the judge falsely approves, tighten `PROMPTS["goal_validation"]`
+        or use a stronger `OLLAMA_REASONING` model.
     """),
     py("""
         final = run_traced("What is the warranty period in months for hose 1071-00-16?")
@@ -3276,11 +2554,14 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ## Inspecting the persisted execution trace
+        ### §9.3 Inspecting the persisted execution trace
 
-        Everything the workflow did is in `agentic.db` — ready to query
-        for audit, debugging, or further analysis. This is the "Relational
-        Control Plane" of the framework's name.
+        Everything the workflow did is in `agentic.db` — the "Relational
+        Control Plane" — queryable for audit, debugging, replay.
+
+        > Shows the **most recent run only**: `run_traced(...)` re-initialises
+        > `agentic.db` each call. Remove the `init_agentic_db(...)` line in
+        > `run_traced` to keep history across runs.
     """),
     py("""
         rows = db_query(DB_AGENTIC, '''
@@ -3298,249 +2579,61 @@ L2_CELLS: list[dict] = [
     """),
 
     md("""
-        ## You've finished Layer 2
+        ## Wrap-up — you've finished Layer 2
 
-        You ran the RCP framework end-to-end:
+        Built end-to-end: 9-table schema (§3), 6 strategies + 10 function
+        templates seeded (§4), 10 function handlers (§6), multi-tier
+        `chat_basic` / `chat_reasoning` / `embed` with retry (§6), 7 LangGraph
+        nodes wired through three conditional edges (§7, §8), and the judge
+        gate that fails off-catalog queries explicitly instead of
+        hallucinating (§9.2).
 
-        - **Schema** — all 9 tables built from the same SQL the source repo ships (§3).
-        - **Templates** — 7 strategies + 11 function templates seeded into `agentic.db` (§4).
-        - **Function library** — Extract Product Number, Extract Requirements, Query Database, Search Products, Search Families, Semantic Search (ChromaDB-backed), Extract Attributes, Compare Items, Filter Items, Convert Units, Analyze With LLM (§6).
-        - **Multi-tier LLM** — `chat_basic` for cheap stages, `chat_reasoning` for synthesis + the judge, `embed` for vector search; all wrapped in `invoke_llm_with_retry` (§6).
-        - **`DatabaseManager` / `PromptLoader` / `DebugConfig`** — same API surface as the wrappers in the repo (§6, §7).
-        - **LangGraph** — seven nodes, tri-condition routing (§7, §8).
-        - **Parallel execution** — `[A \\|\\| B]` syntax in `PlanSteps` triggers a `ThreadPoolExecutor` batch in `node_function_execute` (§7).
-        - **The judge gate** — verify-then-summarise. Off-catalog queries fail explicitly rather than hallucinating (§9 failure-mode cell).
+        ### Lighter than the repo
 
-        **Where this notebook stays lighter than the repo**
+        - **Functions**: 10 of 15. Missing: `Search Categories`,
+          `Aggregate Results`, `Calculate`, `Convert Units`, legacy variants.
+        - **Prompts**: inline `PROMPTS` dict + `fmt_prompt`, not YAML +
+          `PromptLoader`. Same call shape.
+        - **Models**: one chat tier; repo splits `basic` / `reasoning` /
+          `multimodal`. Swap via `OLLAMA_MODEL` / `OLLAMA_REASONING` in §1.
+        - **Parallel `PlanSteps`** (`[A \\|\\| B]`) omitted — no seeded
+          strategy uses it.
 
-        - 11 of 15 functions ship — adding the remaining four (Search Categories, Aggregate Results, Calculate, legacy variants) follows the patterns in §6.
-        - Prompts in a single inline `PROMPTS` dict instead of `config/prompts.yaml`. Same `format_prompt(...)` API.
-        - No multimodal LLM tier — Layer 1 owns the vision model. You'd add a `chat_multimodal()` peer to `chat_basic` / `chat_reasoning`.
+        ### Where to push next
 
-        **Where to push next**
-
-        - Wire one of the failed-query traces back into `agentic.db` for permanent audit logs.
-        - Add a new strategy or function: extend `STRATEGIES_SEED` / `FUNCTIONS_SEED` and re-run §4.
-        - Compare strategies side-by-side on the same query by setting `forced_strategy` per run.
-        - Switch `chat_reasoning` to a stronger model (`phi4`, `qwen2.5:14b`) and re-run the failure-mode cell — does the judge get sharper?
+        - Wire `Search Products` / `Filter Items` into a strategy (extend
+          `STRATEGIES_SEED` and re-run §4).
+        - Point `OLLAMA_REASONING` at a bigger model (`phi4`, `qwen2.5:14b`)
+          and re-run §9.2 — does the judge tighten up?
+        - Compare strategies on one query by setting `forced_strategy`
+          per run (§9.1).
     """),
-]
 
-
-# =====================================================================
-# Notebook 3 — Layer 3: User Interface
-# =====================================================================
-
-L3_CELLS: list[dict] = [
     md("""
-        # Layer 3 — User Interface
-        ### Flask + Server-Sent Events on top of the reasoning engine
+        ### Teardown — release the local Ollama process
 
-        Layer 3 is a thin layer: a Flask app that wraps Layer 2's
-        `graph.invoke(...)` and exposes three endpoints —
-
-        | Method | Path                       | Returns                                  |
-        |--------|----------------------------|------------------------------------------|
-        | POST   | `/query`                   | `{ session_id }`                         |
-        | GET    | `/progress/<session_id>`   | text/event-stream of workflow events     |
-        | GET    | `/result/<session_id>`     | final structured answer                  |
-
-        plus a single-page UI at `/`.
-
-        We start the Flask app in a **background thread** so the notebook
-        can keep running. (If you're editing `web_app.py` itself and want
-        Flask's reloader, use `python run_web.py` in a separate terminal
-        instead — the threaded server here doesn't reload on file changes.)
-    """),
-    md("""
-        ## 0. Pin project root, probe the environment
+        If you started Ollama from §1.5b (`ollama_proc` is a `Popen` handle),
+        running this cell stops it cleanly so you don't leave a server
+        holding GPU memory after the notebook finishes. Safe to skip if
+        Ollama was already running before §1.5.
     """),
     py("""
-        import sys
-        sys.path.insert(0, str(__import__("pathlib").Path.cwd()))
-        from _helpers import pin_project_root, configure_utf8_stdout, env_probe
-
-        ROOT = pin_project_root()
-        configure_utf8_stdout()
-        for k, v in env_probe(check_ollama=True).items():
-            print(f"{k:30s} {v}")
-    """),
-    md("""
-        ## 1. Inspect the Flask app before starting it
-
-        `web_app.py` initialises the LangGraph workflow on import — that's
-        why import alone takes a few seconds. List the routes so you know
-        what's actually exposed.
-    """),
-    py("""
-        from Layer_3_User_Interface.web_app import app
-
-        for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.rule):
-            methods = ",".join(sorted(rule.methods - {"HEAD", "OPTIONS"}))
-            print(f"{methods:8s} {rule.rule}  ->  {rule.endpoint}")
-    """),
-    py("""
-        # Quick peek at the templated frontend (not rendered — just the source).
-        from pathlib import Path
-        head = Path("Layer_3_User_Interface/templates/index.html").read_text(encoding="utf-8")[:600]
-        print(head, "\\n...")
-    """),
-    md("""
-        ## 2. Start the server in a background thread
-
-        We use `werkzeug.serving.make_server` rather than `app.run` so we
-        keep an explicit handle to the server and can shut it down cleanly
-        from a later cell. Port `5051` is non-default to avoid clashing
-        with a separately running `python run_web.py` instance.
-    """),
-    py("""
-        import threading, time
-        from werkzeug.serving import make_server
-
-        HOST, PORT = "127.0.0.1", 5051
-        BASE_URL   = f"http://{HOST}:{PORT}"
-
-        class _Server(threading.Thread):
-            def __init__(self):
-                super().__init__(daemon=True)
-                self.srv = make_server(HOST, PORT, app)
-            def run(self):  self.srv.serve_forever()
-            def stop(self): self.srv.shutdown()
-
-        server = _Server()
-        server.start()
-        time.sleep(1.0)        # give Flask a moment to bind
-        print("running at", BASE_URL)
-    """),
-    py("""
-        # Sanity-check: does the index page render?
-        import requests
-        r = requests.get(BASE_URL, timeout=10)
-        print("status:", r.status_code, " | bytes:", len(r.text))
-    """),
-    md("""
-        ## 3. Submit a query over HTTP
-
-        `POST /query` returns a `session_id`. The reasoning workflow
-        starts in a background thread inside the Flask app — the response
-        is immediate.
-    """),
-    py("""
-        # Try it: change the query string.
-        payload = {"query": "What is the maximum working pressure for hose 1071-00-16?"}
-
-        r = requests.post(f"{BASE_URL}/query", json=payload, timeout=10)
-        r.raise_for_status()
-        session_id = r.json()["session_id"]
-        print("session_id:", session_id)
-    """),
-    md("""
-        ## 4. Stream progress events
-
-        `GET /progress/<id>` is a Server-Sent Events stream — one event
-        per workflow node transition. We iterate `iter_lines()` and print
-        the JSON payloads as they arrive. This is the same trace as
-        Notebook 2's `graph.stream(...)`, but going over the wire.
-    """),
-    py("""
-        import json
-        from urllib3.exceptions import ProtocolError
-
-        # The stream stays open until the workflow signals completion (or fails).
-        # If you want to bail out manually, interrupt the cell.
         try:
-            with requests.get(f"{BASE_URL}/progress/{session_id}",
-                              stream=True, timeout=120) as resp:
-                for raw in resp.iter_lines(decode_unicode=True):
-                    if not raw:
-                        continue
-                    if raw.startswith("data:"):
-                        try:
-                            evt = json.loads(raw[5:].strip())
-                        except json.JSONDecodeError:
-                            print("non-json:", raw)
-                            continue
-                        node = evt.get("node") or evt.get("event") or "?"
-                        print(f"[{node}]  ", json.dumps(evt, ensure_ascii=False)[:200])
-                        if evt.get("done") or evt.get("complete"):
-                            break
-        except (requests.exceptions.ChunkedEncodingError, ProtocolError) as e:
-            print("(stream closed)", e)
-    """),
-    md("""
-        ## 5. Fetch the final result
-    """),
-    py("""
-        r = requests.get(f"{BASE_URL}/result/{session_id}", timeout=10)
-        print("status:", r.status_code)
-        try:
-            import json
-            print(json.dumps(r.json(), indent=2, ensure_ascii=False))
-        except Exception:
-            print(r.text[:1500])
-    """),
-    md("""
-        ## 6. Use the live UI
-
-        The link below opens the running app in a separate browser window.
-        VS Code notebooks generally won't render an `IFrame` to localhost,
-        so we don't bother embedding — just click the URL.
-    """),
-    py("""
-        print("Open this in your browser:")
-        print(" ", BASE_URL)
-    """),
-    md("""
-        ## 7. Configuration tour
-
-        All Layer 2 settings still apply:
-
-        - **Domain name / description** — `Layer_2_Agentic_Reasoning/config/domain_config.py`
-        - **LLM model** — `Layer_2_Agentic_Reasoning/config/config_loader.py`
-        - **Debug verbosity** — `Layer_2_Agentic_Reasoning/config/debug_config.py` (0..4)
-        - **Flask secret / debug** — `.env` (`SECRET_KEY`, `FLASK_DEBUG`)
-
-        And specifically for Layer 3:
-
-        - The threaded server here does **not** reload on file changes. Iterate
-          on `web_app.py` with `python run_web.py` in a separate terminal,
-          which uses Werkzeug's reloader.
-        - Bind to `127.0.0.1` only from a notebook. Don't expose `0.0.0.0`.
-    """),
-    md("""
-        ## 8. Shut the server down
-
-        Important — leaked threads = leaked port = next run fails to bind.
-    """),
-    py("""
-        server.stop()
-        server.join(timeout=3)
-        print("server stopped:", not server.is_alive())
-    """),
-    md("""
-        ## You've finished Layer 3
-
-        - The web app is a thin HTTP wrapper around `graph.invoke(...)`.
-        - Three endpoints (`/query`, `/progress/<id>`, `/result/<id>`) cover the lifecycle.
-        - Background-thread serving keeps the notebook self-contained; switch to a
-          standalone `run_web.py` process the moment you start editing `web_app.py`.
-
-        **Going further**
-
-        - For batch evaluation: see `Experiments/Case_I/` (n=100 annotated queries).
-        - To adapt this to a new domain (Case II is the worked example): the
-          extraction pipeline in Notebook 1 + the strategy/function definitions
-          in Layer 2 are the two surfaces you change.
+            if ollama_proc is not None and ollama_proc.poll() is None:
+                ollama_proc.terminate()
+                ollama_proc.wait(timeout=5)
+                print("ollama_proc terminated.")
+            else:
+                print("Nothing to stop (Ollama was already running, or never started by us).")
+        except NameError:
+            print("`ollama_proc` not defined — §1.5b was not run in this kernel.")
     """),
 ]
 
 
 def main() -> None:
-    write_nb(HERE / "01_layer1_extraction.ipynb",     L1_CELLS)
-    write_nb(HERE / "02_agentic_reasoning.ipynb",     L2_CELLS)
-    write_nb(HERE / "03_layer3_user_interface.ipynb", L3_CELLS)
+    write_nb(HERE / "02_agentic_reasoning.ipynb", L2_CELLS)
 
-    # Remove the old L2 filename if it still exists from earlier builds.
     old = HERE / "02_layer2_agentic_reasoning.ipynb"
     if old.exists():
         old.unlink()
