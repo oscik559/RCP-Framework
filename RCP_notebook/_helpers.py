@@ -60,7 +60,7 @@ def env_probe(check_ollama: bool = False) -> dict:
             status[pkg] = f"MISSING ({e})"
 
     root = Path.cwd()
-    for db in ("database/harvested.db", "database/agentic.db"):
+    for db in ("RCP_notebook/db/harvested.db", "RCP_notebook/db/agentic.db"):
         p = root / db
         status[db] = f"{p.stat().st_size // 1024} KB" if p.exists() else "MISSING"
 
