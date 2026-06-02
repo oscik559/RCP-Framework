@@ -63,8 +63,7 @@ This repository contains the implementation of the **RCP (Relational Control Pla
 ## Requirements
 
 - Python 3.12
-- [Ollama](https://ollama.com) with a vision model for Layer 1 extraction (e.g., `qwen2-vl`)
-- An LLM API key (OpenAI, Anthropic, or local Ollama) for Layer 2 reasoning
+- [Ollama](https://ollama.com) running **locally** — provides every model used by the framework: a vision-language model for Layer 1 extraction, `llama3.2` for Layer 2 reasoning, and `qwen3-embedding:8b` for embeddings. All generation and embedding run on-device; **no commercial API keys are required**.
 
 ---
 
@@ -193,7 +192,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, code conventions,
 
 ## License
 
-MIT License — see [LICENSE](LICENSE).
+Creative Commons Attribution 4.0 International (CC-BY 4.0) — see [LICENSE](LICENSE).
 
 ## Acknowledgments
 

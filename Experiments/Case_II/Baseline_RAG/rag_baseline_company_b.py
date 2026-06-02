@@ -23,7 +23,7 @@ import requests
 # Set COMPANY_B_DB_PATH environment variable to override the default location.
 COMPANY_B_DB = Path(os.environ.get("COMPANY_B_DB_PATH", "database/company_b_harvested.db"))
 OLLAMA_URL = "http://localhost:11434"
-EMBED_MODEL = "qwen3-embedding:latest"
+EMBED_MODEL = "qwen3-embedding:8b"
 LLM_MODEL = "llama3.2:latest"
 TOP_K = 5
 

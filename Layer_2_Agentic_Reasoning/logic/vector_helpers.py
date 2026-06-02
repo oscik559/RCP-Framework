@@ -1,14 +1,14 @@
 """
 Vector Database Integration for Agentic Reasoning System
 
-Provides semantic search capabilities using nomic-embed-text embeddings for
+Provides semantic search capabilities using qwen3-embedding:8b embeddings for
 enhanced keyword suggestion and table content similarity matching. Integrates 
 with existing workflow to improve query understanding through vector similarity.
 
 Architecture:
 - Primary: ChromaDB for persistent vector storage  
 - Fallback: FAISS for in-memory operations (if available)
-- Embeddings: nomic-embed-text model for text-to-vector conversion
+- Embeddings: qwen3-embedding:8b model for text-to-vector conversion
 - Integration: Used by func_suggest_keywords() and func_table_search_on_document()
 
 Key Features:

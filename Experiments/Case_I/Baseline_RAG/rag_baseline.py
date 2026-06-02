@@ -8,7 +8,7 @@ Standard Retrieval-Augmented Generation baseline for evaluation.
 Pipeline:
   1. Load all product data from harvested.db
   2. Chunk text content with configurable size/overlap
-  3. Embed chunks using embeddinggemma:latest (Ollama)
+  3. Embed chunks using qwen3-embedding:8b (Ollama)
   4. Store in in-memory ChromaDB
   5. For each query: retrieve top-k → generate with llama3.2:latest
 
@@ -53,7 +53,7 @@ DEFAULT_CONFIG = {
     "llm_model": "llama3.2:latest",
     "llm_temperature": 0.0,
     # Embeddings
-    "embedding_model": "qwen3-embedding:latest",
+    "embedding_model": "qwen3-embedding:8b",
     # Chunking
     "chunk_size": 800,
     "chunk_overlap": 100,

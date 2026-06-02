@@ -5,6 +5,13 @@ Usage: python Experiments/Case_I/compute_mcnemar.py
 """
 import json
 import math
+import sys
+
+# Force UTF-8 output on Windows (avoids cp1252 crash on emoji/arrows/chi in output)
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
 def wilson_ci(k, n, z=1.96):

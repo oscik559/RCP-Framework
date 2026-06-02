@@ -18,8 +18,8 @@ authors:
   - family-names: Brax
     given-names: Christoffer
     affiliation: "Saab AB"
-repository-code: "https://github.com/oscik559/Hydroscand_Produktbok"
-license: MIT
+repository-code: "https://github.com/oscik559/RCP-Framework"
+license: CC-BY-4.0
 version: "1.0.0"
 date-released: "2026-03-19"
 keywords:
