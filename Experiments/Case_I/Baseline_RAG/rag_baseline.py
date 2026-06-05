@@ -10,7 +10,7 @@ Pipeline:
   2. Chunk text content with configurable size/overlap
   3. Embed chunks using qwen3-embedding:8b (Ollama)
   4. Store in in-memory ChromaDB
-  5. For each query: retrieve top-k → generate with llama3.2:latest
+  5. For each query: retrieve top-k → generate with llama3.2:3b
 
 This serves as the "RAG Baseline" in the paper's evaluation (Section 5).
 """
@@ -50,7 +50,7 @@ logger = logging.getLogger("RAG_BASELINE")
 # ---------------------------------------------------------------------------
 DEFAULT_CONFIG = {
     # LLM
-    "llm_model": "llama3.2:latest",
+    "llm_model": "llama3.2:3b",
     "llm_temperature": 0.0,
     # Embeddings
     "embedding_model": "qwen3-embedding:8b",

@@ -229,6 +229,15 @@ config/logs/
 # database/*.db
 # database/backups/
 
+# ── Confidentiality: Company B (Case II) data — keep LOCAL, never commit ──
+# Root-anchored so the tracked Case I database/harvested.db is unaffected.
+/harvested.db
+*company_b*.db
+database/company_b_harvested.db
+
+# Manuscript working area (kept local; not versioned in the code repo)
+paper_revision/
+
 # Data directories
 data/vector_index/
 data/*.csv
@@ -242,6 +251,11 @@ Layer_1a_Extraction/data/tables/
 
 # Paper (manuscript — not versioned in code repo)
 Paper/
+
+# others
+Experiments/Revision/out/
+Experiments/Revision/adversarial/
+docs/
 
 # Temporary files
 *.tmp

@@ -37,6 +37,7 @@ This repository contains the implementation of the **RCP (Relational Control Pla
 │   ├── db/                       # Database connections and strategy templates
 │   └── logic/                    # State graph, workflow nodes, function library
 ├── Layer_3_User_Interface/          # Web interface and APIs
+├── RCP_notebook/                 # Runnable Jupyter walk-throughs (Layers 1–3, Case I demo)
 ├── Experiments/
 │   ├── Case_I/                   # Case I evaluation (Hydroscand, n=100 queries)
 │   │   ├── Baseline_RAG/         # B1: Naive RAG baseline
@@ -118,6 +119,18 @@ Edit the query directly in `main.py`. Debug verbosity is controlled by `debug_le
 python run_web.py
 # Open http://localhost:5001
 ```
+
+---
+
+## Interactive Notebooks (`RCP_notebook/`)
+
+Three runnable Jupyter notebooks walk through the framework layer by layer on **Case I** (Hydroscand) data, inlining the production code so you can step through and edit it live (they ship with the pre-populated `harvested.db`, so most cells run read-only).
+
+- **`01_layer1_extraction.ipynb`** — the six-stage extraction pipeline (PDF catalog → `harvested.db`). Read-only by default; re-running extraction is opt-in behind a `RERUN_EXTRACTION` flag and needs Ollama + a vision model (`ollama pull qwen2-vl`).
+- **`02_agentic_reasoning.ipynb`** — the RCP engine: builds `agentic.db`, seeds 6 strategies + 10 functions, wires the 7-node LangGraph state machine, and runs queries end-to-end with the verify-then-summarise judge gate. Needs Ollama on `localhost:11434` with `llama3.2:latest` + `nomic-embed-text:latest` (a §1.5 cell can install/pull these).
+- **`03_layer3_user_interface.ipynb`** — starts the Flask + SSE web app over Layer 2 and exercises its `/query`, `/progress/<id>`, and `/result/<id>` endpoints. Same Ollama setup as Notebook 2.
+
+> **Scope:** these are an illustrative single-domain demo on **Case I only** (and deliberately lighter than the repo) — not the full 200-query evaluation (Case I + Case II, n=100 each), which lives in [`Experiments/`](Experiments/).
 
 ---
 

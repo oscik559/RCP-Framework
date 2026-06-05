@@ -42,6 +42,7 @@ between nodes for multi-agent reasoning and execution.
 import concurrent.futures
 import json
 import logging
+import os
 import re
 import sqlite3
 from typing import Any, Dict, List, Optional
@@ -75,6 +76,29 @@ logger = logging.getLogger("NODES")
 
 # Global database manager instance to avoid scattered imports
 db = DatabaseManager()
+
+
+def validation_enabled() -> bool:
+    """Ablation switch for the validation layer (Reviewer 2 revision experiments).
+
+    Returns ``True`` (gates active) by default, so normal runs are unaffected.
+    Set environment variable ``RCP_DISABLE_VALIDATION=1`` to run the "no-gate"
+    (B3-) variant, in which the three validation predicates become pass-through:
+    function-, strategy-, and goal-level gates accept unconditionally and never
+    backtrack. Retrieval, extraction, and synthesis logic are unchanged. Read at
+    call time so the experiment harness can toggle it per run without rebuilding
+    the compiled graph. Bypass points:
+      - node_function_validate  (function-level gate)
+      - node_strategy_validate  (strategy-level abort)
+      - node_goal_validate      (goal-level LLM-judge acceptance)
+    """
+    return os.environ.get("RCP_DISABLE_VALIDATION", "0").strip().lower() not in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+
 
 # Note: Helper functions like infer_sql_type, collect_outputs, merge_values,
 # handler_from_name are imported from workflow_helpers to avoid duplication
@@ -1044,6 +1068,12 @@ def node_function_validate(session_state: SessionState) -> SessionState:
     - Sets validation flags used by strategy routing logic
     - Updates database with detailed validation results
     """
+    # [ABLATION] function-level gate bypass (RCP_DISABLE_VALIDATION): accept the
+    # function's outputs unconditionally and never flag the strategy for abort.
+    if not validation_enabled():
+        session_state["functionValidated"] = True
+        return session_state
+
     function_id = session_state["currentFunctionID"]
     success = session_state.get("functionSuccess", False)
 
@@ -1208,7 +1238,9 @@ def node_strategy_validate(session_state: SessionState) -> SessionState:
 
     # CONDITION 1: Any function failed -> IMMEDIATE ABORT
     # No point continuing a failed strategy - try different approach
-    if failed > 0:
+    # [ABLATION] strategy-level gate bypass (RCP_DISABLE_VALIDATION): do not abort
+    # on function failure; fall through to the success/continue branches instead.
+    if failed > 0 and validation_enabled():
         outcome = f"Strategy aborted: {failed}/{total} function(s) failed - trying new strategy"
         strategy_success_flag = 0
         strategy_done = True  # Mark strategy as complete (failed)
@@ -1433,6 +1465,17 @@ def node_goal_validate(session_state: SessionState) -> SessionState:
                     break
         if chosen:
             primary_outputs.append(chosen)
+
+    # [ABLATION] goal-level gate bypass (RCP_DISABLE_VALIDATION): accept the
+    # assembled answer without the LLM judge (no acceptance predicate, no retry).
+    # finalAnswer is already produced by the synthesis function during execution.
+    if not validation_enabled() and primary_outputs:
+        session_state["goalSatisfied"] = True
+        session_state["judgeConfidence"] = 1.0
+        debug.print_validation(
+            "Goal gate bypassed (RCP_DISABLE_VALIDATION) — accepting without judge", "⚠"
+        )
+        return session_state
 
     # Use LLM judge to validate goal satisfaction using primary analysis outputs
     if primary_outputs:

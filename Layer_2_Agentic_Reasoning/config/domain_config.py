@@ -65,7 +65,7 @@ EXAMPLE_QUERIES = [
 # LLM settings optimized for product catalog queries
 LLM_CONFIG = {
     "provider": "ollama",  # Using local Ollama
-    "model": "llama3.2:latest",  # Or gpt-oss:20b-cloud
+    "model": "llama3.2:3b",  # Or gpt-oss:20b-cloud
     "temperature": 0.0,  # Deterministic for product accuracy
     "max_tokens": 2000,
 }

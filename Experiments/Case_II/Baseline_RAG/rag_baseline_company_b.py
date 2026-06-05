@@ -3,7 +3,7 @@ B1: Naive RAG baseline for Company B Case II evaluation.
 
 Chunks the text content of all extracted_tables, embeds them with
 qwen3-embedding:8b (Ollama), retrieves top-5 chunks for each query,
-and generates with llama3.2:latest.
+and generates with llama3.2:3b.
 """
 
 import json
@@ -24,7 +24,7 @@ import requests
 COMPANY_B_DB = Path(os.environ.get("COMPANY_B_DB_PATH", "database/company_b_harvested.db"))
 OLLAMA_URL = "http://localhost:11434"
 EMBED_MODEL = "qwen3-embedding:8b"
-LLM_MODEL = "llama3.2:latest"
+LLM_MODEL = "llama3.2:3b"
 TOP_K = 5
 
 

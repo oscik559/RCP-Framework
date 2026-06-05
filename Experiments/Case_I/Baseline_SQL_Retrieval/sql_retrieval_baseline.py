@@ -47,7 +47,7 @@ logger = logging.getLogger("SQL_RETRIEVAL")
 # Configuration
 # ---------------------------------------------------------------------------
 DEFAULT_CONFIG = {
-    "llm_model": "llama3.2:latest",
+    "llm_model": "llama3.2:3b",
     "llm_temperature": 0.0,
     "harvested_db": str(PROJECT_ROOT / "database" / "harvested.db"),
     "max_products": 20,

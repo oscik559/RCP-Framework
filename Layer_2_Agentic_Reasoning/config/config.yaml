@@ -22,11 +22,11 @@ temp_db: database/temp.db            # Temporary processing database
 # LLM Models - Three-tier architecture
 llms:
   basic:
-    model: llama3.2:latest
+    model: llama3.2:3b
     temperature: 0.0
   
   reasoning:
-    model: llama3.2:latest
+    model: llama3.2:3b
     temperature: 0.0
   
   multimodal:

@@ -173,7 +173,7 @@ class LLMJudge:
       4. Hallucination (0 or 1)
     """
     
-    def __init__(self, model: str = "llama3.2:latest"):
+    def __init__(self, model: str = "llama3.2:3b"):
         self.llm = ChatOllama(model=model, temperature=0.0)
     
     def score(

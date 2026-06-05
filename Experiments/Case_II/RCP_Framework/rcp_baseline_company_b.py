@@ -37,12 +37,26 @@ import requests
 # Set COMPANY_B_DB_PATH environment variable to override the default location.
 COMPANY_B_DB = Path(os.environ.get("COMPANY_B_DB_PATH", "database/company_b_harvested.db"))
 OLLAMA_URL = "http://localhost:11434"
-LLM_MODEL = "llama3.2:latest"
+LLM_MODEL = "llama3.2:3b"
 
 PRODUCT_CODE_RE = re.compile(
     r"(?:(?:RPT|RNT|TFR|RPY)\s*[\d\s/\-]+|C0\d{6}[\-\d]+)",
     re.IGNORECASE,
 )
+
+
+def validation_enabled() -> bool:
+    """Ablation switch (Reviewer 2 #2) — mirrors the Layer-2 controller flag.
+
+    Default True (gates on, normal B3). Set RCP_DISABLE_VALIDATION=1 for the no-gate
+    (B3-) variant, which makes the Case II validation layer pass-through: no
+    confidence-based strategy retry/backtrack and no goal-level rejection of
+    low-confidence answers (the synthesised answer is accepted regardless).
+    Retrieval, filtering, and synthesis are unchanged.
+    """
+    return os.environ.get("RCP_DISABLE_VALIDATION", "0").strip().lower() not in (
+        "1", "true", "yes", "on",
+    )
 
 # ── Ollama helper ──────────────────────────────────────────────────────────────
 
@@ -304,7 +318,8 @@ def run_b3(query: str, forced_strategy: str | None = None) -> tuple[str, float]:
     state = run_strategy(strategy, state)
 
     # Stage 5: StrategyValidate – retry with ENHANCED if confidence is low
-    if state.get("confidence", 0.0) < CONFIDENCE_THRESHOLD and strategy != "ENHANCED LOOKUP":
+    # [ABLATION] strategy-level gate bypass (RCP_DISABLE_VALIDATION=1): no retry/backtrack.
+    if validation_enabled() and state.get("confidence", 0.0) < CONFIDENCE_THRESHOLD and strategy != "ENHANCED LOOKUP":
         print("  [B3] Low confidence, retrying with ENHANCED LOOKUP")
         state.pop("answer", None)
         state.pop("retrieved_tables", None)
@@ -312,8 +327,9 @@ def run_b3(query: str, forced_strategy: str | None = None) -> tuple[str, float]:
         state = run_strategy("ENHANCED LOOKUP", state)
 
     # Stage 6: GoalValidate – final confidence check
+    # [ABLATION] goal-level gate bypass (RCP_DISABLE_VALIDATION=1): accept synthesis regardless.
     answer = state.get("answer", "Not found in documentation.")
-    if state.get("confidence", 0.0) < 0.3:
+    if validation_enabled() and state.get("confidence", 0.0) < 0.3:
         answer = "Not found in documentation."
 
     return answer, time.time() - t0
